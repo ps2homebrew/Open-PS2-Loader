@@ -362,7 +362,6 @@ int pko_write_file(int fd, char *buf, int length)
 //
 int pko_read_file(int fd, char *buf, int length)
 {
-    int readbytes;
     int nbytes;
     int i;
     pko_pkt_read_req *readcmd;
@@ -375,13 +374,10 @@ int pko_read_file(int fd, char *buf, int length)
 
     readcmd = (pko_pkt_read_req *)&send_packet[0];
     readrly = (pko_pkt_read_rly *)&recv_packet[0];
-    readbytes = 0;
 
     readcmd->cmd = htonl(PKO_READ_CMD);
     readcmd->len = htons((unsigned short)sizeof(pko_pkt_read_req));
     readcmd->fd = htonl(fd);
-
-    readbytes = 0;
 
     if (length < 0) {
         dbgprintf("pko_read_file: illegal req!! (whish to read < 0 bytes!)\n");
@@ -415,7 +411,6 @@ int pko_read_file(int fd, char *buf, int length)
         return -1;
     }
     return nbytes;
-    return readbytes;
 }
 
 //----------------------------------------------------------------------

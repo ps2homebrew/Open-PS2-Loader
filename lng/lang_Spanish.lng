@@ -1,7 +1,6 @@
-# Spanish translation by El_Patas - @http://psx-scene.com/forums/members/elpatas/ @https://www.psx-place.com/members/el_patas.30357/
+# Spanish translation by El_Patas - @http://psx-scene.com/forums/members/elpatas/
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Spanish
-Open PS2 Loader %s
 Guardar cambios
 Atrás
 Conexión de red
@@ -12,11 +11,11 @@ Configuración guardada en %s
 Salir
 Configuración principal
 Menú
-Juegos USB
+Juegos BDM
 Juegos Disco duro
 Juegos Red
 Aplicaciones
-Estilo
+Tema
 Idioma
 Se apagará el sistema
 ¿Salir al navegador de la consola?
@@ -42,8 +41,7 @@ Equis
 Lista de juegos
 Configuración
 Borrar configuraciones
-Configuraciones del juego eliminadas
-Desplazamiento
+Velocidad desplazamiento
 Lento
 Medio
 Rápido
@@ -53,7 +51,7 @@ Espera por favor
 Error al cargar el código ID del juego
 Listas ordenadas por alfabeto
 Error al cargar el archivo de idioma
-No mostrar los colores para depuración
+Colores para depuración
 Mando no encontrado, esperando...
 Carátulas, serigrafías y fondos
 Pantalla panorámica
@@ -62,21 +60,20 @@ Cargando configuración...
 Guardando configuración...
 Iniciar dispositivo
 Actualizar
-Modo de inicio para USB
+Modo de inicio para BDM
 Modo de inicio para Disco duro
 Modo de inicio para Red
 Modo de inicio para Aplicaciones
 Automático
 Manual
-Iniciar servidor HDLDump
-Iniciando servidor HDLDump...
-Servidor HDLDump conectado...
-Error al iniciar el servidor HDLDump. 
-Cerrando servidor HDLDump...
+Iniciar servidor NBD
+Iniciando servidor NBD...
+Servidor NBD conectado...
+Error al iniciar el servidor NBD. 
+Cerrando servidor NBD...
 Ruta del IGR
 Color de fondo
 Color de texto
-- PS2 -
 - Servidor SMB -
 Tipo de dirección IP
 Estática
@@ -100,7 +97,7 @@ Renombrar juego
 Borrar juego
 Iniciar
 Pantalla
-Mostrar operaciones de escritura
+Operaciones de escritura
 Recordar último juego en uso
 Botón de selección
 Error, el juego está fragmentado
@@ -113,8 +110,6 @@ Desvincula el sistema
 Omite vídeos
 Emula DVD-DL
 Quita el IGR
-Sin uso
-Sin uso
 Cambiar el tamaño formateará la VMC
 Crear
 Iniciar
@@ -135,7 +130,7 @@ Refresco automático de las listas
 Acerca del OPL
 Desarrolladores
 Testeadores
-Ruta predeterminada dispositivo USB
+Ruta predeterminada BDM
 Dejar en blanco para salida hacia el navegador de PS2
 Valor en minutos, 0 para desactivar el paro automático
 Paro automático rotación del disco duro
@@ -164,8 +159,6 @@ Modo 3
 Modo 4
 Modo 5
 Modo 6
-Modo 7
-Modo 8
 Configuración GSM
 Configuración de velocidad ethernet y duplex
 100Mbit full-duplex
@@ -173,9 +166,8 @@ Configuración de velocidad ethernet y duplex
 10Mbit full-duplex
 10Mbit half-duplex
 Opciones GSM
-Activar GSM
-Forzar modo de vídeo seleccionado con GSM
-Modo de vídeo seleccionado
+Selector GSM
+Activa/Desactiva el GSM para forzar modos de vídeo
 Modo de vídeo a forzar
 Posición horizontal
 Mueve la posición horizontal de la pantalla
@@ -186,7 +178,7 @@ Ajuste sobre escaneo
 Omitir vídeos FMV
 Omite escenas Full Motion Vídeos
 Configuración PS2RD
-Activar PS2RD
+Motor de trucos PS2RD
 Permitir que PS2RD parchee el juego
 Modo PS2RD
 Auto-seleccionar o seleccionar códigos de juegos
@@ -211,7 +203,7 @@ Logotipo Playstation 2
 Sólo se mostrará si el juego es de la misma región que la consola
 Configuración DualShock 3/4
 Opciones emulación del mando
-Usar emulación del mando
+Emulación del mando
 Activa/desactiva la emulación del mando para el juego seleccionado
 Modo emulación del mando
 Selecciona el modo de emulación del mando
@@ -219,10 +211,10 @@ DualShock 3/4 USB
 DualShock 3/4 Bluetooth
 Ajustes para el puerto
 Selecciona el puerto del mando emulado para aplicar los ajustes
-Usar emulación
-Activa/desactiva la emulación del mando para el puerto seleccionado
-Usar vibración
-Activa/desactiva la vibración para el mando emulado en el puerto seleccionado
+Emulación
+Activa/Desactiva la emulación del mando para el puerto seleccionado
+Vibración
+Activa/Desactiva la vibración para el mando emulado en el puerto seleccionado
 Dirección MAC adaptador bluetooth USB:
 Mando sincronizado con dirección MAC:
 Sincronizar
@@ -239,12 +231,12 @@ Sí
 No
 El adaptador bluetooth debe ser totalmente compatible con los mandos DS3/DS4
 El adaptador bluetooth puede no funcionar correctamente con los mandos DS3/DS4
-Usar emulación Multitap
-Activa/desactiva la emulación Multitap para el juego seleccionado
-Emulación Multitap en el puerto
+Emulación Multitap
+Activa/Desactiva la emulación Multitap para el juego seleccionado
+Emulación Multitap en el puerto:
 Selecciona puerto para la emulación Multitap
-Desactivar método alternativo para falso DS3
-Algunos DS3 falsos necesitan un método alternativo, esta opción lo desactiva
+Solución alternativa para los DS3 falsos 
+Algunos DS3 falsos necesitan una solución alternativa, esta opción la activa
 Emular alternancia de valores de CAMPO
 Solución para juegos que fallan bajo modos de vídeo progresivos.
 Control paterno
@@ -256,15 +248,18 @@ Control paterno desactivado.
 Opciones de compilación:
 Error - esta contraseña no se puede usar.
 El archivo VMC %s está fragmentado. ¿Continuar con la tarjeta de memoria en ranura %d?
-Sonido
+Configuración de sonido
 Efectos de sonido
 Sonido de inicio
 Volumen efectos de sonido
 Volumen sonido de inicio
 ¿Confirmar el cambio de modo de vídeo?
 Caché lista de juegos (Disco duro)
-Activar notificaciones
-%s cargado desde %s
+Notificaciones
+Configuración cargada desde %s
+Tema cargado desde %s
+Idioma cargado desde %s
+Partición %s montada
 Opciones
 Configuración del juego guardada
 Ajuste %s borrado
@@ -280,3 +275,10 @@ Género
 Lanzamiento
 Desarrollador
 Descripción
+Dispositivos de bloque
+Configuración del mando
+Activa/Desactiva el Gestor de Dispositivos de Bloque (Block Device Manager)
+Selecciona dispositivos de bloque (Ejemplo: USB, iLink, MX4SIO)
+Juegos USB
+Juegos iLink
+Juegos MX4SIO

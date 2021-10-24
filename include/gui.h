@@ -53,11 +53,11 @@ typedef void (*gui_callback_t)(void);
 extern int guiInactiveFrames;
 extern int guiFrameId;
 
-#define GUI_SCREEN_MAIN 0
-#define GUI_SCREEN_MENU 1
-#define GUI_SCREEN_INFO 2
+#define GUI_SCREEN_MAIN      0
+#define GUI_SCREEN_MENU      1
+#define GUI_SCREEN_INFO      2
 #define GUI_SCREEN_GAME_MENU 3
-#define GUI_SCREEN_APP_MENU 4
+#define GUI_SCREEN_APP_MENU  4
 
 void guiSwitchScreen(int target);
 
@@ -92,14 +92,14 @@ updates of the menu from another thread without stalls.
 */
 
 /** Detects if a given deffered operation is already complete
-* @param opid The operation id, as returned from guiDeferUpdate
-* @return 1 if the operation was already completed, 0 otherwise */
+ * @param opid The operation id, as returned from guiDeferUpdate
+ * @return 1 if the operation was already completed, 0 otherwise */
 int guiGetOpCompleted(int opid);
 
 /** Defers the given update to an appropriate time.
-* @param op The operation to defer
-* @return int The operation serial id
-*/
+ * @param op The operation to defer
+ * @return int The operation serial id
+ */
 int guiDeferUpdate(struct gui_update_t *op);
 
 void guiExecDeferredOps(void);
@@ -129,24 +129,25 @@ void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();
 void guiShowAudioConfig();
+void guiShowControllerConfig();
 void guiShowNetConfig();
 void guiShowParentalLockConfig();
 
 void guiCheckNotifications(int checkTheme, int checkLang);
 
-/** Renders the given string on screen for the given function until it's io finishes 
-* @note The ptr pointer is watched for it's value. The IO is considered finished when the value becomes zero. 
-* @param ptr The finished state pointer (1 unfinished, 0 finished)
-* @param message The message to display while working
-* @param type the io operation type
-* @param data the data for the operation
-*/
+/** Renders the given string on screen for the given function until it's io finishes
+ * @note The ptr pointer is watched for it's value. The IO is considered finished when the value becomes zero.
+ * @param ptr The finished state pointer (1 unfinished, 0 finished)
+ * @param message The message to display while working
+ * @param type the io operation type
+ * @param data the data for the operation
+ */
 void guiHandleDeferedIO(int *ptr, const char *message, int type, void *data);
 
 void guiGameHandleDeferedIO(int *ptr, struct UIItem *ui, int type, void *data);
 
 /** Renders a single frame with a specified message on the screen
-*/
+ */
 void guiRenderTextScreen(const char *message);
 
 void guiWarning(const char *text, int count);

@@ -2,7 +2,6 @@
 # Fixed by Colton SIlva @ColtonSilvaonKnoxKontor
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Filipino
-Open PS2 Loader %s
 I-save ang mga pagbabago
 Likod
 Network config
@@ -13,7 +12,7 @@ Error sa pagsulat ng setting!
 Lumabas
 Settings
 Menu
-USB Laro
+BDM Laro
 HDD Laro
 ETH Laro
 Apps
@@ -43,7 +42,6 @@ Cross
 Listahan
 Settings ng laro
 Alisin ang Settings
-Inalis ang lahat ng mga pindutan para sa mga laro
 I-scroll
 Mabagal
 Medium
@@ -54,30 +52,29 @@ Mangyaring maghintay
 Nagkaroon ng error habang naglo-load ang ID ng Laro
 Awtomatikong pag-uuri
 Error sa paglo-load ng file na wika
-Huwag paganahin ang mga Kulay ng Debug
-Controller Walang natukoy na , naghihintay...
-Paganahin ang Cover Art
+Debug Colors
+Controller Walang natukoy na , naghihintay…
+Cover Art
 Malapad na screen
 Power-off
 Nilo-load ang config
 Sine-save ang config
 Simulan ang aparato
 Refresh
-USB aparato simula mode
+BDM Start Mode
 HDD aparato simula mode
 ETH aparato simula mode
 Mga application na simulan ang mode
 Awto
 Manwal
-I-sart ang HDL Server
-HDL Server Starting...
-HDL Server Running...
-Bigong i- start ang HDL Server.
-HDL Server Unloading...
+I-sart ang NBD Server
+NBD Server Starting…
+NBD Server Running…
+Bigong i- start ang NBD Server.
+NBD Server Unloading…
 Lumabas sa
 kulay ng background
 kulay ng teksto
-- PS2 -
 - SMB Server -
 uri ng IP address
 Static
@@ -101,7 +98,7 @@ Rename
 Alisin
 Tumakbo
 Ipakita ang mga setting
-I-enable ang write operations
+Write Operations
 Tandaan ang huling play ng laro
 Select button
 Error, fragmented ang laro
@@ -114,8 +111,6 @@ Alisin sa pagkakakawit ng Syscalls
 0 PSS mode
 I-emulate ang DVD-DL
 I-disable ang IGR
-Unused
-Unused
 Ang pagbabago ng laki ay i-reformat ang VMC
 Lumikha
 Magsimula
@@ -136,7 +131,7 @@ Awtomatikong i-refresh
 Tungkol sa
 Mga coders
 Quality Assurance
-USB prefix path
+BDM prefix path
 Ibo-boot ang Custom ELF pagtapos ng IGR
 Value sa (mga) minuto, 0 upang huwag paganahin
 Awtomatikong pababagalin ang HDD
@@ -165,8 +160,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 I-configure ang GSM
 Ethernet speed at duplex setting
 100Mbit full-duplex
@@ -174,9 +167,8 @@ Ethernet speed at duplex setting
 10Mbit full-duplex
 10Mbit half-duplex
 GSM Settings
-paganahin ang GSM
+GSM Selector
 Toggles GSM ON or OFF
-VMODE
 Pwersahin ang Custom Display Mode
 H-POS
 Horizontal Adjustment
@@ -187,7 +179,7 @@ Overscan Adjustment
 FMV Skip
 I-skip ang Full Motion Videos
 Settings ng cheat
-I-enable ang PS2RD Cheat Engine
+PS2RD Cheat Engine
 Ipa-patch ng PS2RD Cheat Engine ang iyong games
 PS2RD Cheat Engine Mode
 Awto. pagpili or pagpili ng game cheats
@@ -205,14 +197,14 @@ Nakansela ang pag-update.
 I-download ang settings mula sa network?
 Customized Settings
 Downloaded Defaults
-Mag aawto-start ng %i s...
+Mag aawto-start ng %i s…
 Auto start
 Value sa segundo, 0 para i-disable auto start
 PS2 Logo
 Ididisplay ang valid disc logo kung tugma ito sa region na bersyon ng laro
 I-configure ang PADEMU
 Pad Emulator Settings
-I-enable ang PadEmulator
+Pad Emulator
 Turns on/off PadEmulator para sa piling laro.
 Mode ng Pad Emulator
 Pumili ng Pad Emulator mode.
@@ -220,9 +212,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Settings para sa port:
 Pumili ng Pad Emulator port para sa settings.
-I-enable ang emulation
+Emulation
 Turns on/off Pad Emulator para sa piling port.
-I-enable ang vibration
+Vibration
 Turns on/off vibration ng Pad Emulator para sa piling port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
@@ -240,12 +232,12 @@ Opo
 Hindi
 Ang Bluetooth adapter ay daapat suportado ng DS3/DS4 controllers.
 Ang Bluetooth adapter ay maaring hindi gumana sa DS3/DS4 controllers.
-I-enable ang Multitap emulation
+Multitap Emulation
 Turns on/off Multitap emulation para sa piling game.
 Multitap emulator on port
 Pumili ng port para sa Multitap emulation.
-I-disable ang workaround para sa pekeng ds3
-Ang ilang fake ds3s ay nangangailangan ng workaround, Maididisable ito ng opsyon na ito.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 I-emulate ang FIELD flipping
 Aayusin ang laro na may isyu ng glitch sa progressive video modes.
 Settings ng Parental Lock
@@ -258,14 +250,17 @@ Opsyon ng build:
 Error - Hindi maaring gamitin ang password na ito.
 VMC %s na file ay fragmented. Magpatuloy gamit ang Memory Card sa slot %d?
 Settings ng Audio
-I-enable ang Sound Effects
-I-enable ang Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Kumpirmahin "video mode change"?
 Cache Game List (HDD)
-I-enable ang Notifications
-%s Naiload mula sa %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Mga Opsyon
 Nai-save ang "Game settings".
 %s settings ay nai-alis.
@@ -281,3 +276,10 @@ Genre
 Nai-eelease
 Debeloper
 Deskripsyon
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

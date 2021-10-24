@@ -10,8 +10,8 @@
 #include "include/pad.h"
 #include "include/sound.h"
 
-#define MENU_POS_V 50
-#define HINT_HEIGHT 32
+#define MENU_POS_V     50
+#define HINT_HEIGHT    32
 #define DECORATOR_SIZE 20
 
 extern const char conf_theme_OPL_cfg;
@@ -36,7 +36,7 @@ enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_ATTRIBUTE_IMAGE,
     ELEM_TYPE_GAME_IMAGE,
     ELEM_TYPE_STATIC_IMAGE,
-    ELEM_TYPE_BACKGROUND, //A static image can be specified as the background. Otherwise, the plasma background will be drawn.
+    ELEM_TYPE_BACKGROUND, // A static image can be specified as the background. Otherwise, the plasma background will be drawn.
     ELEM_TYPE_MENU_ICON,
     ELEM_TYPE_MENU_TEXT,
     ELEM_TYPE_ITEMS_LIST,
@@ -50,9 +50,9 @@ enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_COUNT
 };
 
-#define DISPLAY_ALWAYS 0
+#define DISPLAY_ALWAYS  0
 #define DISPLAY_DEFINED 1
-#define DISPLAY_NEVER 2
+#define DISPLAY_NEVER   2
 
 #define SIZING_NONE -1
 #define SIZING_CLIP 0
@@ -316,9 +316,7 @@ static void freeImageTexture(image_texture_t *texture)
 
 static image_texture_t *initImageTexture(const char *themePath, config_set_t *themeConfig, const char *name, const char *imgName, int isOverlay)
 {
-    int psm = isOverlay ? GS_PSM_CT32 : GS_PSM_CT24;
     image_texture_t *texture = (image_texture_t *)malloc(sizeof(image_texture_t));
-    texPrepare(&texture->source, psm);
     texture->name = NULL;
 
     int texId = -1;
@@ -327,12 +325,12 @@ static image_texture_t *initImageTexture(const char *themePath, config_set_t *th
     if (themePath) {
         char path[256];
         snprintf(path, sizeof(path), "%s%s", themePath, imgName);
-        if (texDiscoverLoad(&texture->source, path, texId, psm) >= 0)
+        if (texDiscoverLoad(&texture->source, path, texId) >= 0)
             ;
         result = 1;
     } else {
         texId = texLookupInternalTexId(imgName);
-        if (texDiscoverLoad(&texture->source, NULL, texId, psm) >= 0)
+        if (texLoadInternal(&texture->source, texId) >= 0)
             ;
         result = 1;
     }
@@ -381,12 +379,11 @@ static image_texture_t *initImageTexture(const char *themePath, config_set_t *th
 static image_texture_t *initImageInternalTexture(config_set_t *themeConfig, const char *name)
 {
     image_texture_t *texture = (image_texture_t *)malloc(sizeof(image_texture_t));
-    texPrepare(&texture->source, GS_PSM_CT24);
     texture->name = NULL;
     int result;
 
     if ((result = texLookupInternalTexId(name)) >= 0) {
-        result = texDiscoverLoad(&texture->source, NULL, result, GS_PSM_CT24);
+        result = texLoadInternal(&texture->source, result);
         int length = strlen(name) + 1;
         texture->name = (char *)malloc(length * sizeof(char));
         memcpy(texture->name, name, length);
@@ -1046,8 +1043,7 @@ static void thmFree(theme_t *theme)
             texture = &theme->textures[id];
             if (texture->Mem != NULL) {
                 rmUnloadTexture(texture);
-                free(texture->Mem);
-                texture->Mem = NULL;
+                texFree(texture);
             }
         }
 
@@ -1087,10 +1083,10 @@ static int thmLoadResource(GSTEXTURE *texture, int texId, const char *themePath,
     int success = -1;
 
     if (themePath != NULL)
-        success = texDiscoverLoad(texture, themePath, texId, psm); // only set success here
+        success = texDiscoverLoad(texture, themePath, texId); // only set success here
 
     if ((success < 0) && useDefault)
-        texPngLoad(texture, NULL, texId, psm); // we don't mind the result of "default"
+        texLoadInternal(texture, texId); // we don't mind the result of "default"
 
     return success;
 }
@@ -1159,7 +1155,7 @@ static void thmLoad(const char *themePath)
 
     config_set_t *themeConfig = NULL;
     if (!themePath) {
-        //No theme specified. Prepare and load the default theme.
+        // No theme specified. Prepare and load the default theme.
         themeConfig = configAlloc(0, NULL, NULL);
         configReadBuffer(themeConfig, &conf_theme_OPL_cfg, size_conf_theme_OPL_cfg);
     } else {
@@ -1217,7 +1213,7 @@ static void thmLoad(const char *themePath)
         newT->textures[i].Mem = NULL;
 
     // LOGO, loaded here to avoid flickering during startup with device in AUTO + theme set
-    texPngLoad(&newT->textures[LOGO_PICTURE], NULL, LOGO_PICTURE, GS_PSM_CT24);
+    texLoadInternal(&newT->textures[LOGO_PICTURE], LOGO_PICTURE);
 
     // First start with busy icon
     const char *themePath_temp = themePath;
@@ -1235,7 +1231,7 @@ static void thmLoad(const char *themePath)
     newT->loadingIconCount = i;
 
     // Customizable icons
-    for (i = USB_ICON; i <= START_ICON; i++)
+    for (i = BDM_ICON; i <= START_ICON; i++)
         thmLoadResource(&newT->textures[i], i, themePath, GS_PSM_CT32, newT->useDefault);
 
     /* Not customizable icons - currently unused.

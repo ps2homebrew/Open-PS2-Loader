@@ -3,7 +3,7 @@
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
+
   Some parts of the code are taken from HD Project by Polo
 */
 
@@ -37,8 +37,8 @@ int EnableCheatOp;
 int EnablePadEmuOp;
 int PadEmuSettings;
 #endif
-int DisableDebug;
-int *gCheatList; //Store hooks/codes addr+val pairs
+int EnableDebug;
+int *gCheatList; // Store hooks/codes addr+val pairs
 
 static int eecoreInit(int argc, char **argv)
 {
@@ -51,8 +51,12 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("OPL EE core start!\n");
 
     p = _strtok(argv[i], " ");
-    if (!_strncmp(p, "USB_MODE", 8))
-        GameMode = USB_MODE;
+    if (!_strncmp(argv[i], "BDM_ILK_MODE", 12))
+        GameMode = BDM_ILK_MODE;
+    else if (!_strncmp(argv[i], "BDM_M4S_MODE", 12))
+        GameMode = BDM_M4S_MODE;
+    else if (!_strncmp(p, "BDM_USB_MODE", 12))
+        GameMode = BDM_USB_MODE;
     else if (!_strncmp(p, "ETH_MODE", 8))
         GameMode = ETH_MODE;
     else if (!_strncmp(p, "HDD_MODE", 8))
@@ -60,10 +64,10 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("Game Mode = %d\n", GameMode);
 
     p = _strtok(NULL, " ");
-    DisableDebug = 0;
+    EnableDebug = 0;
     if (!_strncmp(p, "1", 1)) {
-        DisableDebug = 1;
-        DPRINTF("Debug Colors disabled\n");
+        EnableDebug = 1;
+        DPRINTF("Debug Colors enabled\n");
     }
 
     p = _strtok(NULL, " ");
@@ -149,8 +153,8 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("Installing Kernel Hooks...\n");
     Install_Kernel_Hooks();
 
-    if (!DisableDebug)
-        GS_BGCOLOUR = 0xff0000; //Blue
+    if (EnableDebug)
+        GS_BGCOLOUR = 0xff0000; // Blue
 
     SifExitRpc();
 
@@ -161,7 +165,7 @@ int main(int argc, char **argv)
 {
     int argOffset;
 
-    if (isInit) { //Ignore argv[0], as it contains the name of this module ("EELOAD"), as passed by the LoadExecPS2 syscall itself (2nd invocation and later will be from LoadExecPS2).
+    if (isInit) { // Ignore argv[0], as it contains the name of this module ("EELOAD"), as passed by the LoadExecPS2 syscall itself (2nd invocation and later will be from LoadExecPS2).
         argv++;
         argc--;
 

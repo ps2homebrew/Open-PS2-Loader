@@ -12,7 +12,7 @@
  * ATTENTION: this does not work when tcpip_input() is called from
  * interrupt context!
  */
-//#define LWIP_TCPIP_CORE_LOCKING_INPUT 1	//Not supported because of the in-game SMAP driver's design (will deadlock).
+// #define LWIP_TCPIP_CORE_LOCKING_INPUT 1    //Not supported because of the in-game SMAP driver's design (will deadlock).
 
 /* ---------- Memory options ---------- */
 /**
@@ -70,7 +70,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
    timeouts. */
-//Only used by tcpip.c, which will be used for IP reassembly and ARP.
+// Only used by tcpip.c, which will be used for IP reassembly and ARP.
 #define MEMP_NUM_SYS_TIMEOUT 1
 
 /* MEMP_NUM_NETCONN: the number of struct netconns. */
@@ -103,8 +103,8 @@ a lot of data that needs to be copied, this should be set high. */
 #endif
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
-//Boman666: Should be atleast 1518 to be compatible with ps2smap
-//TCP_MSS+TCP header+IP header+PBUF_LINK_HLEN = 1460 + 20 + 20 + 14 = 1514
+// Boman666: Should be atleast 1518 to be compatible with ps2smap
+// TCP_MSS+TCP header+IP header+PBUF_LINK_HLEN = 1460 + 20 + 20 + 14 = 1514
 #define PBUF_POOL_BUFSIZE 1540
 
 /* PBUF_LINK_HLEN: the number of bytes that should be allocated for a
@@ -114,14 +114,14 @@ a lot of data that needs to be copied, this should be set high. */
 
 /** SYS_LIGHTWEIGHT_PROT
  * define SYS_LIGHTWEIGHT_PROT in lwipopts.h if you want inter-task protection
- * for certain critical regions during buffer allocation, deallocation and 
+ * for certain critical regions during buffer allocation, deallocation and
  * memory allocation and deallocation.
  */
 #define SYS_LIGHTWEIGHT_PROT 1
 
 /* ---------- TCP options ---------- */
 #define LWIP_TCP 1
-#define TCP_TTL 255
+#define TCP_TTL  255
 
 /* Controls if TCP should queue segments that arrive out of
    order. Define to 0 if your device is low on memory. */
@@ -170,7 +170,7 @@ a lot of data that needs to be copied, this should be set high. */
  * If defined to 0, only existing cache entries are updated. Entries are added when
  * lwIP is sending to them. Recommended for embedded devices.
  */
-//Do not always insert ARP entries, as the ARP table is small.
+// Do not always insert ARP entries, as the ARP table is small.
 #define ETHARP_ALWAYS_INSERT 0
 
 /* ---------- IP options ---------- */
@@ -182,7 +182,7 @@ a lot of data that needs to be copied, this should be set high. */
 /* IP reassembly and segmentation. These are orthogonal even
    if they both deal with IP fragments */
 #define IP_REASSEMBLY 1
-#define IP_FRAG 1
+#define IP_FRAG       1
 
 /* ---------- ICMP options ---------- */
 #define ICMP_TTL 255
@@ -200,11 +200,11 @@ a lot of data that needs to be copied, this should be set high. */
 /**
  * DHCP_DOES_ARP_CHECK==1: Do an ARP check on the offered address.
  */
-#define DHCP_DOES_ARP_CHECK	0	//Don't do the ARP check because an IP address would be first required.
+#define DHCP_DOES_ARP_CHECK 0 // Don't do the ARP check because an IP address would be first required.
 
 #else
 
-#define LWIP_DHCP 0
+#define LWIP_DHCP           0
 #define DHCP_DOES_ARP_CHECK 0
 
 #endif
@@ -222,71 +222,71 @@ a lot of data that needs to be copied, this should be set high. */
 #define LWIP_STATS 0
 
 #if LWIP_STATS
-#define LINK_STATS 1
-#define IP_STATS 1
+#define LINK_STATS   1
+#define IP_STATS     1
 #define IPFRAG_STATS 1
-#define ICMP_STATS 1
-#define UDP_STATS 1
-#define TCP_STATS 1
-#define MEM_STATS 1
-#define MEMP_STATS 1
-#define PBUF_STATS 1
-#define SYS_STATS 1
-#define RAW_STATS 1
+#define ICMP_STATS   1
+#define UDP_STATS    1
+#define TCP_STATS    1
+#define MEM_STATS    1
+#define MEMP_STATS   1
+#define PBUF_STATS   1
+#define SYS_STATS    1
+#define RAW_STATS    1
 #endif /*LWIP_STATS*/
 
-//Boman666: This define will force the TX-data to be splitted in an even number of TCP-segments. This will significantly increase
-//the upload speed, atleast on my configuration (PC - WinXP).
-//#define	PS2IP_EVEN_TCP_SEG
-//spooo:
-//	It is a normal TCP behaviour that small data are delayed. This is
-//	Nagle's algorithm. If you don't want it there's a legal way of
-//	preventing delayed data which is the TCP_NODELAY option.
+// Boman666: This define will force the TX-data to be splitted in an even number of TCP-segments. This will significantly increase
+// the upload speed, atleast on my configuration (PC - WinXP).
+//#define    PS2IP_EVEN_TCP_SEG
+// spooo:
+//     It is a normal TCP behaviour that small data are delayed. This is
+//     Nagle's algorithm. If you don't want it there's a legal way of
+//     preventing delayed data which is the TCP_NODELAY option.
 //
-//	I'm not really sure, here are my thoughts about Boman666's patch:
+//     I'm not really sure, here are my thoughts about Boman666's patch:
 //
-//	- This patch hard-breaks (compile time define) this old grandma-TCP
-//	  behaviour, I'm not sure it is safe.
+//     - This patch hard-breaks (compile time define) this old grandma-TCP
+//       behaviour, I'm not sure it is safe.
 //
-//	- I suspect a possible loss of performance (I have experienced a 1/7
-//	  waste time on a not only networking algorithm) because in case
-//	  that ps2 has to send small packets (sort of response to a query)
-//	  of 2N bytes length, two packets of N bytes size are sent. Which is
-//	  more overhead: 2*(40+N bytes + latency) instead of (40+2N +
-//	  latency).
+//     - I suspect a possible loss of performance (I have experienced a 1/7
+//       waste time on a not only networking algorithm) because in case
+//       that ps2 has to send small packets (sort of response to a query)
+//       of 2N bytes length, two packets of N bytes size are sent. Which is
+//       more overhead: 2*(40+N bytes + latency) instead of (40+2N +
+//       latency).
 //
-//	- I am aware that this patch improves other things, and I have not
-//	  tested this myself yet.
+//     - I am aware that this patch improves other things, and I have not
+//       tested this myself yet.
 //
-//	- I don't really understand the effects of this patch:
-//	  My understanding is that XP ("this" XP stack used with "this"
-//	  protocol, check iop/tcpip/lwip/src/core/tcp_out.c) needs ps2 TCP
-//	  acks to work efficiently (to send more quickly not waiting TCP
-//	  200ms).
+//     - I don't really understand the effects of this patch:
+//       My understanding is that XP ("this" XP stack used with "this"
+//       protocol, check iop/tcpip/lwip/src/core/tcp_out.c) needs ps2 TCP
+//       acks to work efficiently (to send more quickly not waiting TCP
+//       200ms).
 //
-//	- I provide two runtime setsockopt()-configurable replacements
+//     - I provide two runtime setsockopt()-configurable replacements
 //
-//	In replacement, and to make people test with their apps, I added two
-//	new socket (TCP level) options which are:
+//     In replacement, and to make people test with their apps, I added two
+//     new socket (TCP level) options which are:
 //
-//	- TCP_EVENSEG - it re-enables the original Boman666's patch
-//	- TCP_ACKNODELAY - This option forces an ack to be sent
-//	                   at every data packet received.
-//	To activate or not these option *at runtime* (not compile time), use the same
-//	syntax as standard TCP_NODELAY:
-//		int ret, value = 1; /* or 0 */
-//		ret = lwip_setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &value, sizeof(value));
-//	To read option value:
-//		int ret, value,
-//		int valuesize = sizeof(value);
-//		ret = lwip_getsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &value, &valuesize);
-//		printf("TCP_ACKNODELAY state: %i\n", ret == 0? value: -1);
+//     - TCP_EVENSEG - it re-enables the original Boman666's patch
+//     - TCP_ACKNODELAY - This option forces an ack to be sent
+//                        at every data packet received.
+//     To activate or not these option *at runtime* (not compile time), use the same
+//     syntax as standard TCP_NODELAY:
+//         int ret, value = 1; /* or 0 */
+//         ret = lwip_setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &value, sizeof(value));
+//     To read option value:
+//         int ret, value,
+//         int valuesize = sizeof(value);
+//         ret = lwip_getsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &value, &valuesize);
+//         printf("TCP_ACKNODELAY state: %i\n", ret == 0? value: -1);
 //
-//	setsockopt/getsockopt are POSIX, manual is available everywhere. They were not
-//	exported in ps2ip symbol list, I've added them.
-//	One should check performance penalty or improvement by activating any combination
-//	of these three options. The only one which is standard is TCP_NODELAY.
-//	By default, everything is not active.
+//     setsockopt/getsockopt are POSIX, manual is available everywhere. They were not
+//     exported in ps2ip symbol list, I've added them.
+//     One should check performance penalty or improvement by activating any combination
+//     of these three options. The only one which is standard is TCP_NODELAY.
+//     By default, everything is not active.
 
 /*
    --------------------------------------
@@ -294,33 +294,33 @@ a lot of data that needs to be copied, this should be set high. */
    --------------------------------------
 */
 #ifdef INGAME_DRIVER
-//Disable all higher-level checksum verification mechanisms for performance, relying on the MAC-level checksum.
+// Disable all higher-level checksum verification mechanisms for performance, relying on the MAC-level checksum.
 /**
  * CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.
  */
 #if !defined CHECKSUM_CHECK_IP
-#define CHECKSUM_CHECK_IP               0
+#define CHECKSUM_CHECK_IP 0
 #endif
 
 /**
  * CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.
  */
 #if !defined CHECKSUM_CHECK_UDP
-#define CHECKSUM_CHECK_UDP              0
+#define CHECKSUM_CHECK_UDP 0
 #endif
 
 /**
  * CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.
  */
 #if !defined CHECKSUM_CHECK_TCP
-#define CHECKSUM_CHECK_TCP              0
+#define CHECKSUM_CHECK_TCP 0
 #endif
 
 /**
  * CHECKSUM_CHECK_ICMP==1: Check checksums in software for incoming ICMP packets.
  */
 #if !defined CHECKSUM_CHECK_ICMP
-#define CHECKSUM_CHECK_ICMP             0
+#define CHECKSUM_CHECK_ICMP 0
 #endif
 #endif
 

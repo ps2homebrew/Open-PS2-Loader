@@ -23,10 +23,11 @@ enum MENU_IDs {
     MENU_SETTINGS = 0,
     MENU_GFX_SETTINGS,
     MENU_AUDIO_SETTINGS,
+    MENU_CONTROLLER_SETTINGS,
     MENU_PARENTAL_LOCK,
     MENU_NET_CONFIG,
     MENU_NET_UPDATE,
-    MENU_START_HDL,
+    MENU_START_NBD,
     MENU_ABOUT,
     MENU_SAVE_CHANGES,
     MENU_EXIT,
@@ -205,11 +206,12 @@ static void menuInitMainMenu(void)
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SETTINGS, _STR_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_AUDIO_SETTINGS, _STR_AUDIO_SETTINGS);
+    submenuAppendItem(&mainMenu, -1, NULL, MENU_CONTROLLER_SETTINGS, _STR_CONTROLLER_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
     if (gHDDStartMode && gEnableWrite) // enabled at all?
-        submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
+        submenuAppendItem(&mainMenu, -1, NULL, MENU_START_NBD, _STR_STARTNBD);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
@@ -628,7 +630,7 @@ static void menuNextV()
                 cur = cur->next;
 
         selected_item->item->pagestart = selected_item->item->current;
-    } else { //wrap to start
+    } else { // wrap to start
         menuFirstPage();
     }
 }
@@ -647,7 +649,7 @@ static void menuPrevV()
             while (--itms && selected_item->item->pagestart->prev)
                 selected_item->item->pagestart = selected_item->item->pagestart->prev;
         }
-    } else { //wrap to end
+    } else { // wrap to end
         menuLastPage();
     }
 }
@@ -665,7 +667,7 @@ static void menuNextPage()
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
-    } else { //wrap to start
+    } else { // wrap to start
         menuFirstPage();
     }
 }
@@ -683,7 +685,7 @@ static void menuPrevPage()
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
-    } else { //wrap to end
+    } else { // wrap to end
         menuLastPage();
     }
 }
@@ -739,7 +741,7 @@ void menuRenderMenu()
         }
     }
 
-    //hints
+    // hints
     guiDrawSubMenuHints();
 }
 
@@ -759,17 +761,17 @@ int menuCheckParentalLock(void)
     char password[CONFIG_KEY_VALUE_LEN];
     int result;
 
-    result = 0; //Default to unlocked.
+    result = 0; // Default to unlocked.
     if (parentalLockCheckEnabled) {
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
-        //Prompt for password, only if one was set.
+        // Prompt for password, only if one was set.
         if (configGetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, &parentalLockPassword) && (parentalLockPassword[0] != '\0')) {
             password[0] = '\0';
             if (diaShowKeyb(password, CONFIG_KEY_VALUE_LEN, 1, _l(_STR_PARENLOCK_ENTER_PASSWORD_TITLE))) {
                 if (strncmp(parentalLockPassword, password, CONFIG_KEY_VALUE_LEN) == 0) {
                     result = 0;
-                    parentalLockCheckEnabled = 0; //Stop asking for the password.
+                    parentalLockCheckEnabled = 0; // Stop asking for the password.
                 } else if (strncmp(OPL_PARENTAL_LOCK_MASTER_PASS, password, CONFIG_KEY_VALUE_LEN) == 0) {
                     guiMsgBox(_l(_STR_PARENLOCK_DISABLE_WARNING), 0, NULL);
 
@@ -777,12 +779,12 @@ int menuCheckParentalLock(void)
                     saveConfig(CONFIG_OPL, 1);
 
                     result = 0;
-                    parentalLockCheckEnabled = 0; //Stop asking for the password.
+                    parentalLockCheckEnabled = 0; // Stop asking for the password.
                 } else {
                     guiMsgBox(_l(_STR_PARENLOCK_PASSWORD_INCORRECT), 0, NULL);
                     result = EACCES;
                 }
-            } else //User aborted.
+            } else // User aborted.
                 result = EACCES;
         }
     }
@@ -830,6 +832,9 @@ void menuHandleInputMenu()
         } else if (id == MENU_AUDIO_SETTINGS) {
             if (menuCheckParentalLock() == 0)
                 guiShowAudioConfig();
+        } else if (id == MENU_CONTROLLER_SETTINGS) {
+            if (menuCheckParentalLock() == 0)
+                guiShowControllerConfig();
         } else if (id == MENU_PARENTAL_LOCK) {
             if (menuCheckParentalLock() == 0)
                 guiShowParentalLockConfig();
@@ -839,15 +844,20 @@ void menuHandleInputMenu()
         } else if (id == MENU_NET_UPDATE) {
             if (menuCheckParentalLock() == 0)
                 guiShowNetCompatUpdate();
-        } else if (id == MENU_START_HDL) {
+        } else if (id == MENU_START_NBD) {
             if (menuCheckParentalLock() == 0)
-                handleHdlSrv();
+                handleLwnbdSrv();
         } else if (id == MENU_ABOUT) {
             guiShowAbout();
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
+#ifdef PADEMU
+                guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
+                saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
+#else
                 saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
-                menuSetParentalLockCheckState(1); //Re-enable parental lock check.
+#endif
+                menuSetParentalLockCheckState(1); // Re-enable parental lock check.
             }
         } else if (id == MENU_EXIT) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_EXIT), 1, NULL))
@@ -862,8 +872,8 @@ void menuHandleInputMenu()
     }
 
     if (getKeyOn(KEY_START) || getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
-        //Check if there is anything to show the user, at all.
-        if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
+        // Check if there is anything to show the user, at all.
+        if (gAPPStartMode || gETHStartMode || gBDMStartMode || gHDDStartMode)
             guiSwitchScreen(GUI_SCREEN_MAIN);
     }
 }
@@ -920,7 +930,7 @@ void menuHandleInputMain()
 
     // Last Played Auto Start
     if (RemainSecs < 0) {
-        DisableCron = 1; //Disable Counter
+        DisableCron = 1; // Disable Counter
         if (gSelectButton == KEY_CIRCLE)
             selected_item->item->execCircle(selected_item->item);
         else
@@ -1017,7 +1027,7 @@ void menuRenderGameMenu()
 #endif
     }
 
-    //hints
+    // hints
     guiDrawSubMenuHints();
 }
 
@@ -1062,7 +1072,7 @@ void menuHandleInputGameMenu()
             guiGameShowVMCMenu(selected_item->item->current->item.id, selected_item->item->userdata);
 #ifdef PADEMU
         } else if (menuID == GAME_PADEMU_SETTINGS) {
-            guiGameShowPadEmuConfig();
+            guiGameShowPadEmuConfig(0);
 #endif
         } else if (menuID == GAME_SAVE_CHANGES) {
             if (guiGameSaveConfig(itemConfig, selected_item->item->userdata))
@@ -1121,7 +1131,7 @@ void menuRenderAppMenu()
         y += spacing;
     }
 
-    //hints
+    // hints
     guiDrawSubMenuHints();
 }
 

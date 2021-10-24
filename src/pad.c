@@ -188,7 +188,7 @@ static int initializePad(struct pad_data_t *pad)
 }
 
 static void updatePadState(struct pad_data_t *pad, int state)
-{ //To simplify processing, monitor only Disconnected, FindCTP1 & Stable states.
+{ // To simplify processing, monitor only Disconnected, FindCTP1 & Stable states.
     if ((state == PAD_STATE_DISCONN) || (state == PAD_STATE_STABLE) || (state == PAD_STATE_FINDCTP1))
         pad->state = state;
 }
@@ -203,17 +203,17 @@ static int readPad(struct pad_data_t *pad)
     newState = padGetState(pad->port, pad->slot);
     updatePadState(pad, newState);
     if ((oldState == PAD_STATE_DISCONN) && ((pad->state == PAD_STATE_STABLE) || (pad->state == PAD_STATE_FINDCTP1))) {
-        //Pad just connected.
+        // Pad just connected.
         LOG("PAD pad %d,%d connected\n", pad->port, pad->slot);
         initializePad(pad);
     }
-    //The pad may transit from any state to disconnected. So check only for the disconnected state.
+    // The pad may transit from any state to disconnected. So check only for the disconnected state.
     else if ((oldState != PAD_STATE_DISCONN) && (pad->state == PAD_STATE_DISCONN)) {
         LOG("PAD pad %d,%d disconnected\n", pad->port, pad->slot);
     }
 
     if ((pad->state == PAD_STATE_STABLE) || (pad->state == PAD_STATE_FINDCTP1)) {
-        //pad is connected. Read pad button information.
+        // pad is connected. Read pad button information.
         ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
 
         if (ret != 0) {
@@ -258,10 +258,10 @@ static int readPad(struct pad_data_t *pad)
 }
 
 /** Returns delay (in miliseconds) specified for the given key.
-* @param id The button id
-* @param repeat Boolean value specifying if we want initial key delay (0) or the repeat key delay (1)
-* @return the delay to the next key event
-*/
+ * @param id The button id
+ * @param repeat Boolean value specifying if we want initial key delay (0) or the repeat key delay (1)
+ * @return the delay to the next key event
+ */
 static int getKeyDelay(int id, int repeat)
 {
     int delay = paddelay[id - 1];
@@ -302,9 +302,9 @@ int readPads()
 }
 
 /** Key getter with key repeats.
-* @param id The button ID
-* @return nonzero if button is being pressed just now
-*/
+ * @param id The button ID
+ * @return nonzero if button is being pressed just now
+ */
 int getKey(int id)
 {
     if ((id <= 0) || (id >= 17))
@@ -335,9 +335,9 @@ int getKey(int id)
 }
 
 /** Detects key-on event. Returns true if the button was not pressed the last frame but is pressed this frame.
-* @param id The button ID
-* @return nonzero if button is being pressed just now
-*/
+ * @param id The button ID
+ * @return nonzero if button is being pressed just now
+ */
 int getKeyOn(int id)
 {
     if ((id <= 0) || (id >= 17))
@@ -350,9 +350,9 @@ int getKeyOn(int id)
 }
 
 /** Detects key-off event. Returns true if the button was pressed the last frame but is not pressed this frame.
-* @param id The button ID
-* @return nonzero if button is being released
-*/
+ * @param id The button ID
+ * @return nonzero if button is being released
+ */
 int getKeyOff(int id)
 {
     if ((id <= 0) || (id >= 17))
@@ -365,9 +365,9 @@ int getKeyOff(int id)
 }
 
 /** Returns true (nonzero) if the button is currently pressed
-* @param id The button ID
-* @return nonzero if button is being held
-*/
+ * @param id The button ID
+ * @return nonzero if button is being held
+ */
 int getKeyPressed(int id)
 {
     // old v.s. new pad data
@@ -377,9 +377,9 @@ int getKeyPressed(int id)
 }
 
 /** Sets the delay to wait for button repetition event to occur.
-* @param button The button ID
-* @param btndelay The button delay (in query count)
-*/
+ * @param button The button ID
+ * @param btndelay The button delay (in query count)
+ */
 void setButtonDelay(int button, int btndelay)
 {
     if ((button <= 0) || (button >= 17))
@@ -397,7 +397,7 @@ int getButtonDelay(int button)
 }
 
 /** Unloads a single pad.
-* @see unloadPads */
+ * @see unloadPads */
 static void unloadPad(struct pad_data_t *pad)
 {
     padPortClose(pad->port, pad->slot);
@@ -415,8 +415,8 @@ void unloadPads()
 }
 
 /** Tries to start a single pad.
-* @param pad The pad data holding structure
-* @return 0 Error, != 0 Ok */
+ * @param pad The pad data holding structure
+ * @return 0 Error, != 0 Ok */
 static int startPad(struct pad_data_t *pad)
 {
     int newState;
@@ -435,7 +435,7 @@ static int startPad(struct pad_data_t *pad)
 }
 
 /** Starts all pads.
-* @return Count of dual shock compatible pads. 0 if none present. */
+ * @return Count of dual shock compatible pads. 0 if none present. */
 int startPads()
 {
     // scan for pads that exist... at least one has to be present

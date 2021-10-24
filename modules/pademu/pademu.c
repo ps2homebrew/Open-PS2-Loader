@@ -1,4 +1,4 @@
-//sio2man hook code taken from opl mcemu:
+// sio2man hook code taken from opl mcemu:
 /*
    Copyright 2006-2008, Romz
    Copyright 2010, Polo
@@ -12,23 +12,23 @@
 
 #include "ds34bt.h"
 
-#define PAD_INIT ds34bt_init
+#define PAD_INIT       ds34bt_init
 #define PAD_GET_STATUS ds34bt_get_status
-#define PAD_RESET ds34bt_reset
-#define PAD_GET_DATA ds34bt_get_data
+#define PAD_RESET      ds34bt_reset
+#define PAD_GET_DATA   ds34bt_get_data
 #define PAD_SET_RUMBLE ds34bt_set_rumble
-#define PAD_SET_MODE ds34bt_set_mode
+#define PAD_SET_MODE   ds34bt_set_mode
 
 #elif defined(USB)
 
 #include "ds34usb.h"
 
-#define PAD_INIT ds34usb_init
+#define PAD_INIT       ds34usb_init
 #define PAD_GET_STATUS ds34usb_get_status
-#define PAD_RESET ds34usb_reset
-#define PAD_GET_DATA ds34usb_get_data
+#define PAD_RESET      ds34usb_reset
+#define PAD_GET_DATA   ds34usb_get_data
 #define PAD_SET_RUMBLE ds34usb_set_rumble
-#define PAD_SET_MODE ds34usb_set_mode
+#define PAD_SET_MODE   ds34usb_set_mode
 
 #else
 #error "must define mode"
@@ -52,9 +52,9 @@ typedef struct
 } pad_status_t;
 
 #define DIGITAL_MODE 0x41
-#define ANALOG_MODE 0x73
+#define ANALOG_MODE  0x73
 #define ANALOGP_MODE 0x79
-#define CONFIG_MODE 0xF3
+#define CONFIG_MODE  0xF3
 
 #define MAX_PORTS 4
 
@@ -102,7 +102,7 @@ int _start(int argc, char *argv[])
         pad_vibration = argv[1][1];
         mtap_enabled = argv[1][2] & 1;
         mtap_port = (argv[1][2] >> 1) & 1;
-        pad_options = (argv[1][2] >> 2) & 1; //disable workaround for fake ds3
+        pad_options = (argv[1][2] >> 2) & 1; // enable workaround for fake ds3
     }
 
     if (RegisterLibraryEntries(&_exp_pademu) != 0) {
@@ -170,7 +170,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
 {
     register int ret;
 
-    if (!strncmp(lib->name, "sio2man", 8)) {
+    if (!memcmp(lib->name, "sio2man", 8)) {
         ret = pRegisterLibraryEntires(lib);
         if (ret == 0) {
             ReleaseLibraryEntries((struct irx_export_table *)lib);
@@ -211,7 +211,7 @@ void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc)
         if (td->port_ctrl2[port1] == 0x00030064 && td->in[0] == 0x21 && mtap_enabled) {
             sio2proc = pademu_mtap;
         } else if (td->in[0] == 0x01) {
-            if (port2 == 1) { //2 sio cmds
+            if (port2 == 1) { // 2 sio cmds
                 if (mtap_inited) {
                     if (pad[0].enabled) {
                         td->in[0] = 0x00;
@@ -219,9 +219,9 @@ void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc)
                         sio2proc = pademu;
                     }
                 } else {
-                    if (pad[0].enabled && pad[1].enabled) { //emulating 2 pads
+                    if (pad[0].enabled && pad[1].enabled) { // emulating 2 pads
                         sio2proc = pademu;
-                    } else if (pad[0].enabled || pad[1].enabled) { //only one
+                    } else if (pad[0].enabled || pad[1].enabled) { // only one
                         if (pad[0].enabled) {
                             ctrl = 0;
                         } else if (pad[1].enabled) {
@@ -249,7 +249,7 @@ void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc)
                         sio2proc = pademu;
                     }
                 } else {
-                    if (pad[port1].enabled) { //emulating this port
+                    if (pad[port1].enabled) { // emulating this port
                         sio2proc = pademu;
                     }
                 }
@@ -310,7 +310,7 @@ void pademu(sio2_transfer_data_t *td)
     }
 
     if (port2 == 1) {
-        //find next cmd
+        // find next cmd
         for (cmd_size = 5; cmd_size < td->in_size - 3; cmd_size++) {
             if (td->in[cmd_size] == 0x01 && (td->in[cmd_size + 1] & 0xF0) == 0x40 && td->in[cmd_size + 2] == 0x00) {
                 if (cmd_size != 5 && cmd_size != 9 && cmd_size != 21)
@@ -342,10 +342,10 @@ void pademu(sio2_transfer_data_t *td)
                 out = td->out;
                 port = 0;
 
-                if (pad[1].enabled) { //emulating ports 0 & 1
+                if (pad[1].enabled) { // emulating ports 0 & 1
                     pademu_cmd(1, (u8 *)&td->in[cmd_size], (u8 *)&td->out[cmd_size], td->in_size - cmd_size);
                 }
-            } else { //emulating only port 1
+            } else { // emulating only port 1
                 in = (u8 *)&td->in[cmd_size];
                 out = (u8 *)&td->out[cmd_size];
                 port = 1;
@@ -383,11 +383,11 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
     out[2] = 0x5A;
 
     switch (in[1]) {
-        case 0x40: //set vref param
+        case 0x40: // set vref param
             mips_memcpy(&out[3], &pademu_data[0], 6);
             break;
 
-        case 0x41: //query button mask
+        case 0x41: // query button mask
             if (pad[port].mode_id != DIGITAL_MODE) {
                 out[3] = pad[port].mask[0];
                 out[4] = pad[port].mask[1];
@@ -398,23 +398,23 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
             }
             break;
 
-        case 0x43: //enter/exit config mode
+        case 0x43: // enter/exit config mode
             if (pad[port].mode_cfg) {
                 pad[port].mode_cfg = in[3];
                 break;
             }
 
             pad[port].mode_cfg = in[3];
-        case 0x42: //read data
+        case 0x42: // read data
             if (in[1] == 0x42) {
-                if (pad[port].vibration) { //disable/enable vibration
+                if (pad[port].vibration) { // disable/enable vibration
                     PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
                 }
             }
 
             i = PAD_GET_DATA(&out[3], out_size - 3, port);
 
-            if (pad[port].mode_lock == 0) { //mode unlocked
+            if (pad[port].mode_lock == 0) { // mode unlocked
                 if (pad[port].mode != i) {
                     pad[port].mode = i;
 
@@ -428,7 +428,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
             out[1] = pad[port].mode_id;
             break;
 
-        case 0x44: //set mode and lock
+        case 0x44: // set mode and lock
             pad[port].mode = in[3];
             pad[port].mode_lock = in[4];
             if (pad[port].mode) {
@@ -443,12 +443,12 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
             PAD_SET_MODE(pad[port].mode, pad[port].mode_lock, port);
             break;
 
-        case 0x45: //query model and mode
+        case 0x45: // query model and mode
             mips_memcpy(&out[3], &pademu_data[1], 6);
             out[5] = pad[port].mode;
             break;
 
-        case 0x46: //query act
+        case 0x46: // query act
             if (in[3] == 0x00)
                 mips_memcpy(&out[3], &pademu_data[2], 6);
             else
@@ -456,11 +456,11 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 
             break;
 
-        case 0x47: //query comb
+        case 0x47: // query comb
             mips_memcpy(&out[3], &pademu_data[4], 6);
             break;
 
-        case 0x4C: //query mode
+        case 0x4C: // query mode
             if (in[3] == 0x00)
                 out[6] = 0x04;
             else
@@ -468,10 +468,10 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 
             break;
 
-        case 0x4D: //set act align
+        case 0x4D: // set act align
             mips_memcpy(&out[3], &pademu_data[5], 6);
 
-            for (i = 0; i < 6; i++) { //vibration
+            for (i = 0; i < 6; i++) { // vibration
                 if (in[3 + i] == 0x00)
                     pad[port].rrum = i + 3;
 
@@ -480,7 +480,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
             }
             break;
 
-        case 0x4F: //set button info
+        case 0x4F: // set button info
             pad[port].mode_id = ANALOGP_MODE;
             pad[port].mode_p = 1;
 
@@ -513,24 +513,24 @@ void pademu_mtap(sio2_transfer_data_t *td)
     }
 
     switch (td->in[1]) {
-        case 0x12: //returns slot number for pad
+        case 0x12: // returns slot number for pad
             mips_memcpy(td->out, &mtap_data, sizeof(mtap_data));
             td->out[3] = MAX_SLOT;
             td->stat6c = 0x00001100;
             mtap_inited = 1;
             break;
 
-        case 0x13: //returns slot number for mc
+        case 0x13: // returns slot number for mc
             break;
 
-        case 0x21: //changes slot for pad
+        case 0x21: // changes slot for pad
             mips_memcpy(td->out, &mtap_data, sizeof(mtap_data));
-            mtap_slot = td->out[5] = td->in[2]; //slot
+            mtap_slot = td->out[5] = td->in[2]; // slot
             td->out[6] = 0x5a;
             td->stat6c = 0x00001100;
             break;
 
-        case 0x22: //changes slot for mc
+        case 0x22: // changes slot for mc
             break;
     }
 }

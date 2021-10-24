@@ -18,10 +18,10 @@
 #include <irx.h>
 
 /* These are used with the dir parameter of ata_device_sector_io().  */
-#define ATA_DIR_READ 0
+#define ATA_DIR_READ  0
 #define ATA_DIR_WRITE 1
 
-#define ATAD_XFER_MODE_PIO 0x08
+#define ATAD_XFER_MODE_PIO  0x08
 #define ATAD_XFER_MODE_MDMA 0x20
 #define ATAD_XFER_MODE_UDMA 0x40
 
@@ -39,13 +39,13 @@ typedef struct _ata_devinfo
 
 /* Error definitions.  */
 #define ATA_RES_ERR_NOTREADY -501
-#define ATA_RES_ERR_TIMEOUT -502
-#define ATA_RES_ERR_IO -503
-#define ATA_RES_ERR_NODATA -504
-#define ATA_RES_ERR_NODEV -505
-#define ATA_RES_ERR_CMD -506
-#define ATA_RES_ERR_LOCKED -509
-#define ATA_RES_ERR_ICRC -510
+#define ATA_RES_ERR_TIMEOUT  -502
+#define ATA_RES_ERR_IO       -503
+#define ATA_RES_ERR_NODATA   -504
+#define ATA_RES_ERR_NODEV    -505
+#define ATA_RES_ERR_CMD      -506
+#define ATA_RES_ERR_LOCKED   -509
+#define ATA_RES_ERR_ICRC     -510
 
 int atad_start(void);
 ata_devinfo_t *ata_get_devinfo(int device);
@@ -56,11 +56,11 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir);
 int ata_device_flush_cache(int device);
 
 // APA Partition
-#define APA_MAGIC 0x00415041 // 'APA\0'
-#define APA_IDMAX 32
-#define APA_MAXSUB 64 // Maximum # of sub-partitions
-#define APA_PASSMAX 8
-#define APA_FLAG_SUB 0x0001
+#define APA_MAGIC       0x00415041 // 'APA\0'
+#define APA_IDMAX       32
+#define APA_MAXSUB      64 // Maximum # of sub-partitions
+#define APA_PASSMAX     8
+#define APA_FLAG_SUB    0x0001
 #define APA_MBR_VERSION 2
 
 typedef struct

@@ -66,7 +66,7 @@ typedef struct _Sio2Packet
     u32 rdcount;
 } Sio2Packet;
 
-#ifdef USB_DRIVER
+#ifdef BDM_DRIVER
 struct fat_file
 {
     u32 cluster;
@@ -104,7 +104,7 @@ typedef struct _McImageSpec
 {
     int active; /* Activation flag */
 
-#ifdef USB_DRIVER
+#ifdef BDM_DRIVER
     u32 stsec; /* Vmc file start sector */
 #endif
 

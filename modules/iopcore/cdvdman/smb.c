@@ -14,27 +14,28 @@
 #include <intrman.h>
 #include <sifman.h>
 
-#include "smsutils.h"
 #include "oplsmb.h"
 #include "smb.h"
 #include "cdvd_config.h"
 
+#include "smsutils.h"
+
 #define USE_CUSTOM_RECV 1
 
 //Round up the erasure amount, so that memset can erase memory word-by-word.
-#define ZERO_PKT_ALIGNED(hdr, hdrSize) mips_memset((hdr), 0, ((hdrSize) + 3) & ~3)
+#define ZERO_PKT_ALIGNED(hdr, hdrSize) memset((hdr), 0, ((hdrSize) + 3) & ~3)
 
 /* Limit the maximum chunk size of receiving operations, to avoid triggering the congestion avoidance algorithm of the SMB server.
    This is because the IOP cannot clear the received frames fast enough, causing the number of bytes in flight to grow exponentially.
    The TCP congestion avoidence algorithm may induce some latency, causing extremely poor performance.
    The value to use should be smaller than the TCP window size. Right now, it is 10240 (according to lwipopts.h). */
-#define CLIENT_MAX_BUFFER_SIZE 8192    //Allow up to 8192 bytes to be received.
-#define CLIENT_MAX_XMIT_SIZE USHRT_MAX //Allow up to 65535 bytes to be transmitted.
-#define CLIENT_MAX_RECV_SIZE 8192      //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_BUFFER_SIZE 8192      //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_XMIT_SIZE   USHRT_MAX //Allow up to 65535 bytes to be transmitted.
+#define CLIENT_MAX_RECV_SIZE   8192      //Allow up to 8192 bytes to be received.
 
 int smb_io_sema = -1;
 
-#define WAITIOSEMA(x) WaitSema(x)
+#define WAITIOSEMA(x)   WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
 
 // !!! ps2ip exports functions pointers !!!
@@ -56,7 +57,7 @@ static u8 nb_GetPacketType(void);            // Read message type
 
 static server_specs_t server_specs;
 
-#define LM_AUTH 0
+#define LM_AUTH   0
 #define NTLM_AUTH 1
 
 static u16 UID, TID;
@@ -129,7 +130,7 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
     opt = 1;
     plwip_setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&opt, sizeof(opt));
 
-    mips_memset(&sock_addr, 0, sizeof(sock_addr));
+    memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_addr = dst_IP;
     sock_addr.sin_family = AF_INET;
     sock_addr.sin_port = htons(dst_port);
@@ -232,7 +233,7 @@ static int asciiToUtf16(char *out, const char *in)
 {
     int len;
     const char *pIn;
-    u8 *pOut;
+    char *pOut;
 
     for (pIn = in, pOut = out, len = 0; *pIn != '\0'; pIn++, pOut += 2, len += 2) {
         pOut[0] = *pIn;
@@ -318,8 +319,8 @@ negotiate_retry:
     server_specs.MaxBufferSize = NPRsp->MaxBufferSize;
     server_specs.MaxMpxCount = NPRsp->MaxMpxCount;
     server_specs.SessionKey = NPRsp->SessionKey;
-    mips_memcpy(server_specs.EncryptionKey, &NPRsp->ByteField[0], NPRsp->KeyLength);
-    mips_memcpy(server_specs.PrimaryDomainServerName, &NPRsp->ByteField[NPRsp->KeyLength], sizeof(server_specs.PrimaryDomainServerName));
+    memcpy(server_specs.EncryptionKey, &NPRsp->ByteField[0], NPRsp->KeyLength);
+    memcpy(server_specs.PrimaryDomainServerName, &NPRsp->ByteField[NPRsp->KeyLength], sizeof(server_specs.PrimaryDomainServerName));
     strncpy(server_specs.Username, Username, sizeof(server_specs.Username));
     server_specs.Username[sizeof(server_specs.Username) - 1] = '\0';
     strncpy(server_specs.Password, Password, sizeof(server_specs.Password));
@@ -366,7 +367,7 @@ lbl_session_setup:
     if (server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) {
         password_len = server_specs.PasswordLen;
         // Copy the password accordingly to auth type
-        mips_memcpy(&SSR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
+        memcpy(&SSR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
         // fill SSR->AnsiPasswordLength or SSR->UnicodePasswordLength accordingly to auth type
         if (AuthType == LM_AUTH)
             SSR->AnsiPasswordLength = password_len;
@@ -381,10 +382,10 @@ lbl_session_setup:
     }
 
     // Add User name
-    offset += setStringField(&SSR->ByteField[offset], server_specs.Username);
+    offset += setStringField((char *)&SSR->ByteField[offset], server_specs.Username);
 
     // PrimaryDomain, acquired from Negotiate Protocol Response data
-    offset += setStringField(&SSR->ByteField[offset], server_specs.PrimaryDomainServerName);
+    offset += setStringField((char *)&SSR->ByteField[offset], server_specs.PrimaryDomainServerName);
 
     // NativeOS
     if (useUnicode && ((offset & 1) != 0)) {
@@ -392,7 +393,7 @@ lbl_session_setup:
         SSR->ByteField[offset] = '\0';
         offset++;
     }
-    offset += setStringField(&SSR->ByteField[offset], "PlayStation 2");
+    offset += setStringField((char *)&SSR->ByteField[offset], "PlayStation 2");
 
     // NativeLanMan
     if (useUnicode && ((offset & 1) != 0)) {
@@ -400,7 +401,7 @@ lbl_session_setup:
         SSR->ByteField[offset] = '\0';
         offset++;
     }
-    offset += setStringField(&SSR->ByteField[offset], "SMBMAN");
+    offset += setStringField((char *)&SSR->ByteField[offset], "SMBMAN");
 
     SSR->ByteCount = offset;
 
@@ -455,7 +456,7 @@ int smb_TreeConnectAndX(char *ShareName)
     if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL) {
         password_len = server_specs.PasswordLen;
         // Copy the password accordingly to auth type
-        mips_memcpy(&TCR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
+        memcpy(&TCR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
     }
     TCR->PasswordLength = password_len;
     offset += password_len;
@@ -466,9 +467,9 @@ int smb_TreeConnectAndX(char *ShareName)
     }
 
     // Add share name
-    offset += setStringField(&TCR->ByteField[offset], ShareName);
+    offset += setStringField((char *)&TCR->ByteField[offset], ShareName);
 
-    mips_memcpy(&TCR->ByteField[offset], "?????\0", 6); // Service, any type of device
+    memcpy(&TCR->ByteField[offset], "?????\0", 6); // Service, any type of device
     offset += 6;
 
     TCR->ByteCount = offset;
@@ -491,7 +492,7 @@ int smb_TreeConnectAndX(char *ShareName)
 }
 
 //-------------------------------------------------------------------------
-int smb_OpenAndX(char *filename, u16 *FID, int Write)
+int smb_OpenAndX(char *filename, u8 *FID, int Write)
 {
     OpenAndXRequest_t *OR = &SMB_buf.smb.openAndXRequest;
     OpenAndXResponse_t *ORsp = &SMB_buf.smb.openAndXResponse;
@@ -522,7 +523,7 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     }
 
     // Add filename
-    offset += setStringField(&OR->ByteField[offset], filename);
+    offset += setStringField((char *)&OR->ByteField[offset], filename);
     OR->ByteCount = offset;
 
     nb_SetSessionMessage(sizeof(OpenAndXRequest_t) + offset + 1);
@@ -540,7 +541,7 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
         return -1000;
     }
 
-    *FID = ORsp->FID;
+    memcpy(FID, &ORsp->FID, 2);
 
     SIGNALIOSEMA(smb_io_sema);
 
@@ -773,7 +774,7 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nb
 //-------------------------------------------------------------------------
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
-    return smb_ReadFile(cdvdman_settings.FIDs[part_num], lsn << 11, lsn >> 21, buf, (int)(nsectors << 11));
+    return smb_ReadFile(cdvdman_settings.FIDs[part_num], lsn * 2048, lsn >> 21, buf, (int)(nsectors * 2048));
 }
 
 void smb_CloseAll(void)

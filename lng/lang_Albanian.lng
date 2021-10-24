@@ -1,0 +1,282 @@
+Albanian
+Ruaj Ndryshimet
+Prapa
+Cilësimet e Rrjetit
+Cilësimet e Avancuara
+<asnjë vlerë>
+Cilësimet u ruajtën në %s
+Gabim në shkruarjen e cilësimeve!
+Dil
+Cilësimet
+Menu
+Lojërat BDM
+Lojërat HDD
+Lojërat ETH
+Aplikacionet
+Temë
+Gjuha
+Sistemi do të fiket.
+Dil tek Shfletuesi?
+Anulo përditësimin?
+%d: HardDisk nuk u gjet.
+%d: HardDisk Drive not është i formatuar.
+%d: Gabim në nisjen e Rrjetit.
+%d: Nuk u gjet asnjë Adapter Rrjeti.
+%d: Nuk mund të lidhem me serverin SMB.
+%d: Nuk mund të identifikohem me serverin SMB.
+%d: Nuk mund të hap dot SMB share.
+%d: Nuk mund të listoj SMB shares.
+%d: Nuk mund të listoj lojërat.
+%d: Serveri DHCP është i paarritshëm.
+%d: Nuk ka lidhje me Rrjetin.
+Ndezur
+Fikur
+OK
+Zgjidhe
+Anulo
+Rreth
+Kryq
+Lista e Lojërave
+Cilësimet e Lojës
+Fshi Cilësimet
+Shpejtesia e Rrotullimit
+Ngadalë
+Normal
+Shpejt
+Menuja Normale
+Ngarko nga Disku
+Ju Lutem Prisni.
+Gabim në ngarkimin e Game ID.
+Renditje Automatike
+Gabim në ngarkimin e skedarit të gjuhës.
+Rregullo ngjyrat
+Nuk u gjet asnje levë, duke pritur…
+Arti i Kopertinës
+Ekran i Gjerë
+Fik
+Duke ngarkuar konfigurimin…
+Duke ruajtur konfigurimin…
+Nise Paisjen
+Rifresko
+Nisja BDM
+Nisja e paisjes HDD
+Nisja e paisjes ETH 
+Nisja e Aplikacioneve
+Automatike
+Manuale
+Nis Serverin NBD
+Serveri NBD duke u nisur…
+Serveri NBD duke punuar…
+Dështoi të nisi Serverin NBD.
+Serveri NBD po shkarkohet…
+IGR Path
+Ngjyra e Sfondit
+Ngjyra e Tekstit
+- Serveri SMB -
+Lloji i Adresës IP
+Statike
+DHCP
+Adresa IP
+Adresa
+Mask
+Gateway
+Serveri DNS
+Port
+Share
+User
+Password
+<nuk është vënë>
+Lloji i Adresës
+IP
+NetBIOS
+Prano
+Artikulli do të fshihet përfundimisht, vazhdo?
+Riemërto
+Fshi
+Vazhdo
+Cilësimet e Ekranit
+Operacionet e Shkrimit
+Kujto lojën e luajtur së fundmi
+Zgjidh Butonin
+Gabim, loja është e fragmentuar.
+Gabim, nuk mund të hap këtë artikull.
+Testo Ndryshimet
+Lëre bosh per vërtetimin e MYSAFIRIT.
+Lexime të Sakta
+Mënyrë e Sinkronizuar
+Hiq Thirrjet e Sistemit
+Anashkalo Videot
+Imito DVD-DL
+Çaktivizo IGR
+Ndryshimi i madhësise ka për të formatuar Kartën e Memories Virtuale.
+Krijo
+Fillo
+Modifiko
+Aborto
+Rivendos
+Përdor të përgjithshmen
+Konfiguro Kartën e Memories Virtuale
+Emri
+Hapësira
+Statusi
+Progresi
+Karta e Memories Virtuale ekziston.
+Dosje e gabuar e KMV, madhësia është e pasaktë.
+Dosja KMV duhet të krijohet.
+Gabim në aksesimin e KMV %s. Vazhdo me Kartën e Memories ne vendin %d?
+Rifreskim Automatik
+Rreth
+Koduesit
+Kontroll Cilësie
+BDM Prefix Path
+Nis një ELF te modifikuar pas një IGR.
+Vlera ne minuta, 0 për të çaktivizuar fikjen e rrotullimit.
+Fikja Automatike e Rrotullimit të HDD
+Mënyra e Videos
+Ngjyra e Dialogut
+Ngjyra e Zgjedhur
+Rivendos Ngjyrat
+Info
+ELF i modifikuar
+Përzgjedhja e Ngjyrave
+Rilidhu
+Lëre bosh për te listuar te gjitha shpërndarjet.
+ETH Prefix Path
+Backspace
+Hapësira
+Hy
+Metoda
+VMC Slot 1
+VMC Slot 2
+ID e Lojës
+Mënyra DMA
+V-Sync
+Menyra 1
+Menyra 2
+Menyra 3
+Menyra 4
+Menyra 5
+Menyra 6
+Konfiguro GSM
+Menyra e lidhjes me Ethernet
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
+Cilësimet GSM
+Zgjedhësi GSM
+Ndërron GSM fikur/ndezur.
+Përforco Mënyrën e Paraqitjes së modifikuar.
+H-POS
+Përshtatje Horizontale
+V-POS
+Përshtatje Vertikale
+Skanim i gjerë
+Përshtatje e skanimit të gjerë
+Anashkalo FMV
+Anashkalon videot me lëvizje të plotë.
+Cilësimet e Hileve
+PS2RD Cheat Engine
+Lë PS2RD Cheat Engine të te ndryshoje lojën.
+Menyra e PS2RD Cheat Engine
+Zgjedhje Automatike apo zgjidh hilet e lojes.
+Zgjidh Hilet Automatikisht
+Zgjidh Hilet e Lojes
+Gabim: dështoi të ngarkojë dosjen e hiles.
+Nuk u gjet asnjë hile.
+Shkarko të parazgjedhurat
+Përditëso Rrjetin
+Rishkruaj Shënimet Ekzistuese
+Përditësimi dështoi.
+Dështoi të lidhet për të përditësuar serverin.
+Përditësimi u kompletua.
+Përditësimi u anullua.
+Shkarko cilësimet nga rrjeti?
+Cilësimet e modifikuara
+Shkarkimet e Parazgjedhura
+Skanimi automatik në %i s…
+Fillimi Automatik
+Vlera ne sekonda(s), 0 për të fikur Fillimin Automatik.
+Logoja PS2
+Paraqitet për një logo të vlefshme të bashkangjitur me rajonin e konsolit.
+Konfiguro PADEMU
+Cilësimet e Pad Emulator
+Pad Emulator
+Ndërron fikur/ndezur Pad Emulator për lojën e zgjedhur.
+Mënyra e Pad Emulator
+Mënyra e zgjedhjes së Pad Emulator.
+DualShock3/4 USB
+DualShock3/4 BT
+Cilësimet Për Portën:
+Zgjidh porten e Pad Emulator për cilësimet.
+Imitimi
+Ndërron fikur/ndezur Pad Emulator për portën e zgjedhur.
+Vibrimi
+Nderron fikur/ndezur vibrimin për Pad Emulator në portën e zgjedhur.
+Adresa Mac e USB Bluetooth Adapter:
+DS Controller i çiftuar me Adresën MAC:
+Çifto
+Çifto DS Controller
+Çifto DS controller me adresën MAC të adapterit Bluetooth.
+Nuk është lidhur
+Bluetooth Adapter Informacion
+Tregon më shumë informacion dhe veçoritë e mbështetura.
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Veçoritë e Mbështetura:
+Po
+Jo
+Adapteri Bluetooth duhet te jete plotesisht i pershtatshem me levat DS3/DS4.
+Adapteri Bluetooth mund te mos punoje sakte me levat DS3/DS4.
+Imitimi Multitap
+Nderron fikur/ndezur imitimin Multitap per lojen e zgjedhur.
+Imituesi Multitap ne Porten:
+Zgjidh porten per imitimin Multitap.
+Zgjidhje per DS3 Fallco.
+Disa DS3 fallco duan nje zgjidhje, ky opsion do ta aktivizoje ate.
+Imitio Rrokullisjen e FIELD
+Rregullimi per lojerat qe kan difekt ne Metoden e videos progresive.
+Cilesimet e Kycit Prinderor
+Password i Kycit Prinderor
+Lere bosh nese do ta fikesh kycin prinderor
+Vendos Passwordin per Kycin Prinderor
+Passwordi i Kycit Prinderor eshte i gabuar.
+Kyci Prinderor u fik.
+Opsionet e Ndertimit:
+Gabim - ky password nuk mund te perdoret.
+Dosja e VMC %s eshte e fragmentuar. Vazhdo me Karten e Memories ne slot %d?
+Cilesimet Audio
+Efektet e Zerit
+Zeri i Ndezjes
+Volum i Efektit te Zerit
+Volum i Zerit te Ndezjes
+Konfirmo ndryshimin e menyres se videos?
+Ruaj Listen e Lojerave (HDD)
+Njoftimet
+Konfigurimi u ngarkua nga %s
+Tema u ngarkua nga %s
+Gjuha u ngarkua nga %s
+Pjesa %s u montua.
+Opsionet
+Cilesimet e lojes u ruajten.
+Cilesimet %s u hoqen.
+Mbishkruan cilesimet e pajtueshmerise se lojes kur aktivizohet.
+Menyra e Cilesimeve
+Globale
+Per Loje
+Te gjitha
+Zgjidh cilesime per te hequr.
+Forumet e Suportuara:
+Titulli
+Zhaner
+Leshimi
+Zhvilluesi
+Pershkrimi
+Blloko Paisje
+Cilesimet e Leves
+Nderron fikur/ndezur Menaxherin e Bllokuesit te Paisjes.
+Nderron fikur/ndezur Pasijet e Bllokuara (p.sh. USB).
+Lojërat USB
+Lojërat iLink
+Lojërat MX4SIO

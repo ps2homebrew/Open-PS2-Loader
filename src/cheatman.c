@@ -29,20 +29,20 @@
 static int gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
 static int gCheatMode;   // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
 
-static int gCheatList[MAX_CHEATLIST]; //Store hooks/codes addr+val pairs
+static int gCheatList[MAX_CHEATLIST]; // Store hooks/codes addr+val pairs
 
 void InitCheatsConfig(config_set_t *configSet)
 {
     config_set_t *configGame = configGetByType(CONFIG_GAME);
 
-    //Default values.
+    // Default values.
     gCheatSource = 0;
     gEnableCheat = 0;
     gCheatMode = 0;
     memset(gCheatList, 0, sizeof(gCheatList));
 
     if (configGetInt(configSet, CONFIG_ITEM_CHEATSSOURCE, &gCheatSource)) {
-        //Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
+        // Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
         if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
             configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &gCheatMode);
         }
@@ -75,14 +75,14 @@ static code_t make_code(const char *s)
     int i = 0;
 
     while (*s) {
-        if (isxdigit(*s))
+        if (isxdigit((int)*s))
             digits[i++] = *s;
         s++;
     }
 
     sscanf(digits, "%08X %08X", &address, &value);
 
-    //Return Code Address and Value
+    // Return Code Address and Value
     code.addr = address;
     code.val = value;
     return code;
@@ -99,10 +99,10 @@ static int is_cheat_code(const char *s)
     int i = 0;
 
     while (*s) {
-        if (isxdigit(*s)) {
+        if (isxdigit((int)*s)) {
             if (++i > CODE_DIGITS)
                 return 0;
-        } else if (!isspace(*s)) {
+        } else if (!isspace((int)*s)) {
             return 0;
         }
         s++;
@@ -178,7 +178,7 @@ static int is_empty_str(const char *s)
     size_t slen = strlen(s);
 
     while (slen--) {
-        if (isgraph(*s++))
+        if (isgraph((int)*s++))
             return 0;
     }
 
@@ -200,13 +200,13 @@ static int trim_str(char *s)
         return -1;
 
     /* Get first non-space char */
-    while (isspace(*t++))
+    while (isspace((int)*t++))
         first++;
 
     /* Get last non-space char */
     last = strlen(s) - 1;
     t = &s[last];
-    while (isspace(*t--))
+    while (isspace((int)*t--))
         last--;
 
     /* Kill leading/trailing spaces */
@@ -224,7 +224,7 @@ static int trim_str(char *s)
 static int is_empty_substr(const char *s, size_t count)
 {
     while (count--) {
-        if (isgraph(*s++))
+        if (isgraph((int)*s++))
             return 0;
     }
 

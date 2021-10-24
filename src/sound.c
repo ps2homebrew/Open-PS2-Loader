@@ -7,7 +7,7 @@
 #include "include/ioman.h"
 #include "include/themes.h"
 
-//default sfx
+// default sfx
 extern unsigned char boot_adp[];
 extern unsigned int size_boot_adp;
 
@@ -47,7 +47,7 @@ static struct sfxEffect sfx_files[SFX_COUNT] = {
 static struct audsrv_adpcm_t sfx[SFX_COUNT];
 static int sfx_initialized = 0;
 
-//Returns 0 if the specified file was read. The sfxEffect structure will not be updated unless the file is successfully read.
+// Returns 0 if the specified file was read. The sfxEffect structure will not be updated unless the file is successfully read.
 static int sfxRead(const char *full_path, struct sfxEffect *sfx)
 {
     int adpcm;
@@ -118,7 +118,7 @@ static void sfxInitDefaults(void)
     sfx_files[SFX_TRANSITION].builtin = 1;
 }
 
-//Returns 0 (AUDSRV_ERR_NOERROR) if the sound was loaded successfully.
+// Returns 0 (AUDSRV_ERR_NOERROR) if the sound was loaded successfully.
 static int sfxLoad(struct sfxEffect *sfxData, audsrv_adpcm_t *sfx)
 {
     int ret;
@@ -132,7 +132,7 @@ static int sfxLoad(struct sfxEffect *sfxData, audsrv_adpcm_t *sfx)
     ret = audsrv_load_adpcm(sfx, sfxData->buffer, sfxData->size);
     if (sfxData->builtin == 0) {
         free(sfxData->buffer);
-        sfxData->buffer = NULL; //Mark the buffer as freed.
+        sfxData->buffer = NULL; // Mark the buffer as freed.
     }
 
     return ret;
@@ -154,7 +154,7 @@ void sfxVolume(void)
     audsrv_adpcm_set_volume(0, gBootSndVolume);
 }
 
-//Returns number of audio files successfully loaded, < 0 if an unrecoverable error occurred.
+// Returns number of audio files successfully loaded, < 0 if an unrecoverable error occurred.
 int sfxInit(int bootSnd)
 {
     char sound_path[256];
@@ -177,14 +177,14 @@ int sfxInit(int bootSnd)
     sfxInitDefaults();
     sfxVolume();
 
-    //Check default theme is not current theme
+    // Check default theme is not current theme
     int themeID = thmGetGuiValue();
     if (themeID != 0) {
-        //Get theme path for sfx
+        // Get theme path for sfx
         char *thmPath = thmGetFilePath(themeID);
         snprintf(sound_path, sizeof(sound_path), "%ssound", thmPath);
 
-        //Check for custom sfx folder
+        // Check for custom sfx folder
         DIR *dir = opendir(sound_path);
         if (dir != NULL) {
             thmSfxEnabled = 1;

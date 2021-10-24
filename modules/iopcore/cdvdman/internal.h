@@ -1,9 +1,68 @@
+
+#ifndef __CDVDMAN_INTERNAL__
+#define __CDVDMAN_INTERNAL__
+
+#include "dev9.h"
+#include "oplsmb.h"
+#include "smb.h"
+#include "atad.h"
+#include "ioplib_util.h"
+#include "cdvdman_opl.h"
+#include "cdvd_config.h"
+#include "device.h"
+
+#include <loadcore.h>
+#include <stdio.h>
+#include <sifman.h>
+#include <sysclib.h>
+#include <sysmem.h>
+#include <thbase.h>
+#include <thevent.h>
+#include <intrman.h>
+#include <ioman.h>
+#include <thsemap.h>
+#include <errno.h>
+#include <io_common.h>
+#include <usbd.h>
+#include <cdvdman.h>
+#include "ioman_add.h"
+
+#include <defs.h>
+
+#include "smsutils.h"
+
 #ifdef __IOPCORE_DEBUG
-#define DPRINTF(args...) printf(args)
+#define DPRINTF(args...)  printf(args)
 #define iDPRINTF(args...) Kprintf(args)
 #else
 #define DPRINTF(args...)
 #define iDPRINTF(args...)
+#endif
+
+#define CDVDMAN_SETTINGS_DEFAULT_COMMON         \
+    {                                           \
+        0x69, 0x69, 0x1234, 0x39393939, "B00BS" \
+    }
+#define CDVDMAN_SETTINGS_DEFAULT_HDD 0x12345678
+#define CDVDMAN_SETTINGS_DEFAULT_SMB                          \
+    "######  FILENAME  ######",                               \
+    {                                                         \
+        {                                                     \
+            "192.168.0.10", 0x8510, "PS2SMB", "", "GUEST", "" \
+        }                                                     \
+    }
+
+#ifdef HDD_DRIVER
+#define CDVDMAN_SETTINGS_TYPE                    cdvdman_settings_hdd
+#define CDVDMAN_SETTINGS_DEFAULT_DEVICE_SETTINGS CDVDMAN_SETTINGS_DEFAULT_HDD,
+#elif SMB_DRIVER
+#define CDVDMAN_SETTINGS_TYPE                    cdvdman_settings_smb
+#define CDVDMAN_SETTINGS_DEFAULT_DEVICE_SETTINGS CDVDMAN_SETTINGS_DEFAULT_SMB,
+#elif BDM_DRIVER
+#define CDVDMAN_SETTINGS_TYPE cdvdman_settings_bdm
+#define CDVDMAN_SETTINGS_DEFAULT_DEVICE_SETTINGS
+#else
+#error Unknown driver type. Please check the Makefile.
 #endif
 
 struct SteamingData
@@ -32,8 +91,46 @@ typedef struct
     void *cdread_buf;
 } cdvdman_status_t;
 
+struct dirTocEntry
+{
+    short length;
+    u32 fileLBA;         // 2
+    u32 fileLBA_bigend;  // 6
+    u32 fileSize;        // 10
+    u32 fileSize_bigend; // 14
+    u8 dateStamp[6];     // 18
+    u8 reserved1;        // 24
+    u8 fileProperties;   // 25
+    u8 reserved2[6];     // 26
+    u8 filenameLength;   // 32
+    char filename[128];  // 33
+} __attribute__((packed));
+
 typedef void (*StmCallback_t)(void);
 
 //Internal (common) function prototypes
-void SetStm0Callback(StmCallback_t callback);
-int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf);
+extern void SetStm0Callback(StmCallback_t callback);
+extern int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf);
+extern int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf);
+extern int cdvdman_sendSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16 out_size);
+extern void cdvdman_cb_event(int reason);
+
+extern void cdvdman_init(void);
+extern void cdvdman_fs_init(void);
+extern void cdvdman_searchfile_init(void);
+extern void cdvdman_initdev(void);
+
+extern struct CDVDMAN_SETTINGS_TYPE cdvdman_settings;
+
+#define CDVDMAN_BUF_SECTORS 2
+extern u8 cdvdman_buf[CDVDMAN_BUF_SECTORS * 2048];
+
+extern int cdrom_io_sema;
+extern int cdvdman_searchfilesema;
+
+extern cdvdman_status_t cdvdman_stat;
+
+extern unsigned char sync_flag;
+extern unsigned char cdvdman_cdinited;
+
+#endif

@@ -1,7 +1,7 @@
 /*
   Copyright 2010, volca
   Parts Copyright 2009, jimmikaelkael
-  Copyright (c) 2002, A.Lee & Nicholas Van Veen  
+  Copyright (c) 2002, A.Lee & Nicholas Van Veen
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 
@@ -22,9 +22,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define PROGRAM_NAME "opl2iso"
+#define PROGRAM_NAME    "opl2iso"
 #define PROGRAM_EXTNAME "UL.CFG to ISO converter"
-#define PROGRAM_VER "0.0.2"
+#define PROGRAM_VER     "0.0.2"
 
 typedef unsigned char u8;
 typedef unsigned short u16;

@@ -19,7 +19,7 @@
 #include "dve_reg.h"
 
 #define MAKE_J(func) (u32)((0x02 << 26) | (((u32)func) / 4)) // Jump (MIPS instruction)
-#define NOP 0x00000000                                       // No Operation (MIPS instruction)
+#define NOP          0x00000000                              // No Operation (MIPS instruction)
 
 extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd);
 
@@ -27,7 +27,7 @@ extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd)
 // NTSC
 #define GS_MODE_NTSC 0x02
 // PAL
-#define GS_MODE_PAL 0x03
+#define GS_MODE_PAL  0x03
 
 struct GSMDestSetGsCrt
 {
@@ -75,7 +75,7 @@ extern struct GSMFlags GSMFlags;
 extern void Hook_SetGsCrt();
 extern void GSHandler();
 
-static unsigned int KSEG_backup[2]; //Copies of the original words at 0x80000100 and 0x80000104.
+static unsigned int KSEG_backup[2]; // Copies of the original words at 0x80000100 and 0x80000104.
 
 /* Update GSM params */
 /*-------------------*/
@@ -168,7 +168,7 @@ static void Remove_GSHandler(void)
 
     Disable_GSBreakpoint();
 
-    //Restore the original stuff at the level 2 exception handler.
+    // Restore the original stuff at the level 2 exception handler.
     ee_kmode_enter();
     *(volatile u32 *)0x80000100 = KSEG_backup[0];
     *(volatile u32 *)0x80000104 = KSEG_backup[1];
@@ -205,7 +205,7 @@ void DisableGSM(void)
 /* Set up the DVE for 576P mode               */
 /*--------------------------------------------*/
 void setdve_576P(void)
-{ //The parameters are exactly the same as the 480P mode's. Regardless of the model, GS revision or region.
+{ // The parameters are exactly the same as the 480P mode's. Regardless of the model, GS revision or region.
     dve_prepare_bus();
 
     dve_set_reg(0x77, 0x11);

@@ -10,7 +10,10 @@ enum INTERNAL_TEXTURE {
     LOAD5_ICON,
     LOAD6_ICON,
     LOAD7_ICON,
+    BDM_ICON,
     USB_ICON,
+    ILINK_ICON,
+    MX4SIO_ICON,
     HDD_ICON,
     ETH_ICON,
     APP_ICON,
@@ -83,19 +86,17 @@ enum INTERNAL_TEXTURE {
     TEXTURES_COUNT
 };
 
-#define ERR_BAD_FILE -1
-#define ERR_READ_STRUCT -2
-#define ERR_INFO_STRUCT -3
-#define ERR_SET_JMP -4
+#define ERR_BAD_FILE      -1
+#define ERR_READ_STRUCT   -2
+#define ERR_INFO_STRUCT   -3
+#define ERR_SET_JMP       -4
 #define ERR_BAD_DIMENSION -5
 #define ERR_MISSING_ALPHA -6
-#define ERR_BAD_DEPTH -7
+#define ERR_BAD_DEPTH     -7
 
 int texLookupInternalTexId(const char *name);
-int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
-int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
-int texBmpLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
-void texPrepare(GSTEXTURE *texture, short psm);
-int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
+int texLoadInternal(GSTEXTURE *texture, int texId);
+int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId);
+void texFree(GSTEXTURE *texture);
 
 #endif

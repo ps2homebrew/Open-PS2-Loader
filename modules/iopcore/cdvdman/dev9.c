@@ -41,7 +41,7 @@ extern char atad_inited;
 #endif
 
 #define VERSION "1.0"
-#define BANNER "\nDEV9 device driver v%s - Copyright (c) 2003 Marcus R. Brown\n\n"
+#define BANNER  "\nDEV9 device driver v%s - Copyright (c) 2003 Marcus R. Brown\n\n"
 
 /* SSBUS registers.  */
 #define SSBUS_R_1418 0xbf801418

@@ -1,7 +1,6 @@
 # Danish translation by BongKris, updated by Mufhin
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Danish
-Open PS2 Loader %s
 Gem indstillinger
 Tilbage
 Netværksindstillinger
@@ -12,7 +11,7 @@ Fejl ved lagering af indstillinger!
 Afslut
 Indstillinger
 Menu
-USB-spil
+BDM-spil
 HDD-spil
 ETH-spil
 Programmer
@@ -42,7 +41,6 @@ Kryds
 Spilliste
 Spilindst.
 Fjern indstillinger
-Spilindstillinger nulstillet
 Scrolling
 Langsom
 Medium
@@ -53,30 +51,29 @@ Vent venligst
 Fejl ved indlæsning af spil-ID
 Automatisk sortering
 Fejl ved indlæsning af sprogfil
-Deaktivér fejlfindingsfarver
-Ingen controller registreret, venter...
-Aktivér Cover Art
+Debug Colors
+Ingen controller registreret, venter…
+Cover Art
 Widescreen-format
 Sluk
 Indlæser indstillinger
 Gemmer indstillinger
 Start enhed
 Genindlæs
-USB-enhed starttilstand
+BDM Start Mode
 HDD-enhed starttilstand
 ETH-enhed starttilstand
 Programmenu starttilstand
 Automatisk
 Manuel
-Start HDL-server
-HDL-server starter...
-HDL-server aktiv...
-Kunne ikke starte HDL-server.
-HDL-server lukker ned...
+Start NBD-server
+NBD-server starter…
+NBD-server aktiv…
+Kunne ikke starte NBD-server.
+NBD-server lukker ned…
 IGR-sti
 Baggrundsfarve
 Tekstfarve
-- PS2 -
 - SMB-server -
 IP-metode
 Statisk
@@ -100,7 +97,7 @@ Omdøb
 Slet
 Kør
 Skærmindstillinger
-Aktivér skriveoperationer
+Write Operations
 Husk sidst spillede spil
 Select-knap
 Fejl: spillet er fragmenteret
@@ -113,8 +110,6 @@ Frigiv syscalls
 Skip videoer
 Emuler DVD-DL
 Deaktiver IGR
-Unused
-Unused
 Ændring af størrelsen vil omformatere VMC
 Opret
 Start
@@ -135,7 +130,7 @@ Automatisk opdatering
 Om
 Kodere
 Kvalitetstestere
-USB-præfiks sti
+BDM-præfiks sti
 Starter brugerdefineret ELF efter en IGR
 Værdi i minuttet(r), 0 for at deaktivere spindown
 Automatisk harddisk-spindown
@@ -164,8 +159,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 Konfigurér GSM
 Ethernet-hastighed og duplex
 100Mbit full-duplex
@@ -173,9 +166,8 @@ Ethernet-hastighed og duplex
 10Mbit full-duplex
 10Mbit half-duplex
 GSM-indstillinger
-Aktivér GSM
+GSM Selector
 Slå GSM til eller fra
-Videotilstand
 Tvungen brugerdefineret skærmtilstand
 Horisontal position
 Horisontal justering
@@ -186,7 +178,7 @@ Overscan-justering
 Vis ikke FMV
 Springer over Full Motion-videoer
 Snydeindstillinger
-Aktivér PS2RD Cheat Engine
+PS2RD Cheat Engine
 Tillad PS2RD Cheat Engine at patche dine spil
 PS2RD Cheat Engine-tilstand
 Auto-vælg eller Vælg spilsnydekoder
@@ -204,14 +196,14 @@ Opdatering annulleret.
 Hent indstillinger fra netværket?
 Brugerdefinerede indstillinger
 Hent standardindstillinger
-Auto-start om %i s...
+Auto-start om %i s…
 Auto-start
 Værdi i sekunder(s), 0 for at deaktivere auto-start
 PS2-logo
 Vises kun med et gyldigt disklogo, som matcher konsollens region
 Konfigurér PADEMU
 Pad Emulator-indstillinger
-Aktivér PadEmulator
+Pad Emulator
 Slå Pad Emulator Til/Fra for valgte spil.
 Pad Emulator-tilstand
 Vælg Pad Emulator-tilstand.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 indstillinger for port:
 Vælg Pad Emulator-port for indstillinger.
-Aktivér emulering
+Emulation
 Slå Pad Emulator Til/Fra for valgte port.
-Aktivér vibration
+Vibration
 Slå vibration Til/Fra for valgte Pad Emulator-port.
 USB-bluetooth adapter MAC-adresse:
 DS controller parret med MAC-adresse:
@@ -239,12 +231,12 @@ Ja
 Nej
 Bluetooth-adapter skal være fuldt kompatibel med DS3/DS4 controllere.
 Bluetooth-adapter fungerer muligvis ikke korrekt med DS3/DS4 controllere.
-Aktivér Multitap-emulering
+Multitap Emulation
 Slå Multitap-emulering Til/Fra for valgte spil.
 Multitap Emulator på port
 Vælg port til Multitap-emulering.
-Deaktiver løsning for falsk DS3
-Nogle falske DS3'er har brug for en workaround-løsning, dette deaktiverer den.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emuler FIELD flipping
 Fikser spil der har fejl ved progressive video-tilstand.
 Forældrelås-indstillinger
@@ -257,14 +249,17 @@ Build-muligheder:
 Fejl - adgangskoden kan ikke anvendes.
 VMC %s fil er fragmenteret. Fortsæt med Memory Card i indgang %d?
 Lydindstillinger
-Aktiver lydeffekter
-Aktiver opstartslyd
+Sound Effects
+Boot Sound
 Lydeffekter-volumen
 Opstartslyd-volumen
 Bekræft skift af videotilstand?
 Cache spillisten (HDD)
-Aktiver notifikationer
-%s indlæst fra  %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Indstillinger
 Spilindstillinger gemt.
 %s indstillinger fjernet.
@@ -280,3 +275,10 @@ Genre
 Udgivelse
 Udvikler
 Beskrivelse
+Block Devices
+Controller-indstillinger
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

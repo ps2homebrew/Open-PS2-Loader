@@ -6,7 +6,7 @@
 #include "ioman.h"
 
 static SifRpcClientData_t SifRpcClient;
-static unsigned char RpcBuffer[64] ALIGNED(64);
+static char RpcBuffer[64] ALIGNED(64);
 
 int nbnsInit(void)
 {

@@ -16,16 +16,16 @@
 #include "include/sound.h"
 
 // UI spacing of the dialogues (pixels between consecutive items)
-#define UI_SPACING_H 10
-#define UI_SPACING_V 2
+#define UI_SPACING_H      10
+#define UI_SPACING_V      2
 // spacer ui element width (simulates tab)
-#define UI_SPACER_WIDTH 50
+#define UI_SPACER_WIDTH   50
 // minimal pixel width of spacer
 #define UI_SPACER_MINIMAL 30
 // length of breaking line in pixels
-#define UI_BREAK_LEN 600
+#define UI_BREAK_LEN      600
 // scroll speed (delay in ms!) when in dialogs
-#define DIA_SCROLL_SPEED 300
+#define DIA_SCROLL_SPEED  300
 // scroll speed (delay in ms!) when setting int value
 #define DIA_INT_SET_SPEED 100
 
@@ -33,10 +33,10 @@ static int screenWidth;
 static int screenHeight;
 
 // Utility stuff
-#define KEYB_MODE 2
-#define KEYB_WIDTH 12
+#define KEYB_MODE   2
+#define KEYB_WIDTH  12
 #define KEYB_HEIGHT 4
-#define KEYB_ITEMS (KEYB_WIDTH * KEYB_HEIGHT)
+#define KEYB_ITEMS  (KEYB_WIDTH * KEYB_HEIGHT)
 
 static void diaDrawBoundingBox(int x, int y, int w, int h, int focus)
 {
@@ -91,14 +91,14 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
         guiDrawBGPlasma();
         rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
-        //Title
+        // Title
         if (title != NULL) {
             fntRenderString(gTheme->fonts[0], 25, 20, ALIGN_NONE, 0, 0, title, gTheme->textColor);
             // separating line
             rmDrawLine(25, 38, 615, 38, gColWhite);
         }
 
-        //Text
+        // Text
         fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
 
         // separating line for simpler orientation
@@ -206,7 +206,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 sfxPlay(SFX_CONFIRM);
                 if (mask_buffer != NULL)
                     free(mask_buffer);
-                return 1; //ENTER
+                return 1; // ENTER
             } else if (selcommand == 3) {
                 sfxPlay(SFX_CONFIRM);
                 selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
@@ -239,7 +239,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
             sfxPlay(SFX_CONFIRM);
             if (mask_buffer != NULL)
                 free(mask_buffer);
-            return 1; //ENTER
+            return 1; // ENTER
         } else if (getKeyOn(KEY_SELECT)) {
             selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
             sfxPlay(SFX_CONFIRM);
@@ -670,7 +670,7 @@ static int diaHandleInput(struct UIItem *item, int *modified)
             if (item->intvalue.current < item->intvalue.max) {
                 item->intvalue.current++;
             } else {
-                item->intvalue.current = item->intvalue.min; //was "= 0;"
+                item->intvalue.current = item->intvalue.min; // was "= 0;"
             }
         } else if (getKey(KEY_DOWN)) {
             sfxPlay(SFX_CURSOR);

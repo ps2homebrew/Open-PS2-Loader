@@ -84,15 +84,15 @@ void sysLoadElf(char *filename, int argc, char **argv)
 
     DPRINTF("t_loadElf: elf path = '%s'\n", filename);
 
-    if (!DisableDebug)
-        GS_BGCOLOUR = 0x00ff00; //Green
+    if (EnableDebug)
+        GS_BGCOLOUR = 0x00ff00; // Green
 
     DPRINTF("t_loadElf: cleaning user memory...");
 
     // wipe user memory
     WipeUserMemory((void *)&_end, (void *)ModStorageStart);
-    //The upper half (from ModStorageEnd to GetMemorySize()) is taken care of by LoadExecPS2().
-    //WipeUserMemory((void *)ModStorageEnd, (void *)GetMemorySize());
+    // The upper half (from ModStorageEnd to GetMemorySize()) is taken care of by LoadExecPS2().
+    // WipeUserMemory((void *)ModStorageEnd, (void *)GetMemorySize());
 
     FlushCache(0);
 
@@ -125,8 +125,8 @@ void sysLoadElf(char *filename, int argc, char **argv)
 
     DPRINTF(" failed\n");
 
-    //Error
-    GS_BGCOLOUR = 0xffffff; //White	- shouldn't happen.
+    // Error
+    GS_BGCOLOUR = 0xffffff; // White    - shouldn't happen.
     SleepThread();
 }
 

@@ -9,6 +9,7 @@
 #include <sysclib.h>
 
 #include "ioplib_util.h"
+
 #include "smsutils.h"
 
 #ifdef __IOPCORE_DEBUG
@@ -66,7 +67,7 @@ static struct FakeModule modulefake_list[] = {
 #ifdef __USE_DEV9
     {"DEV9.IRX", "dev9", FAKE_MODULE_ID_DEV9, 0x0208, 0},
 #endif
-#ifdef USB_DRIVER
+#ifdef BDM_DRIVER
     {"USBD.IRX", "USB_driver", FAKE_MODULE_ID_USBD, 0x0204, 2},
 #endif
 #ifdef SMB_DRIVER
@@ -82,7 +83,7 @@ static struct FakeModule modulefake_list[] = {
     {NULL, NULL, 0, 0}};
 
 //--------------------------------------------------------------
-int getModInfo(u8 *modname, modinfo_t *info)
+int getModInfo(char *modname, modinfo_t *info)
 {
     iop_library_t *libptr;
     register int i;
@@ -246,7 +247,7 @@ static int Hook_ReferModuleStatus(int id, ModuleStatus_t *status)
 
     mod = checkFakemodById(id, modulefake_list);
     if (mod != NULL) {
-        mips_memset(status, 0, sizeof(ModuleStatus_t));
+        memset(status, 0, sizeof(ModuleStatus_t));
         strcpy(status->name, mod->name);
         status->version = mod->version;
         status->id = mod->id;

@@ -1,7 +1,6 @@
 # Korean translation by ddinghoya
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Korean
-오픈 PS2 로더 %s
 저장 변경
 뒤로
 네트워크 구성
@@ -12,7 +11,7 @@ Korean
 종료
 설정
 메뉴
-USB 게임
+BDM 게임
 HDD 게임
 ETH 게임
 응용프로그램
@@ -42,7 +41,6 @@ X
 게임 목록
 게임 설정
 설정 삭제
-설정된 게임 키 제거
 스크롤 속도
 느림
 보통
@@ -53,30 +51,29 @@ X
 게임 ID 불러오는 중 오류
 자동 정렬
 언어 파일 불러오는 중 오류
-디버그 색상 비활성
-컨트롤러가 없습니다. 대기 중...
-표지 보기
+Debug Colors
+컨트롤러가 없습니다. 대기 중…
+Cover Art
 와이드화면
 전원 끄기
 불러오기 설정
 저장 설정
 장치 시작
 새로 고침
-USB 장치 시작 모드
+BDM Start Mode
 HDD 장치 시작 모드
 ETH 장치 시작 모드
 응용프로그램 시작 모드
 자동
 수동
-HDL 서버 시작
-HDL 서버 시작 중...
-HDL 서버 가동 중...
-HDL 서버 시작 실패
-HDL 서버 업로딩 중...
+NBD 서버 시작
+NBD 서버 시작 중…
+NBD 서버 가동 중…
+NBD 서버 시작 실패
+NBD 서버 업로딩 중…
 IGR 경로
 배경 색상
 문자 색상
-- PS2 -
 - SMB 서버 -
 IP 주소 형식
 Static
@@ -100,7 +97,7 @@ NetBIOS
 삭제
 실행
 디스플레이 설정
-쓰기 작업 활성
+Write Operations
 마지막에 실행한 게임 기억
 버튼 선택
 오류, 게임이 손상 되었습니다.
@@ -113,8 +110,6 @@ NetBIOS
 비디오 건너뛰기
 DV-DL 에뮬레이트
 IGR 비활성
-미사용
-미사용
 크기 변경시 VMC 재포멧 됩니다.
 생성
 시작
@@ -135,7 +130,7 @@ VMC %s 오류, 메모리카드(슬롯 %d)에서 계속합니까?
 오픈 PS2 로더 정보
 개발자
 품질 보증
-USB prefix 경로
+BDM prefix 경로
 IGR 후 사용자 정의 ELF 부팅
 분 입력, 회전 멈추지 않으려면 0으로 설정
 자동 HDD 회전 멈춤
@@ -164,8 +159,6 @@ V-동기화
 모드 4
 모드 5
 모드 6
-모드 7
-모드 8
 GSM 구성
 이더넷 링크 모드
 100Mbit full-duplex
@@ -173,9 +166,8 @@ GSM 구성
 10Mbit full-duplex
 10Mbit half-duplex
 GSM 설정
-GSM 활성화
+GSM Selector
 GSM 켜기 또는 끄기
-VMODE
 강제 커스텀 디스플레이 모드
 H-POS
 수평 조정
@@ -186,7 +178,7 @@ V-POS
 FMV 건너뛰기
 풀 모션 비디오 건너뛰기
 치트 설정
-PS2RD 치트 엔진 활성화
+PS2RD Cheat Engine
 PS2RD 치트 엔진 패치 적용
 PS2RD 치트 엔진 모드
 게임 치트 자동 선택 또는 선택
@@ -204,14 +196,14 @@ PS2RD 치트 엔진 모드
 네트워크에서 설정을 다운로드 합니까?
 사용자 정의 설정
 다운로드 받은 기본값
-%i 자동 시작...
+%i 자동 시작…
 자동 시작
 초 입력, 자동 시작하지 않으려면 0으로 설정
 PS2 로고
 콘솔의 지역과 일치하는 유효한 디스크 로고만 표시
 PADEMU 구성
 패드 에뮬레이터 설정
-패드 에뮬레이터 활성화
+Pad Emulator
 선택된 게임 패드에뮬레이터 켬/끔.
 패드 에뮬레이터 모드
 패드 에뮬레이터 모드 선택
@@ -219,9 +211,9 @@ PADEMU 구성
 듀얼쇼크3/4 BT
 포트 설정:
 설정용 패드 에뮬레이터 포트 활성화.
-에뮬레이션 활성화
+Emulation
 선택된 포트 패드에뮬레이터 켬/끔.
-진동 활성화
+Vibration
 패드 에뮬레이터에 선택된 포트 진동 켬/끔
 USB 블루투스 어답터 맥 주소:
 DS 컨트롤러 맥 주소와 페어링:
@@ -239,12 +231,12 @@ LMP 버전:
 아니오
 블루투스 어댑터는 DS3/DS4 컨트롤러와 완벽하게 호환되어야 합니다.
 블루투스 어댑터가 DS3/DS4 컨트롤러에서 올바르게 작동하지 않을 수 있습니다.
-멀티탭 에뮬레이션 활성화
+Multitap Emulation
 선택한 게임을 위한 멀티탭 에뮬레이션 켬/끔.
 포트상의 멀티탭 에뮬레이터
 멀티탭 에뮬레이션을 위한 포트를 선택.
-Fake DS3에 대한 해결방법 비활성화
-일부 fake DSs3는 해결 방법이 필요합니다. 이 옵션은 옵션을 비활성화.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 필드 뒤집기 에뮬레이션
 프로그레시브 비디오 모드에서 결함이있는 게임 수정.
 보호자 잠금 설정
@@ -257,14 +249,17 @@ Fake DS3에 대한 해결방법 비활성화
 오류 - 이 비밀번호를 사용할 수 없습니다.
 VMC %s 파일이 조각화되었습니다. 슬롯 %d에서 메모리 카드를 계속 사용하겠습니까?
 오디오 설정
-사운드 효과 활성화
-부팅 사운드 활성화
+Sound Effects
+Boot Sound
 사운드 효과 볼륨
 부팅 사운드 볼륨
 비디오 모드 변경을 확인하겠습니까?
 캐쉬 게임 목록 (HDD)
-알림 활성화
-%s에서 %s을(를)로드했습니다.
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 게임 설정이 저장되었습니다.
 %s 설정이 제거되었습니다.
@@ -280,3 +275,10 @@ Options
 개정
 개발자
 설명
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

@@ -3,7 +3,7 @@
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
+
   Some parts of the code are taken from HD Project by Polo
 */
 
@@ -11,7 +11,7 @@
 #define MODMGR_H
 
 #define LF_PATH_MAX 252
-#define LF_ARG_MAX 252
+#define LF_ARG_MAX  252
 
 enum _lf_functions {
     LF_F_MOD_LOAD = 0,

@@ -19,9 +19,9 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#define PROGRAM_NAME "genvmc"
+#define PROGRAM_NAME    "genvmc"
 #define PROGRAM_EXTNAME "VMC file generator for Open PS2 Loader"
-#define PROGRAM_VER "0.1.0"
+#define PROGRAM_VER     "0.1.0"
 
 typedef unsigned char u8;
 typedef unsigned short u16;

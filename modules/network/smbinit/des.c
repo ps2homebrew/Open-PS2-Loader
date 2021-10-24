@@ -59,7 +59,7 @@
                    *((c)++) = (unsigned char)(((l) >> 16) & 0xff), \
                    *((c)++) = (unsigned char)(((l) >> 24) & 0xff))
 
-#define ITERATIONS 16
+#define ITERATIONS           16
 #define HPERM_OP(a, t, n, m) ((t) = ((((a) << (16 - (n))) ^ (a)) & (m)), \
                               (a) = (a) ^ (t) ^ (t >> (16 - (n))))
 
@@ -376,42 +376,42 @@ static const unsigned int des_skb[8][64] = {
          des_SPtrans[6][(u >> 24) & 0x3f];
 
 /* IP and FP
-	 * The problem is more of a geometric problem that random bit fiddling.
-	 0  1  2  3  4  5  6  7      62 54 46 38 30 22 14  6
-	 8  9 10 11 12 13 14 15      60 52 44 36 28 20 12  4
-        16 17 18 19 20 21 22 23      58 50 42 34 26 18 10  2
-	24 25 26 27 28 29 30 31  to  56 48 40 32 24 16  8  0
+     * The problem is more of a geometric problem that random bit fiddling.
+     0  1  2  3  4  5  6  7      62 54 46 38 30 22 14  6
+     8  9 10 11 12 13 14 15      60 52 44 36 28 20 12  4
+    16 17 18 19 20 21 22 23      58 50 42 34 26 18 10  2
+    24 25 26 27 28 29 30 31  to  56 48 40 32 24 16  8  0
 
-	32 33 34 35 36 37 38 39      63 55 47 39 31 23 15  7
-	40 41 42 43 44 45 46 47      61 53 45 37 29 21 13  5
-	48 49 50 51 52 53 54 55      59 51 43 35 27 19 11  3
-	56 57 58 59 60 61 62 63      57 49 41 33 25 17  9  1
+    32 33 34 35 36 37 38 39      63 55 47 39 31 23 15  7
+    40 41 42 43 44 45 46 47      61 53 45 37 29 21 13  5
+    48 49 50 51 52 53 54 55      59 51 43 35 27 19 11  3
+    56 57 58 59 60 61 62 63      57 49 41 33 25 17  9  1
 
-	The output has been subject to swaps of the form
-	0 1 -> 3 1 but the odd and even bits have been put into
-	2 3    2 0 
-	different words.  The main trick is to remember that
-	t=((l>>size)^r)&(mask);
-	r^=t;
-	l^=(t<<size);
-	can be used to swap and move bits between words.
+    The output has been subject to swaps of the form
+    0 1 -> 3 1 but the odd and even bits have been put into
+    2 3    2 0
+    different words.  The main trick is to remember that
+    t=((l>>size)^r)&(mask);
+    r^=t;
+    l^=(t<<size);
+    can be used to swap and move bits between words.
 
-	So l =  0  1  2  3  r = 16 17 18 19
-	        4  5  6  7      20 21 22 23
-	        8  9 10 11      24 25 26 27
-	       12 13 14 15      28 29 30 31
-	becomes (for size == 2 and mask == 0x3333)
-	   t =   2^16  3^17 -- --   l =  0  1 16 17  r =  2  3 18 19
-		 6^20  7^21 -- --        4  5 20 21       6  7 22 23
-		10^24 11^25 -- --        8  9 24 25      10 11 24 25
-                14^28 15^29 -- --       12 13 28 29      14 15 28 29
+    So l =  0  1  2  3  r = 16 17 18 19
+            4  5  6  7      20 21 22 23
+            8  9 10 11      24 25 26 27
+           12 13 14 15      28 29 30 31
+    becomes (for size == 2 and mask == 0x3333)
+       t =   2^16  3^17 -- --   l =  0  1 16 17  r =  2  3 18 19
+             6^20  7^21 -- --        4  5 20 21       6  7 22 23
+            10^24 11^25 -- --        8  9 24 25      10 11 24 25
+            14^28 15^29 -- --       12 13 28 29      14 15 28 29
 
-	Thanks for hints from Richard Outerbridge - he told me IP&FP
-	could be done in 15 xor, 10 shifts and 5 ands.
-	When I finally started to think of the problem in 2D
-	I first got ~42 operations without xors.  When I remembered
-	how to use xors :-) I got it to its final state.
-	*/
+    Thanks for hints from Richard Outerbridge - he told me IP&FP
+    could be done in 15 xor, 10 shifts and 5 ands.
+    When I finally started to think of the problem in 2D
+    I first got ~42 operations without xors.  When I remembered
+    how to use xors :-) I got it to its final state.
+    */
 #define PERM_OP(a, b, t, n, m) ((t) = ((((a) >> (n)) ^ (b)) & (m)), \
                                 (b) ^= (t),                         \
                                 (a) ^= ((t) << (n)))
@@ -460,8 +460,8 @@ static unsigned char *DES_createkeys(unsigned char *key)
     c2l(in, d);
 
     /* I now do it in 47 simple operations :-)
-	 * Thanks to John Fletcher (john_fletcher@lccmail.ocf.llnl.gov)
-	 * for the inspiration. :-) */
+     * Thanks to John Fletcher (john_fletcher@lccmail.ocf.llnl.gov)
+     * for the inspiration. :-) */
     PERM_OP(d, c, t, 4, 0x0f0f0f0f);
     HPERM_OP(c, t, -2, 0xcccc0000);
     HPERM_OP(d, t, -2, 0xcccc0000);
@@ -483,7 +483,7 @@ static unsigned char *DES_createkeys(unsigned char *key)
         c &= 0x0fffffff;
         d &= 0x0fffffff;
         /* could be a few less shifts but I am to lazy at this
-		 * point in time to investigate */
+         * point in time to investigate */
         s = des_skb[0][(c)&0x3f] |
             des_skb[1][((c >> 6) & 0x03) | ((c >> 7) & 0x3c)] |
             des_skb[2][((c >> 13) & 0x0f) | ((c >> 14) & 0x30)] |
@@ -524,21 +524,21 @@ unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *ci
     PERM_OP(l, r, t, 8, 0x00ff00ff);
     PERM_OP(r, l, t, 1, 0x55555555);
     /* r and l are reversed - remember that :-) - fix
-	 * it in the next step */
+     * it in the next step */
 
     /* Things have been modified so that the initial rotate is
-	 * done outside the loop.  This required the 
-	 * des_SPtrans values in sp.h to be rotated 1 bit to the right.
-	 * One perl script later and things have a 5% speed up on a sparc2.
-	 * Thanks to Richard Outerbridge <71755.204@CompuServe.COM>
-	 * for pointing this out. */
+     * done outside the loop.  This required the
+     * des_SPtrans values in sp.h to be rotated 1 bit to the right.
+     * One perl script later and things have a 5% speed up on a sparc2.
+     * Thanks to Richard Outerbridge <71755.204@CompuServe.COM>
+     * for pointing this out. */
     t = (r << 1) | (r >> 31);
     r = (l << 1) | (l >> 31);
     l = t;
 
     s = (unsigned int *)keys;
     /* I don't know if it is worth the effort of loop unrolling the
-	 * inner loop */
+     * inner loop */
     for (i = 0; i < 32; i += 4) {
         D_ENCRYPT(l, r, i + 0); /*  1 */
         D_ENCRYPT(r, l, i + 2); /*  2 */
@@ -547,9 +547,9 @@ unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *ci
     r = (r >> 1) | (r << 31);
 
     /* swap l and r
-	 * we will not do the swap so just remember they are
-	 * reversed for the rest of the subroutine
-	 * luckily FP fixes this problem :-) */
+     * we will not do the swap so just remember they are
+     * reversed for the rest of the subroutine
+     * luckily FP fixes this problem :-) */
 
     PERM_OP(r, l, t, 1, 0x55555555);
     PERM_OP(l, r, t, 8, 0x00ff00ff);

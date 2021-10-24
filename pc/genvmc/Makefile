@@ -17,7 +17,7 @@ clean:
 	rm -f src/*.o
 
 rebuild: clean all
-	
+
 bin/genvmc: src/genvmc.o
 	@mkdir -p bin
 	$(CC) $(CFLAGS) src/genvmc.c -o bin/genvmc

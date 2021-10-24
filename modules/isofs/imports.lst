@@ -2,7 +2,6 @@ thsemap_IMPORTS_start
 I_CreateSema
 I_DeleteSema
 I_SignalSema
-I_iSignalSema
 I_WaitSema
 thsemap_IMPORTS_end
 
@@ -12,22 +11,16 @@ I_close
 I_read
 I_lseek
 I_AddDrv
-I_DelDrv
 ioman_IMPORTS_end
-
-stdio_IMPORTS_start
-I_printf
-stdio_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_memset
+I_memcmp
 I_memcpy
 I_strcmp
-I_strncmp
 I_strcpy
 I_strlen
 I_strncpy
 I_strchr
 I_strrchr
 sysclib_IMPORTS_end
-

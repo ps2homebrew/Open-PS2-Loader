@@ -9,13 +9,11 @@ I_ReleaseLibraryEntries
 loadcore_IMPORTS_end
 
 ps2ip_IMPORTS_start
-I_lwip_socket
-I_lwip_connect
-I_lwip_bind
-I_lwip_send
-I_lwip_sendto
 I_lwip_recv
+I_lwip_sendto
 I_lwip_close
+I_lwip_socket
+I_lwip_bind
 I_lwip_shutdown
 ps2ip_IMPORTS_end
 

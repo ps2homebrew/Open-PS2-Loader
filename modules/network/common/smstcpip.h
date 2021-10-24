@@ -20,7 +20,7 @@
 #include "smstcpip-common.h"
 
 #define ps2ip_IMPORTS_start DECLARE_IMPORT_TABLE(ps2ip, 1, 4)
-#define ps2ip_IMPORTS_end END_IMPORT_TABLE
+#define ps2ip_IMPORTS_end   END_IMPORT_TABLE
 
 struct pbuf *pbuf_alloc(pbuf_layer l, u16 size, pbuf_flag flag);
 #define I_pbuf_alloc DECLARE_IMPORT(33, pbuf_alloc)
@@ -125,17 +125,17 @@ char *inet_ntoa(struct in_addr addr); /* returns ptr to static buffer; not reent
 
 /* Compatibility macros.  */
 
-#define accept lwip_accept
-#define bind lwip_bind
-#define disconnect lwip_close
-#define connect lwip_connect
-#define listen lwip_listen
-#define recv lwip_recv
-#define recvfrom lwip_recvfrom
-#define send lwip_send
-#define sendto lwip_sendto
-#define socket lwip_socket
-#define select lwip_select
+#define accept      lwip_accept
+#define bind        lwip_bind
+#define disconnect  lwip_close
+#define connect     lwip_connect
+#define listen      lwip_listen
+#define recv        lwip_recv
+#define recvfrom    lwip_recvfrom
+#define send        lwip_send
+#define sendto      lwip_sendto
+#define socket      lwip_socket
+#define select      lwip_select
 #define ioctlsocket lwip_ioctl
 
 int ps2ip_setconfig(t_ip_info *ip_info);
@@ -148,7 +148,7 @@ err_t ps2ip_input(struct pbuf *pBuf, struct netif *pNetIF);
 // ntba2
 #define getsockname lwip_getsockname
 #define getpeername lwip_getpeername
-#define getsockopt lwip_getsockopt
-#define setsockopt lwip_setsockopt
+#define getsockopt  lwip_getsockopt
+#define setsockopt  lwip_setsockopt
 
 #endif /* IOP_PS2IP_H */

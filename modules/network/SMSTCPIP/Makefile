@@ -15,11 +15,6 @@ IOP_LIBS =
 
 IOP_INCS += -Iinclude -I../../iopcore/common
 IOP_CFLAGS += -DLWIP_NOASSERT
-ifneq ($(IOP_CC_VERSION),3.2.2)
-ifneq ($(IOP_CC_VERSION),3.2.3)
-IOP_CFLAGS += -mno-memcpy
-endif
-endif
 
 ifeq ($(INGAME_DRIVER),1)
 IOP_CFLAGS += -DINGAME_DRIVER
@@ -35,4 +30,12 @@ endif
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.bin.make
-include ../../Rules.make
+include $(PS2SDK)/samples/Makefile.iopglobal
+
+ifneq ($(IOP_CC_VERSION),3.2.2)
+ifneq ($(IOP_CC_VERSION),3.2.3)
+IOP_CFLAGS += -mno-memcpy
+# Ignore warnings due to the old version of lwIP being used.
+IOP_CFLAGS += -Wno-attributes -Wno-array-bounds -Wno-unused-but-set-variable
+endif
+endif

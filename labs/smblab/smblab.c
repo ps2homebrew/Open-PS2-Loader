@@ -127,7 +127,7 @@ void set_ipconfig(void)
 //--------------------------------------------------------------
 int main(int argc, char *argv[2])
 {
-    int i, ret, id;
+    int i, ret;
 
     init_scr();
     scr_clear();
@@ -167,47 +167,47 @@ int main(int argc, char *argv[2])
     set_ipconfig();
 
     DPRINTF("loading iomanX... ");
-    id = SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading fileXio... ");
-    id = SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading poweroff... ");
-    id = SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading ps2dev9... ");
-    id = SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smsutils... ");
-    id = SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smstcpip... ");
-    id = SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smsmap... ");
-    id = SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
+    SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading udptty... ");
-    id = SifExecModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading ioptrap... ");
-    id = SifExecModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading ps2link... ");
-    id = SifExecModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smbman... ");
-    id = SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("modules load OK\n");
@@ -252,15 +252,17 @@ int main(int argc, char *argv[2])
     strcpy(logon.serverIP, "192.168.0.2");
     logon.serverPort = 445;
     strcpy(logon.User, "GUEST");
-    //strcpy(logon.User, "jimmikaelkael");
+    /*
+    strcpy(logon.User, "jimmikaelkael");
     // we could reuse the generated hash
-    //memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
-    //logon.PasswordType = HASHED_PASSWORD;
+    memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+    logon.PasswordType = HASHED_PASSWORD;
     // or log sending the plaintext password
-    //strcpy(logon.Password, "mypassw");
-    //logon.PasswordType = PLAINTEXT_PASSWORD;
+    strcpy(logon.Password, "mypassw");
+    logon.PasswordType = PLAINTEXT_PASSWORD;
     // or simply tell we're not sending password
-    //logon.PasswordType = NO_PASSWORD;
+    logon.PasswordType = NO_PASSWORD;
+    */
 
     DPRINTF("LOGON... ");
     ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
@@ -317,13 +319,13 @@ int main(int argc, char *argv[2])
 
     strcpy(openshare.ShareName, "PS2SMB");
     // we could reuse the generated hash
-    //memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
-    //logon.PasswordType = HASHED_PASSWORD;
+    // memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+    // logon.PasswordType = HASHED_PASSWORD;
     // or log sending the plaintext password
-    //strcpy(logon.Password, "mypassw");
-    //logon.PasswordType = PLAINTEXT_PASSWORD;
+    // strcpy(logon.Password, "mypassw");
+    // logon.PasswordType = PLAINTEXT_PASSWORD;
     // or simply tell we're not sending password
-    //logon.PasswordType = NO_PASSWORD;
+    // logon.PasswordType = NO_PASSWORD;
 
     DPRINTF("OPENSHARE... ");
     ret = fileXioDevctl("smb:", SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
@@ -408,15 +410,14 @@ int main(int argc, char *argv[2])
     // rename file test:
     // ----------------------------------------------------------------
     /*
-	DPRINTF("IO rename... ");
-	ret = fileXioRename("smb:\\rename_me\\rename_me.txt", "smb:\\rename_me\\renamed.txt");
-	if (ret == 0) {
-		DPRINTF("OK\n");
-	}
-	else {
-		DPRINTF("Error %d\n", ret);
-	}
-	*/
+        DPRINTF("IO rename... ");
+        ret = fileXioRename("smb:\\rename_me\\rename_me.txt", "smb:\\rename_me\\renamed.txt");
+        if (ret == 0) {
+            DPRINTF("OK\n");
+        } else {
+            DPRINTF("Error %d\n", ret);
+        }
+     */
 
 
     // ----------------------------------------------------------------
@@ -435,15 +436,14 @@ int main(int argc, char *argv[2])
     // delete file test:
     // ----------------------------------------------------------------
     /*
-	DPRINTF("IO remove... ");
-	ret = remove("smb:\\delete_me\\delete_me.txt");
-	if (ret == 0) {
-		DPRINTF("OK\n");
-	}
-	else {
-		DPRINTF("Error %d\n", ret);
-	}
-	*/
+    DPRINTF("IO remove... ");
+    ret = remove("smb:\\delete_me\\delete_me.txt");
+    if (ret == 0) {
+        DPRINTF("OK\n");
+    } else {
+        DPRINTF("Error %d\n", ret);
+    }
+    */
 
 
     // ----------------------------------------------------------------
@@ -485,16 +485,18 @@ int main(int argc, char *argv[2])
         DPRINTF("\n");
 
         // 64bit write test
-        //fileXioLseek64(fd, filesize - 16, SEEK_SET);
-        //fileXioWrite(fd, "\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC", 16);
-        //fileXioLseek64(fd, filesize - 16, SEEK_SET);
-        //fileXioRead(fd, buf, 16);
-        //p = (u8 *)buf;
-        //DPRINTF("read = ");
-        //for (i=0; i<16; i++) {
-        //	DPRINTF("%02X", p[i]);
-        //}
-        //DPRINTF("\n");
+        /*
+        fileXioLseek64(fd, filesize - 16, SEEK_SET);
+        fileXioWrite(fd, "\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC", 16);
+        fileXioLseek64(fd, filesize - 16, SEEK_SET);
+        fileXioRead(fd, buf, 16);
+        p = (u8 *)buf;
+        DPRINTF("read = ");
+        for (i = 0; i < 16; i++) {
+            DPRINTF("%02X", p[i]);
+        }
+        DPRINTF("\n");
+        */
 
         fileXioClose(fd);
     }
@@ -510,7 +512,7 @@ int main(int argc, char *argv[2])
         close(fd);
     }
 
-    //while(1);
+    // while(1);
 
 
     // ----------------------------------------------------------------
@@ -549,77 +551,73 @@ int main(int argc, char *argv[2])
     }
 
     /*
-	// ----------------------------------------------------------------
-	// chdir test
-	// ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+    // chdir test
+    // ----------------------------------------------------------------
 
-	DPRINTF("IO chdir... ");
-	ret = fileXioChdir("smb:\\dossier2");
-	if (ret == 0) {
-		DPRINTF("OK\n");
-	}
-	else {
-		DPRINTF("Error %d\n", ret);
-	}
-
-
-	// ----------------------------------------------------------------
-	// dopen/dread/dclose test
-	// ----------------------------------------------------------------
-
-	DPRINTF("IO dopen... ");
-	fd = fileXioDopen("smb:\\");
-	if (fd >= 0) {
-		DPRINTF("OK\n\t ");
-		ret = 1;
-		while (ret == 1) {
-			ret = fileXioDread(fd, &dirent);
-			if (ret == 1)
-				DPRINTF("%s ", dirent.name);
-		}
-		fileXioDclose(fd);
-		DPRINTF("\n");
-	}
-	else {
-		DPRINTF("Error %d\n", ret);
-	}
+    DPRINTF("IO chdir... ");
+    ret = fileXioChdir("smb:\\dossier2");
+    if (ret == 0) {
+        DPRINTF("OK\n");
+    } else {
+        DPRINTF("Error %d\n", ret);
+    }
 
 
-	// ----------------------------------------------------------------
-	// chdir test
-	// ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+    // dopen/dread/dclose test
+    // ----------------------------------------------------------------
 
-	DPRINTF("IO chdir... ");
-	ret = fileXioChdir("smb:\\..");
-	if (ret == 0) {
-		DPRINTF("OK\n");
-	}
-	else {
-		DPRINTF("Error %d\n", ret);
-	}
+    DPRINTF("IO dopen... ");
+    fd = fileXioDopen("smb:\\");
+    if (fd >= 0) {
+        DPRINTF("OK\n\t ");
+        ret = 1;
+        while (ret == 1) {
+            ret = fileXioDread(fd, &dirent);
+            if (ret == 1)
+                DPRINTF("%s ", dirent.name);
+        }
+        fileXioDclose(fd);
+        DPRINTF("\n");
+    } else {
+        DPRINTF("Error %d\n", ret);
+    }
 
 
-	// ----------------------------------------------------------------
-	// dopen/dread/dclose test
-	// ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+    // chdir test
+    // ----------------------------------------------------------------
 
-	DPRINTF("IO dopen... ");
-	fd = fileXioDopen("smb:\\");
-	if (fd >= 0) {
-		DPRINTF("OK\n\t ");
-		ret = 1;
-		while (ret == 1) {
-			ret = fileXioDread(fd, &dirent);
-			if (ret == 1)
-				DPRINTF("%s ", dirent.name);
-		}
-		fileXioDclose(fd);
-		DPRINTF("\n");
-	}
-	else {
-		DPRINTF("Error %d\n", ret);
- 	}
-	*/
+    DPRINTF("IO chdir... ");
+    ret = fileXioChdir("smb:\\..");
+    if (ret == 0) {
+        DPRINTF("OK\n");
+    } else {
+        DPRINTF("Error %d\n", ret);
+    }
+
+
+    // ----------------------------------------------------------------
+    // dopen/dread/dclose test
+    // ----------------------------------------------------------------
+
+    DPRINTF("IO dopen... ");
+    fd = fileXioDopen("smb:\\");
+    if (fd >= 0) {
+        DPRINTF("OK\n\t ");
+        ret = 1;
+        while (ret == 1) {
+            ret = fileXioDread(fd, &dirent);
+            if (ret == 1)
+                DPRINTF("%s ", dirent.name);
+        }
+        fileXioDclose(fd);
+        DPRINTF("\n");
+    } else {
+        DPRINTF("Error %d\n", ret);
+    }
+    */
 
     // ----------------------------------------------------------------
     // how to close a share:

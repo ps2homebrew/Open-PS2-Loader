@@ -54,7 +54,7 @@ int sbCreateSemaphore(void)
     return CreateSema(&sema);
 }
 
-//0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
+// 0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
 static int isValidIsoName(char *name, int *pNameLen)
 {
     // Old ISO image naming format: SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
@@ -142,7 +142,7 @@ static int loadISOGameListCache(const char *path, struct game_cache_list *cache)
                 result = ENOMEM;
             }
         } else {
-            result = -1; //Empty file (should not happen)
+            result = -1; // Empty file (should not happen)
         }
 
         fclose(file);
@@ -233,14 +233,14 @@ static int updateISOGameList(const char *path, const struct game_cache_list *cac
         } else
             result = ENOMEM;
     } else {
-        //Last game deleted.
+        // Last game deleted.
         remove(filename);
     }
 
     return result;
 }
 
-//Queries for the game entry, based on filename. Only the new filename format is supported (filename.ext).
+// Queries for the game entry, based on filename. Only the new filename format is supported (filename.ext).
 static int queryISOGameListCache(const struct game_cache_list *cache, base_game_info_t *ginfo, const char *filename)
 {
     char isoname[ISO_GAME_FNAME_MAX + 1];
@@ -277,7 +277,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                 base_game_info_t *game;
 
                 if (NameLen > ISO_GAME_NAME_MAX)
-                    continue; //Skip files that cannot be supported properly.
+                    continue; // Skip files that cannot be supported properly.
 
                 if (format == GAME_FORMAT_OLD_ISO) {
                     struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
@@ -296,7 +296,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                         strncpy(game->extension, &dirent->d_name[GAME_STARTUP_MAX + NameLen], sizeof(game->extension));
                         game->extension[sizeof(game->extension) - 1] = '\0';
                     } else {
-                        //Out of memory.
+                        // Out of memory.
                         break;
                     }
                 } else {
@@ -320,23 +320,23 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                                     strncpy(game->extension, &dirent->d_name[NameLen], sizeof(game->extension));
                                     game->extension[sizeof(game->extension) - 1] = '\0';
                                 } else {
-                                    //Out of memory.
+                                    // Out of memory.
                                     fileXioUmount("iso:");
                                     break;
                                 }
                             } else {
-                                //Unable to parse SYSTEM.CNF.
+                                // Unable to parse SYSTEM.CNF.
                                 fileXioUmount("iso:");
                                 continue;
                             }
 
                             fileXioUmount("iso:");
                         } else {
-                            //Unable to mount game.
+                            // Unable to mount game.
                             continue;
                         }
                     } else {
-                        //Entry was found in cache.
+                        // Entry was found in cache.
                         struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
 
                         if (next != NULL) {
@@ -346,7 +346,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                             game = &(*glist)->gameinfo;
                             memcpy(game, &cachedGInfo, sizeof(base_game_info_t));
                         } else {
-                            //Out of memory.
+                            // Out of memory.
                             break;
                         }
                     }
@@ -416,21 +416,39 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                 memset(*list, 0, sizeof(base_game_info_t) * count);
 
                 while (size > 0) {
-                    read(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
-
+                    int ulfd = 1;
+                    u8 part;
+                    unsigned int name_checksum;
                     base_game_info_t *g = &(*list)[id++];
+
+                    // populate game entry in list even if entry corrupted
+                    read(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
+                    size -= sizeof(USBExtreme_game_entry_t);
 
                     // to ensure no leaks happen, we copy manually and pad the strings
                     memcpy(g->name, GameEntry.name, UL_GAME_NAME_MAX);
                     g->name[UL_GAME_NAME_MAX] = '\0';
-                    memcpy(g->startup, &GameEntry.startup[3], GAME_STARTUP_MAX);
+                    memcpy(g->startup, GameEntry.startup, GAME_STARTUP_MAX);
                     g->startup[GAME_STARTUP_MAX] = '\0';
                     g->extension[0] = '\0';
                     g->parts = GameEntry.parts;
                     g->media = GameEntry.media;
                     g->format = GAME_FORMAT_USBLD;
-                    g->sizeMB = -1;
-                    size -= sizeof(USBExtreme_game_entry_t);
+                    g->sizeMB = 0;
+                    name_checksum = USBA_crc32(g->name);
+
+                    // TODO: size calculation is very slow
+                    // implmented some caching, or do not touch at all
+
+                    // calculate total size for individual game
+                    // for (part = 0; part < g->parts && ulfd >= 0; part++) {
+                    //     snprintf(path, sizeof(path), "%sul.%08X.%s.%02x", prefix, name_checksum, g->startup, part);
+                    //     ulfd = openFile(path, O_RDONLY);
+                    //     if (ulfd >= 0) {
+                    //         g->sizeMB += (getFileSize(ulfd) >> 20);
+                    //         close(ulfd);
+                    //     }
+                    // }
                 }
             }
         }
@@ -482,7 +500,7 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
     char buffer[6];
 
     result = -1;
-    if (game->media == SCECdPS2DVD) { //Only DVDs can have multiple layers.
+    if (game->media == SCECdPS2DVD) { // Only DVDs can have multiple layers.
         if ((file = fopen(path, "rb")) != NULL) {
             if (fseek(file, layer1_offset * 2048, SEEK_SET) == 0) {
                 if ((fread(buffer, 1, sizeof(buffer), file) == sizeof(buffer)) &&
@@ -503,7 +521,7 @@ int sbProbeISO9660_64(const char *path, base_game_info_t *game, u32 layer1_offse
     char buffer[6];
 
     result = -1;
-    if (game->media == SCECdPS2DVD) { //Only DVDs can have multiple layers.
+    if (game->media == SCECdPS2DVD) { // Only DVDs can have multiple layers.
         if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
             if (lseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
                 if ((read(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
@@ -530,7 +548,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     int i;
     struct cdvdman_settings_common *settings;
 
-    unsigned int compatmask = 0;
+    int compatmask = 0;
     configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatmask);
 
     char gameid[5];
@@ -619,15 +637,15 @@ void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, 
 
         memset(&GameEntry, 0, sizeof(GameEntry));
         GameEntry.Byte08 = 0x08; // just to be compatible with original ul.cfg
-        strcpy(GameEntry.startup, "ul.");
+        memcpy(GameEntry.magic, "ul.", 3);
 
         for (i = 0; i < gamecount; i++) {
             game = &(*list)[i];
 
             if (game->format == GAME_FORMAT_USBLD && (i != excludeID)) {
-                memset(&GameEntry.startup[3], 0, GAME_STARTUP_MAX);
+                memcpy(GameEntry.startup, game->startup, GAME_STARTUP_MAX);
                 memcpy(GameEntry.name, game->name, UL_GAME_NAME_MAX);
-                strncpy(&GameEntry.startup[3], game->startup, GAME_STARTUP_MAX);
+                // don't fill last symbol with zero, cause trailing symbol can be useful character
                 GameEntry.parts = game->parts;
                 GameEntry.media = game->media;
 
@@ -699,11 +717,10 @@ config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const
     char path[256];
     snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
-    configRead(config); //Does not matter if the config file could be loaded or not.
+    configRead(config); // Does not matter if the config file could be loaded or not.
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
-    if (game->sizeMB != -1)
-        configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
+    configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
 
     configSetStr(config, CONFIG_ITEM_FORMAT, game->format != GAME_FORMAT_USBLD ? "ISO" : "UL");
     configSetStr(config, CONFIG_ITEM_MEDIA, game->media == SCECdPS2CD ? "CD" : "DVD");

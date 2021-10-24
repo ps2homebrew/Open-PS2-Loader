@@ -29,7 +29,7 @@ I_FreeSysMemory
 sysmem_IMPORTS_end
 
 thsemap_IMPORTS_start
-I_CreateSema
+I_CreateSema //CreateMutex
 I_DeleteSema
 I_WaitSema
 I_SignalSema
@@ -46,8 +46,6 @@ sysclib_IMPORTS_end
 thbase_IMPORTS_start
 I_CreateThread
 I_StartThread
-I_DeleteThread
-I_TerminateThread
 I_ExitDeleteThread
 thbase_IMPORTS_end
 

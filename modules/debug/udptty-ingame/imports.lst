@@ -1,4 +1,3 @@
-
 thsemap_IMPORTS_start
 I_CreateSema
 I_DeleteSema
@@ -32,7 +31,6 @@ stdio_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_prnt
-I_strncmp
 sysclib_IMPORTS_end
 
 sysmem_IMPORTS_start

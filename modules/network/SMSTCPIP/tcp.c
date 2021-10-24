@@ -6,9 +6,9 @@
 
 /*
  * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
- * All rights reserved. 
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice,
@@ -17,21 +17,21 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission. 
+ *    derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED 
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  * OF SUCH DAMAGE.
  *
  * This file is part of the lwIP TCP/IP stack.
- * 
+ *
  * Author: Adam Dunkels <adam@sics.se>
  *
  */
@@ -273,17 +273,17 @@ err_t tcp_bind(struct tcp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
         }
     }
 #else  /* SO_REUSE */
-    /* Search through list of PCB's in LISTEN state. 
-     
+    /* Search through list of PCB's in LISTEN state.
+
   If there is a PCB bound to specified port and IP_ADDR_ANY another PCB can be bound to the interface IP
-  or to the loopback address on the same port if SOF_REUSEADDR is set. Any combination of PCB's bound to 
+  or to the loopback address on the same port if SOF_REUSEADDR is set. Any combination of PCB's bound to
   the same local port, but to one address out of {IP_ADDR_ANY, 127.0.0.1, interface IP} at a time is valid.
   But no two PCB's bound to same local port and same local address is valid.
-  
-  If SOF_REUSEPORT is set several PCB's can be bound to same local port and same local address also. But then 
+
+  If SOF_REUSEPORT is set several PCB's can be bound to same local port and same local address also. But then
   all PCB's must have the SOF_REUSEPORT option set.
-  
-  When the two options aren't set and specified port is already bound, ERR_USE is returned saying that 
+
+  When the two options aren't set and specified port is already bound, ERR_USE is returned saying that
   address is already in use. */
     for (cpcb = (struct tcp_pcb *)tcp_listen_pcbs; cpcb != NULL; cpcb = cpcb->next) {
         if (cpcb->local_port == port) {
@@ -307,7 +307,7 @@ err_t tcp_bind(struct tcp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
         }
     }
 
-    /* Search through list of PCB's in a state in which they can accept or send data. Same decription as for 
+    /* Search through list of PCB's in a state in which they can accept or send data. Same decription as for
      PCB's in state LISTEN applies to this PCB's regarding the options SOF_REUSEADDR and SOF_REUSEPORT. */
     for (cpcb = tcp_active_pcbs; cpcb != NULL; cpcb = cpcb->next) {
         if (cpcb->local_port == port) {
@@ -331,13 +331,13 @@ err_t tcp_bind(struct tcp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
         }
     }
 
-    /* Search through list of PCB's in TIME_WAIT state. If SO_REUSEADDR is set a bound combination [IP, port} 
-     can be rebound. The same applies when SOF_REUSEPORT is set. 
-     
-     If SOF_REUSEPORT is set several PCB's can be bound to same local port and same local address also. But then 
+    /* Search through list of PCB's in TIME_WAIT state. If SO_REUSEADDR is set a bound combination [IP, port}
+     can be rebound. The same applies when SOF_REUSEPORT is set.
+
+     If SOF_REUSEPORT is set several PCB's can be bound to same local port and same local address also. But then
      all PCB's must have the SOF_REUSEPORT option set.
-     
-     When the two options aren't set and specified port is already bound, ERR_USE is returned saying that 
+
+     When the two options aren't set and specified port is already bound, ERR_USE is returned saying that
      address is already in use. */
     for (cpcb = tcp_tw_pcbs; cpcb != NULL; cpcb = cpcb->next) {
         if (cpcb->local_port == port) {
@@ -353,7 +353,7 @@ err_t tcp_bind(struct tcp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
         }
     }
 
-    /* If SOF_REUSEPORT isn't set in all PCB's bound to specified port and local address specified then 
+    /* If SOF_REUSEPORT isn't set in all PCB's bound to specified port and local address specified then
      {IP, port} can't be reused. */
     if (!reuse_port_all_set) {
         LWIP_DEBUGF(TCP_DEBUG, ("tcp_bind: not all sockets have SO_REUSEPORT set.\n"));
@@ -460,7 +460,7 @@ tcp_new_port(void)
     struct tcp_pcb *pcb;
 #ifndef TCP_LOCAL_PORT_RANGE_START
 #define TCP_LOCAL_PORT_RANGE_START 4096
-#define TCP_LOCAL_PORT_RANGE_END 0x7fff
+#define TCP_LOCAL_PORT_RANGE_END   0x7fff
 #endif
     static u16_t port = TCP_LOCAL_PORT_RANGE_START;
     // randomize the port value a bit to avoid TCP conflicts
@@ -593,7 +593,7 @@ void tcp_slowtmr(void)
                                             pcb->rtime, pcb->rto));
 
                 /* Double retransmission time-out unless we are trying to
-         * connect to somebody (i.e., we are in SYN_SENT). */
+                 * connect to somebody (i.e., we are in SYN_SENT). */
                 if (pcb->state != SYN_SENT) {
                     pcb->rto = ((pcb->sa >> 3) + pcb->sv) << tcp_backoff[pcb->nrtx];
                 }
@@ -816,7 +816,6 @@ tcp_seg_copy(struct tcp_seg *seg)
 static err_t
 tcp_recv_null(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 {
-    arg = arg;
     if (p != NULL) {
         pbuf_free(p);
     } else if (err == ERR_OK) {

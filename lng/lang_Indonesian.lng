@@ -1,7 +1,6 @@
 # Indonesian translation by verislasher completed by jbliz
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Indonesian
-Open PS2 Loader %s
 Simpan Perubahan
 Kembali
 Konfigurasi jaringan
@@ -12,7 +11,7 @@ Kesalahan penulisan setingan!
 Keluar
 Setingan
 Menu
-USB Games
+BDM Games
 HDD Games
 ETH Games
 Aplikasi
@@ -42,7 +41,6 @@ Kali
 Daftar Game
 Setingan
 Hapus setingan
-Semua kunci permainan yang dihapus
 Gulir
 Lambat
 Sedang
@@ -53,30 +51,29 @@ Mohon tunggu
 Kesalahan saat memuat ID Permainan
 Penyortiran otomatis
 Kesalahan memuat file bahasa
-Menonaktifkan Warna Debug
-Tak ada kontroler terdeteksi, menunggu ...
-Aktifkan Sampul
+Debug Colors
+Tak ada kontroler terdeteksi, menunggu …
+Cover Art
 Layar lebar
 Matikan
 Memuat konfigurasi
 Menyimpan konfigurasi
 Memulai perangkat
 Segarkan
-Memulai mode perangkat USB
+BDM Start Mode
 Memulai mode perangkat HDD
 Memulai mode perangkat ETH
 Memulai mode Aplikasi
 Otomatis
 Manual
-Mulai Server HDL
-Memulai Server HDL ...
-Menjalankan Server HDL...
-Gagal memulai Server HDL.
-Mengembalikan Server HDL...
+Mulai Server NBD
+Memulai Server NBD …
+Menjalankan Server NBD…
+Gagal memulai Server NBD.
+Mengembalikan Server NBD…
 Pintasan IGR
 Warna latar belakang
 Warna teks
-- PS2 - 
 - SMB Server -
 Jenis alamat IP
 Statis
@@ -100,7 +97,7 @@ Ubah nama
 Hapus
 Jalankan
 Setingan tampilan
-Memungkinkan operasi tulis
+Write Operations
 Ingat pertandingan terakhir dimainkan
 Pilih tombol
 Kesalahan, game terfragmentasi
@@ -113,8 +110,6 @@ Melepas kaitan syscalls
 Lewati video
 Emulasi DVD-DL
 Nonaktifkan IGR
-Tdk terpakai
-Unused
 Mengubah ukuran akan memformat ulang VMC
 Membuat
 Mulai
@@ -135,7 +130,7 @@ Segarkan otomatis
 Tentang
 Pengkode
 Kualitas jaminan
-Awalan pintas USB
+Awalan pintas BDM
 Jalankan ELF Kustom setelah IGR
 Nilai dalam menit (s), 0 untuk menonaktifkan berhenti
 HDD Otomatis berhenti
@@ -164,8 +159,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 Konfigurasi GSM
 Mode tautan ethernet
 100Mbit rangkap penuh
@@ -173,9 +166,8 @@ Mode tautan ethernet
 10Mbit rangkap penuh
 10Mbit setengah rangkap
 Setingan GSM
-Aktifkan GSM
+GSM Selector
 Alih GSM ON atau OFF
-VMODE
 Paksa Mode Tampilan Kustom
 H-POS
 Penyesuaian horisontal
@@ -186,7 +178,7 @@ Penyesuaian Tampilan berlebih
 Lewati FMV
 Lompati Video Gerakan Penuh
 Setingan Cheat
-Aktifkan PS2RD Cheat Engine
+PS2RD Cheat Engine
 Biarkan PS2RD Cheat Engine menambal permainan Anda
 Modus PS2RD Cheat Engine
 Pilih otomatis atau Pilih game cheats
@@ -204,14 +196,14 @@ Perbarui dibatalkan
 Unduh pengaturan dari jaringan?
 Setingan disesuaikan
 Unduhan default
-Mulai otomatis dalam %i s...
+Mulai otomatis dalam %i s…
 Mulai otomatis
 Nilai dalam detik, 0 mencegah mulai otomatis
 Logo PS2
 Hanya ditampilkan untuk logo disc yang valid yang cocok dengan region konsol
 Konfigurasi PADEMU
 Pengaturan Stik Emulator
-Aktifkan PadEmulator
+Pad Emulator
 Hidup/matikan StikEmulator game dipilih.
 mode Stik Emulator
 Pilih mode Stik Emulator
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Setingan untuk port:
 Pilih port Stik Emulator untuk setingan
-Aktifkan emulasi
+Emulation
 Hidup/matikan Stik Emulator port dipilih
-Aktifkan getar
+Vibration
 Hidup/matikan getar Stik Emulator port dipilih
 Alamat mac adaptor bluetooth Usb
 Pengontrol DS dipasangkan ke Alamat MAC:
@@ -239,12 +231,12 @@ Ya
 Tidak
 adapter Bluetooth harus sepenuhnya cocok dengan Pengontrol DS3/DS4.
 adapter Bluetooth mungkin tidak bekerja dengan benar dengan Pengontrol DS3/DS4.
-Aktifkan emulasi Multitap
+Multitap Emulation
 Aktifkan/NonAktifkan emulasi Multitap untuk game dipilih.
 emulator Multitap pada port
 Pilih port untuk emulasi Multitap.
-Nonaktifkan solusi untuk DS3 palsu
-beberapa ds3s palsu butuh solusi, opsi ini akan nonaktif.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulasikan FIELD flipping
 Perbaiki Game yang bermasalah di mode video progresif.
 Seting kunci Parental
@@ -257,14 +249,17 @@ Opsi Bentukan:
 Kesalahan - kata sandi tak bisa dipakai.
 Berkas VMC %s terfragmentasi. Gunakan kartu memori di slot %d?
 Pengaturan Audio
-Aktifkan efek suara
-Aktifkan suara Boot
+Sound Effects
+Boot Sound
 Volume efek suara
 Volume suara Boot
 Konfirmasi perubahan mode video?
 Daftar Tembolok Game(HDD)
-Izinkan Pemberitahuan
-%s dimuat dari %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Pengaturan Game disimpan.
 %s setingan dihapus.
@@ -280,3 +275,10 @@ Aliran
 Rilis
 Pengembang
 Deskripsi
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

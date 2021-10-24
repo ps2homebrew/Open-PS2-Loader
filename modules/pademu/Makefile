@@ -18,10 +18,8 @@ ifeq ($(VMC),1)
 IOP_CFLAGS += -DVMC
 endif
 
-IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJS_DIR)%)
-
 IOP_CFLAGS += -DUSE_SMSUTILS
 
 include $(PS2SDK)/Defs.make
 include ../Rules.bin.make
-include ../Rules.make
+include $(PS2SDK)/samples/Makefile.iopglobal

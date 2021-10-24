@@ -1,7 +1,7 @@
 /*
   Copyright 2010, volca
   Parts Copyright 2009, jimmikaelkael
-  Copyright (c) 2002, A.Lee & Nicholas Van Veen  
+  Copyright (c) 2002, A.Lee & Nicholas Van Veen
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 
@@ -13,7 +13,7 @@
 
 u32 crctab[0x400];
 
-#define EXIT_OK 0
+#define EXIT_OK      0
 #define EXIT_FAILURE 1
 
 //-----------------------------------------------------------------------
@@ -116,14 +116,15 @@ int listGames(void)
 //-----------------------------------------------------------------------
 int findGame(const char *gameid, cfg_t *item)
 {
-    // open ul.cfg
-    FILE *ul = fopen("ul.cfg", "rb");
+    FILE *ul;
 
     if (!item) {
         printf("Invalid target record (internal error)!\n");
         return EXIT_FAILURE;
     }
 
+    // open ul.cfg
+    ul = fopen("ul.cfg", "rb");
     if (ul == NULL) {
         printf("No ul.cfg in the current directory!\n");
         return EXIT_FAILURE;
@@ -146,16 +147,22 @@ int findGame(const char *gameid, cfg_t *item)
         fread(item->pad, 1, sizeof(item->pad), ul);
 
         // in the ul.????_???.?? form?
-        if (strncmp(item->image, gameid, 15) == 0)
+        if (strncmp(item->image, gameid, 15) == 0) {
+            fclose(ul);
             return 1;
+        }
 
         // in the ????_???.?? form?
-        if (strncmp(&item->image[3], gameid, 12) == 0)
+        if (strncmp(&item->image[3], gameid, 12) == 0) {
+            fclose(ul);
             return 1;
+        }
 
         // game name itself?
-        if (strncmp(item->name, gameid, 32) == 0)
+        if (strncmp(item->name, gameid, 32) == 0) {
+            fclose(ul);
             return 1;
+        }
 
         // in the ul.????????.????_???.??.?? form? (Drag-Dropped part-file name)
         char *temp;
@@ -168,11 +175,13 @@ int findGame(const char *gameid, cfg_t *item)
             temp = (char *)gameid;
         else
             temp++;
-        if ((strlen(temp) >= 23)                                //Minimum part file name length is really 26
+        if ((strlen(temp) >= 23)                                // Minimum part file name length is really 26
             && (strncmp("ul.", temp, 3) == 0)                   //"ul." at start
             && (strncmp(&item->image[2], &(temp[11]), 12) == 0) //.game_ID after CRC
-        )
+        ) {
+            fclose(ul);
             return 1;
+        }
     }
 
     fclose(ul);
@@ -253,12 +262,14 @@ int exportGame(const char *gameid)
             if (read != fwrite(block, 1, read, fdest)) {
                 printf("Could not write to destination file '%s' (Insufficient disk space?). Resulting file will be invalid\n", rname);
                 fclose(fdest);
+                fclose(fsrc);
                 return EXIT_FAILURE;
             }
         }
     }
 
     fclose(fdest);
+    fclose(fsrc);
 
     printf("* All parts processed...\n");
 

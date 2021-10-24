@@ -24,7 +24,7 @@ struct UIItem diaNetConfig[] = {
 
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CAT_PS2}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"- PS2 -", -1}}},
     {UI_BREAK},
 
     // ---- IP address type ----
@@ -135,6 +135,33 @@ struct UIItem diaNetConfig[] = {
     // end of dialog
     {UI_TERMINATOR}};
 
+// Block Devices Settings Menu
+struct UIItem diaBlockDevicesConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BLOCKDEVICE_SETTINGS}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"USB", -1}}},
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ON}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"iLink", -1}}},
+    {UI_SPACER},
+    {UI_BOOL, CFG_ENABLEILK, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"MX4SIO", -1}}},
+    {UI_SPACER},
+    {UI_BOOL, CFG_ENABLEMX4SIO, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+    {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
 // Settings Menu
 struct UIItem diaConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SETTINGS}}},
@@ -172,16 +199,11 @@ struct UIItem diaConfig[] = {
     {UI_LABEL, CFG_LBL_AUTOSTARTLAST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_AUTOSTARTLAST}}},
     {UI_SPACER},
     {UI_INT, CFG_AUTOSTARTLAST, 1, 1, _STR_HINT_AUTOSTARTLAST, 0, 0, {.intvalue = {0, 0, 0, 9}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SELECTBUTTON}}},
-    {UI_SPACER},
-    {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USB_PREFIX}}},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BDM_PREFIX}}},
     {UI_SPACER},
-    {UI_STRING, CFG_USBPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
+    {UI_STRING, CFG_BDMPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ETH_PREFIX}}},
@@ -194,9 +216,11 @@ struct UIItem diaConfig[] = {
     {UI_INT, CFG_HDDSPINDOWN, 1, 1, _STR_HINT_SPINDOWN, 0, 0, {.intvalue = {20, 20, 0, 20}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USBMODE}}},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BDMMODE}}},
     {UI_SPACER},
-    {UI_ENUM, CFG_USBMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_ENUM, CFG_BDMMODE, 1, 1, _STR_HINT_BDM_START, 0, 0, {.intvalue = {0, 0}}},
+    {UI_SPACER},
+    {UI_BUTTON, BLOCKDEVICE_BUTTON, 1, 1, _STR_HINT_BLOCK_DEVICES, 0, 0, {.label = {NULL, _STR_BLOCKDEVICE_SETTINGS}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDDMODE}}},
@@ -239,11 +263,6 @@ struct UIItem diaUIConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_LANGUAGE}}},
     {UI_SPACER},
     {UI_ENUM, UICFG_LANG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SCROLLING}}},
-    {UI_SPACER},
-    {UI_ENUM, UICFG_SCROLL, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_AUTOSORT}}},
@@ -456,7 +475,7 @@ struct UIItem diaGSConfig[] = {
     {UI_BOOL, GSMCFG_ENABLEGSM, 1, 1, _STR_HINT_ENABLEGSM, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_GSMVMODE}}},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_VMODE}}},
     {UI_SPACER},
     {UI_ENUM, GSMCFG_GSMVMODE, 1, 1, _STR_HINT_GSMVMODE, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
@@ -516,43 +535,43 @@ struct UIItem diaPadEmuConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMU_SETTINGS}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_SETTINGS_SOURCE}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_SETTINGS_SOURCE}}},
     {UI_SPACER},
     {UI_ENUM, PADCFG_PADEMU_SOURCE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_ENABLE}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PADEMU_ENABLE}}},
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_ENABLE, 1, 1, _STR_HINT_PADEMU_ENABLE, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_MODE}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PADEMU_MODE}}},
     {UI_SPACER},
     {UI_ENUM, PADCFG_PADEMU_MODE, 1, 1, _STR_HINT_PADEMU_MODE, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_MTAP_ENABLE}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_MTAP_ENABLE}}},
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_MTAP, 1, 1, _STR_HINT_MTAP_ENABLE, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_MTAP_PORT}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_MTAP_PORT}}},
     {UI_SPACER},
     {UI_INT, PADCFG_PADEMU_MTAP_PORT, 1, 1, _STR_HINT_MTAP_PORT, 0, 0, {.intvalue = {1, 1, 1, 2}}},
     {UI_BREAK},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADPORT}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PADPORT}}},
     {UI_SPACER},
     {UI_ENUM, PADCFG_PADPORT, 1, 1, _STR_HINT_PAD_PORT, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_PORT}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PADEMU_PORT}}},
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_PORT, 1, 1, _STR_HINT_PADEMU_PORT, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_VIB}}},
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PADEMU_VIB}}},
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_VIB, 1, 1, _STR_HINT_PADEMU_VIB, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
@@ -560,21 +579,21 @@ struct UIItem diaPadEmuConfig[] = {
     {UI_SPLITTER},
     {UI_BREAK},
 
-    {UI_LABEL, PADCFG_USBDG_MAC_STR, 1, 1, -1, -45, 0, {.label = {NULL, _STR_USBDG_MAC}}},
+    {UI_LABEL, PADCFG_USBDG_MAC_STR, 1, 1, -1, -50, 0, {.label = {NULL, _STR_USBDG_MAC}}},
     {UI_SPACER},
     {UI_LABEL, PADCFG_USBDG_MAC, 1, 1, -1, 0, 0, {.label = {"", -1}}},
     {UI_BREAK},
-    {UI_LABEL, PADCFG_PAD_MAC_STR, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PAD_MAC}}},
+    {UI_LABEL, PADCFG_PAD_MAC_STR, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PAD_MAC}}},
     {UI_SPACER},
     {UI_LABEL, PADCFG_PAD_MAC, 1, 1, -1, 0, 0, {.label = {"", -1}}},
     {UI_BREAK},
 
-    {UI_LABEL, PADCFG_PAIR_STR, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PAIR_PAD}}},
+    {UI_LABEL, PADCFG_PAIR_STR, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PAIR_PAD}}},
     {UI_SPACER},
     {UI_BUTTON, PADCFG_PAIR, 1, 1, _STR_HINT_PAIRPAD, 0, 0, {.label = {NULL, _STR_PAIR}}},
     {UI_BREAK},
 
-    {UI_LABEL, PADCFG_PADEMU_WORKAROUND_STR, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_WORKAROUND}}},
+    {UI_LABEL, PADCFG_PADEMU_WORKAROUND_STR, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PADEMU_WORKAROUND}}},
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_WORKAROUND, 1, 1, _STR_HINT_PADEMU_WORKAROUND, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
@@ -903,6 +922,31 @@ struct UIItem diaAudioConfig[] = {
     {UI_INT, CFG_BOOT_SND_VOLUME, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
     {UI_BREAK},
 
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+    {UI_BREAK},
+    // end of dialog
+    {UI_TERMINATOR}};
+
+// Controller Settings Menu
+struct UIItem diaControllerConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CONTROLLER_SETTINGS}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SCROLLING}}},
+    {UI_SPACER},
+    {UI_ENUM, UICFG_SCROLL, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SELECTBUTTON}}},
+    {UI_SPACER},
+    {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+#ifdef PADEMU
+    {UI_BREAK},
+    {UI_BUTTON, PADEMU_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
+    {UI_BREAK},
+#endif
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},

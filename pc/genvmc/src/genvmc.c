@@ -8,26 +8,26 @@
 #include "genvmc.h"
 
 // mc file attributes
-#define SCE_STM_R 0x01
-#define SCE_STM_W 0x02
-#define SCE_STM_X 0x04
-#define SCE_STM_C 0x08
-#define SCE_STM_F 0x10
-#define SCE_STM_D 0x20
-#define sceMcFileAttrReadable SCE_STM_R
-#define sceMcFileAttrWriteable SCE_STM_W
-#define sceMcFileAttrExecutable SCE_STM_X
+#define SCE_STM_R                0x01
+#define SCE_STM_W                0x02
+#define SCE_STM_X                0x04
+#define SCE_STM_C                0x08
+#define SCE_STM_F                0x10
+#define SCE_STM_D                0x20
+#define sceMcFileAttrReadable    SCE_STM_R
+#define sceMcFileAttrWriteable   SCE_STM_W
+#define sceMcFileAttrExecutable  SCE_STM_X
 #define sceMcFileAttrDupProhibit SCE_STM_C
-#define sceMcFileAttrFile SCE_STM_F
-#define sceMcFileAttrSubdir SCE_STM_D
-#define sceMcFileCreateDir 0x0040
-#define sceMcFileAttrClosed 0x0080
-#define sceMcFileCreateFile 0x0200
-#define sceMcFile0400 0x0400
-#define sceMcFileAttrPDAExec 0x0800
-#define sceMcFileAttrPS1 0x1000
-#define sceMcFileAttrHidden 0x2000
-#define sceMcFileAttrExists 0x8000
+#define sceMcFileAttrFile        SCE_STM_F
+#define sceMcFileAttrSubdir      SCE_STM_D
+#define sceMcFileCreateDir       0x0040
+#define sceMcFileAttrClosed      0x0080
+#define sceMcFileCreateFile      0x0200
+#define sceMcFile0400            0x0400
+#define sceMcFileAttrPDAExec     0x0800
+#define sceMcFileAttrPS1         0x1000
+#define sceMcFileAttrHidden      0x2000
+#define sceMcFileAttrExists      0x8000
 
 // SONY superblock magic & version
 static char SUPERBLOCK_MAGIC[] = "Sony PS2 Memory Card Format ";
@@ -405,10 +405,10 @@ int main(int argc, char **argv, char **env)
         return EXIT_FAILURE;
     }
 
-    //if ((size_MB != 1) && (size_MB % 8)) {
-    //	printf("Error: VMC size_in_MB not multiple of 8...\n");
-    //	return EXIT_FAILURE;
-    //}
+    // if ((size_MB != 1) && (size_MB % 8)) {
+    //     printf("Error: VMC size_in_MB not multiple of 8...\n");
+    //     return EXIT_FAILURE;
+    // }
 
     int r = vmc_mcformat(argv[2], size_MB * 1024, 16);
     if (r != 0) {

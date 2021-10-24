@@ -30,7 +30,7 @@
 #define MODNAME "udptty"
 IRX_ID(MODNAME, 2, 1);
 
-struct irx_export_table _exp_udptty;
+extern struct irx_export_table _exp_udptty;
 
 #define DEVNAME "tty"
 
@@ -75,7 +75,7 @@ static iop_device_t tty_device = {
 /* KPRTTY */
 #ifdef KPRTTY
 #define PRNT_IO_BEGIN 0x200
-#define PRNT_IO_END 0x201
+#define PRNT_IO_END   0x201
 
 typedef struct _KprArg
 {

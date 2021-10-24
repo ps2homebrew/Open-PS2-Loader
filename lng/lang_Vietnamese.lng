@@ -1,7 +1,6 @@
 # Vietnamese translation by zidane89
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Vietnamese
-OPL %s
 Lưu thay đổi
 Quay lại
 Network Settings
@@ -12,9 +11,9 @@ Không lưu được cài đặt!
 Thoát
 Cài đặt
 Menu
-Trò chơi trên USB
+Trò chơi trên BDM
 Trò chơi trên HDD
-Trò chơi qua ETH 
+Trò chơi qua ETH
 Ứng dụng
 Chủ đề
 Ngôn ngữ
@@ -24,7 +23,7 @@ Hủy bỏ các cập nhật?
 %d: Không phát hiện ổ cứng
 %d: Ổ cứng chưa định dạng
 %d: Lỗi khởi chạy mạng
-%d: Không có adaptor mạng 
+%d: Không có adaptor mạng
 %d: Không thể kết nối đến SMB server
 %d: Không thể đăng nhập vào SMB server
 %d: Không mở được SMB share
@@ -42,7 +41,6 @@ Nút X
 Danh sách trò chơi
 Cài đặt Game
 Remove Settings
-Removed all keys for the game
 Cuộn
 Chậm
 Thường
@@ -53,30 +51,29 @@ Vui lòng chờ
 Lỗi khi nạp Game ID
 Tự động phân loại
 Lỗi nạp tập tin ngôn ngữ
-Ngắt màu Debug 
-Không có cần điều khiển, đợi chút...
-Bật Cover Art
+Debug Colors
+Không có cần điều khiển, đợi chút…
+Cover Art
 Màn hình rộng
 Tắt máy
 Nạp cấu hình
 Lưu cấu hình
 Chọn thiết bị lưu trò chơi
 Làm mới
-Chọn USB 
-Chọn HDD 
-Chọn ETH 
+BDM Start Mode
+Chọn HDD
+Chọn ETH
 Hiển thị menu ứng dụng
 Tự động
 Thủ công
-Khởi chạy máy chủ HDL 
-Máy chủ HDL khởi chạy...
-Máy chủ HDL đang chạy...
-khởi chạy máy chủ HDL thất bại.
-Không nạp được máy chủ HDL...
+Khởi chạy máy chủ NBD
+Máy chủ NBD khởi chạy…
+Máy chủ NBD đang chạy…
+khởi chạy máy chủ NBD thất bại.
+Không nạp được máy chủ NBD…
 Vá IGR
 Màu nền
 Màu chữ
-- PS2 -
 - SMB Server -
 Gõ địa chỉ IP
 Tĩnh
@@ -96,11 +93,11 @@ IP
 NetBIOS
 Truy cập
 Mục này sẽ bị xóa vĩnh viễn, tiếp tục?
-Đổi tên 
-Xóa  
+Đổi tên
+Xóa
 Chạy
 Cài đặt hiển thị
-Kích hoạt thao tác ghi
+Write Operations
 Nhớ các cài đặt cuối cùng
 Chọn nút
 Lỗi, trò chơi bị phân mảnh
@@ -113,8 +110,6 @@ Unhook Syscalls
 Bỏ qua các Video
 Giả lập DVD-DL
 Ngắt IGR
-Không dùng
-Không dùng
 Thay đổi dung lượng sẽ định dạng lại VMC
 Tạo
 Bắt đầu
@@ -135,7 +130,7 @@ Tự động làm tươi
 Thông tin
 Coders
 Đảm bảo chất lượng
-USB prefix path
+BDM prefix path
 Boots Custom ELF after an IGR
 Giá trị tính bằng phút(s), 0 tắt chế độ chờ HDD
 HDD tự động chờ
@@ -143,7 +138,7 @@ Chế độ Video
 Màu hộp thoại
 Chọn màu
 Reset Colors
-Thông tin   
+Thông tin
 Tùy chỉnh ELF
 Màu sắc lựa chọn
 Kết nối lại
@@ -156,26 +151,23 @@ Chế độ
 VMC ở Khe 1
 VMC ở Khe 2
 Game ID
-Chế độ DMA 
+Chế độ DMA
 V-Sync
-Mode 1  
-Mode 2  
-Mode 3  
-Mode 4  
-Mode 5  
-Mode 6  
-Mode 7  
-Mode 8  
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
 Cấu hình GSM
 Ethernet Link Mode
 100Mbit Full-duplex
 100Mbit Half-duplex
 10Mbit Full-duplex
 10Mbit Half-duplex
-Cài đặt GSM 
-Bật GSM
+Cài đặt GSM
+GSM Selector
 Bật hoặc tắt GSM
-VMODE
 Chế độ hiển thị tùy chỉnh bắt buộc
 H-POS
 Điều chỉnh theo chiều ngang
@@ -185,10 +177,10 @@ Overscan
 Overscan Adjustment
 Bỏ qua FMV
 Bỏ qua Full Motion Videos
-Cài đặt Cheat 
-Bật PS2RD Cheat Engine
+Cài đặt Cheat
+PS2RD Cheat Engine
 Hãy để PS2RD Cheat Engine vá vào trò chơi
-Chế độ PS2RD Cheat Engine 
+Chế độ PS2RD Cheat Engine
 Tự động chọn hoặc chọn trò chơi ăn gian
 Tự động chọn cheats
 Chọn cheats trò chơi
@@ -204,14 +196,14 @@ Hủy cập nhật.
 Tải về cài đặt qua mạng?
 Cài đặt tùy chỉnh
 Tải về mặc định
-Tự khởi động trong %i s...
+Tự khởi động trong %i s…
 Tự khởi động
 đơn vị bằng giây(s), 0 để ngắt tự khởi động
-Logo PS2 
+Logo PS2
 Displayed for a valid disc logo matching the console's region.
 Cấu hình PADEMU
 Cài đặt giả lập tay cầm
-Bật PadEmulator
+Pad Emulator
 Bật/tắt PadEmulator cho trò chơi đã chọn.
 Chế độ Pad Emulator
 Chọn chế độ Pad Emulator.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Cài đặt cổng:
 Chọn cổng cài đặt Pad Emulator.
-Bật giả lập
+Emulation
 Bật/tắt Pad Emulator cổng đã chọn.
-Bật rung
+Vibration
 Bật/tắt rung Pad Emulator cho cổng đã chọn.
 Địa chỉ MAC của USB Bluetooth:
 Địa chỉ MAC của tay DS:
@@ -239,12 +231,12 @@ Yes
 No
 Bluetooth adapter phải tương thích với tay cầm DS3/DS4.
 Bluetooth adapter có thể không hoạt động chính xác với tay cầm DS3/DS4.
-Bật giả lập Multitap 
+Multitap Emulation
 Bật/tắt giả lập Multitap cho trò chơi đã chọn.
 Giả lập Multitap tại cổng
 Chọn cổng giả lập Multitap.
-Ngắt workaround để fake DS3
-Fake ds3s cần workaround, Tùy chọn này sẽ ngắt nó.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD flipping
 Khắc phục các game bị trục trặc trong chế độ progressive modes.
 Cài đặt khóa phụ huynh
@@ -257,14 +249,17 @@ Tùy chọn Build:
 Lỗi - mật khẩu này không thể sử dụng.
 Tệp VMC %s bị phân mảnh. Tiếp tục với MC ở khe %d?
 Cài đặt âm thanh
-Bật hiệu ứng âm thanh
-Tăng cường âm lượng
+Sound Effects
+Boot Sound
 Mức hiệu ứng âm thanh
 Tăng mức âm lượng
 Thay đổi chế độ video?
 Cache danh sách trò chơi (HDD)
-Enable Notifications
-%s loaded from %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Game settings saved.
 %s settings removed.
@@ -280,3 +275,10 @@ Genre
 Release
 Developer
 Description
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

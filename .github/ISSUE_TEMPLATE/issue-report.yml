@@ -1,0 +1,76 @@
+name: Issue report
+description: Create a report to help us improve
+title: "[ISSUE]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### __Disclaimer:__
+        Issue reports for the OPL app that was not downloaded from the official GitHub repo releases section or official Mega mirror are not accepted.
+        Issue reports for 3rd party HDD adapters (like Gamestar) are not accepted.
+        Issue reports for consoles with installed and enabled modchip are not accepted.
+        Before posting the issue confirm that you meet the below requirements.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checks
+      description: "Check before posting"
+      options:
+        - label: I have checked existing [__OPL issues__](https://github.com/ps2homebrew/Open-PS2-Loader/issues) for duplicates and found none
+        - label: I am using either OPL [latest stable version](https://github.com/ps2homebrew/Open-PS2-Loader/releases/latest), or [archived version](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A) or [__OPL beta version__](https://github.com/ps2homebrew/open-ps2-loader/releases)
+
+  - type: textarea
+    id: explanation
+    attributes:
+      label: Describe the issue
+      description: A clear and concise description of what the issue is.
+      placeholder: My issue is...
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ### Configuration
+        > (please complete the following information):
+
+  - type: input
+    id: console
+    attributes:
+      label: Console model
+      description: you can see it on the console sticker or inside OSDSYS (press triangle on main menú)
+      placeholder: SCPH-?????
+    validations:
+      required: true
+
+  - type: input
+    id: oplver
+    attributes:
+      label: "OPL version / revision"
+      description: "you can see it on the About option from the settings menu (press start in game list)"
+      placeholder: "eg: OPL stable 1.0.0 | OPL beta 1.1.0 1732"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: "In which device(s) have you experienced this issue?"
+      multiple: true
+      options:
+        - USB
+        - SMB
+        - HDD
+        - iLink
+        - MX4SIO
+
+  - type: textarea
+    id: context-and-data
+    attributes:
+      label: Context and extra information
+      description: Information about affected games (Game name, [Game ID], link to redump.org) and expected behavior
+      placeholder: "game affected is Kingdom Hearts: II Final Mix [SLPM_666.75], http://redump.org/disc/7733/"
+    validations:
+      required: false

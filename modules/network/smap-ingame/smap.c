@@ -21,35 +21,35 @@
 #include "main.h"
 #include "xfer.h"
 
-/*	There is a difference in how the transmissions are made,
-	between this driver and the SONY original.
+/*  There is a difference in how the transmissions are made,
+    between this driver and the SONY original.
 
-	SONY:
-		1. NETDEV calls SMAP's xmit callback.
-		2. SMAP's xmit event handler issues that XMIT event (for the main thread).
-		3. XMIT event copies the frames to the Tx buffer and sets up the BDs.
-		4. Tx DNV handler is called (always, regardless of what event it is being handled!).
-		5. Interrupts are re-enabled, except for TXDNV.
-		6. If there are frames to transmit, write to TX_GNP_0 and enable the TXDNV interrupt
+    SONY:
+        1. NETDEV calls SMAP's xmit callback.
+        2. SMAP's xmit event handler issues that XMIT event (for the main thread).
+        3. XMIT event copies the frames to the Tx buffer and sets up the BDs.
+        4. Tx DNV handler is called (always, regardless of what event it is being handled!).
+        5. Interrupts are re-enabled, except for TXDNV.
+        6. If there are frames to transmit, write to TX_GNP_0 and enable the TXDNV interrupt
 
-		The TXDNV interrupt is hence always disabled, but only enabled when a frame(s) is sent.
-		Perhaps there is a lack of a check on the TXEND interrupt because it is polling on the TX BDs before every transmission.
+        The TXDNV interrupt is hence always disabled, but only enabled when a frame(s) is sent.
+        Perhaps there is a lack of a check on the TXEND interrupt because it is polling on the TX BDs before every transmission.
 
-		I don't know how to test this, but it seems like the TXDNV interrupt is asserted for as long as
-		there is no valid frame to transmit, hence this design by SONY.
+        I don't know how to test this, but it seems like the TXDNV interrupt is asserted for as long as
+        there is no valid frame to transmit, hence this design by SONY.
 
-	OPL:
-		1. Network stack calls SMAPSendPacket().
-		2. TX_GNP_0 is checked and waited on (Tx channel 0 is in single mode)
-		3. Frame is copied into the Tx buffer and a BD is set up.
-		4. TX_GNP_0 is written to. */
+    OPL:
+        1. Network stack calls SMAPSendPacket().
+        2. TX_GNP_0 is checked and waited on (Tx channel 0 is in single mode)
+        3. Frame is copied into the Tx buffer and a BD is set up.
+        4. TX_GNP_0 is written to. */
 
 #define DEV9_SMAP_ALL_INTR_MASK (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND | SMAP_INTR_TXEND | SMAP_INTR_RXDNV | SMAP_INTR_TXDNV)
-//Unlike the SONY original, the RXDNV interrupt is not handled as statistics are not recorded.
-//For the sake of simplicity, Tx channel 0 is operated in single-mode. Do not handle TXDNV.
-#define DEV9_SMAP_INTR_MASK (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
-//The Tx interrupt events are handled separately
-#define DEV9_SMAP_INTR_MASK2 (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
+// Unlike the SONY original, the RXDNV interrupt is not handled as statistics are not recorded.
+// For the sake of simplicity, Tx channel 0 is operated in single-mode. Do not handle TXDNV.
+#define DEV9_SMAP_INTR_MASK     (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
+// The Tx interrupt events are handled separately
+#define DEV9_SMAP_INTR_MASK2    (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
 
 struct SmapDriverData SmapDriverData;
 
@@ -74,7 +74,7 @@ static void _smap_write_phy(volatile u8 *emac3_regbase, unsigned int address, u1
             break;
     }
 
-    //if(i>=100) printf("smap: %s: > %d ms\n", "_smap_write_phy", i);
+    // if(i>=100) printf("smap: %s: > %d ms\n", "_smap_write_phy", i);
 }
 
 static u16 _smap_read_phy(volatile u8 *emac3_regbase, unsigned int address)
@@ -338,17 +338,17 @@ static int InitPHY(struct SmapDriverData *SmapDrivPrivData)
     return 0;
 }
 
-//Checks the status of the Ethernet link
+// Checks the status of the Ethernet link
 static void CheckLinkStatus(struct SmapDriverData *SmapDrivPrivData)
 {
     if (!(_smap_read_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_BMSR) & SMAP_PHY_BMSR_LINK)) {
-        //Link lost
+        // Link lost
         SmapDrivPrivData->LinkStatus = 0;
         InitPHY(SmapDrivPrivData);
     }
 }
 
-//This timer callback starts the Ethernet link check event.
+// This timer callback starts the Ethernet link check event.
 static unsigned int LinkCheckTimerCB(struct SmapDriverData *SmapDrivPrivData)
 {
     CheckLinkStatus(SmapDrivPrivData);
@@ -361,9 +361,11 @@ static int Dev9IntrCb(int flag)
     USE_SPD_REGS;
     volatile u8 *smap_regbase, *emac3_regbase;
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
 
     emac3_regbase = SmapDriverData.emac3_regbase;
     smap_regbase = SmapDriverData.smap_regbase;
@@ -378,7 +380,9 @@ static int Dev9IntrCb(int flag)
         }
     }
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 
     return 0;
 }
@@ -418,16 +422,18 @@ int SMAPStart(void)
     int result;
     volatile u8 *emac3_regbase;
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
 
     if (!SmapDriverData.SmapIsInitialized) {
         emac3_regbase = SmapDriverData.emac3_regbase;
 
         dev9IntrEnable(DEV9_SMAP_INTR_MASK2);
 
-        //Initialize the PHY, only if there's no valid link status. It should have already been previously initialized successfully by the previous instance of SMAP.
+        // Initialize the PHY, only if there's no valid link status. It should have already been previously initialized successfully by the previous instance of SMAP.
         result = (!(_smap_read_phy(emac3_regbase, SMAP_DsPHYTER_BMSR) & SMAP_PHY_BMSR_LINK)) ? InitPHY(&SmapDriverData) : 0;
         if (result == 0 && !SmapDriverData.NetDevStopFlag) {
             SMAP_EMAC3_SET32(SMAP_R_EMAC3_MODE0, SMAP_E3_TXMAC_ENABLE | SMAP_E3_RXMAC_ENABLE);
@@ -435,7 +441,7 @@ int SMAPStart(void)
             SmapDriverData.SmapIsInitialized = 1;
 
             if (!SmapDriverData.EnableLinkCheckTimer) {
-                USec2SysClock(5000000, &SmapDriverData.LinkCheckTimer); //Since there isn't a thread that allows the link checking code to determine whether frames were received or not and to check the link status, just reduce the polling frequency.
+                USec2SysClock(5000000, &SmapDriverData.LinkCheckTimer); // Since there isn't a thread that allows the link checking code to determine whether frames were received or not and to check the link status, just reduce the polling frequency.
                 SetAlarm(&SmapDriverData.LinkCheckTimer, (void *)&LinkCheckTimerCB, &SmapDriverData);
                 SmapDriverData.EnableLinkCheckTimer = 1;
             }
@@ -443,7 +449,9 @@ int SMAPStart(void)
             SmapDriverData.NetDevStopFlag = 0;
     }
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 
     return 0;
 }
@@ -452,9 +460,11 @@ void SMAPStop(void)
 {
     volatile u8 *emac3_regbase;
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
     SmapDriverData.NetDevStopFlag = 1;
 
     if (SmapDriverData.SmapIsInitialized) {
@@ -466,7 +476,9 @@ void SMAPStop(void)
         SmapDriverData.SmapIsInitialized = 0;
     }
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 }
 
 static int ParseSmapConfiguration(const char *cmd, unsigned int *configuration)
@@ -510,7 +522,7 @@ static int ParseSmapConfiguration(const char *cmd, unsigned int *configuration)
 
     return 0;
 fail_end:
-    //	printf("smap: %s: %s - invalid digit\n", "scan_number", CmdStart);
+    // printf("smap: %s: %s - invalid digit\n", "scan_number", CmdStart);
     return -1;
 }
 
@@ -544,7 +556,10 @@ int smap_init(int argc, char *argv[])
         argv++;
     }
 
-    //	if(argc!=0) return -1;
+    /*
+    if (argc != 0)
+        return -1;
+*/
 
     SmapDriverData.smap_regbase = smap_regbase;
     SmapDriverData.emac3_regbase = emac3_regbase;
@@ -631,7 +646,7 @@ int smap_init(int argc, char *argv[])
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_TX_THRESHOLD, 12 << SMAP_E3_TX_THRESHLD_BITSFT);
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_RX_WATERMARK, 16 << SMAP_E3_RX_LO_WATER_BITSFT | 128 << SMAP_E3_RX_HI_WATER_BITSFT);
 
-    //Unlike the SONY original, register the interrupt handler for only RXEND and EMAC3.
+    // Unlike the SONY original, register the interrupt handler for only RXEND and EMAC3.
     dev9RegisterIntrCb(5, &Dev9IntrCb); /* RXEND */
     dev9RegisterIntrCb(6, &Dev9IntrCb); /* EMAC3 */
 

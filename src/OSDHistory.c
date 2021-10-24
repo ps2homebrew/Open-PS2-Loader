@@ -1,11 +1,11 @@
-/*	Play history management functions
-	Note: while the code for updating the data itself was a copy of the original,
-	the code that reads/writes the history file was written with general know-how,
-	for simplicity.
-	The original code used libmc and was also designed to allow the host software (the browser) access the history.
-	(the browser's boot animation would vary according to the user's play history)
+/*  Play history management functions
+    Note: while the code for updating the data itself was a copy of the original,
+    the code that reads/writes the history file was written with general know-how,
+    for simplicity.
+    The original code used libmc and was also designed to allow the host software (the browser) access the history.
+    (the browser's boot animation would vary according to the user's play history)
 
-	However, OPL does not need any of that, so it can be made simpler.	*/
+    However, OPL does not need any of that, so it can be made simpler.    */
 
 #include <errno.h>
 #include <kernel.h>
@@ -20,8 +20,8 @@
 #include "include/util.h"
 #include "include/OSDHistory.h"
 
-/*	The OSDs have this weird bug whereby the size of the icon file is hardcoded to 1776 bytes... even though that is way too long!
-	Unfortunately, using the right size will cause the icon to be deemed as corrupted data by the HDDOSD. */
+/*  The OSDs have this weird bug whereby the size of the icon file is hardcoded to 1776 bytes... even though that is way too long!
+    Unfortunately, using the right size will cause the icon to be deemed as corrupted data by the HDDOSD. */
 #define SONY_SYSDATA_ICON_SYS_SIZE 1776
 
 extern unsigned char icon_sys_A[];
@@ -49,12 +49,12 @@ int CreateSystemDataFolder(const char *path, char FolderRegionLetter)
                     icon = icon_sys_C;
                     size = SONY_SYSDATA_ICON_SYS_SIZE;
                     break;
-                default: //case 'A':
+                default: // case 'A':
                     icon = icon_sys_A;
                     size = SONY_SYSDATA_ICON_SYS_SIZE;
                     break;
             }
-            result = write(fd, icon, size) == size ? 0 : -EIO; //Yes, just let it write past the end of the icon. Read the comment above.
+            result = write(fd, icon, size) == size ? 0 : -EIO; // Yes, just let it write past the end of the icon. Read the comment above.
             close(fd);
         } else
             result = fd;
@@ -114,8 +114,8 @@ int AddOldHistoryFileRecord(const char *path, const struct HistoryEntry *OldHist
 
 static u16 GetTimestamp(void)
 {
-    //The original obtained the time and date from globals.
-    //return OSD_HISTORY_SET_DATE(currentYear, currentMonth, currentDate);
+    // The original obtained the time and date from globals.
+    // return OSD_HISTORY_SET_DATE(currentYear, currentMonth, currentDate);
     sceCdCLOCK time;
     sceCdReadClock(&time);
     return OSD_HISTORY_SET_DATE(btoi(time.year), btoi(time.month & 0x7F), btoi(time.day));
@@ -132,7 +132,7 @@ int AddHistoryRecord(const char *name)
 
     DEBUG_PRINTF("Adding history record: %s\n", name);
 
-    //For simplicity, create the data folder immediately if the history file does not exist (unlike the original).
+    // For simplicity, create the data folder immediately if the history file does not exist (unlike the original).
     sprintf(path, "mc0:/%s", GetSystemDataPath());
     if ((result = LoadHistoryFile(path, HistoryEntries)) != 0) {
         path[2] = '1';
@@ -171,7 +171,7 @@ int AddHistoryRecord(const char *name)
             }
         }
 
-        //In v1.0x, this was strcmp
+        // In v1.0x, this was strcmp
         if (!strncmp(HistoryEntries[i].name, name, sizeof(HistoryEntries[i].name))) {
             IsNewRecord = 0;
 
@@ -193,7 +193,7 @@ int AddHistoryRecord(const char *name)
 
                 HistoryEntries[i].LaunchCount = NewLaunchCount;
             } else {
-                //Was a check against 0x40 in v1.0x
+                // Was a check against 0x40 in v1.0x
                 if (HistoryEntries[i].LaunchCount < 0x3F) {
                     HistoryEntries[i].LaunchCount++;
                 } else {
@@ -203,15 +203,15 @@ int AddHistoryRecord(const char *name)
             }
         }
     }
-
-    /*	i = 0;
-	do {	//Original does this. I guess, it is used to ensure that the next random value is truly random?
-		rand();
-		i++;
-	} while(i < (currentMinute * 60 + currentSecond)); */
-
+    /*
+        i = 0;
+        do { //Original does this. I guess, it is used to ensure that the next random value is truly random?
+            rand();
+            i++;
+        } while (i < (currentMinute * 60 + currentSecond));
+    */
     if (IsNewRecord) {
-        //Count and consolidate a list of blank slots.
+        // Count and consolidate a list of blank slots.
         NumBlankSlots = 0;
         NumSlotsUsed = 0;
         for (i = 0; i < MAX_HISTORY_ENTRIES; i++) {
@@ -219,7 +219,7 @@ int AddHistoryRecord(const char *name)
                 BlankSlotList[NumBlankSlots] = i;
                 NumBlankSlots++;
             } else {
-                //Not present in v1.0x.
+                // Not present in v1.0x.
                 if (HistoryEntries[i].ShiftAmount == 0x7) {
                     NumSlotsUsed++;
                 }
@@ -228,18 +228,18 @@ int AddHistoryRecord(const char *name)
 
         if (NumSlotsUsed != MAX_HISTORY_ENTRIES) {
             if (NumBlankSlots > 0) {
-                //Randomly choose an empty slot.
+                // Randomly choose an empty slot.
                 NewEntry = &HistoryEntries[result = BlankSlotList[rand() % NumBlankSlots]];
             } else {
-                //Copy out the victim record
+                // Copy out the victim record
                 NewEntry = &HistoryEntries[LeastUsedRecord];
                 memcpy(&OldHistoryEntry, NewEntry, sizeof(OldHistoryEntry));
 
-                //Unlike the original, add the old history record here.
+                // Unlike the original, add the old history record here.
                 AddOldHistoryFileRecord(path, &OldHistoryEntry);
             }
 
-            //Initialize the new entry.
+            // Initialize the new entry.
             strncpy(NewEntry->name, name, sizeof(NewEntry->name) - 1);
             NewEntry->LaunchCount = 1;
             NewEntry->bitmask = 1;
@@ -248,12 +248,12 @@ int AddHistoryRecord(const char *name)
         }
     }
 
-    //Unlike the original, save here.
+    // Unlike the original, save here.
     return SaveHistoryFile(path, HistoryEntries);
 }
 
 static void GetBootFilename(const char *bootpath, char *filename)
-{ //Extract filename from the full path to the file on the CD/DVD.
+{ // Extract filename from the full path to the file on the CD/DVD.
     int i, length;
 
     filename[0] = '\0';
@@ -268,7 +268,7 @@ static void GetBootFilename(const char *bootpath, char *filename)
         }
     }
 
-    if (i == 0) { //The boot path contains only the filename.
+    if (i == 0) { // The boot path contains only the filename.
         strcpy(filename, bootpath);
     }
 }

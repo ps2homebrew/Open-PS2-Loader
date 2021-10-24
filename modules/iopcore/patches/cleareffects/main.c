@@ -1,7 +1,7 @@
 /**
-  * Patch for games (e.g. Half Life) that have the SPU2 Digital Effects function inadvertently enabled with old settings from previously-run software.
-  * Solve this problem by disabling sound effects via sceSdSetEfectAttr(), which will clear the necessary registers.
-  */
+ * Patch for games (e.g. Half Life) that have the SPU2 Digital Effects function inadvertently enabled with old settings from previously-run software.
+ * Solve this problem by disabling sound effects via sceSdSetEfectAttr(), which will clear the necessary registers.
+ */
 
 #include <loadcore.h>
 #include <libsd.h>

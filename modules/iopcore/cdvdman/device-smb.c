@@ -4,32 +4,8 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
-#include "smsutils.h"
-#include "mass_common.h"
-#include "mass_stor.h"
-#include "oplsmb.h"
-#include "smb.h"
 #include "smstcpip.h"
-#include "atad.h"
-#include "ioplib_util.h"
-#include "cdvdman.h"
 #include "internal.h"
-#include "cdvd_config.h"
-
-#include <loadcore.h>
-#include <stdio.h>
-#include <sysclib.h>
-#include <sysmem.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <intrman.h>
-#include <ioman.h>
-#include <thsemap.h>
-#include <errno.h>
-#include <io_common.h>
-#include "ioman_add.h"
-
-#include <errno.h>
 
 #include "device.h"
 
@@ -86,6 +62,11 @@ void DeviceDeinit(void)
     DeviceUnmount();
 }
 
+int DeviceReady(void)
+{
+    return SCECdComplete;
+}
+
 void DeviceFSInit(void)
 {
     int i = 0;
@@ -105,7 +86,7 @@ void DeviceFSInit(void)
             sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12 ? "CD" : "DVD", cdvdman_settings.filename);
         }
 
-        smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i++], 0);
+        smb_OpenAndX(tmp_str, (u8 *)&cdvdman_settings.FIDs[i++], 0);
     } else {
         // Open all parts files
         for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
@@ -114,7 +95,7 @@ void DeviceFSInit(void)
             else
                 sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
 
-            smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
+            smb_OpenAndX(tmp_str, (u8 *)&cdvdman_settings.FIDs[i], 0);
         }
     }
 }
@@ -139,6 +120,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
     register int i, esc_flag = 0;
     u8 *p = (u8 *)buffer;
+    int rv = SCECdErNO;
 
     lbound = 0;
     ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
@@ -156,9 +138,12 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
             } else
                 esc_flag = 1;
 
-            smb_ReadCD(offslsn, sectors_to_read, &p[r], i);
+            if (smb_ReadCD(offslsn, sectors_to_read, &p[r], i) <= 0) {
+                rv = SCECdErREAD;
+                break;
+            }
 
-            r += sectors_to_read << 11;
+            r += sectors_to_read * 2048;
             offslsn += sectors_to_read;
             sectors_to_read = sectors;
             lsn = nlsn;
@@ -168,5 +153,5 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
             break;
     }
 
-    return 0;
+    return rv;
 }

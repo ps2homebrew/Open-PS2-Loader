@@ -35,7 +35,7 @@
 #include "ps2ip_internal.h"
 #include "arch/sys_arch.h"
 
-#define SYS_MBOX_SIZE 64
+#define SYS_MBOX_SIZE        64
 #define SYS_THREAD_PRIO_BASE TCPIP_THREAD_PRIO
 
 struct sys_mbox_msg
@@ -208,10 +208,10 @@ extern sys_mbox_t g_TCPIPMBox;
 
 err_t ps2ip_input(struct pbuf *pInput, struct netif *pNetIF)
 {
-    //When ps2smap receive data, it invokes this function. It'll be called directly by the interrupthandler, which means we are
-    //running in an interrupt-context. We'll pass on the data to the tcpip message-thread by adding a callback message. If the
-    //messagebox is full, we can't wait for the tcpip-thread to process a message to make room for our message, since we're
-    //in interrupt-context. If the messagebox or messagequeue is full, drop the packet.
+    // When ps2smap receive data, it invokes this function. It'll be called directly by the interrupthandler, which means we are
+    // running in an interrupt-context. We'll pass on the data to the tcpip message-thread by adding a callback message. If the
+    // messagebox is full, we can't wait for the tcpip-thread to process a message to make room for our message, since we're
+    // in interrupt-context. If the messagebox or messagequeue is full, drop the packet.
     InputMSG *pIMSG;
     struct tcpip_msg *pMSG;
 
@@ -219,10 +219,10 @@ err_t ps2ip_input(struct pbuf *pInput, struct netif *pNetIF)
         pbuf_free(pInput);
         return ERR_OK;
     } /* end if */
-      //Allocate messagequeue entry.
+      // Allocate messagequeue entry.
     pIMSG = &aMSGs[u8LastMSG];
     u8LastMSG = GetNextMSGQueueIndex(u8LastMSG);
-    //Initialize the InputMSG.
+    // Initialize the InputMSG.
     pIMSG->pInput = pInput;
     pIMSG->pNetIF = pNetIF;
     pMSG = (struct tcpip_msg *)memp_malloc(MEMP_TCPIP_MSG);
@@ -243,21 +243,21 @@ err_t ps2ip_input(struct pbuf *pInput, struct netif *pNetIF)
 #else
 err_t ps2ip_input(struct pbuf *pInput, struct netif *pNetIF)
 {
-    //	switch(htons(((struct eth_hdr*)(pInput->payload))->type))	// Don't know why, but using htons will cause this function to not work in the SMS LWIP stack.
+    // switch(htons(((struct eth_hdr*)(pInput->payload))->type))    // Don't know why, but using htons will cause this function to not work in the SMS LWIP stack.
     switch (((struct eth_hdr *)(pInput->payload))->type) {
         case ETHTYPE_IP:
-            //IP-packet. Update ARP table, obtain first queued packet.
+            // IP-packet. Update ARP table, obtain first queued packet.
             etharp_ip_input(pNetIF, pInput);
             pbuf_header(pInput, (int)-sizeof(struct eth_hdr));
             pNetIF->input(pInput, pNetIF);
             break;
         case ETHTYPE_ARP:
-            //ARP-packet. Pass pInput to ARP module, get ARP reply or ARP queued packet.
-            //Pass to network layer.
+            // ARP-packet. Pass pInput to ARP module, get ARP reply or ARP queued packet.
+            // Pass to network layer.
             etharp_arp_input(pNetIF, (struct eth_addr *)&pNetIF->hwaddr, pInput);
-        //Fall through: The SMS LWIP stack was modified, and etharp_arp_input does not free the PBUF on its own.
+        // Fall through: The SMS LWIP stack was modified, and etharp_arp_input does not free the PBUF on its own.
         default:
-            //Unsupported ethernet packet-type. Free pInput.
+            // Unsupported ethernet packet-type. Free pInput.
             pbuf_free(pInput);
     }
 
@@ -438,7 +438,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t pMBox, void **ppvMSG, u32_t u32Timeout)
 
     } /* end while */
 
-    if (ppvMSG != NULL) //This pointer may be NULL.
+    if (ppvMSG != NULL) // This pointer may be NULL.
         *ppvMSG = pMBox->apvMSG[pMBox->u16First];
     pMBox->u16First = GenNextMBoxIndex(pMBox->u16First);
 
@@ -468,24 +468,24 @@ sys_sem_t sys_sem_new(u8_t aCount)
 
 } /* end sys_sem_new */
 
-static unsigned int TimeoutHandler(void* pvArg)
+static unsigned int TimeoutHandler(void *pvArg)
 {
     iReleaseWaitThread((int)pvArg);
     return 0;
 }
 
-static u32_t ComputeTimeDiff(const iop_sys_clock_t* pStart, const iop_sys_clock_t* pEnd)
+static u32_t ComputeTimeDiff(const iop_sys_clock_t *pStart, const iop_sys_clock_t *pEnd)
 {
     iop_sys_clock_t Diff;
     u32 iSec, iUSec, iDiff;
 
-    Diff.lo = pEnd->lo-pStart->lo;
-    Diff.hi = pEnd->hi-pStart->hi - (pStart->lo>pEnd->lo);
+    Diff.lo = pEnd->lo - pStart->lo;
+    Diff.hi = pEnd->hi - pStart->hi - (pStart->lo > pEnd->lo);
 
     SysClock2USec(&Diff, &iSec, &iUSec);
-    iDiff=(iSec * 1000) + (iUSec / 1000);
+    iDiff = (iSec * 1000) + (iUSec / 1000);
 
-    return((iDiff != 0) ? iDiff : 1);
+    return ((iDiff != 0) ? iDiff : 1);
 }
 
 u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
@@ -493,9 +493,9 @@ u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
     u32 WaitTime;
 
     if (aTimeout == 0)
-        return(WaitSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
+        return (WaitSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
     else if (aTimeout == 1)
-        return(PollSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
+        return (PollSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
     else {
 
         iop_sys_clock_t lTimeout;
@@ -513,7 +513,7 @@ u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
 
             WaitTime = ComputeTimeDiff(&Start, &End);
             if (WaitTime > aTimeout)
-              WaitTime = aTimeout;
+                WaitTime = aTimeout;
         } else
             WaitTime = SYS_ARCH_TIMEOUT;
 
@@ -554,7 +554,7 @@ void ps2ip_mem_free(void *rmem)
 }
 
 /* Only pbuf_realloc() uses mem_realloc(), which uses this function.
-   As pbuf_realloc can only shrink PBUFs, I don't think SYSMEM will fail to allocate a smaller region.	*/
+   As pbuf_realloc can only shrink PBUFs, I don't think SYSMEM will fail to allocate a smaller region.    */
 void *ps2ip_mem_realloc(void *rmem, int newsize)
 {
     int OldState;

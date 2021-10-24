@@ -1,37 +1,37 @@
 # Turkish translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
+# Turkish translation by Serdar Sağlam 2021 All translations have been revised and corrected.
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Turkish
-Open PS2 Loader %s
-Değişiklikleri kaydet
+Değişiklikleri Kaydet
 Geri
-Ağ ayarları
-Gelişmiş ayarlar
+Ağ Ayarları
+Gelişmiş Seçenekler
 <değer yok>
-Ayarlar %s a kaydedildi
-Ayarlar yazılırken hata oluştu!
+Ayarlar şuraya kaydedildi %s
+Ayarlar yazılırken hata!
 Çıkış
 Ayarlar
 Menü
-USB Oyunları
-HDD Oyunları
-AĞ Oyunları
+BDM Oyunlar
+HDD Oyunlar
+ETH Oyunlar
 Uygulamalar
 Tema
 Dil
-Çıkış işlemi gücü kapatacaktır.
-Browser'a çık
+Sistem kapatılacaktır.
+Tarayıcıya Çıkılsın mı?
 Güncelleme iptal edilsin mi?
-%d: HardDisk sürücü bulunamadı
-%d: HardDisk sürücü biçimlendirilmemiş
-%d: Ağ başlatma hatası
-%d: Ağ kartı bulunamadı
-%d: SMB sunucusuna bağlanılamadı
-%d: SMB sunucusunda oturum açılamıyor
-%d: Paylaşım klasörü açılamıyor
-%d: Ağ paylaşımları listelenemiyor
-%d: Oyunlar listelenemiyor
-%d: DHCP sunucusu erişilebilir değil
-%d: Ağ bağlantısı yok
+%d: Sabit Disk algılanmadı.
+%d: Sabit Disk biçimlendirilmemiş.
+%d: Ağ başlatma hatası.
+%d: Ağ bağdaştırıcısı algılanmadı.
+%d: SMB sunucusuna bağlanılamıyor.
+%d: SMB sunucusunda oturum açılamıyor.
+%d: SMB paylaşımı açılamıyor.
+%d: SMB paylaşımları listelenemiyor.
+%d: Oyunlar listelenemiyor.
+%d: DHCP sunucusu kullanılamıyor.
+%d: Ağ bağlantısı yok.
 Açık
 Kapalı
 Tamam
@@ -39,244 +39,247 @@ Seç
 İptal
 Daire
 Çarpı
-Oyun listesi
-Oyun ayarları
-Ayarları sil
-Oyunun tüm anahtarları kaldırıldı
-Kaydırma
+Oyun Listesi
+Oyun Ayarları
+Ayarları Kaldır
+Kaydırma Hızı
 Yavaş
 Orta
 Hızlı
-Varsayılan menü
-Diskten yükle
-Lütfen bekleyiniz
-Oyun kimliği yüklenirken hata oluştu
-Otomatik sıralama
-Dil dosyası yüklenirken hata oluştu
-Hata ayıklama renklerini iptal et
-Oyun kolu algılanmadı, bekliyor...
-Kapak Resimlerini etkinleştir
-Geniş ekran
-Gücü kapat
-Ayarlar yükleniyor
-Ayarlar kayıt ediliyor
-Cihazı başlat
+Varsayılan Menü
+Diskten Yükle
+Lütfen bekleyin.
+Oyun Kimliği yüklenirken hata oluştu.
+Otomatik Sırala
+Dil dosyası yüklenirken hata oluştu.
+Hata Ayıklama Renkleri
+Denetleyici algılanmadı, bekliyor…
+Kapak Resmi
+Geniş Ekran
+Kapat
+Yapılandırma yükleniyor…
+Yapılandırma kaydediliyor…
+Cihazı Başlat
 Yenile
-USB cihazı başlangıç türü
-HDD cihazı başlangıç türü
-AĞ cihazı başlangıç türü
-Uygulamalar menüsü görünüm kipi
+BDM Başlangıç Kipi
+HDD Başlangıç Kipi
+ETH Başlangıç Kipi
+Uygulamalar Başlangıç ​​Kipi
 Otomatik
 El ile
-HDL Sunucu Başlat
-HDL Sunucu Başlatma Hatası
-HDL Sunucu Başlıyor...
-HDL Sunucu Çalışıyor...
-HDL Sunucu Durduruluyor...
-IGR yeri
-Arkaplan rengi
-Metin rengi
-- PS2 - 
-- SMB Sunucusu -
-IP adres türü
-Sabit
+NBD Sunucusunu Başlat
+NBD Sunucusu başlatılıyor…
+NBD Sunucusu çalışıyor…
+NBD Sunucusu başlatılamadı.
+NBD Sunucusu durduruluyor…
+IGR Yolu
+Arkaplan Rengi
+Yazı Rengi
+- SMB Sunucu -
+IP Adresi Türü
+Statik
 DHCP
-IP adresi
-Ağ Adresi
-Ağ Maskesi
+IP Adresi
+Adres
+Maske
 Ağ Geçidi
-DNS
+DNS Sunucu
 Port
 Paylaşım
-Kullanıcı Adı
-Şifre
+Kullanıcı
+Parola
 <ayarlanmadı>
-Adres türü
+Adres Türü
 IP
 NetBIOS
-Kabul et
-Nesne kalıcı olarak silinecek, devam edilsin mi?
-Y.Adlandır
+Onayla
+Öge kalıcı olarak silinecek, devam edilsin mi?
+Adlandır
 Sil
 Çalıştır
-Görüntü ayarları
-Yazma işlemlerini aktif et
-Enson oynanan oyunu hatırla
-Seçme tuşu
-Hata, oyun dosyası parçalı
-Hata, nesne çalıştırılamıyor
-Test et
-MİSAFİR oturumu için boş bırakınız.
-Okuma hızını emüle et
-Senkronize Modu
-Sistem çağrılarını çöz
-Videoları atla
-DVD-DL i etkinleştir
-IGR i etkisizleştir
-Kullanılmıyor
-Kullanılmıyor
-VMC Boyutu değiştirmek VMC nin biçimlendirilmesine neden olur
+Görüntü Ayarları
+İşlemleri Yaz
+Son Oynanan Oyunu Hatırla
+Seç Düğmesi
+Hata, oyun parçalandı.
+Hata, öge çalıştırılamadı.
+Değişiklikleri Dene
+Misafir yetkilendirmesi için boş bırakın.
+Doğru Okumalar
+Eş Zamanlı Kip
+Sistem Çağrılarını Kaldır
+Videoları Atla
+DVD-DL Etkinleştir
+IGR Devre Dışı
+Boyut değiştirilmesi VMC'yi yeniden biçimlendirir.
 Oluştur
 Başlat
 Düzenle
-Vazgeç
+İptal
 Sıfırla
-Standardı kullan
-VMC Yapılandırma
+Genel Kullan
+VMC'yi Yapılandır
 İsim
 Boyut
 Durum
-İlerleme
-VMC dosyası var
-Geçersiz VMC dosyası, boyut hatalı
-VMC dosyasının oluşturulması gerekli
-VMC %sdosyası hatalı, fiziksel HK ile devam edilsin mi (slot %d)?
-Otomatik yenileme
+İlerleyiş
+VMC dosyası var.
+Geçersiz VMC dosyası, boyut yanlış.
+VMC dosyasının oluşturulması gerekiyor.
+VMC'ye erişim hatası %s. Yuvadaki bellek kartı ile devam edilsin mi %d?
+Otomatik Yenileme
 Hakkında
-Geliştiriciler
-Kalite Kontrolü
-USB önek yolu
-IGR'den sonra özel bir ELF'e başlar
-Dakika olarak değer, iptal etmek için 0 giriniz
-Otomatik Sabit Disk durdurma
-Video modu
-İleti rengi
-Seçili öğe rengi
-Renkleri sıfırla
+Kodlayıcılar
+Kalite Güvencesi
+BDM Önek Yolu
+Bir IGR'den sonra özel ELF başlatır.
+Dakika olarak değer, iptal etmek için 0 girin.
+Otomatik Sabit Disk Durdurma
+Video Kipi
+İletişim Rengi
+Seçim Rengi
+Renkleri Sıfırla
 Bilgi
 Özel ELF
-Renk seçimi
-Tekrar Bağlan
-Paylaşımları listelemek için boş bırakınız
-Ağ önek yolu
-Geri tuşu
-Boşluk
-Giriş
+Renk Seçimi
+Yeniden Bağlan
+Paylaşımları listelemek için boş bırakın.
+ETH Önek Yolu
+Geri Tuşu
+Boşluk Tuşu
+Enter Tuşu
 Kip
-VMC Yuvası 1
-VMC Yuvası 2
-Oyun Kimliği
+VMC Yuva 1
+VMC Yuva 2
+Oyun ID
 DMA Kipi
-V-Sync
+Dikey Eşitleme
 Kip 1
 Kip 2
 Kip 3
 Kip 4
 Kip 5
 Kip 6
-Kip 7
-Kip 8
-GSM ayarları
-Ağ Bağlantı kipi
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+GSM'yi Yapılandır
+Ethernet Link Kipi
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 GSM Ayarları
-GSM Aktif
-GSM'i Açar ve Kapatır
-VMODE
-Zorlanmış özel görüntüleme kipi
-Y-Konum
-Yatay Ayarlama
-D-Konum
-Dikey Ayarlama
-Overscan
-Overscan Ayarı
-FMV Atlama
-Full Motion Videoları atlar
+GSM Seçici
+GSM'i açar/kapatır.
+Zorunlu özel görüntüleme kipi.
+H-POS
+Yatay ayar.
+V-POS
+Dikey ayar.
+Aşırı Tarama
+Aşırı tarama ayar.
+FMV Atla
+Tam hareketli videoları atlar.
 Hile Ayarları
-PS2RD Cheat Engine'i Aktif et
-PS2RD Cheat Engine'in oyunlara yama yapmasına izin ver
-PS2RD Cheat Engine Kipi
-Hileleri Otomatik veya Manuel seçer
-Hileleri Otomatik Seç
-Hileleri Manuel Seç
-Hata: Hile dosyası yüklemesi başarısız
-Hile bulunamadı
-Varsayılanları indir
-Internetten güncelleme
-Varolan kayıtların üzerine yaz
-Güncelleme başarısız.
-Güncelleme sunucusuna bağlantı kurulamadı.
+PS2RD Hile Motoru
+PS2RD Hile Motorunun oyun yamalamasına izin verin.
+PS2RD Hile Motoru Kipi
+Oyun hilelerini otomatik olarak girin veya seçin.
+Otomatik Hile Seçimi
+Oyun Hile Seçimi
+Hata: hile dosyası yüklenemedi.
+Hile bulunamadı.
+Varsayılanları İndir
+Ağ Güncellemesi
+Mevcut Kayıtların Üzerine Yaz
+Güncellene başarısız.
+Güncelleme sunucusuna bağlanılamadı.
 Güncelleme tamamlandı.
 Güncelleme iptal edildi.
-Internetten ayarlar indirilsin mi?
-Kişiselleştirilmiş Ayarlar
-Varsayılanlar indirildi
-Otomatik başlatılacak %i s...
-Otomatik başlat
-Saniye olarak değer, iptal etmek için 0 giriniz
-PS2 Logosu
-Sadece konsolun bölgesine uyan, kabul edilebilir logolar gösterilir.
-PADEMU'yu ayarla
-Pad Emulator Ayarları
-PadEmulator Aktif Et
-Seçilen oyun için PADEMU'nun durumu
-Pad Emulator modu
-Pad Emulator modunu seçin.
+Ayarlar ağdan indirilsin mi?
+Özelleştirilmiş Ayarlar
+İndirilen Varsayılanlar
+%i içinde otomatik başlat…
+Otomatik Başlat
+Otomatik başlatmayı kapatmak için saniye cinsinden değer, 0.
+PS2 Logo
+Konsolun bölgesiyle eşleşen geçerli bir disk logosu için görüntülenir.
+PADEMU Yapılandır
+Pad Emülatör Ayarları
+Pad Emülatör
+Seçilen oyun için Pad Emülatörü açar/kapatır.
+Pad Emülatör Kipi
+Pad Emülatör kipini seçin.
 DualShock3/4 USB
 DualShock3/4 BT
-Port için ayarlar.
-Ayarlanacak Pad Emulator portunu seçin
-Emulasyonu aç
-Seçilen port için Pad Emulator durumu
-Titreşimi aç
-Seçilen port için Pad Emulator titreşimi durumu
-USB Bluetooth adaptörü MAC adresi:
-MAC adresi ile eşleşmiş DS kolu:
+Port Ayarları:
+Ayarlar için Pad Emülatör portunu seçin.
+Emülatör
+Seçilen port için Pad Emülatörü açar/kapatır.
+Titreşim
+Pad Emülatör seçili port için titreşimi açar/kapatır.
+USB Bluetooth Adaptörü MAC Adresi:
+MAC Adresiyle Eşleştirilmiş DS Denetleyicisi:
 Eşleştir
-DS kolu eşleştir
-DS kolunu Bluetooth adaptörü MAC adresi ile eşleştir
-Bağlı değil
-Bluetooth adaptörü bilgileri
-Desteklenen özellikler ve daha fazla bilgi gösterir
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
+DS Denetleyicisi Eşleştir
+DS denetleyicisini Bluetooth adaptörü MAC adresiyle eşleştirin.
+Bağlı Değil
+Bluetooth Adaptör Bilgileri
+Daha fazla bilgi ve desteklenen özellikleri gösterir.
+HCI Sürümü:
+LMP Sürümü:
+Üretici Firma ID:
+Desteklenen Özellikler:
 Evet
 Hayır
-Bluetooth adaptörü DS3/DS4 kolları ile büyük ihtimalle tam uyumlu.
-Bluetooth adaptörü DS3/DS4 kolları ile tam doğru çalışmayabilir.
-Multitap emulasyonunu aç
-Seçilen oyun için Multitap emulasyonu durumu
-Multitap emulasyonu portu
-Multitap emulasyonu için port seçin
-Sahte DS3ler için workaround'u kapat
-Bazı sahte DS3ler ile çalışabilmek için gereken workaround'u kapatır.
-FIELD flipping emüle et
-Progressive video modları ile bozulan oyunlar için çözüm yaması.
-Ebeveyn Kilidi Ayarları
-Ebeveyn Kilidi Şifresi
-Ebeveyn Kilidini kapatmak için boş bırakın.
-Ebeveyn Kilidi Şifresini Girin.
-Ebeveyn Kilidi Şifresi Yanlış.
-Ebeveyn Kilidi Kapatıldı.
-Build Ayarları:
+Bluetooth adaptörü, DS3/DS4 denetleyicileriyle tam uyumlu olmalıdır.
+Bluetooth adaptörü, DS3/DS4 denetleyicileriyle düzgün çalışmayabilir.
+Multitap Emülatör
+Seçilen oyun için Multitap Emülatörü açar/kapatır.
+Multitap Emülatör Portu:
+Multitap emülatörü için port seçin.
+Sahte DS3 Geçici Çözümü
+Bazı sahte DS3'ler için geçici çözüme ihtiyacı vardır, bu seçenek etkinleştirecektir.
+Alan Çevirme Emülatörü
+Aşamalı video kiplerinde hata veren oyunlar için düzeltme.
+Yetişkin Kilidi Ayarları
+Yetişkin Kilidi Parolası
+Yetişkin kilidini devre dışı bırakmak için boş bırakın.
+Yetişkin Kilidi Parolasını Girin
+Yetişkin kilidi parolası yanlış.
+Yetişkin kilidi devre dışı.
+Yapı Seçenekleri:
 Hata - bu parola kullanılamaz.
-VMC %sdosyası fragment olmuş, fiziksel HK ile devam edilsin mi (slot %d)?
+VMC %s dosyası bozulmuş. %d yuvasındaki Bellek Kartı ile devam edilsin mi?
 Ses Ayarları
-Ses Efektleri Olsun
-Açılış Sesi Olsun
-Ses Efektleri Kuvveti
-Açılış Sesi Kuvveti
-Video çıkış modu değiştirilsin mi?
-Oyun listesini cachele (HDD)
-Bildirimleri aktifleştir
-%s yüklendi %s konumundan
-Options
+Ses Efektleri
+Önyükleme Sesi
+Ses Efektleri Seviyesi
+Önyükleme Sesi Seviyesi
+Video kipi değişikliği onaylansın mı?
+Önbellek Oyun Listesi (HDD)
+Bildirimler
+Yapılandırma şuradan yüklendi %s
+Tema şuradan yüklendi %s
+Dil şuradan yüklendi %s
+%s bölümü takıldı.
+Seçenekler
 Oyun ayarları kaydedildi.
-%s ayarları silindi.
-Aktifleştirildiğinde varolan oyun uyumluluk ayarlarının üzerine yazar.
-Ayarlar Modu
-Global
-Oyun başına
-Hepsi
-Silinecek ayarları seçin.
-Destek forumu:
-Ad
+%s ayarları kaldırıldı.
+Etkinleştirildiğinde mevcut oyun uyumluluğu ayarlarının üzerine yazar.
+Ayarlar Kipi
+Genel
+Oyuna Özel
+Tümü
+Kaldırılacak ayarları seçin.
+Destek Forumları:
+Başlık
 Tür
-Çıkış
+Tarih
 Geliştirici
 Açıklama
+Cihazları Engelle
+Denetleyici Ayarları
+Cihaz Engelleme Yöneticisi aç/kapat.
+Engellenen Cihazları (örn. USB) açın/kapatın.
+USB Oyunları
+iLink Oyunları
+MX4SIO Oyunları

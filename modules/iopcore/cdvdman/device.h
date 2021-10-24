@@ -1,5 +1,6 @@
 void DeviceInit(void);   //Called in _start()
 void DeviceDeinit(void); //Called in _exit(). Interrupts are disabled.
+int DeviceReady(void);   //Check if device is ready
 
 void DeviceFSInit(void);  //Called when the filesystem layer is initialized
 void DeviceLock(void);    //Prevents further accesses to the device.

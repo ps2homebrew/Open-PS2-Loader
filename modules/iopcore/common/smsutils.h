@@ -15,12 +15,21 @@
 
 #define smsutils_IMPORTS_start DECLARE_IMPORT_TABLE(smsutils, 1, 1)
 
-extern void mips_memcpy(void *, const void *, unsigned);
+extern void *mips_memcpy(void *, const void *, size_t);
 #define I_mips_memcpy DECLARE_IMPORT(4, mips_memcpy)
 
-extern void mips_memset(void *, int, unsigned);
+extern void *mips_memset(void *, int, size_t);
 #define I_mips_memset DECLARE_IMPORT(5, mips_memset)
 
 #define smsutils_IMPORTS_end END_IMPORT_TABLE
+
+#ifdef memcpy
+#undef memcpy
+#endif
+#define memcpy mips_memcpy
+#ifdef memset
+#undef memset
+#endif
+#define memset mips_memset
 
 #endif /* __SMSUTILS_H */

@@ -3,7 +3,7 @@
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review Open PS2 Loader README & LICENSE files for further details.
-  
+
   Some parts of the code are taken from HD Project by Polo
 */
 
@@ -88,7 +88,7 @@ char *_strrchr(const char *string, int c)
 
     /* if char is never found then this will return 0 */
     /* if char is found then this will return the last matched location
-	   before strchr returned 0 */
+       before strchr returned 0 */
 
     lastmatch = 0;
     result = _strchr(string, c);
@@ -308,7 +308,7 @@ void set_ipconfig(void)
     strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_gateway, 16);
     g_ipconfig_len += strlen(g_ps2_gateway) + 1;
 
-    //Add Ethernet operation mode to g_ipconfig buf
+    // Add Ethernet operation mode to g_ipconfig buf
     if (g_ps2_ETHOpMode != ETH_OP_MODE_AUTO) {
         strncpy(&g_ipconfig[g_ipconfig_len], "-no_auto", 9);
         g_ipconfig_len += 9;

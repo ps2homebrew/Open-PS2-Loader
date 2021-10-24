@@ -30,7 +30,7 @@ static int *tickThreadId;
 static int lockSema;
 
 static int postStopSeseqTick(void)
-{ //Even if the atick thread waits on the locking semaphore, it will wake up immediately when the RPC thread unlocks the critical section.
+{ // Even if the atick thread waits on the locking semaphore, it will wake up immediately when the RPC thread unlocks the critical section.
     WakeupThread(*tickThreadId);
     return 1;
 }
@@ -63,7 +63,7 @@ int _start(int argc, char **argv)
 
     lc = GetLoadcoreInternalData();
 
-    //Locate the specified module.
+    // Locate the specified module.
     m = lc->image_info;
     while (m != NULL) {
         if (modId == m->id)
@@ -80,31 +80,31 @@ int _start(int argc, char **argv)
 
         lockSema = CreateSema(&sema);
 
-        //Generate pointer to the threadId variable.
+        // Generate pointer to the threadId variable.
         hi16 = *(vu16 *)(m->text_start + 0x00000ac0);
         lo16 = *(volatile s16 *)(m->text_start + 0x00000ac4);
         tickThreadId = (int *)(((u32)hi16 << 16) + lo16);
 
-        //Apply patch on module. The module has not been initialized yet and has no running threads.
-        //sndIopAtick
+        // Apply patch on module. The module has not been initialized yet and has no running threads.
+        // sndIopAtick
         *(vu32 *)(m->text_start + 0x00000418) = JAL((u32)&_lock);
         *(vu32 *)(m->text_start + 0x000018f4) = JMP((u32)&_unlock);
 
-        //sndIopRpcFunc
+        // sndIopRpcFunc
         *(vu32 *)(m->text_start + 0x00000d58) = JAL((u32)&_lock_RpcFunc);
-        *(vu32 *)(m->text_start + 0x00000d64) = 0x00000000; //nop
-        *(vu32 *)(m->text_start + 0x00000d80) = 0xac233d24; //sw v1, $3d24(at) - Replace instruction at 0xd64.
+        *(vu32 *)(m->text_start + 0x00000d64) = 0x00000000; // nop
+        *(vu32 *)(m->text_start + 0x00000d80) = 0xac233d24; // sw v1, $3d24(at) - Replace instruction at 0xd64.
         *(vu32 *)(m->text_start + 0x00000f54) = JAL((u32)&_unlock);
-        *(vu32 *)(m->text_start + 0x00000f58) = 0x00000000; //nop
+        *(vu32 *)(m->text_start + 0x00000f58) = 0x00000000; // nop
 
-        //sndIopSesqCmd_STOPSE
+        // sndIopSesqCmd_STOPSE
         *(vu32 *)(m->text_start + 0x00001f4c) = JMP((u32)&postStopSeseqTick);
-        //sndIopSesqCmd_STOPSEID
+        // sndIopSesqCmd_STOPSEID
         *(vu32 *)(m->text_start + 0x00001ff8) = JMP((u32)&postStopSeseqTick);
-        //sndIopCmd_STOPALL
+        // sndIopCmd_STOPALL
         *(vu32 *)(m->text_start + 0x00000c30) = JMP((u32)&postStopSeseqTick);
 
-        FlushIcache(); //Flush instruction cache as instructions were modified.
+        FlushIcache(); // Flush instruction cache as instructions were modified.
 
         return MODULE_RESIDENT_END;
     }

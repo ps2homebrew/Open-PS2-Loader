@@ -64,7 +64,7 @@ int ata_device_set_transfer_mode(int device, int type, int mode)
     if (res)
         return res;
 
-    //Note: PIO is not supported by ata_device_sector_io.
+    // Note: PIO is not supported by ata_device_sector_io.
     switch (type) {
         case ATA_XFER_MODE_MDMA:
             ata_multiword_dma_mode(mode);

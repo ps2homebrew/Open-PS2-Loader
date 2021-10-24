@@ -26,7 +26,6 @@ sysclib_IMPORTS_end
 
 ps2ip_IMPORTS_start
  I_pbuf_alloc
- I_pbuf_free
  I_netif_add
  I_netif_set_default
  I_ps2ip_input

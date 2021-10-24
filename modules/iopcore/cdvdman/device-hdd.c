@@ -4,29 +4,7 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
-#include "smsutils.h"
-#include "mass_common.h"
-#include "mass_stor.h"
-#include "atad.h"
-#include "ioplib_util.h"
-#include "cdvdman.h"
 #include "internal.h"
-#include "cdvd_config.h"
-
-#include <loadcore.h>
-#include <stdio.h>
-#include <sysclib.h>
-#include <sysmem.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <intrman.h>
-#include <ioman.h>
-#include <thsemap.h>
-#include <errno.h>
-#include <io_common.h>
-#include "ioman_add.h"
-
-#include <errno.h>
 
 #include "device.h"
 
@@ -53,7 +31,7 @@ static int cdvdman_get_part_specs(u32 lsn)
     hdl_partspecs_t *ps;
 
     for (ps = cdvdman_partspecs, i = 0; i < NumParts; i++, ps++) {
-        if ((lsn >= ps->part_offset) && (lsn < (ps->part_offset + (ps->part_size >> 11)))) {
+        if ((lsn >= ps->part_offset) && (lsn < (ps->part_offset + (ps->part_size / 2048)))) {
             CurrentPart = i;
             break;
         }
@@ -77,7 +55,7 @@ void DeviceInit(void)
     hdl_apa_header apaHeader;
     int r;
 
-    DPRINTF("fs_init: apa header LBA = %lu\n", cdvdman_settings.lba_start);
+    DPRINTF("DeviceInit: apa header LBA = %lu\n", cdvdman_settings.lba_start);
 
 #ifdef HD_PRO
     //For HDPro, as its custom ATAD module does not export ata_io_start() and ata_io_finish(). And it also resets the ATA bus.
@@ -88,11 +66,11 @@ void DeviceInit(void)
 #endif
 
     while ((r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ)) != 0) {
-        DPRINTF("fs_init: failed to read apa header %d\n", r);
+        DPRINTF("DeviceInit: failed to read apa header %d\n", r);
         DelayThread(2000);
     }
 
-    mips_memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
+    memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
 
     cdvdman_settings.common.media = apaHeader.discType;
     cdvdman_settings.common.layer1_start = apaHeader.layer1_start;
@@ -101,6 +79,11 @@ void DeviceInit(void)
 
 void DeviceDeinit(void)
 {
+}
+
+int DeviceReady(void)
+{
+    return SCECdComplete;
 }
 
 void DeviceFSInit(void)
@@ -126,22 +109,22 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 offset = 0;
     while (sectors) {
-        if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)))))
+        if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)))))
             if (cdvdman_get_part_specs(lsn) != 0)
-                return -ENXIO;
+                return SCECdErTRMOPN;
 
-        u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)) - lsn;
+        u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)) - lsn;
         if (sectors < nsectors)
             nsectors = sectors;
 
         u32 lba = cdvdman_partspecs[CurrentPart].data_start + ((lsn - cdvdman_partspecs[CurrentPart].part_offset) << 2);
         if (ata_device_sector_io(0, (void *)(buffer + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
-            return -EIO;
+            return SCECdErREAD;
         }
-        offset += nsectors << 11;
+        offset += nsectors * 2048;
         sectors -= nsectors;
         lsn += nsectors;
     }
 
-    return 0;
+    return SCECdErNO;
 }

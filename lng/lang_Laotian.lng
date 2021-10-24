@@ -1,7 +1,6 @@
 # Laotian translation by blackbutterfly (Anousith Phompida <noum_terry@hotmail.com>)
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Laotian
-Open PS2 Loader %s
 ບັນທຶກການປ່ຽນແປງ
 ກັບຄືນ
 ກຳນົດຄ່າທາງດ້ານ Network
@@ -12,7 +11,7 @@ Settings saved to %s
 ອອກຈາກໂປຣແກຣມ
 ການຕັ້ງຄ່າ
 ເມນູ
-ຫຼິ້ນເກມຜ່ານ USB
+ຫຼິ້ນເກມຜ່ານ BDM
 ຫຼິ້ນເກມຜ່ານ Hard Disk
 ຫຼິ້ນເກມຜ່ານ Network
 ໂປຣແກຣມຕ່າງໆ
@@ -42,7 +41,6 @@ Settings saved to %s
 ໄປທີ່ລາຍຊື່ເກມ
 ຕັ້ງຄ່າໃຫ້ເກມນີ້
 Remove Settings
-ລົບລ້າງ Key ທັງໝົດອອກຈາກເກມ
 ການເລື່ອນ
 ຊ້າໆ
 ປານກາງ
@@ -53,30 +51,29 @@ Remove Settings
 ເກີດຂໍ້ຜິດພາດໃນຂະນະທີ່ໂຫຼດເກມ ID
 ລຽງລຳດັບລາຍຊື່ເກມແບບອັດຕະໂນມັດ
 ເກີດຂໍ້ຜິດພາດໃນຂະນະທີ່ໂຫຼດ File ພາສາ
-ປິດຂັ້ນຕອນການສະແດງຂໍ້ຜິດພາດດ້ວຍສີ
-ບໍ່ສາມາດກວດພົບມືເກມ, ກະລຸນາລໍຖ້າ...
-ສາມາດເຫັນຮູບໜ້າປົກເກມ
+Debug Colors
+ບໍ່ສາມາດກວດພົບມືເກມ, ກະລຸນາລໍຖ້າ…
+Cover Art
 ຈໍໍກວ້າງ
 ປິດເຄື່ອງ
 ກຳລັງໂຫຼດການຕັ້ງຄ່າ
 ກຳລັງບັນທຶກການຕັ້ງຄ່າ
 ເປີດໃຊ້ອຸປະກອນເຊື່ອມຕໍ່
 ເອີ້ນຄືນໃໝ່
-ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ USB
-ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Hard Disk 
+BDM Start Mode
+ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Hard Disk
 ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Network
 ໂໝດ ຕ່າງໆສຳລັບໂປຣແກຣມ
 ອັດຕະໂນມັດ
 ເລືອກເອງ
-ເປີດໃຊ້ HDL Server
-HDL Server ກຳລັງເລີ່ມໃຊ້ງານ...
-HDL Server ກໍາລັງດໍາເນີນການ...
-Failed to start HDL Server.
-HDL Server ກໍາລັງຢຸດການໃຊ້ງານ...
+ເປີດໃຊ້ NBD Server
+NBD Server ກຳລັງເລີ່ມໃຊ້ງານ…
+NBD Server ກໍາລັງດໍາເນີນການ…
+Failed to start NBD Server.
+NBD Server ກໍາລັງຢຸດການໃຊ້ງານ…
 IGR path
 ສີຂອງພື້ນຫຼັງ
 ສີຂອງຂໍ້ຄວາມ
-- PS2 -
 - SMB Server -
 ປະເພດຂອງ IP address
 ຄ່າຄົງທີ່
@@ -100,7 +97,7 @@ NetBIOS
 ລົບ
 ຫຼິ້ນເກມນີ້
 ຕັ້ງຄ່າການສະແດງຜົນ
-ສາມາດລົບເກມ ແລະ ປ່ຽນຊື່ເກມໄດ້
+Write Operations
 ໃຫ້ລະບົບຈື່ເກມທີ່ຫຼິ້ນໄປຄັ້ງສຸດທ້າຍ
 ເລືອກປຸ່ມ
 ເກີດຂໍ້ຜິດພາດ, ເກມນີ້ມີ fragmentation. ກະລຸນາ Defragment ເກມນີ້ກ່ອນ
@@ -111,10 +108,8 @@ Test Changes
 ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
 Unhook Syscalls
 ຂ້າມການຫຼິ້ນວິດິໂອ
-ປະມວນຜົນ DVD-DL 
+ປະມວນຜົນ DVD-DL
 Disable IGR
-Unused
-Unused
 ການປ່ຽນຂະໜາດຈະເຮັດໃຫ້ VMC(ກ້ອນເຊບສະເໝືອນຈິງ) ຖືກ format ໃໝ່
 ສ້າງ
 Start
@@ -135,7 +130,7 @@ Error accessing VMC %s. Continue with the Memory Card in slot %d?
 ກ່ຽວກັບໂປຣແກຣມ
 ກຸ່ມນັກພັດທະນາໂປຣແກຣມ
 ການປະກັນໃນຄຸນະພາບ
-USB prefix path
+BDM prefix path
 ປະມວນຜົນ ELF ຫຼັງຈາກ IGR
 ໃສ່ຄ່າເປັນນາທີ, ເລືອກ 0 ເພື່ອປິດການຢຸດໝຸນຮອບ
 ການຢຸດຮອບໝູນອັດຕະໂນມັດຂອງ Hard Disk
@@ -164,8 +159,6 @@ V-Sync
 ໂໝດ  4
 ໂໝດ  5
 ໂໝດ  6
-ໂໝດ  7
-ໂໝດ  8
 ກຳນົດຄ່າ GSM
 ໂໝດການເຊື່ອມຕໍ່ຂອງສາຍ LAN
 ສົ່ງຂໍ້ມູນ 100Mbit ແບບ full-duplex
@@ -173,9 +166,8 @@ V-Sync
 ສົ່ງຂໍ້ມູນ 10Mbit ແບບ full-duplex
 ສົ່ງຂໍ້ມູນ 10Mbit ແບບ half-duplex
 ການຕັ້ງຄ່າ GSM
-ເປີດໃຊ້ງານ GSM
+GSM Selector
 Toggles GSM ເປີດ ຫຼື ປິດ
-VMODE
 ບັງຄັບໃຊ້ໂໝດການສະແດງຜົນທີ່ປັບແຕ່ງເອງ
 H-POS
 ການປັບແຕ່ງຄ່າສະແດງຜົນຕາມແນວນອນ
@@ -186,7 +178,7 @@ Overscan Adjustment
 ຂ້າມຂັ້ນຕອນ FMV
 ຂ້າມຂັ້ນຕອນສະແດງພາບເຄື່ອນໄຫວ Full Video
 ຕັ້ງຄ່າການໂກງເກມ
-ເປີດໃຊ້ງານ ຄຳສັ່ງໂກງເກມ PS2RD
+PS2RD Cheat Engine
 ອະນຸຍາດໃຫ້ ຄຳສັ່ງໂກງເກມ PS2RD ເຂົ້າເຖິງເກມຂອງເຈົ້າ
 ໂໝດຂອງ ຄຳສັ່ງໂກງເກມ PS2RD
 ເລືອກການໂກງແບບອັດຕະໂນມັດ ຫຼື ເລືອກເອງ
@@ -211,7 +203,7 @@ PS2 Logo
 ຈະຖືກສະແດງຜົນ ກໍຕໍ່ເມື່ອໂລໂກ້ຂອງແຜ່ນຖືກຕ້ອງ ແລະ ສອດຄ່ອງຕາມໂຊນຂອງເຄື່ອງ
 Configure PADEMU
 Pad Emulator Settings
-Enable PadEmulator
+Pad Emulator
 Turns on/off PadEmulator for selected game.
 Pad Emulator mode
 Select Pad Emulator mode.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Settings for port:
 Select Pad Emulator port for settings.
-Enable emulation
+Emulation
 Turns on/off Pad Emulator for selected port.
-Enable vibration
+Vibration
 Turns on/off vibration for Pad Emulator selected port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
@@ -239,12 +231,12 @@ Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
+Multitap emulation
 Turns on/off Multitap emulation for selected game.
 Multitap emulator on port
 Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -257,14 +249,17 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Game settings saved.
 %s settings removed.
@@ -280,3 +275,10 @@ Genre
 Release
 Developer
 Description
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

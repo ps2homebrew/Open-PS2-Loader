@@ -20,7 +20,7 @@ typedef struct
 
 /** allocates a new atlas. Further settings should be set manually
  * on the atlas_t::surface.
-  */
+ */
 atlas_t *atlasNew(size_t width, size_t height, u8 psm);
 
 /// Frees the atlas

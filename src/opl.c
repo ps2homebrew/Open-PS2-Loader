@@ -26,7 +26,7 @@
 #include "httpclient.h"
 
 #include "include/supportbase.h"
-#include "include/usbsupport.h"
+#include "include/bdmsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
@@ -81,10 +81,10 @@ typedef struct
     submenu_list_t *subMenu;
 } opl_io_module_t;
 
-//App support stuff.
+// App support stuff.
 static unsigned char shouldAppsUpdate;
 
-//Network support stuff.
+// Network support stuff.
 #define HTTP_IOBUF_SIZE 512
 static unsigned int CompatUpdateComplete, CompatUpdateTotal;
 static unsigned char CompatUpdateStopFlag, CompatUpdateFlags;
@@ -130,7 +130,7 @@ int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];
 int ps2_dns[4];
-int gETHOpMode; //See ETH_OP_MODES.
+int gETHOpMode; // See ETH_OP_MODES.
 int gPCShareAddressIsNetBIOS;
 int pc_ip[4];
 int gPCPort;
@@ -140,10 +140,12 @@ char gPCUserName[32];
 char gPCPassword[32];
 int gNetworkStartup;
 int gHDDSpindown;
-int gUSBStartMode;
+int gBDMStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
+int gEnableILK;
+int gEnableMX4SIO;
 int gAutosort;
 int gAutoRefresh;
 int gEnableNotifications;
@@ -171,11 +173,11 @@ int gPadEmuSettings;
 #endif
 int gScrollSpeed;
 char gExitPath[32];
-int gDisableDebug;
+int gEnableDebug;
 int gPS2Logo;
 int gDefaultDevice;
 int gEnableWrite;
-char gUSBPrefix[32];
+char gBDMPrefix[32];
 char gETHPrefix[32];
 int gRememberLastPlayed;
 int KeyPressedOnce;
@@ -186,6 +188,10 @@ unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];
 unsigned char gDefaultSelTextColor[3];
 unsigned char gDefaultUITextColor[3];
+hdl_game_info_t *gAutoLaunchGame;
+char gOPLPart[128];
+char *gHDDPrefix;
+char gExportName[32];
 
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
 {
@@ -304,9 +310,9 @@ static void itemExecTriangle(struct menu_item *curMenu)
 static void initMenuForListSupport(int mode)
 {
     opl_io_module_t *mod = &list_support[mode];
-    mod->menuItem.icon_id = mod->support->iconId;
+    mod->menuItem.icon_id = mod->support->itemIconId();
     mod->menuItem.text = NULL;
-    mod->menuItem.text_id = mod->support->textId;
+    mod->menuItem.text_id = mod->support->itemTextId();
 
     mod->menuItem.userdata = mod->support;
 
@@ -371,7 +377,7 @@ static void initSupport(item_list_t *itemList, int startMode, int mode, int forc
 
 static void initAllSupport(int force_reinit)
 {
-    initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
+    initSupport(bdmGetObject(0), gBDMStartMode, BDM_MODE, force_reinit);
     initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
     initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
@@ -379,13 +385,13 @@ static void initAllSupport(int force_reinit)
 
 static void deinitAllSupport(int exception, int modeSelected)
 {
-    moduleCleanup(&list_support[USB_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[BDM_MODE], exception, modeSelected);
     moduleCleanup(&list_support[ETH_MODE], exception, modeSelected);
     moduleCleanup(&list_support[HDD_MODE], exception, modeSelected);
     moduleCleanup(&list_support[APP_MODE], exception, modeSelected);
 }
 
-//For resolving the mode, given an app's path
+// For resolving the mode, given an app's path
 int oplPath2Mode(const char *path)
 {
     char appsPath[64];
@@ -401,8 +407,8 @@ int oplPath2Mode(const char *path)
             if (blkdevnameend != NULL) {
                 blkdevnamelen = (int)(blkdevnameend - appsPath);
 
-                while ((blkdevnamelen > 0) && isdigit(appsPath[blkdevnamelen - 1]))
-                    blkdevnamelen--; //Ignore the unit number.
+                while ((blkdevnamelen > 0) && isdigit((int)appsPath[blkdevnamelen - 1]))
+                    blkdevnamelen--; // Ignore the unit number.
 
                 if (strncmp(path, appsPath, blkdevnamelen) == 0)
                     return listSupport->mode;
@@ -490,7 +496,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
 
                         if (ret == 0)
                             count++;
-                        else if (ret < 0) { //Stopped because of unrecoverable error.
+                        else if (ret < 0) { // Stopped because of unrecoverable error.
                             break;
                         }
                     }
@@ -530,7 +536,7 @@ config_set_t *oplGetLegacyAppsConfig(void)
         return appConfig;
     }
 
-    for (i = MODE_COUNT; i >= 0; i--) {
+    for (i = MODE_COUNT - 1; i >= 0; i--) {
         listSupport = list_support[i].support;
         if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetLegacyAppsPath != NULL)) {
             listSupport->itemGetLegacyAppsPath(appsPath, sizeof(appsPath));
@@ -558,7 +564,7 @@ config_set_t *oplGetLegacyAppsInfo(char *name)
     config_set_t *appConfig;
     char appsPath[128];
 
-    for (i = MODE_COUNT; i >= 0; i--) {
+    for (i = MODE_COUNT - 1; i >= 0; i--) {
         listSupport = list_support[i].support;
         if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetLegacyAppsInfo != NULL)) {
             listSupport->itemGetLegacyAppsInfo(appsPath, sizeof(appsPath), name);
@@ -591,6 +597,10 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
     if (gRememberLastPlayed)
         configGetStr(configGetByType(CONFIG_LAST), "last_played", &temp);
 
+    // refresh device icon and text (for bdm)
+    mdl->menuItem.icon_id = mdl->support->itemIconId();
+    mdl->menuItem.text_id = mdl->support->itemTextId();
+
     // read the new game list
     struct gui_update_t *gup = NULL;
     int count = mdl->support->itemUpdate();
@@ -611,7 +621,7 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
             gup->submenu.selected = 0;
 
             if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0) {
-                gup->submenu.selected = 1; //Select Last Played Game
+                gup->submenu.selected = 1; // Select Last Played Game
             }
 
             guiDeferUpdate(gup);
@@ -638,7 +648,7 @@ void menuDeferredUpdate(void *data)
     if (mod->support->itemNeedsUpdate()) {
         updateMenuFromGameList(mod);
 
-        //If other modes have been updated, then the apps list should be updated too.
+        // If other modes have been updated, then the apps list should be updated too.
         if (*mode != APP_MODE)
             shouldAppsUpdate = 1;
     }
@@ -702,18 +712,18 @@ void setErrorMessage(int strId)
 static int lscstatus = CONFIG_ALL;
 static int lscret = 0;
 
-static int checkLoadConfigUSB(int types)
+static int checkLoadConfigBDM(int types)
 {
     char path[64];
     int value;
 
     // check USB
-    if (usbFindPartition(path, "conf_opl.cfg", 0)) {
+    if (bdmFindPartition(path, "conf_opl.cfg", 0)) {
         configEnd();
         configInit(path);
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
-        configSetInt(configOPL, CONFIG_OPL_USB_MODE, START_MODE_AUTO);
+        configSetInt(configOPL, CONFIG_OPL_BDM_MODE, START_MODE_AUTO);
         return value;
     }
 
@@ -723,13 +733,16 @@ static int checkLoadConfigUSB(int types)
 static int checkLoadConfigHDD(int types)
 {
     int value;
+    char path[64];
 
     hddLoadModules();
-    value = open("pfs0:conf_opl.cfg", O_RDONLY);
+
+    snprintf(path, sizeof(path), "%sconf_opl.cfg", gHDDPrefix);
+    value = open(path, O_RDONLY);
     if (value >= 0) {
         close(value);
         configEnd();
-        configInit("pfs0:");
+        configInit(gHDDPrefix);
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
@@ -739,7 +752,7 @@ static int checkLoadConfigHDD(int types)
     return 0;
 }
 
-//When this function is called, the current device for loading/saving config is the memory card.
+// When this function is called, the current device for loading/saving config is the memory card.
 static int tryAlternateDevice(int types)
 {
     char pwd[8];
@@ -748,18 +761,18 @@ static int tryAlternateDevice(int types)
 
     getcwd(pwd, sizeof(pwd));
 
-    //First, try the device that OPL booted from.
+    // First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
-        if ((value = checkLoadConfigUSB(types)) != 0)
+        if ((value = checkLoadConfigBDM(types)) != 0)
             return value;
     } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
         if ((value = checkLoadConfigHDD(types)) != 0)
             return value;
     }
 
-    //Config was not found on the boot device. Check all supported devices.
-    // Check USB device
-    if ((value = checkLoadConfigUSB(types)) != 0)
+    // Config was not found on the boot device. Check all supported devices.
+    //  Check USB device
+    if ((value = checkLoadConfigBDM(types)) != 0)
         return value;
     // Check HDD
     if ((value = checkLoadConfigHDD(types)) != 0)
@@ -781,11 +794,11 @@ static int tryAlternateDevice(int types)
         configInit("mass0:");
     } else {
         // No? Check if the save location on the HDD is available.
-        dir = opendir("pfs0:");
+        dir = opendir(gHDDPrefix);
         if (dir != NULL) {
             closedir(dir);
             configEnd();
-            configInit("pfs0:");
+            configInit(gHDDPrefix);
         }
     }
     showCfgPopup = 0;
@@ -829,7 +842,7 @@ static void _loadConfig()
             if (configGetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, &value))
                 gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 
-            configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
+            configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gEnableDebug);
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
             configGetInt(configOPL, CONFIG_OPL_HDD_GAME_LIST_CACHE, &gHDDGameListCache);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
@@ -838,14 +851,16 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, &gDefaultDevice);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, &gEnableWrite);
             configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
-            configGetStrCopy(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix, sizeof(gUSBPrefix));
+            configGetStrCopy(configOPL, CONFIG_OPL_BDM_PREFIX, gBDMPrefix, sizeof(gBDMPrefix));
             configGetStrCopy(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix, sizeof(gETHPrefix));
             configGetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, &gRememberLastPlayed);
             configGetInt(configOPL, CONFIG_OPL_AUTOSTART_LAST, &gAutoStartLastPlayed);
-            configGetInt(configOPL, CONFIG_OPL_USB_MODE, &gUSBStartMode);
+            configGetInt(configOPL, CONFIG_OPL_BDM_MODE, &gBDMStartMode);
             configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, &gEnableILK);
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
             configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
@@ -884,6 +899,8 @@ static void _loadConfig()
                 sscanf(temp, "%d.%d.%d.%d", &ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
             if (configGetStr(configNet, CONFIG_NET_PS2_DNS, &temp))
                 sscanf(temp, "%d.%d.%d.%d", &ps2_dns[0], &ps2_dns[1], &ps2_dns[2], &ps2_dns[3]);
+
+            configGetStrCopy(configNet, CONFIG_NET_NBD_DEFAULT_EXPORT, gExportName, sizeof(gExportName));
         }
     }
 
@@ -894,12 +911,12 @@ static void _loadConfig()
     showCfgPopup = 1;
 }
 
-static int trySaveConfigUSB(int types)
+static int trySaveConfigBDM(int types)
 {
     char path[64];
 
     // check USB
-    if (usbFindPartition(path, "conf_opl.cfg", 1)) {
+    if (bdmFindPartition(path, "conf_opl.cfg", 1)) {
         configSetMove(path);
         return configWriteMulti(types);
     }
@@ -910,9 +927,9 @@ static int trySaveConfigUSB(int types)
 static int trySaveConfigHDD(int types)
 {
     hddLoadModules();
-    //Check that the formatted & usable HDD is connected.
+    // Check that the formatted & usable HDD is connected.
     if (hddCheck() == 0) {
-        configSetMove("pfs0:");
+        configSetMove(gHDDPrefix);
         return configWriteMulti(types);
     }
 
@@ -932,29 +949,29 @@ static int trySaveAlternateDevice(int types)
 
     getcwd(pwd, sizeof(pwd));
 
-    //First, try the device that OPL booted from.
+    // First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
-        if ((value = trySaveConfigUSB(types)) > 0)
+        if ((value = trySaveConfigBDM(types)) > 0)
             return value;
     } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
         if ((value = trySaveConfigHDD(types)) > 0)
             return value;
     }
 
-    //Config was not saved to the boot device. Try all supported devices.
-    //Try memory cards
+    // Config was not saved to the boot device. Try all supported devices.
+    // Try memory cards
     if (sysCheckMC() >= 0) {
         if ((value = trySaveConfigMC(types)) > 0)
             return value;
     }
     // Try a USB device
-    if ((value = trySaveConfigUSB(types)) > 0)
+    if ((value = trySaveConfigBDM(types)) > 0)
         return value;
     // Try the HDD
     if ((value = trySaveConfigHDD(types)) > 0)
         return value;
 
-    //We tried everything, but...
+    // We tried everything, but...
     return 0;
 }
 
@@ -978,7 +995,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_XOFF, gXOff);
         configSetInt(configOPL, CONFIG_OPL_YOFF, gYOff);
         configSetInt(configOPL, CONFIG_OPL_OVERSCAN, gOverscan);
-        configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
+        configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gEnableDebug);
         configSetInt(configOPL, CONFIG_OPL_PS2LOGO, gPS2Logo);
         configSetInt(configOPL, CONFIG_OPL_HDD_GAME_LIST_CACHE, gHDDGameListCache);
         configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
@@ -987,14 +1004,16 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, gDefaultDevice);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, gEnableWrite);
         configSetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, gHDDSpindown);
-        configSetStr(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix);
+        configSetStr(configOPL, CONFIG_OPL_BDM_PREFIX, gBDMPrefix);
         configSetStr(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix);
         configSetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, gRememberLastPlayed);
         configSetInt(configOPL, CONFIG_OPL_AUTOSTART_LAST, gAutoStartLastPlayed);
-        configSetInt(configOPL, CONFIG_OPL_USB_MODE, gUSBStartMode);
+        configSetInt(configOPL, CONFIG_OPL_BDM_MODE, gBDMStartMode);
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, gEnableILK);
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
@@ -1063,7 +1082,7 @@ void applyConfig(int themeID, int langID)
 
     initAllSupport(0);
 
-    moduleUpdateMenu(USB_MODE, changed, langChanged);
+    moduleUpdateMenu(BDM_MODE, changed, langChanged);
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);
     moduleUpdateMenu(APP_MODE, changed, langChanged);
@@ -1105,11 +1124,11 @@ int saveConfig(int types, int showUI)
     return lscret;
 }
 
-#define COMPAT_UPD_MODE_UPD_USR 1   //Update all records, even those that were modified by the user.
-#define COMPAT_UPD_MODE_NO_MTIME 2  //Do not check the modified time-stamp.
-#define COMPAT_UPD_MODE_MTIME_GMT 4 //Modified time-stamp is in GMT, not JST.
+#define COMPAT_UPD_MODE_UPD_USR   1 // Update all records, even those that were modified by the user.
+#define COMPAT_UPD_MODE_NO_MTIME  2 // Do not check the modified time-stamp.
+#define COMPAT_UPD_MODE_MTIME_GMT 4 // Modified time-stamp is in GMT, not JST.
 
-#define EOPLCONNERR 0x4000 //Special error code for connection errors.
+#define EOPLCONNERR 0x4000 // Special error code for connection errors.
 
 static int CompatAttemptConnection(void)
 {
@@ -1131,7 +1150,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     config_set_t *itemConfig, *downloadedConfig;
     u16 length;
     s8 ConnMode, hasMtime;
-    u8 *HttpBuffer;
+    char *HttpBuffer;
     int i, count, HttpSocket, result, retries, ConfigSource;
     iox_stat_t stat;
     u8 mtime[6];
@@ -1139,7 +1158,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     const char *startup;
 
     switch (support->mode) {
-        case USB_MODE:
+        case BDM_MODE:
             device = 3;
             break;
         case ETH_MODE:
@@ -1156,7 +1175,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     if (device < 0) {
         LOG("CompatUpdate: unrecognized mode: %d\n", support->mode);
         CompatUpdateStatus = OPL_COMPAT_UPDATE_STAT_ERROR;
-        return; //Shouldn't happen, but what if?
+        return; // Shouldn't happen, but what if?
     }
 
     result = 0;
@@ -1168,7 +1187,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
         if (count > 0) {
             ConnMode = HTTP_CMODE_PERSISTENT;
             if ((HttpSocket = CompatAttemptConnection()) >= 0) {
-                //Update compatibility list.
+                // Update compatibility list.
                 for (i = 0; !CompatUpdateStopFlag && result >= 0 && i < count; i++, CompatUpdateComplete++) {
                     startup = support->itemGetStartup(configSet != NULL ? id : i);
 
@@ -1184,7 +1203,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
                     if (itemConfig != NULL) {
                         ConfigSource = CONFIG_SOURCE_DEFAULT;
                         if ((mode & COMPAT_UPD_MODE_UPD_USR) || !configGetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, &ConfigSource) || ConfigSource != CONFIG_SOURCE_USER) {
-                            if (!(mode & COMPAT_UPD_MODE_NO_MTIME) && (ConfigSource == CONFIG_SOURCE_DLOAD) && configGetStat(itemConfig, &stat)) { //Only perform a stat operation for downloaded setting files.
+                            if (!(mode & COMPAT_UPD_MODE_NO_MTIME) && (ConfigSource == CONFIG_SOURCE_DLOAD) && configGetStat(itemConfig, &stat)) { // Only perform a stat operation for downloaded setting files.
                                 if (!(mode & COMPAT_UPD_MODE_MTIME_GMT)) {
                                     clock.second = itob(stat.mtime[1]);
                                     clock.minute = itob(stat.mtime[2]);
@@ -1194,19 +1213,19 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
                                     clock.year = itob((stat.mtime[6] | ((unsigned short int)stat.mtime[7] << 8)) - 2000);
                                     configConvertToGmtTime(&clock);
 
-                                    mtime[0] = btoi(clock.year);      //Year
-                                    mtime[1] = btoi(clock.month) - 1; //Month
-                                    mtime[2] = btoi(clock.day) - 1;   //Day
-                                    mtime[3] = btoi(clock.hour);      //Hour
-                                    mtime[4] = btoi(clock.minute);    //Minute
-                                    mtime[5] = btoi(clock.second);    //Second
+                                    mtime[0] = btoi(clock.year);      // Year
+                                    mtime[1] = btoi(clock.month) - 1; // Month
+                                    mtime[2] = btoi(clock.day) - 1;   // Day
+                                    mtime[3] = btoi(clock.hour);      // Hour
+                                    mtime[4] = btoi(clock.minute);    // Minute
+                                    mtime[5] = btoi(clock.second);    // Second
                                 } else {
-                                    mtime[0] = (stat.mtime[6] | ((unsigned short int)stat.mtime[7] << 8)) - 2000; //Year
-                                    mtime[1] = stat.mtime[5] - 1;                                                 //Month
-                                    mtime[2] = stat.mtime[4] - 1;                                                 //Day
-                                    mtime[3] = stat.mtime[3];                                                     //Hour
-                                    mtime[4] = stat.mtime[2];                                                     //Minute
-                                    mtime[5] = stat.mtime[1];                                                     //Second
+                                    mtime[0] = (stat.mtime[6] | ((unsigned short int)stat.mtime[7] << 8)) - 2000; // Year
+                                    mtime[1] = stat.mtime[5] - 1;                                                 // Month
+                                    mtime[2] = stat.mtime[4] - 1;                                                 // Day
+                                    mtime[3] = stat.mtime[3];                                                     // Hour
+                                    mtime[4] = stat.mtime[2];                                                     // Minute
+                                    mtime[5] = stat.mtime[1];                                                     // Second
                                 }
                                 hasMtime = 1;
 
@@ -1240,7 +1259,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
 
                                 LOG("CompatUpdate: Connection lost. Retrying.\n");
 
-                                //Connection lost. Attempt to re-connect.
+                                // Connection lost. Attempt to re-connect.
                                 ConnMode = HTTP_CMODE_PERSISTENT;
                                 if ((HttpSocket = CompatAttemptConnection()) < 0) {
                                     result = HttpSocket | EOPLCONNERR;
@@ -1253,10 +1272,10 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
                             LOG("CompatUpdate: skipping %s\n", startup);
                         }
 
-                        if (configSet == NULL) //Do not free what is not ours.
+                        if (configSet == NULL) // Do not free what is not ours.
                             configFree(itemConfig);
                     } else {
-                        //Can't do anything because the config file cannot be opened/created.
+                        // Can't do anything because the config file cannot be opened/created.
                         LOG("CompatUpdate: skipping %s (no config)\n", startup);
                     }
 
@@ -1329,7 +1348,7 @@ void oplUpdateGameCompat(int UpdateAll)
         }
     }
 
-    if (started < 1) //Nothing done
+    if (started < 1) // Nothing done
         CompatUpdateStatus = OPL_COMPAT_UPDATE_STAT_DONE;
 }
 
@@ -1360,13 +1379,13 @@ int oplUpdateGameCompatSingle(int id, item_list_t *support, config_set_t *config
 }
 
 // ----------------------------------------------------------
-// -------------------- HD SRV Support ----------------------
+// -------------------- NBD SRV Support ---------------------
 // ----------------------------------------------------------
-static int loadHdldSvr(void)
+static int loadLwnbdSvr(void)
 {
     int ret, padStatus;
 
-    // deint audio lib while hdl server is running
+    // deint audio lib while nbd server is running
     sfxEnd();
 
     // block all io ops, wait for the ones still running to finish
@@ -1375,17 +1394,17 @@ static int loadHdldSvr(void)
 
     // Deinitialize all support without shutting down the HDD unit.
     deinitAllSupport(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
-    clearErrorMessage(); /*	At this point, an error might have been displayed (since background tasks were completed).
-					Clear it, otherwise it will get displayed after the server is closed.	*/
+    clearErrorMessage(); /* At this point, an error might have been displayed (since background tasks were completed).
+                            Clear it, otherwise it will get displayed after the server is closed. */
 
     unloadPads();
-    sysReset(0);
+    // sysReset(0); // usefull ? printf doesn't work with it.
 
     ret = ethLoadInitModules();
     if (ret == 0) {
         ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
         if (ret >= 0) {
-            ret = sysLoadModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL);
+            ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 4, (char *)&gExportName);
             if (ret >= 0)
                 ret = 0;
         }
@@ -1403,7 +1422,7 @@ static int loadHdldSvr(void)
     return ret;
 }
 
-static void unloadHdldSvr(void)
+static void unloadLwnbdSvr(void)
 {
     ethDeinitModules();
     unloadPads();
@@ -1430,18 +1449,21 @@ static void unloadHdldSvr(void)
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
 }
 
-void handleHdlSrv()
+void handleLwnbdSrv()
 {
-    // prepare for hdl, display screen with info
-    guiRenderTextScreen(_l(_STR_STARTINGHDL));
-    if (loadHdldSvr() == 0)
-        guiMsgBox(_l(_STR_RUNNINGHDL), 0, NULL);
-    else
-        guiMsgBox(_l(_STR_STARTFAILHDL), 0, NULL);
+    char temp[256];
+    // prepare for lwnbd, display screen with info
+    guiRenderTextScreen(_l(_STR_STARTINGNBD));
+    if (loadLwnbdSvr() == 0) {
+        snprintf(temp, sizeof(temp), "%s IP: %d.%d.%d.%d %s", _l(_STR_RUNNINGNBD),
+                 ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], ps2_ip_use_dhcp ? "DHCP" : "");
+        guiMsgBox(temp, 0, NULL);
+    } else
+        guiMsgBox(_l(_STR_STARTFAILNBD), 0, NULL);
 
     // restore normal functionality again
-    guiRenderTextScreen(_l(_STR_UNLOADHDL));
-    unloadHdldSvr();
+    guiRenderTextScreen(_l(_STR_UNLOADNBD));
+    unloadLwnbdSvr();
 }
 
 // ----------------------------------------------------------
@@ -1459,7 +1481,7 @@ static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)
     if (!mod->support)
         return;
 
-    //Shutdown if not required anymore.
+    // Shutdown if not required anymore.
     if ((mod->support->mode != modeSelected) && (modeSelected != IO_MODE_SELECTED_ALL)) {
         if (mod->support->itemShutdown)
             mod->support->itemShutdown();
@@ -1516,11 +1538,14 @@ void setDefaultColors(void)
 
 static void setDefaults(void)
 {
-    clearIOModuleT(&list_support[USB_MODE]);
+    clearIOModuleT(&list_support[BDM_MODE]);
     clearIOModuleT(&list_support[ETH_MODE]);
     clearIOModuleT(&list_support[HDD_MODE]);
     clearIOModuleT(&list_support[APP_MODE]);
 
+    gAutoLaunchGame = NULL;
+    gOPLPart[0] = '\0';
+    gHDDPrefix = "pfs0:";
     gBaseMCDir = "mc?:OPL";
 
     ps2_ip_use_dhcp = 1;
@@ -1558,14 +1583,14 @@ static void setDefaults(void)
     gDefaultDevice = APP_MODE;
     gAutosort = 1;
     gAutoRefresh = 0;
-    gDisableDebug = 1;
+    gEnableDebug = 0;
     gPS2Logo = 0;
     gHDDGameListCache = 0;
     gEnableWrite = 0;
     gRememberLastPlayed = 0;
     gAutoStartLastPlayed = 9;
-    gSelectButton = KEY_CIRCLE; //Default to Japan.
-    gUSBPrefix[0] = '\0';
+    gSelectButton = KEY_CIRCLE; // Default to Japan.
+    gBDMPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
     gEnableNotifications = 0;
     gEnableArt = 0;
@@ -1575,10 +1600,13 @@ static void setDefaults(void)
     gSFXVolume = 80;
     gBootSndVolume = 80;
 
-    gUSBStartMode = START_MODE_DISABLED;
+    gBDMStartMode = START_MODE_DISABLED;
     gHDDStartMode = START_MODE_DISABLED;
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
+
+    gEnableILK = 0;
+    gEnableMX4SIO = 0;
 
     frameCounter = 0;
 
@@ -1591,7 +1619,7 @@ static void setDefaults(void)
 
     // Last Played Auto Start
     KeyPressedOnce = 0;
-    DisableCron = 1; //Auto Start Last Played counter disabled by default
+    DisableCron = 1; // Auto Start Last Played counter disabled by default
     CronStart = 0;
     RemainSecs = 0;
 }
@@ -1654,6 +1682,54 @@ static void deferredAudioInit(void)
         LOG("sfxInit: %d samples loaded.\n", ret);
 }
 
+static void autoLaunchHDDGame(char *argv[])
+{
+    int ret;
+    char path[256];
+    config_set_t *configSet;
+
+    setDefaults();
+
+    gAutoLaunchGame = malloc(sizeof(hdl_game_info_t));
+    if (gAutoLaunchGame == NULL) {
+        PREINIT_LOG("Failed to allocate memory. Loading GUI\n");
+        return;
+    }
+
+    memset(gAutoLaunchGame, 0, sizeof(hdl_game_info_t));
+
+    snprintf(gAutoLaunchGame->startup, sizeof(gAutoLaunchGame->startup), argv[1]);
+    gAutoLaunchGame->start_sector = strtoul(argv[2], NULL, 0);
+    snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:%s", argv[3]);
+
+    configInit(NULL);
+
+    ioInit();
+    LOG_ENABLE();
+
+    hddLoadModules();
+
+    ret = configReadMulti(CONFIG_ALL);
+    if (CONFIG_ALL & CONFIG_OPL) {
+        if (!(ret & CONFIG_OPL))
+            ret = checkLoadConfigHDD(CONFIG_ALL);
+
+        if (ret & CONFIG_OPL) {
+            config_set_t *configOPL = configGetByType(CONFIG_OPL);
+
+            configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
+            configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
+            configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
+        }
+    }
+
+    snprintf(path, sizeof(path), "%sCFG/%s.cfg", gHDDPrefix, gAutoLaunchGame->startup);
+    configSet = configAlloc(0, NULL, path);
+    configRead(configSet);
+
+    hddLaunchGame(-1, configSet);
+}
+
 // --------------------- Main --------------------
 int main(int argc, char *argv[])
 {
@@ -1668,6 +1744,17 @@ int main(int argc, char *argv[])
 
     // reset, load modules
     reset();
+
+    /* argv[0] boot path
+       argv[1] game->startup
+       argv[2] str to u32 game->start_sector
+       argv[3] opl partition read from hdd0:__common/OPL/conf_hdd.cfg
+       argv[4] "mini" */
+    if (argc >= 5) {
+        if (!strcmp(argv[4], "mini"))
+            autoLaunchHDDGame(argv);
+    }
+
     init();
 
     // until this point in the code is reached, only PREINIT_LOG macro should be used

@@ -1,7 +1,6 @@
 # Italian translation by jauffreblades completed by Peppe90
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Italian
-Open PS2 Loader %s
 Salva Modifiche
 Indietro
 Configurazione di Rete
@@ -12,7 +11,7 @@ Errore scrittura impostazioni!
 Esci
 Impostazioni
 Menu
-Giochi USB
+Giochi BDM
 Giochi HDD
 Giochi ETH
 Apps
@@ -40,9 +39,8 @@ Annulla
 Cerchio
 X
 Lista Giochi
-Impostazioni Gioco 
+Impostazioni Gioco
 Rimuovi Impostazioni
-Rimosse tutte le chiavi per il gioco.
 Scorrimento
 Lento
 Medio
@@ -53,30 +51,29 @@ Attendere prego.
 Errore durante il caricamento dell'ID di gioco.
 Ordinamento Automatico
 Errore nel caricamento del file di lingua.
-Disattiva Colori di Debug
-Nessun controller rilevato, in attesa...
-Abilita Cover Art
+Debug Colors
+Nessun controller rilevato, in attesa…
+Cover Art
 Widescreen
 Spegni
-Caricamento configurazione...
-Salvataggio configurazione...
+Caricamento configurazione…
+Salvataggio configurazione…
 Avvia Dispositivo
 Aggiorna
-Modalità di Avvio USB
+BDM Start Mode
 Modalità di Avvio HDD
 Modalità di Avvio ETH
 Modalità di Avvio Apps
 Auto
 Manuale
-Avvia Server HDL
-Avvio server in corso...
-Server HDL in esecuzione...
-Server HDL in chiusura...
-Server HDL in scaricamento dalla memoria...
+Avvia Server NBD
+Avvio server in corso…
+Server NBD in esecuzione…
+Server NBD in chiusura…
+Server NBD in scaricamento dalla memoria…
 Percorso IGR
 Colore dello Sfondo
 Colore Testo
-- PS2 - 
 - Server SMB -
 Tipo di Indirizzo IP
 Statico
@@ -100,7 +97,7 @@ Rinomina
 Cancella
 Esegui
 Impostazioni Display
-Abilita Operazioni in Scrittura
+Write Operations
 Ricorda Ultimo Titolo Giocato
 Tasto di Selezione
 Errore, il gioco è frammentato.
@@ -113,8 +110,6 @@ Slega Chiamate Sys
 Salta i Video
 Disabilita DVD-DL
 Disabilita IGR
-Inutilizzato
-Inutilizzato
 Modificare la dimensione riformatterà la VMC.
 Crea
 Avvia
@@ -135,7 +130,7 @@ Aggiornamento Automatico
 Info Versione
 Sviluppatori
 Controllo Qualità
-Percorso USB Prefisso
+Percorso BDM Prefisso
 Avvia ELF personalizzato dopo un IGR.
 Valore in minuti, 0 per disabilitare lo spin down.
 Spin Down Automatico HDD
@@ -152,7 +147,7 @@ Percorso ETH Prefisso
 Backspace
 Spazio
 Invio
-Modalità 
+Modalità
 Slot VMC 1
 Slot VMC 2
 ID gioco
@@ -164,8 +159,6 @@ Modo 3
 Modo 4
 Modo 5
 Modo 6
-Modo 7
-Modo 8
 Configura GSM
 Modalità Collegamento Ethernet
 100Mbit full-duplex
@@ -173,9 +166,8 @@ Modalità Collegamento Ethernet
 10Mbit full-duplex
 10Mbit half-duplex
 Impostazioni GSM
-Abilita GSM
+GSM Selector
 Imposta GSM On/Off.
-VMODE
 Forza modo di visualizzazione personalizzato.
 H-POS
 Regolazione orizzontale.
@@ -186,7 +178,7 @@ Regolazione overscan.
 Salta FMV
 Salta i filmati.
 Impostazioni Trucchi
-Abilita Motore Trucchi PS2RD
+PS2RD Cheat Engine
 Permetti a PS2RD di applicare patch ai giochi.
 Modo Motore Trucchi PS2RD
 Selezione automatica o seleziona trucchi.
@@ -204,14 +196,14 @@ Aggiornamento annullato.
 Scaricare le impostazioni via rete?
 Impostazioni Personalizzate
 Impostazioni di Default Scaricate
-Avvio automatico in %i s...
+Avvio automatico in %i s…
 Avvio Automatico
 Valore in secondi, 0 per disabilitare l'avvio automatico.
 Logo PS2
 Funziona solo se la regione del gioco combacia con quella della console.
 Configura PADEMU
 Impostazioni Emulatore Pad
-Abilita Emulatore Pad
+Pad Emulator
 Attiva/disattiva l'Emulatore Pad per il gioco selezionato.
 Modalità Emulatore Pad
 Seleziona modalità per l'Emulatore Pad.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Impostazioni Per l'Ingresso:
 Seleziona l'ingresso dell'Emulatore Pad per le impostazioni.
-Abilita Emulazione
+Emulation
 Attiva/disattiva l'Emulatore Pad per l'ingresso selezionato.
-Abilita Vibrazione
+Vibration
 Attiva/disattiva la vibrazione per l'Emulatore Pad nell'ingresso selezionato.
 Indirizzo MAC dell'Adattatore Bluetooth USB:
 Controller DS Associato a Indirizzo MAC:
@@ -239,12 +231,12 @@ Si
 No
 L'adattatore Bluetooth dovrebbe essere perfettamente compatibile con i controller DS3/DS4.
 L'adattatore Bluetooth potrebbe non funzionare correttamente con i controller DS3/DS4.
-Abilita emulazione Multitap
+Multitap Emulation
 Attiva/disattiva l'emulazione del Multitap per il gioco selezionato.
 Emulatore Multitap nell'ingresso:
 Seleziona l'ingresso per l'emulazione del Multitap.
-Disabilita patch per ds3 falsi
-Alcuni ds3 cloni necessitano di una patch, questa opzione la disabiliterà.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emula FIELD Flipping
 Fix per i giochi che presentano problemi in modalità video progressiva.
 Impostazioni Blocco Genitori
@@ -257,14 +249,17 @@ Opzioni di Costruzione:
 Errore - password non utilizzabile.
 Il file VMC %s è frammentato. Continuare con la Memory Card nello slot %d?
 Impostazioni Audio
-Abilita Effetti Sonori
-Abilita Suono di Avvio
+Sound Effects
+Boot Sound
 Volume Effetti Sonori
 Volume Suono di avvio
 Confermare la modifica della modalità video?
 Cache Lista Giochi (HDD)
-Abilita Notifiche
-%s caricato da %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Opzioni
 Impostazioni salvate.
 %s impostazioni rimosse.
@@ -280,3 +275,10 @@ Genere
 Pubblicazione
 Sviluppatore
 Descrizione
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

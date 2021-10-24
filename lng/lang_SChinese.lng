@@ -1,7 +1,6 @@
 # Simplified Chinese translation by eyu2007
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Simplified Chinese
-Open PS2 Loader %s
 保存设置
 返回
 网络设置
@@ -12,7 +11,7 @@ Open PS2 Loader %s
 离开
 设置
 选单
-USB 游戏
+BDM 游戏
 HDD 游戏
 ETH 游戏
 应用程序
@@ -42,7 +41,6 @@ X
 游戏列表
 游戏设置
 删除设置
-移除游戏所有的设置
 滚动
 较慢
 中等
@@ -53,30 +51,29 @@ X
 读取 游戏 ID 时出错
 自动滚动
 读取语言文件时出错
-禁用调试跳色
-未检测到摇杆, 等待中...
-显示游戏封面
+Debug Colors
+未检测到摇杆, 等待中…
+Cover Art
 宽屏幕
 关机
 设置读取中
 设置储存中
 启动设备
 重新整理
-USB 设备启动模式
+BDM Start Mode
 HDD 设备启动模式
 ETH 设备启动模式
 应用程序启动模式
 自动
 手动
-启动 HDL 服务
-HDL 服务启动中...
-HDL 服务正在运行...
-启动 HDL 服务时出错.
-HDL 服务未能读取...
+启动 NBD 服务
+NBD 服务启动中…
+NBD 服务正在运行…
+启动 NBD 服务时出错.
+NBD 服务未能读取…
 IGR 位置
 背景颜色
 文字颜色
-- PS2 -
 - SMB 服务器 -
 IP 地址模式
 静态
@@ -100,7 +97,7 @@ NetBIOS
 删除
 运行
 显示设置
-启用删除与重新命名功能
+Write Operations
 记住最后一个玩的游戏
 选定键
 错误, 游戏有碎片
@@ -113,8 +110,6 @@ GUEST验证留空.
 跳过 videos
 模拟 DVD-DL
 禁用 IGR
-空闲
-空闲
 改变大小将会重新格式化 VMC
 生成
 开始
@@ -135,7 +130,7 @@ VMC %s 出错, 继续使用物理记忆卡吗 (slot %d)?
 关于
 程序
 测试
-USB 前缀路径
+BDM 前缀路径
 自定义IGR启动文件
 数值以分钟计,设为 0 禁用降速
 自动 HDD 降速
@@ -164,8 +159,6 @@ DMA 模式
 模式 4
 模式 5
 模式 6
-模式 7
-模式 8
 配置 GSM
 以太网链接模式
 100Mbit 全双工
@@ -173,9 +166,8 @@ DMA 模式
 10Mbit 全双工
 10Mbit 半双工
 GSM 设置
-启用 GSM
+GSM Selector
 切换 GSM 开或关
-VMODE
 强制自定义显示模式
 H-POS
 水平调整
@@ -186,7 +178,7 @@ V-POS
 跳过 FMV
 跳过全动态视频
 金手指设置
-启用 PS2RD 金手指引擎
+PS2RD Cheat Engine
 允许 PS2RD 金手指引擎对你的游戏进行补丁
 PS2RD 金手指引擎模式
 自动或手动选择游戏金手指
@@ -204,14 +196,14 @@ PS2RD 金手指引擎模式
 从网络上下载设置?
 自定义设置
 已下载默认值
-将自动于 %i 秒后启动...
+将自动于 %i 秒后启动…
 自动启动
 以秒为单位,设为 0 来禁用自动启动
 PS2 标志
 只显示与控制台区域匹配的有效磁盘标识
 配置PADEMU
 Pad模拟器设置
-开启Pad模拟器
+Pad Emulator
 为选定的游戏开启/关闭pad模拟调节。
 Pad模拟器模式
 选择Pad模拟器模式。
@@ -219,9 +211,9 @@ Pad模拟器模式
 蓝牙连接
 设置端口:
 选择Pad模拟器端口
-开启模拟
+Emulation
 打开/关闭选定端口的模拟器
-开启振动
+Vibration
 打开/关闭选定端口的振动。
 USB蓝牙适配器MAC地址:
 D  S 手 柄   MAC地址:
@@ -239,12 +231,12 @@ LMP版本:
 否
 蓝牙适配器应该完全兼容DS3/DS4手柄
 蓝牙适配器可能无法与DS3/DS4手柄匹配
-开启多重模拟
+Multitap Emulation
 打开/关闭这个游戏的多重模拟.
 多重模拟端口
 选择进行多重模拟的端口
-禁用仿冒DS3手柄
-这个选项将使一些仿冒的DS3手柄无法工作
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 模拟播片扫描方式切换
 修正逐行模式下视频播放有问题的游戏.
 家长锁设置
@@ -257,14 +249,17 @@ LMP版本:
 错误-无法使用此密码.
 vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
 音频设置
-启用声音效果
-启用启动声音
+Sound Effects
+Boot Sound
 音效音量
 启动音量
 确认视频模式更改？
 缓存游戏列表 (硬盘)
-启用通知
-%s 从 %s加载
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 游戏设置已保存。
 %s设置已删除。
@@ -280,3 +275,10 @@ Genre
 Release
 Developer
 Description
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

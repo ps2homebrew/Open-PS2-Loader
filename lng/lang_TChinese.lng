@@ -1,7 +1,6 @@
 # Traditional Chinese translation by kane159 - kane159<kane12369@gmail.com
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Traditional Chinese
-Open PS2 Loader %s
 保存設置
 返回
 網絡設置
@@ -12,7 +11,7 @@ Open PS2 Loader %s
 離開
 設置
 選單
-USB 遊戲
+BDM 遊戲
 HDD 遊戲
 ETH 遊戲
 應用程式
@@ -42,7 +41,6 @@ ETH 遊戲
 遊戲清單
 遊戲設置
 刪除設置
-移除遊戲所有的設置
 滾動
 較慢
 中等
@@ -53,30 +51,29 @@ ETH 遊戲
 讀取 Game ID 時出錯
 自動滾動
 讀取語言文件時出錯
-禁用調試跳色
-"無偵測到搖桿, 等待中..."
-啟用圖示封面
+Debug Colors
+"無偵測到搖桿, 等待中…"
+Cover Art
 寬螢幕
 關機
 設置讀取中
 設置儲存中
 啟動裝置
 重新整理
-USB 裝置啟動模式
+BDM Start Mode
 HDD 裝置啟動模式
 ETH 裝置啟動模式
 應用程式啟動模式
 自動
 手動
-啟動 HDL 服務
-HDL 服務啟動中...
-HDL 服務正在運行...
-啟動 HDL 服務時出錯.
-HDL 服務未能讀取...
+啟動 NBD 服務
+NBD 服務啟動中…
+NBD 服務正在運行…
+啟動 NBD 服務時出錯.
+NBD 服務未能讀取…
 IGR 位置
 背景顏色
 文字顏色
-- PS2 -
 - SMB 伺服器 -
 IP 位置模式
 靜態
@@ -100,7 +97,7 @@ NetBIOS
 刪除
 運行
 顯示設置
-啟用刪除與重新命名功能
+Write Operations
 記住最後一個玩的遊戲
 選定鍵
 "錯誤, 遊戲有碎片"
@@ -113,8 +110,6 @@ GUEST驗證留空.
 跳過 videos
 模擬 DVD-DL
 禁用 IGR
-空閑
-空閑
 改變大小將會重新格式化 VMC
 生成
 開始
@@ -135,7 +130,7 @@ VMC 檔案已存在
 關於
 程序
 測試
-USB 前墜路徑
+BDM 前墜路徑
 自定義IGR啟動文件
 "數值以分鐘計,設為 0 禁用降速"
 自動 HDD 降速
@@ -164,8 +159,6 @@ DMA 模式
 模式 4
 模式 5
 模式 6
-模式 7
-模式 8
 配置 GSM
 以太網鏈接模式
 100Mbit 全雙工
@@ -173,9 +166,8 @@ DMA 模式
 10Mbit 全雙工
 10Mbit 半雙工
 GSM 設置
-啟用 GSM
+GSM Selector
 切換 GSM 開或關
-畫面模式
 強制自定義顯示模式
 水平調整
 調整水平方向的顯示位置
@@ -186,7 +178,7 @@ GSM 設置
 跳過 FMV
 跳過全動態視頻
 金手指設置
-啟用 PS2RD 金手指引擎
+PS2RD Cheat Engine
 允許 PS2RD 金手指引擎對你的遊戲進行補丁
 PS2RD 金手指引擎模式
 自動選擇或選擇遊戲金手指
@@ -204,14 +196,14 @@ PS2RD 金手指引擎模式
 從網絡上下載設置?
 自定義設置
 已下載預設值
-將自動於 %i 秒後啟動...
+將自動於 %i 秒後啟動…
 自動啟動
 "以秒為單位,設為 0 來禁用自動啟動"
 PS2 標誌
 Only displayed for a valid disc logo which matches the console's region
 配置PADEMU
 PADEMU設置
-開啟PADEMU
+Pad Emulator
 為選定遊戲開啟/關閉PADEMU調節.
 連接模式
 選擇PADEMU連接模式.
@@ -219,9 +211,9 @@ PADEMU設置
 藍牙連接
 設置埠:
 選擇應用PADEMU埠
-開啟模擬
+Emulation
 打開/關閉選定埠的模擬
-開啟振動
+Vibration
 打開/關閉選定埠的振動.
 藍牙適配器MAC地址:
 D   S  手 柄MAC地址:
@@ -239,12 +231,12 @@ LMP版本:
 否
 藍牙適配器完全兼容DS3/DS4手柄
 藍牙適配器與DS3/DS4手柄不匹配
-開啟分插模擬
+Multitap Emulation
 打開/關閉分插模擬.
 模擬分插埠
 選擇模擬的分插埠
-禁用仿製DS3手柄
-這個選項將使仿製DS3手柄無法工作
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 模擬播片掃描方式切換
 修正逐行模式下視頻播放有問題的遊戲.
 家長鎖設置
@@ -257,14 +249,17 @@ LMP版本:
 錯誤-無法使用此密碼.
 vmc %s 文件碎片化.是否繼續使用插槽 %d 中的記憶卡？
 音頻設置
-啟用聲音效果
-啟用啟動聲音
+Sound Effects
+Boot Sound
 音效音量
 啟動音量
 確認視頻模式更改？
 緩存遊戲列表 (硬碟)
-啟用通知
-%s 從 %s 載入
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 遊戲設置已保存。
 %s 設置已刪除。
@@ -280,3 +275,10 @@ Genre
 Release
 Developer
 Description
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

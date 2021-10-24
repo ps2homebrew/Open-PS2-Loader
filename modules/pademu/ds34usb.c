@@ -14,7 +14,7 @@
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
-#define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
+#define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 4
 
@@ -201,7 +201,7 @@ static void usb_data_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("DS34USB: usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    // DPRINTF("DS34USB: usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     usb_resulCode = resultCode;
 
@@ -212,7 +212,7 @@ static void usb_cmd_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("DS34USB: usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    // DPRINTF("DS34USB: usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     SignalSema(ds34pad[pad].cmd_sema);
 }
@@ -272,29 +272,29 @@ static void readReport(u8 *data, int pad)
             ds34pad[pad].data[0] = ~report->ButtonStateL;
             ds34pad[pad].data[1] = ~report->ButtonStateH;
 
-            ds34pad[pad].data[2] = report->RightStickX; //rx
-            ds34pad[pad].data[3] = report->RightStickY; //ry
-            ds34pad[pad].data[4] = report->LeftStickX;  //lx
-            ds34pad[pad].data[5] = report->LeftStickY;  //ly
+            ds34pad[pad].data[2] = report->RightStickX; // rx
+            ds34pad[pad].data[3] = report->RightStickY; // ry
+            ds34pad[pad].data[4] = report->LeftStickX;  // lx
+            ds34pad[pad].data[5] = report->LeftStickY;  // ly
 
-            ds34pad[pad].data[6] = report->PressureRight; //right
-            ds34pad[pad].data[7] = report->PressureLeft;  //left
-            ds34pad[pad].data[8] = report->PressureUp;    //up
-            ds34pad[pad].data[9] = report->PressureDown;  //down
+            ds34pad[pad].data[6] = report->PressureRight; // right
+            ds34pad[pad].data[7] = report->PressureLeft;  // left
+            ds34pad[pad].data[8] = report->PressureUp;    // up
+            ds34pad[pad].data[9] = report->PressureDown;  // down
 
-            ds34pad[pad].data[10] = report->PressureTriangle; //triangle
-            ds34pad[pad].data[11] = report->PressureCircle;   //circle
-            ds34pad[pad].data[12] = report->PressureCross;    //cross
-            ds34pad[pad].data[13] = report->PressureSquare;   //square
+            ds34pad[pad].data[10] = report->PressureTriangle; // triangle
+            ds34pad[pad].data[11] = report->PressureCircle;   // circle
+            ds34pad[pad].data[12] = report->PressureCross;    // cross
+            ds34pad[pad].data[13] = report->PressureSquare;   // square
 
-            ds34pad[pad].data[14] = report->PressureL1; //L1
-            ds34pad[pad].data[15] = report->PressureR1; //R1
-            ds34pad[pad].data[16] = report->PressureL2; //L2
-            ds34pad[pad].data[17] = report->PressureR2; //R2
+            ds34pad[pad].data[14] = report->PressureL1; // L1
+            ds34pad[pad].data[15] = report->PressureR1; // R1
+            ds34pad[pad].data[16] = report->PressureL2; // L2
+            ds34pad[pad].data[17] = report->PressureR2; // R2
 
-            if (report->PSButtonState) {                                       //display battery level
-                if (report->Select && (ds34pad[pad].btn_delay == MAX_DELAY)) { //PS + SELECT
-                    if (ds34pad[pad].analog_btn < 2)                           //unlocked mode
+            if (report->PSButtonState) {                                       // display battery level
+                if (report->Select && (ds34pad[pad].btn_delay == MAX_DELAY)) { // PS + SELECT
+                    if (ds34pad[pad].analog_btn < 2)                           // unlocked mode
                         ds34pad[pad].analog_btn = !ds34pad[pad].analog_btn;
 
                     ds34pad[pad].oldled[0] = led_patterns[pad][(ds34pad[pad].analog_btn & 1)];
@@ -313,7 +313,7 @@ static void readReport(u8 *data, int pad)
                     ds34pad[pad].btn_delay--;
             }
 
-            if (report->Power == 0xEE) //charging
+            if (report->Power == 0xEE) // charging
                 ds34pad[pad].oldled[3] = 1;
             else
                 ds34pad[pad].oldled[3] = 0;
@@ -380,29 +380,29 @@ static void readReport(u8 *data, int pad)
             ds34pad[pad].data[0] = ~(report->Share | report->L3 << 1 | report->R3 << 2 | report->Option << 3 | up << 4 | right << 5 | down << 6 | left << 7);
             ds34pad[pad].data[1] = ~(report->L2 | report->R2 << 1 | report->L1 << 2 | report->R1 << 3 | report->Triangle << 4 | report->Circle << 5 | report->Cross << 6 | report->Square << 7);
 
-            ds34pad[pad].data[2] = report->RightStickX; //rx
-            ds34pad[pad].data[3] = report->RightStickY; //ry
-            ds34pad[pad].data[4] = report->LeftStickX;  //lx
-            ds34pad[pad].data[5] = report->LeftStickY;  //ly
+            ds34pad[pad].data[2] = report->RightStickX; // rx
+            ds34pad[pad].data[3] = report->RightStickY; // ry
+            ds34pad[pad].data[4] = report->LeftStickX;  // lx
+            ds34pad[pad].data[5] = report->LeftStickY;  // ly
 
-            ds34pad[pad].data[6] = right * 255; //right
-            ds34pad[pad].data[7] = left * 255;  //left
-            ds34pad[pad].data[8] = up * 255;    //up
-            ds34pad[pad].data[9] = down * 255;  //down
+            ds34pad[pad].data[6] = right * 255; // right
+            ds34pad[pad].data[7] = left * 255;  // left
+            ds34pad[pad].data[8] = up * 255;    // up
+            ds34pad[pad].data[9] = down * 255;  // down
 
-            ds34pad[pad].data[10] = report->Triangle * 255; //triangle
-            ds34pad[pad].data[11] = report->Circle * 255;   //circle
-            ds34pad[pad].data[12] = report->Cross * 255;    //cross
-            ds34pad[pad].data[13] = report->Square * 255;   //square
+            ds34pad[pad].data[10] = report->Triangle * 255; // triangle
+            ds34pad[pad].data[11] = report->Circle * 255;   // circle
+            ds34pad[pad].data[12] = report->Cross * 255;    // cross
+            ds34pad[pad].data[13] = report->Square * 255;   // square
 
-            ds34pad[pad].data[14] = report->L1 * 255;   //L1
-            ds34pad[pad].data[15] = report->R1 * 255;   //R1
-            ds34pad[pad].data[16] = report->PressureL2; //L2
-            ds34pad[pad].data[17] = report->PressureR2; //R2
+            ds34pad[pad].data[14] = report->L1 * 255;   // L1
+            ds34pad[pad].data[15] = report->R1 * 255;   // R1
+            ds34pad[pad].data[16] = report->PressureL2; // L2
+            ds34pad[pad].data[17] = report->PressureR2; // R2
 
-            if (report->PSButton) {                                           //display battery level
-                if (report->Share && (ds34pad[pad].btn_delay == MAX_DELAY)) { //PS + Share
-                    if (ds34pad[pad].analog_btn < 2)                          //unlocked mode
+            if (report->PSButton) {                                           // display battery level
+                if (report->Share && (ds34pad[pad].btn_delay == MAX_DELAY)) { // PS + Share
+                    if (ds34pad[pad].analog_btn < 2)                          // unlocked mode
                         ds34pad[pad].analog_btn = !ds34pad[pad].analog_btn;
 
                     ds34pad[pad].oldled[0] = rgbled_patterns[pad][(ds34pad[pad].analog_btn & 1)][0];
@@ -426,7 +426,7 @@ static void readReport(u8 *data, int pad)
                     ds34pad[pad].btn_delay--;
             }
 
-            if (report->Power != 0xB && report->Usb_plugged) //charging
+            if (report->Power != 0xB && report->Usb_plugged) // charging
                 ds34pad[pad].oldled[3] = 1;
             else
                 ds34pad[pad].oldled[3] = 0;
@@ -448,14 +448,14 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
     if (ds34pad[pad].type == DS3) {
         mips_memcpy(usb_buf, output_01_report, sizeof(output_01_report));
 
-        usb_buf[1] = 0xFE; //rt
-        usb_buf[2] = rrum; //rp
-        usb_buf[3] = 0xFE; //lt
-        usb_buf[4] = lrum; //lp
+        usb_buf[1] = 0xFE; // rt
+        usb_buf[2] = rrum; // rp
+        usb_buf[3] = 0xFE; // lt
+        usb_buf[4] = lrum; // lp
 
-        usb_buf[9] = led[0] & 0x7F; //LED Conf
+        usb_buf[9] = led[0] & 0x7F; // LED Conf
 
-        if (led[3]) //means charging, so blink
+        if (led[3]) // means charging, so blink
         {
             usb_buf[13] = 0x32;
             usb_buf[18] = 0x32;
@@ -468,14 +468,14 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         usb_buf[0] = 0x05;
         usb_buf[1] = 0xFF;
 
-        usb_buf[4] = rrum * 255; //ds4 has full control
+        usb_buf[4] = rrum * 255; // ds4 has full control
         usb_buf[5] = lrum;
 
-        usb_buf[6] = led[0]; //r
-        usb_buf[7] = led[1]; //g
-        usb_buf[8] = led[2]; //b
+        usb_buf[6] = led[0]; // r
+        usb_buf[7] = led[1]; // g
+        usb_buf[8] = led[2]; // b
 
-        if (led[3]) //means charging, so blink
+        if (led[3]) // means charging, so blink
         {
             usb_buf[9] = 0x80;  // Time to flash bright (255 = 2.5 seconds)
             usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)

@@ -10,7 +10,7 @@
 #include "include/system.h"
 #include <string.h>
 #include <malloc.h>
-#include <osd_config.h>
+#include <rom0_info.h>
 
 #include "include/hdd.h"
 
@@ -35,91 +35,61 @@ int getFileSize(int fd)
     return size;
 }
 
-#define MAX_ENTRY 128
-
 static int checkMC()
 {
     int mc0_is_ps2card, mc1_is_ps2card;
     int mc0_has_folder, mc1_has_folder;
-    int memcardtype, dummy;
-    int i, ret;
-    static sceMcTblGetDir mc_direntry[MAX_ENTRY] __attribute__((aligned(64)));
 
     if (mcID == -1) {
-        mcSync(0, NULL, NULL);
-
-        mcGetInfo(0, 0, &memcardtype, &dummy, &dummy);
-        mcSync(0, NULL, &ret);
-        mc0_is_ps2card = (ret == -1 && memcardtype == 2);
-        mc0_has_folder = 0;
-
-        mcGetInfo(1, 0, &memcardtype, &dummy, &dummy);
-        mcSync(0, NULL, &ret);
-        mc1_is_ps2card = (ret == -1 && memcardtype == 2);
-        mc1_has_folder = 0;
-
-        if (mc0_is_ps2card) {
-            memset(mc_direntry, 0, sizeof(mc_direntry));
-            mcGetDir(0, 0, "*", 0, MAX_ENTRY - 2, mc_direntry);
-            mcSync(0, NULL, &ret);
-            for (i = 0; i < ret; i++) {
-                if (mc_direntry[i].AttrFile & sceMcFileAttrSubdir && !strcmp((char *)mc_direntry[i].EntryName, "OPL")) {
-                    mc0_has_folder = 1;
-                    break;
-                }
-            }
+        mc0_is_ps2card = 0;
+        DIR *mc0_root_dir = opendir("mc0:/");
+        if (mc0_root_dir != NULL) {
+            closedir(mc0_root_dir);
+            mc0_is_ps2card = 1;
         }
 
-        if (mc1_is_ps2card) {
-            memset(mc_direntry, 0, sizeof(mc_direntry));
-            mcGetDir(1, 0, "*", 0, MAX_ENTRY - 2, mc_direntry);
-            mcSync(0, NULL, &ret);
-            for (i = 0; i < ret; i++) {
-                if (mc_direntry[i].AttrFile & sceMcFileAttrSubdir && !strcmp((char *)mc_direntry[i].EntryName, "OPL")) {
-                    mc1_has_folder = 1;
-                    break;
-                }
-            }
+        mc1_is_ps2card = 0;
+        DIR *mc1_root_dir = opendir("mc1:/");
+        if (mc1_root_dir != NULL) {
+            closedir(mc1_root_dir);
+            mc1_is_ps2card = 1;
+        }
+
+        mc0_has_folder = 0;
+        DIR *mc0_opl_dir = opendir("mc0:OPL/");
+        if (mc0_opl_dir != NULL) {
+            closedir(mc0_opl_dir);
+            mc0_has_folder = 1;
+        }
+
+        mc1_has_folder = 0;
+        DIR *mc1_opl_dir = opendir("mc1:OPL/");
+        if (mc1_opl_dir != NULL) {
+            closedir(mc1_opl_dir);
+            mc1_has_folder = 1;
         }
 
         if (mc0_has_folder) {
-            mcID = 0x30;
+            mcID = '0';
             return mcID;
         }
 
         if (mc1_has_folder) {
-            mcID = 0x31;
+            mcID = '1';
             return mcID;
         }
 
         if (mc0_is_ps2card) {
-            mcID = 0x30;
+            mcID = '0';
             return mcID;
         }
 
         if (mc1_is_ps2card) {
-            mcID = 0x31;
+            mcID = '1';
             return mcID;
         }
     }
     return mcID;
-}
-
-static void writeMCIcon(void)
-{
-    int fd;
-
-    fd = openFile("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC);
-    if (fd >= 0) {
-        write(fd, &icon_icn, size_icon_icn);
-        close(fd);
-    }
-
-    fd = openFile("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC);
-    if (fd >= 0) {
-        write(fd, &icon_sys, size_icon_sys);
-        close(fd);
-    }
 }
 
 void checkMCFolder(void)
@@ -131,22 +101,29 @@ void checkMCFolder(void)
         return;
     }
 
-    mcSync(0, NULL, NULL);
-    mcMkDir(mcID & 1, 0, "OPL");
-    mcSync(0, NULL, NULL);
+    snprintf(path, sizeof(path), "mc%d:OPL/", mcID & 1);
+    mkdir(path, 0777);
 
     snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID & 1);
-    fd = open(path, O_RDONLY, 0666);
+    fd = open(path, O_RDONLY);
     if (fd < 0) {
-        writeMCIcon();
+        fd = openFile(path, O_WRONLY | O_CREAT | O_TRUNC);
+        if (fd >= 0) {
+            write(fd, &icon_icn, size_icon_icn);
+            close(fd);
+        }
     } else {
         close(fd);
     }
 
     snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID & 1);
-    fd = open(path, O_RDONLY, 0666);
+    fd = open(path, O_RDONLY);
     if (fd < 0) {
-        writeMCIcon();
+        fd = openFile(path, O_WRONLY | O_CREAT | O_TRUNC);
+        if (fd >= 0) {
+            write(fd, &icon_sys, size_icon_sys);
+            close(fd);
+        }
     } else {
         close(fd);
     }
@@ -172,18 +149,15 @@ static int checkFile(char *path, int mode)
             char dirPath[256];
             char *pos = strrchr(path, '/');
             if (pos) {
-                memcpy(dirPath, path + 4, (pos - path) - 4);
-                dirPath[(pos - path) - 4] = '\0';
-                int ret = 0;
-                mcSync(0, NULL, NULL);
-                mcMkDir(path[2] - '0', 0, dirPath);
-                mcSync(0, NULL, &ret);
-                if (ret < 0) {
-                    // If the error is that the folder already exists, just pass through
-                    if (ret != -4) {
+                memcpy(dirPath, path, (pos - path));
+                dirPath[(pos - path)] = '\0';
+                DIR *dir = opendir(dirPath);
+                if (dir == NULL) {
+                    int res = mkdir(dirPath, 0777);
+                    if (res != 0)
                         return 0;
-                    }
-                }
+                } else
+                    closedir(dir);
             }
         }
     }
@@ -267,10 +241,10 @@ file_buffer_t *openFileBuffer(char *fpath, int mode, short allocResult, unsigned
         if (mode == O_RDONLY) {
             fileBuffer->lastPtr = NULL;
 
-            //Check for and skip the UTF-8 BOM sequence.
+            // Check for and skip the UTF-8 BOM sequence.
             if ((read(fd, bom, sizeof(bom)) != 3) ||
                 (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF)) {
-                //Not BOM, so rewind.
+                // Not BOM, so rewind.
                 lseek(fd, 0, SEEK_SET);
             }
         } else
@@ -292,7 +266,7 @@ file_buffer_t *openFileBufferBuffer(short allocResult, const void *buffer, unsig
     fileBuffer->size = size;
     fileBuffer->available = size;
     fileBuffer->buffer = (char *)malloc((size + 1) * sizeof(char));
-    fileBuffer->lastPtr = fileBuffer->buffer; //O_RDONLY, but with the data in the buffer.
+    fileBuffer->lastPtr = fileBuffer->buffer; // O_RDONLY, but with the data in the buffer.
     fileBuffer->allocResult = allocResult;
     fileBuffer->fd = -1;
     fileBuffer->mode = O_RDONLY;
@@ -313,8 +287,8 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
         if (fileBuffer->lastPtr) {
             // Calculate the remaining chars to the right of lastPtr
             lineSize = fileBuffer->available - (fileBuffer->lastPtr - fileBuffer->buffer);
-            /*LOG("##### Continue read, position: %X (total: %d) line size (\\0 not inc.): %d end: %x\n",
-					fileBuffer->lastPtr - fileBuffer->buffer, fileBuffer->available, lineSize, fileBuffer->lastPtr[lineSize]);*/
+            /* LOG("##### Continue read, position: %X (total: %d) line size (\\0 not inc.): %d end: %x\n",
+                fileBuffer->lastPtr - fileBuffer->buffer, fileBuffer->available, lineSize, fileBuffer->lastPtr[lineSize]); */
             posLF = strchr(fileBuffer->lastPtr, '\n');
         }
 
@@ -322,7 +296,7 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
             // if available, we shift the remaining chars to the left ...
             if (lineSize) {
-                //LOG("##### LF not found, Shift %d characters from end to beginning\n", lineSize);
+                // LOG("##### LF not found, Shift %d characters from end to beginning\n", lineSize);
                 memmove(fileBuffer->buffer, fileBuffer->lastPtr, lineSize);
             }
 
@@ -331,7 +305,7 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
                 // Load as many characters necessary to fill the buffer
                 length = fileBuffer->size - lineSize - 1;
-                //LOG("##### Asking for %d characters to complete buffer\n", length);
+                // LOG("##### Asking for %d characters to complete buffer\n", length);
                 readSize = read(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
                 fileBuffer->buffer[lineSize + readSize] = '\0';
 
@@ -340,11 +314,11 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
                 // Now update read context info
                 lineSize = lineSize + readSize;
-                //LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
+                // LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
 
                 // If buffer not full it means we are at EOF
                 if (fileBuffer->size != lineSize + 1) {
-                    //LOG("##### Reached EOF\n");
+                    // LOG("##### Reached EOF\n");
                     close(fileBuffer->fd);
                     fileBuffer->fd = -1;
                 }
@@ -365,7 +339,7 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
         fileBuffer->lastPtr[lineSize] = '\0';
         *outBuf = fileBuffer->lastPtr;
 
-        //LOG("##### Result line is \"%s\" size: %d avail: %d pos: %d\n", fileBuffer->lastPtr, lineSize, fileBuffer->available, fileBuffer->lastPtr - fileBuffer->buffer);
+        // LOG("##### Result line is \"%s\" size: %d avail: %d pos: %d\n", fileBuffer->lastPtr, lineSize, fileBuffer->available, fileBuffer->lastPtr - fileBuffer->buffer);
 
         // If we are at EOF and no more chars available to scan, then we are finished
         if (!lineSize && !fileBuffer->available && fileBuffer->fd == -1)
@@ -397,23 +371,23 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
 void writeFileBuffer(file_buffer_t *fileBuffer, char *inBuf, int size)
 {
-    //LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
+    // LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
     if (fileBuffer->available && fileBuffer->available + size > fileBuffer->size) {
-        //LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
+        // LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
         write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         fileBuffer->lastPtr = fileBuffer->buffer;
         fileBuffer->available = 0;
     }
 
     if (size > fileBuffer->size) {
-        //LOG("writeFileBuffer direct write: %d\n", size);
+        // LOG("writeFileBuffer direct write: %d\n", size);
         write(fileBuffer->fd, inBuf, size);
     } else {
         memcpy(fileBuffer->lastPtr, inBuf, size);
         fileBuffer->lastPtr += size;
         fileBuffer->available += size;
 
-        //LOG("writeFileBuffer lastPrt: %d\n", (fileBuffer->lastPtr - fileBuffer->buffer));
+        // LOG("writeFileBuffer lastPrt: %d\n", (fileBuffer->lastPtr - fileBuffer->buffer));
     }
 }
 
@@ -421,7 +395,7 @@ void closeFileBuffer(file_buffer_t *fileBuffer)
 {
     if (fileBuffer->fd >= 0) {
         if (fileBuffer->mode != O_RDONLY && fileBuffer->available) {
-            //LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
+            // LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
             write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         }
         close(fileBuffer->fd);
@@ -493,7 +467,7 @@ int InitConsoleRegionData(void)
             case 'A':
                 ConsoleRegion = CONSOLE_REGION_USA;
                 break;
-            default: //For Japanese and unidentified consoles.
+            default: // For Japanese and unidentified consoles.
                 ConsoleRegion = CONSOLE_REGION_JAPAN;
         }
 
@@ -530,7 +504,7 @@ int CheckPS2Logo(int fd, u32 lba)
     char text[1024];
 
     w = 0;
-    if ((fd > 0) && (lba == 0)) // USB_MODE & ETH_MODE
+    if ((fd > 0) && (lba == 0)) // BDM_MODE & ETH_MODE
         w = read(fd, logo, sizeof(logo)) == sizeof(logo);
     if ((lba > 0) && (fd == 0)) {       // HDD_MODE
         for (k = 0; k <= 12 * 4; k++) { // NB: Disc sector size (2048 bytes) and HDD sector size (512 bytes) differ, hence why we multiplied the number of sectors (12) by 4.
@@ -561,14 +535,14 @@ int CheckPS2Logo(int fd, u32 lba)
             } else {
                 strcat(text, "don't match!");
             }
-            if (!gDisableDebug)
+            if (gEnableDebug)
                 guiWarning(text, 12);
         } else {
-            if (!gDisableDebug)
+            if (gEnableDebug)
                 guiWarning("Not a valid PS2 Logo first byte!", 12);
         }
     } else {
-        if (!gDisableDebug)
+        if (gEnableDebug)
             guiWarning("Error reading first 12 disc sectors (PS2 Logo)!", 25);
     }
     return ValidPS2Logo;

@@ -248,7 +248,7 @@ again_1:
     }
     /* no fully matching pcb found? then look for an unconnected pcb */
     if (pcb == NULL) {
-/* Iterate through the UDP PCB list for a pcb that matches
+        /* Iterate through the UDP PCB list for a pcb that matches
        the local address. */
 
 #ifdef SO_REUSE
@@ -563,17 +563,17 @@ err_t udp_bind(struct udp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
 #endif
 
 #else  /* SO_REUSE */
-        /* Search through list of PCB's. 
-         
+        /* Search through list of PCB's.
+
       If there is a PCB bound to specified port and IP_ADDR_ANY another PCB can be bound to the interface IP
-      or to the loopback address on the same port if SOF_REUSEADDR is set. Any combination of PCB's bound to 
+      or to the loopback address on the same port if SOF_REUSEADDR is set. Any combination of PCB's bound to
       the same local port, but to one address out of {IP_ADDR_ANY, 127.0.0.1, interface IP} at a time is valid.
       But no two PCB's bound to same local port and same local address is valid.
-      
-      If SOF_REUSEPORT is set several PCB's can be bound to same local port and same local address also. But then 
+
+      If SOF_REUSEPORT is set several PCB's can be bound to same local port and same local address also. But then
       all PCB's must have the SOF_REUSEPORT option set.
-      
-      When the two options aren't set and specified port is already bound, ERR_USE is returned saying that 
+
+      When the two options aren't set and specified port is already bound, ERR_USE is returned saying that
       address is already in use. */
         else if (ipcb->local_port == port) {
             if (ip_addr_cmp(&(ipcb->local_ip), ipaddr)) {
@@ -596,7 +596,7 @@ err_t udp_bind(struct udp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
     }
 
 #ifdef SO_REUSE
-    /* If SOF_REUSEPORT isn't set in all PCB's bound to specified port and local address specified then 
+    /* If SOF_REUSEPORT isn't set in all PCB's bound to specified port and local address specified then
      {IP, port} can't be reused. */
     if (!reuse_port_all_set) {
         LWIP_DEBUGF(UDP_DEBUG, ("udp_bind: not all sockets have SO_REUSEPORT set.\n"));
@@ -609,7 +609,7 @@ err_t udp_bind(struct udp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
     if (port == 0) {
 #ifndef UDP_LOCAL_PORT_RANGE_START
 #define UDP_LOCAL_PORT_RANGE_START 4096
-#define UDP_LOCAL_PORT_RANGE_END 0x7fff
+#define UDP_LOCAL_PORT_RANGE_END   0x7fff
 #endif
         port = UDP_LOCAL_PORT_RANGE_START;
         ipcb = udp_pcbs;

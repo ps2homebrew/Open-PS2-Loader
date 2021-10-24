@@ -24,8 +24,8 @@
 #ifndef _CHEATENGINE_H_
 #define _CHEATENGINE_H_
 
-#define MAX_HOOKS 5
-#define MAX_CODES 250
+#define MAX_HOOKS     5
+#define MAX_CODES     250
 #define MAX_CHEATLIST (MAX_HOOKS * 2 + MAX_CODES * 2)
 
 extern void (*Old_SetupThread)(void *gp, void *stack, s32 stack_size, void *args, void *root_func);

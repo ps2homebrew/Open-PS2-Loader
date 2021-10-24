@@ -44,10 +44,11 @@ static ee_sema_t gQueueSema;
 static int screenWidth;
 static int screenHeight;
 
+static int showPartPopup = 0;
 static int showThmPopup;
 static int showLngPopup;
 
-static clock_t popupTimer = 0;
+static clock_t popupTimer;
 
 // forward decl.
 static void guiShow();
@@ -96,10 +97,10 @@ static gui_screen_handler_t *screenHandlerTarget = NULL;
 static int transIndex;
 
 // Helper perlin noise data
-#define PLASMA_H 32
-#define PLASMA_W 32
+#define PLASMA_H              32
+#define PLASMA_W              32
 #define PLASMA_ROWS_PER_FRAME 6
-#define FADE_SIZE 256
+#define FADE_SIZE             256
 
 static GSTEXTURE gBackgroundTex;
 static int pperm[512];
@@ -201,7 +202,7 @@ void guiShowAbout()
     char OPLVersion[40];
     char OPLBuildDetails[40];
 
-    snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
+    snprintf(OPLVersion, sizeof(OPLVersion), "Open PS2 Loader %s", OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
     snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"
@@ -214,7 +215,7 @@ void guiShowAbout()
 #ifdef PADEMU
                                                        " - PADEMU"
 #endif
-             //Version numbers
+             // Version numbers
              ,
              GSM_VERSION
 #ifdef IGS
@@ -249,50 +250,67 @@ static void guiResetNotifications(void)
     popupTimer = 0;
 }
 
-static void guiRenderNotifications(char *type, char *path, int y)
+static void guiRenderNotifications(char *string, int y)
 {
-    char notification[128];
-    char *col_pos;
     int x;
 
-    snprintf(notification, sizeof(notification), _l(_STR_NOTIFICATIONS), type, path);
-    if ((col_pos = strchr(notification, ':')) != NULL)
-        *(col_pos + 1) = '\0';
-
-    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
+    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], string)) - 10;
 
     rmDrawRect(x - 10, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
-    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, string, gTheme->textColor);
 }
 
 static void guiShowNotifications(void)
 {
+    char notification[128];
+    char *col_pos;
     int y = 10;
     int yadd = 35;
-    clock_t currentTime;
 
-    currentTime = clock();
-    if (showThmPopup || showLngPopup || showCfgPopup) {
+    if (showPartPopup || showThmPopup || showLngPopup || showCfgPopup) {
         if (!popupTimer) {
             popupTimer = clock() + 5000 * (CLOCKS_PER_SEC / 1000);
             sfxPlay(SFX_MESSAGE);
         }
 
+        if (showPartPopup) {
+            col_pos = strchr(gOPLPart, ':');
+            col_pos++;
+
+            snprintf(notification, sizeof(notification), _l(_STR_PARTITION_NOTIFICATION), col_pos);
+            guiRenderNotifications(notification, y);
+            y += yadd;
+        }
+
         if (showCfgPopup) {
-            guiRenderNotifications("CFG", configGetDir(), y);
+            snprintf(notification, sizeof(notification), _l(_STR_CFG_NOTIFICATION), configGetDir());
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
+
+            guiRenderNotifications(notification, y);
             y += yadd;
         }
 
         if (showThmPopup) {
-            guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
+            snprintf(notification, sizeof(notification), _l(_STR_THM_NOTIFICATION), thmGetFilePath(thmGetGuiValue()));
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
+
+            guiRenderNotifications(notification, y);
             y += yadd;
         }
 
-        if (showLngPopup)
-            guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
+        if (showLngPopup) {
+            snprintf(notification, sizeof(notification), _l(_STR_LNG_NOTIFICATION), lngGetFilePath(lngGetGuiValue()));
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
 
-        if (currentTime >= popupTimer) {
+            guiRenderNotifications(notification, y);
+        }
+
+        if (clock() >= popupTimer) {
             guiResetNotifications();
+            showPartPopup = 0;
             showCfgPopup = 0;
         }
     }
@@ -314,19 +332,19 @@ static void guiShowNetCompatUpdateResult(int result)
 {
     switch (result) {
         case OPL_COMPAT_UPDATE_STAT_DONE:
-            //Completed with no errors.
+            // Completed with no errors.
             guiMsgBox(_l(_STR_NET_UPDATE_DONE), 0, NULL);
             break;
         case OPL_COMPAT_UPDATE_STAT_ERROR:
-            //Completed with errors.
+            // Completed with errors.
             guiMsgBox(_l(_STR_NET_UPDATE_FAILED), 0, NULL);
             break;
         case OPL_COMPAT_UPDATE_STAT_CONN_ERROR:
-            //Completed with errors.
+            // Completed with errors.
             guiMsgBox(_l(_STR_NET_UPDATE_CONN_FAILED), 0, NULL);
             break;
         case OPL_COMPAT_UPDATE_STAT_ABORTED:
-            //User-aborted.
+            // User-aborted.
             guiMsgBox(_l(_STR_NET_UPDATE_CANCELLED), 0, NULL);
             break;
     }
@@ -373,13 +391,13 @@ void guiShowNetCompatUpdate(void)
                     }
                 }
                 break;
-            case UIID_BTN_CANCEL: //If the user pressed the cancel button.
+            case UIID_BTN_CANCEL: // If the user pressed the cancel button.
             case NETUPD_BTN_CANCEL:
                 if (started) {
                     if (guiMsgBox(_l(_STR_CONFIRMATION_CANCEL_UPDATE), 1, NULL)) {
                         guiRenderTextScreen(_l(_STR_PLEASE_WAIT));
                         oplAbortUpdateGameCompat();
-                        //The process truly ends when the UI callback gets the update from the worker thread that the process has ended.
+                        // The process truly ends when the UI callback gets the update from the worker thread that the process has ended.
                     }
                 } else {
                     done = 1;
@@ -417,6 +435,20 @@ void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t *co
     }
 }
 
+static void guiShowBlockDeviceConfig(void)
+{
+    int ret;
+
+    diaSetInt(diaBlockDevicesConfig, CFG_ENABLEILK, gEnableILK);
+    diaSetInt(diaBlockDevicesConfig, CFG_ENABLEMX4SIO, gEnableMX4SIO);
+
+    ret = diaExecuteDialog(diaBlockDevicesConfig, -1, 1, NULL);
+    if (ret) {
+        diaGetInt(diaBlockDevicesConfig, CFG_ENABLEILK, &gEnableILK);
+        diaGetInt(diaBlockDevicesConfig, CFG_ENABLEMX4SIO, &gEnableMX4SIO);
+    }
+}
+
 static int guiUpdater(int modified)
 {
     int showAutoStartLast;
@@ -425,68 +457,65 @@ static int guiUpdater(int modified)
         diaGetInt(diaConfig, CFG_LASTPLAYED, &showAutoStartLast);
         diaSetVisible(diaConfig, CFG_LBL_AUTOSTARTLAST, showAutoStartLast);
         diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, showAutoStartLast);
+
+        diaGetInt(diaConfig, CFG_BDMMODE, &gBDMStartMode);
+        diaSetVisible(diaConfig, BLOCKDEVICE_BUTTON, gBDMStartMode);
     }
     return 0;
 }
 
 void guiShowConfig()
 {
-    int value;
-
     // configure the enumerations
-    const char *selectButtons[] = {_l(_STR_CIRCLE), _l(_STR_CROSS), NULL};
-    const char *deviceNames[] = {_l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), NULL};
+    const char *deviceNames[] = {_l(_STR_BDM_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), NULL};
     const char *deviceModes[] = {_l(_STR_OFF), _l(_STR_MANUAL), _l(_STR_AUTO), NULL};
 
-    diaSetEnum(diaConfig, CFG_SELECTBUTTON, selectButtons);
     diaSetEnum(diaConfig, CFG_DEFDEVICE, deviceNames);
-    diaSetEnum(diaConfig, CFG_USBMODE, deviceModes);
+    diaSetEnum(diaConfig, CFG_BDMMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
-    diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
+    diaSetInt(diaConfig, CFG_DEBUG, gEnableDebug);
     diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
     diaSetInt(diaConfig, CFG_HDDGAMELISTCACHE, gHDDGameListCache);
     diaSetString(diaConfig, CFG_EXITTO, gExitPath);
     diaSetInt(diaConfig, CFG_ENWRITEOP, gEnableWrite);
     diaSetInt(diaConfig, CFG_HDDSPINDOWN, gHDDSpindown);
-    diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
+    diaSetString(diaConfig, CFG_BDMPREFIX, gBDMPrefix);
     diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
     diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
     diaSetInt(diaConfig, CFG_AUTOSTARTLAST, gAutoStartLastPlayed);
     diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, gRememberLastPlayed);
     diaSetVisible(diaConfig, CFG_LBL_AUTOSTARTLAST, gRememberLastPlayed);
 
-    diaSetInt(diaConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
-    diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
+    diaSetInt(diaConfig, CFG_BDMMODE, gBDMStartMode);
+    diaSetVisible(diaConfig, BLOCKDEVICE_BUTTON, gBDMStartMode);
     diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
     diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
     diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
 
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {
-        diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
+        diaGetInt(diaConfig, CFG_DEBUG, &gEnableDebug);
         diaGetInt(diaConfig, CFG_PS2LOGO, &gPS2Logo);
         diaGetInt(diaConfig, CFG_HDDGAMELISTCACHE, &gHDDGameListCache);
         diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
         diaGetInt(diaConfig, CFG_ENWRITEOP, &gEnableWrite);
         diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);
-        diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix, sizeof(gUSBPrefix));
+        diaGetString(diaConfig, CFG_BDMPREFIX, gBDMPrefix, sizeof(gBDMPrefix));
         diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
         diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
         diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
-        DisableCron = 1; //Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
-        if (diaGetInt(diaConfig, CFG_SELECTBUTTON, &value))
-            gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
-        else
-            gSelectButton = KEY_CIRCLE;
+        DisableCron = 1; // Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
         diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
-        diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
         diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
+
+        if (ret == BLOCKDEVICE_BUTTON)
+            guiShowBlockDeviceConfig();
 
         applyConfig(-1, -1);
         menuReinitMainMenu();
@@ -503,7 +532,7 @@ static int guiUIUpdater(int modified)
         if (temp != curTheme) {
             curTheme = temp;
             if (temp == 0) {
-                //Display the default theme's colours.
+                // Display the default theme's colours.
                 diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_COLOUR); // Must be correctly set before doing the diaS/GetColor !!
                 diaSetItemType(diaUIConfig, UICFG_UICOL, UI_COLOUR);
                 diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_COLOUR);
@@ -513,7 +542,7 @@ static int guiUIUpdater(int modified)
                 diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
                 diaSetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
             } else if (temp == thmGetGuiValue()) {
-                //Display the current theme's colours.
+                // Display the current theme's colours.
                 diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_COLOUR);
                 diaSetItemType(diaUIConfig, UICFG_UICOL, UI_COLOUR);
                 diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_COLOUR);
@@ -523,14 +552,14 @@ static int guiUIUpdater(int modified)
                 diaSetU64Color(diaUIConfig, UICFG_TXTCOL, gTheme->textColor);
                 diaSetU64Color(diaUIConfig, UICFG_SELCOL, gTheme->selTextColor);
             } else {
-                //When another theme is highlighted in the list, its colours are not known. Don't show any colours.
+                // When another theme is highlighted in the list, its colours are not known. Don't show any colours.
                 diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_SPACER);
                 diaSetItemType(diaUIConfig, UICFG_UICOL, UI_SPACER);
                 diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_SPACER);
                 diaSetItemType(diaUIConfig, UICFG_SELCOL, UI_SPACER);
             }
 
-            //The user cannot adjust the current theme's colours.
+            // The user cannot adjust the current theme's colours.
             temp = !temp;
             diaSetEnabled(diaUIConfig, UICFG_BGCOL, temp);
             diaSetEnabled(diaUIConfig, UICFG_UICOL, temp);
@@ -570,8 +599,6 @@ void guiShowUIConfig(void)
     showCfgPopup = 0;
     guiResetNotifications();
 
-    // configure the enumerations
-    const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
     // clang-format off
     const char *vmodeNames[] = {_l(_STR_AUTO)
         , "PAL 640x512i @50Hz 24bit"
@@ -591,11 +618,9 @@ void guiShowUIConfig(void)
 
 reselect_video_mode:
     previousVMode = gVMode;
-    diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
     diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());
     diaSetEnum(diaUIConfig, UICFG_LANG, (const char **)lngGetGuiList());
     diaSetEnum(diaUIConfig, UICFG_VMODE, vmodeNames);
-    diaSetInt(diaUIConfig, UICFG_SCROLL, gScrollSpeed);
     diaSetInt(diaUIConfig, UICFG_THEME, thmGetGuiValue());
     diaSetInt(diaUIConfig, UICFG_LANG, lngGetGuiValue());
     diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
@@ -611,7 +636,6 @@ reselect_video_mode:
 
     int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
     if (ret) {
-        diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
         diaGetInt(diaUIConfig, UICFG_LANG, &langID);
         diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
         if (themeID == 0) {
@@ -639,7 +663,7 @@ reselect_video_mode:
 
     if (previousVMode != gVMode) {
         if (guiConfirmVideoMode() == 0) {
-            //Restore previous video mode, without changing the theme & language settings.
+            // Restore previous video mode, without changing the theme & language settings.
             gVMode = previousVMode;
             applyConfig(themeID, langID);
             goto reselect_video_mode;
@@ -721,7 +745,7 @@ void guiShowNetConfig(void)
     diaSetString(diaNetConfig, NETCFG_SHARE_PASSWORD, gPCPassword);
     diaSetInt(diaNetConfig, NETCFG_ETHOPMODE, gETHOpMode);
 
-    //Update the spacer item between the OK and reconnect buttons (See dialogs.c).
+    // Update the spacer item between the OK and reconnect buttons (See dialogs.c).
     if (gNetworkStartup == 0) {
         diaSetLabel(diaNetConfig, NETCFG_OK, _l(_STR_OK));
         diaSetVisible(diaNetConfig, NETCFG_RECONNECT, 1);
@@ -768,7 +792,7 @@ void guiShowParentalLockConfig(void)
     config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
     // Set current values
-    configGetStrCopy(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password, CONFIG_KEY_VALUE_LEN); //This will return the current password, or a blank string if it is not set.
+    configGetStrCopy(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password, CONFIG_KEY_VALUE_LEN); // This will return the current password, or a blank string if it is not set.
     diaSetString(diaParentalLockConfig, CFG_PARENLOCK_PASSWORD, password);
 
     result = diaExecuteDialog(diaParentalLockConfig, -1, 1, NULL);
@@ -819,6 +843,36 @@ void guiShowAudioConfig(void)
     diaSetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, gBootSndVolume);
 
     diaExecuteDialog(diaAudioConfig, -1, 1, guiAudioUpdater);
+}
+
+void guiShowControllerConfig(void)
+{
+    int value;
+
+    // configure the enumerations
+    const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
+    const char *selectButtons[] = {_l(_STR_CIRCLE), _l(_STR_CROSS), NULL};
+
+    diaSetEnum(diaControllerConfig, UICFG_SCROLL, scrollSpeeds);
+    diaSetEnum(diaControllerConfig, CFG_SELECTBUTTON, selectButtons);
+
+    diaSetInt(diaControllerConfig, UICFG_SCROLL, gScrollSpeed);
+    diaSetInt(diaControllerConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
+
+    int result = diaExecuteDialog(diaControllerConfig, -1, 1, NULL);
+    if (result) {
+        diaGetInt(diaControllerConfig, UICFG_SCROLL, &gScrollSpeed);
+
+        if (diaGetInt(diaControllerConfig, CFG_SELECTBUTTON, &value))
+            gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
+        else
+            gSelectButton = KEY_CIRCLE;
+#ifdef PADEMU
+        if (result == PADEMU_GLOBAL_BUTTON)
+            guiGameShowPadEmuConfig(1);
+#endif
+        applyConfig(-1, -1);
+    }
 }
 
 int guiShowKeyboard(char *value, int maxLength)
@@ -889,7 +943,7 @@ static void guiHandleOp(struct gui_update_t *item)
 
                 // Last Played Auto Start
                 if ((gAutoStartLastPlayed) && !(KeyPressedOnce))
-                    DisableCron = 0; //Release Auto Start Last Played counter
+                    DisableCron = 0; // Release Auto Start Last Played counter
             }
 
             break;
@@ -948,7 +1002,7 @@ static void guiHandleDeferredOps(void)
 
 void guiExecDeferredOps(void)
 {
-    //Clears deferred operations list by executing them.
+    // Clears deferred operations list by executing them.
     guiHandleDeferredOps();
 }
 
@@ -990,26 +1044,26 @@ static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR *res)
 {
     asm volatile(
 #if __GNUC__ > 3
-        "lqc2   $vf1, (%[a])\n"           // load the first vector
-        "lqc2   $vf2, (%[b])\n"           // load the second vector
-        "qmtc2  %[mix], $vf3\n"           // move the mix value from reg to VU
-        "vaddw.x $vf5, $vf0, $vf0\n"      // vf5.x = 1
-        "vsub.x  $vf4x, $vf5x, $vf3x\n"   // subtract 1 - vf3,x, store the result in vf4.x
-        "vmulax.xyzw $ACC, $vf1, $vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
-        "vmaddx.xyzw $vf1, $vf2, $vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-        "sqc2   $vf1, (%[res])\n"         // transfer the result in acc to the ee
+        "lqc2           $vf1, (%[a])\n"        // load the first vector
+        "lqc2           $vf2, (%[b])\n"        // load the second vector
+        "qmtc2          %[mix], $vf3\n"        // move the mix value from reg to VU
+        "vaddw.x        $vf5, $vf0, $vf0\n"    // vf5.x = 1
+        "vsub.x         $vf4x, $vf5x, $vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
+        "vmulax.xyzw    $ACC, $vf1, $vf3x\n"   // multiply vf1 by vf3.x, store the result in ACC
+        "vmaddx.xyzw    $vf1, $vf2, $vf4x\n"   // multiply vf2 by vf4.x add ACC, store the result in vf1
+        "sqc2           $vf1, (%[res])\n"      // transfer the result in acc to the ee
 #else
-        "lqc2	vf1, (%[a])\n"         // load the first vector
-        "lqc2	vf2, (%[b])\n"         // load the second vector
-        "qmtc2	%[mix], vf3\n"         // move the mix value from reg to VU
-        "vaddw.x vf5, vf00, vf00\n"    // vf5.x = 1
-        "vsub.x vf4x, vf5x, vf3x\n"    // subtract 1 - vf3,x, store the result in vf4.x
-        "vmulax.xyzw ACC, vf1, vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
-        "vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-        "sqc2	vf1, (%[res])\n"       // transfer the result in acc to the ee
+        "lqc2           vf1, (%[a])\n"      // load the first vector
+        "lqc2           vf2, (%[b])\n"      // load the second vector
+        "qmtc2          %[mix], vf3\n"      // move the mix value from reg to VU
+        "vaddw.x        vf5, vf00, vf00\n"  // vf5.x = 1
+        "vsub.x         vf4x, vf5x, vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
+        "vmulax.xyzw    ACC, vf1, vf3x\n"   // multiply vf1 by vf3.x, store the result in ACC
+        "vmaddx.xyzw    vf1, vf2, vf4x\n"   // multiply vf2 by vf4.x add ACC, store the result in vf1
+        "sqc2           vf1, (%[res])\n"    // transfer the result in acc to the ee
 #endif
-        : [ res ] "+r"(res), "=m"(*res)
-        : [ a ] "r"(a), [ b ] "r"(b), [ mix ] "r"(mix), "m"(*a), "m"(*b));
+        : [res] "+r"(res), "=m"(*res)
+        : [a] "r"(a), [b] "r"(b), [mix] "r"(mix), "m"(*a), "m"(*b));
 }
 
 static float guiCalcPerlin(float x, float y, float z)
@@ -1070,7 +1124,7 @@ static float guiCalcPerlin(float x, float y, float z)
 
     vec.x -= 1;
 
-    //float n110
+    // float n110
     b.z = Vu0DotProduct(&pgrad3[gi110], &vec);
 
     vec.y += 1;
@@ -1254,7 +1308,7 @@ void guiDrawSubMenuHints(void)
 
     x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[0] : subMenuIcons[1], subMenuHints[0], gTheme->fonts[0], x, y, gTheme->textColor);
     x += 12;
-    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
+    guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
 }
 
 static int endIntro = 0; // Break intro loop and start 'Last Played Auto Start' countdown
@@ -1328,8 +1382,8 @@ static void guiDrawOverlays()
     }
 
     // BLURT output
-    //    if (!gDisableDebug)
-    //        fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
+    // if (gEnableDebug)
+    //     fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
 }
 
 static void guiReadPads()
@@ -1422,6 +1476,9 @@ void guiMainLoop(void)
 {
     guiResetNotifications();
     guiCheckNotifications(1, 1);
+
+    if (gOPLPart[0] != '\0')
+        showPartPopup = 1;
 
     while (!gTerminate) {
         guiStartFrame();
@@ -1610,7 +1667,7 @@ int guiConfirmVideoMode(void)
         else if (getKeyOn(gSelectButton))
             terminate = 2;
 
-        //If the user fails to respond within the timeout period, deem it as a cancel operation.
+        // If the user fails to respond within the timeout period, deem it as a cancel operation.
         if (clock() > timeEnd)
             terminate = 1;
 

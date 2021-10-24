@@ -21,9 +21,9 @@ extern void *poeveticanew_raw;
 extern int size_poeveticanew_raw;
 
 /// Maximal count of atlases per font
-#define ATLAS_MAX 4
+#define ATLAS_MAX    4
 /// Atlas width in pixels
-#define ATLAS_WIDTH 256
+#define ATLAS_WIDTH  256
 /// Atlas height in pixels
 #define ATLAS_HEIGHT 256
 
@@ -62,9 +62,9 @@ typedef struct
 typedef struct
 {
     /** GLYPH CACHE. Every glyph in the ASCII range is cached when first used
-	 * this means no additional memory aside from the one needed to render the
-	 * character set is used.
-	 */
+     * this means no additional memory aside from the one needed to render the
+     * character set is used.
+     */
     fnt_glyph_cache_entry_t **glyphCache;
 
     /// Maximal font cache page index
@@ -353,7 +353,7 @@ static int fntGlyphAtlasPlace(font_t *font, fnt_glyph_cache_entry_t *glyph)
 {
     FT_GlyphSlot slot = font->face->glyph;
 
-    //LOG("FNTSYS GlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
+    // LOG("FNTSYS GlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
 
     if (slot->bitmap.width == 0 || slot->bitmap.rows == 0) {
         // no bitmap glyph, just skip
@@ -362,16 +362,16 @@ static int fntGlyphAtlasPlace(font_t *font, fnt_glyph_cache_entry_t *glyph)
 
     int aid = 0;
     for (; aid < ATLAS_MAX; aid++) {
-        //LOG("FNTSYS Placing aid %d...\n", aid);
+        // LOG("FNTSYS Placing aid %d...\n", aid);
         atlas_t **atl = &font->atlases[aid];
         if (!*atl) { // atlas slot not yet used
-            //LOG("FNTSYS aid %d is new...\n", aid);
+            // LOG("FNTSYS aid %d is new...\n", aid);
             *atl = fntNewAtlas();
         }
 
         glyph->allocation = atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.buffer);
         if (glyph->allocation) {
-            //LOG("FNTSYS Found placement\n", aid);
+            // LOG("FNTSYS Found placement\n", aid);
             glyph->atlas = *atl;
 
             return 1;
@@ -396,9 +396,9 @@ static fnt_glyph_cache_entry_t *fntCacheGlyph(font_t *font, uint32_t gid)
 
     fnt_glyph_cache_entry_t *page = font->glyphCache[pageid];
     /* Should never happen.
-	if (!page) // safeguard
-		return NULL;
-	*/
+    if (!page) // safeguard
+        return NULL;
+    */
 
     fnt_glyph_cache_entry_t *glyph = &page[idx];
     if (glyph->isValid)
@@ -453,7 +453,7 @@ void fntUpdateAspectRatio()
     for (i = 0; i < FNT_MAX_COUNT; i++) {
         if (fonts[i].isValid) {
             fntCacheFlush(&fonts[i]);
-            //TODO: this seems correct, but the rest of the OPL UI (i.e. spacers) doesn't seem to be correctly scaled.
+            // TODO: this seems correct, but the rest of the OPL UI (i.e. spacers) doesn't seem to be correctly scaled.
             FT_Set_Char_Size(fonts[i].face, FNTSYS_CHAR_SIZE * 64, FNTSYS_CHAR_SIZE * 64, fDPI * ws, fDPI * hs);
         }
     }
@@ -464,14 +464,14 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t *glyph, int pen_x, int pen_y)
     // only if glyph has atlas placement
     if (glyph->allocation) {
         /* TODO: Ineffective on many parts:
-		 * 1. Usage of floats for UV - fixed point should suffice (and is used internally by GS for UV)
-		 *
-		 * 2. GS_SETREG_TEX0 for every quad - why? gsKit should only set texture if demanded
-		 *    We should prepare a special fnt render method that would step over most of the
-		 *    performance problems under - beginning with rmSetupQuad and continuing into gsKit
-		 *    - this method would handle the preparation of the quads and GS upload itself,
-		 *    without the use of prim_quad_texture and rmSetupQuad...
-		 */
+         * 1. Usage of floats for UV - fixed point should suffice (and is used internally by GS for UV)
+         *
+         * 2. GS_SETREG_TEX0 for every quad - why? gsKit should only set texture if demanded
+         *    We should prepare a special fnt render method that would step over most of the
+         *    performance problems under - beginning with rmSetupQuad and continuing into gsKit
+         *    - this method would handle the preparation of the quads and GS upload itself,
+         *    without the use of prim_quad_texture and rmSetupQuad...
+         */
         quad.ul.x = pen_x + glyph->ox;
         if (rmGetInterlacedFrameMode() == 0)
             quad.ul.y = pen_y + glyph->oy;

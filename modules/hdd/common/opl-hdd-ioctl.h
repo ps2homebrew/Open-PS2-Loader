@@ -2,7 +2,7 @@
 #define OPL_HDD_IOCTL_H
 
 // Commands and structures for XATAD.IRX
-#define ATA_DEVCTL_IS_48BIT 0x6840
+#define ATA_DEVCTL_IS_48BIT          0x6840
 #define ATA_DEVCTL_SET_TRANSFER_MODE 0x6841
 
 #define ATA_XFER_MODE_MDMA 0x20

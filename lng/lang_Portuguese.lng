@@ -1,7 +1,6 @@
 # Portuguese translation by danielb
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Portuguese
-Open PS2 Loader %s
 Salvar alterações
 Voltar
 Configurações de Rede
@@ -12,7 +11,7 @@ Erro ao salvar configurações!
 Sair
 Configurações
 Menu
-Jogos por USB
+Jogos por BDM
 Jogos por HDD
 Jogos por Rede
 Aplicações
@@ -26,8 +25,8 @@ Cancelar atualização?
 %d: Erro ao iniciar rede
 %d: Adaptador de Rede não detetado
 %d: Não foi possível ligar ao servidor SMB
-%d: Não foi possível efetuar login no servidor SMB 
-%d: Não foi possível abrir a partilha SMB 
+%d: Não foi possível efetuar login no servidor SMB
+%d: Não foi possível abrir a partilha SMB
 %d: Impossivel listar partilhas SMB
 %d: Impossivel listar jogos
 %d: Servidor DHCP indisponivel
@@ -42,7 +41,6 @@ Cruz
 Lista de Jogos
 Aj. do jogo
 Remover configurações
-Removidos todos os ajustes para o jogo
 Rolagem
 Lento
 Médio
@@ -53,30 +51,29 @@ Por favor espere
 Erro ao carregar ID do jogo
 Ordenar automaticamente
 Erro ao carregar ficheiro de idioma
-Desativar depuração de cores
-Comando não detectado, esperando...
-Ativar Arte de Capas
+Debug Colors
+Comando não detectado, esperando…
+Cover Art
 Ecrâ Panorâmico
 Desligar PS2
 Carregando configurações
-A guardar configurações...
+A guardar configurações…
 Iniciar dispositivo
 Atualizar
-Modo de inicio para dispositivo USB
+BDM Start Mode
 Modo de inicio para dispositivo HDD
 Modo de inicio para dispositivo Rede
 Modo de inicio para Aplicações
 Automático
 Manual
-Iniciar servidor HDL
-Servidor HDL a iniciar...
-Servidor HDL a executar...
-Erro a iniciar o servidor de HDL Dump.
-Servidor HDL a fechar...
+Iniciar servidor NBD
+Servidor NBD a iniciar…
+Servidor NBD a executar…
+Erro a iniciar o servidor de NBD Dump.
+Servidor NBD a fechar…
 Definir saída do IGR
 Cor de fundo
 Cor do texto
-- PS2 -
 - Servidor SMB -
 Endereço IP
 Estático
@@ -100,7 +97,7 @@ Renomear
 Apagar
 Iniciar
 Configurações de Ecrâ
-Ativar operações de escrita
+Write Operations
 Lembrar último jogo executado
 Botão de Seleção
 Erro, o jogo está fragmentado
@@ -113,8 +110,6 @@ Desativar chamadas do sistema
 Saltar vídeos
 Emular DVD-DL
 Desativar IGR
-Não utilizado
-Não utilizado
 Alterar o tamanho (Irá reformatar o VMC!)
 Criar
 Iniciar
@@ -135,7 +130,7 @@ Atualização automática
 Créditos
 Desenvolvedores
 Controlo de qualidade
-Prefixo de caminho USB
+Prefixo de caminho BDM
 Iniciar ELF personalizado depois do IGR
 Valor em minuto(s), 0 p/ desativar
 Desligamento automático do HDD
@@ -164,8 +159,6 @@ Modo 3
 Modo 4
 Modo 5
 Modo 6
-Modo 7
-Modo 8
 Configurar GSM
 Velocidade Ethernet e sistema Duplex
 100Mbit full-duplex
@@ -173,9 +166,8 @@ Velocidade Ethernet e sistema Duplex
 10Mbit full-duplex
 10Mbit half-duplex
 Opções do GSM
-Ativar o GSM
+GSM Selector
 Permitir que o GSM ative o modo de vídeo escolhido
-Modo de vídeo selecionado
 Modo de vídeo a ser ativado
 Ajuste horizontal
 Definir compensação horizontal
@@ -186,7 +178,7 @@ Ajustar Overscan
 Saltar FMV
 Saltar vídeos
 Opções de Cheat
-Ativar PS2RD Cheat Engine
+PS2RD Cheat Engine
 Permite PS2RD Cheat Engine injetar código nos jogos.
 Modo da PS2RD Cheat Engine
 Auto-Selecionar ou Selecionar cheats de jogo
@@ -204,14 +196,14 @@ Atualização cancelada.
 Descarregar definições da Internet?
 Definições personalizadas
 Pré-definições de download
-Início automático em %i s...
+Início automático em %i s…
 Auto iniciar
 Valor em segundos, 0 para desativar
 Logo PS2
 Apenas é exibido para um disco válido e que seja da mesma região da consola
 Configurar PADEMU
 Definições do Emulador de Comando
-Ativar Emulador Comando
+Pad Emulator
 Ligar/Desligar o emulador para o jogo selecionado.
 Modo do Emulador de Comando
 Selecione o modo do Emulador de Comando.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Definições para a porta:
 Selecione a porta do Emulador de Comando para as definições
-Ativar emulação
+Emulation
 Ligar/Desligar o emulador para a porta selecionada.
-Ativar vibração
+Vibration
 Ligar/Desligar vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
 Comando DS emparelhado ao endereço MAC:
@@ -239,12 +231,12 @@ Sim
 Não
 O adaptador Bluetooth deve ser completamente compatível com comandos DS3/DS4.
 O adaptador Bluetooth pode não funcionar corretamente com comandos DS3/DS4.
-Ativar emulação Multitap
+Multitap Emulation
 Ligar/Desligar a emulação Multitap para o jogo selecionado
 Emulador Multitap na porta
 Selecionar porta para o emulador de Multitap.
-Desativar workaround para clones DS3
-Alguns clones DS3 precisam de workaround, esta opção irá desativar-lo.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emular inversão de CAMPO
 Correção para jogos que apresentam falhas nos modos de vídeo progressivo.
 Definições do Controlo Parental
@@ -257,14 +249,17 @@ Opções de compilação:
 Erro - esta password não pode ser usada.
 O ficheiro VMC %s está fragmentado. Continuar com o Cartão de Memoria na ranhura %d?
 Definições de Áudio
-Ativar sons
-Ativar som de Arranque
+Sound Effects
+Boot Sound
 Volume dos sons
 Volume do som de arranque
 Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HDD)
-Ativar notificações
-%s carregado de %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Configurações do jogo guardadas.
 %s configurações removidas.
@@ -280,3 +275,10 @@ Gênero
 Data de lançamento
 Desenvolvedor
 Descrição
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games

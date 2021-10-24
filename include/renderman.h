@@ -21,16 +21,16 @@
 
 #define DIM_UNDEF -1
 
-#define ALIGN_TOP (0 << 0)
-#define ALIGN_BOTTOM (1 << 0)
+#define ALIGN_TOP     (0 << 0)
+#define ALIGN_BOTTOM  (1 << 0)
 #define ALIGN_VCENTER (2 << 0)
-#define ALIGN_LEFT (0 << 2)
-#define ALIGN_RIGHT (1 << 2)
+#define ALIGN_LEFT    (0 << 2)
+#define ALIGN_RIGHT   (1 << 2)
 #define ALIGN_HCENTER (2 << 2)
-#define ALIGN_NONE (ALIGN_TOP | ALIGN_LEFT)
-#define ALIGN_CENTER (ALIGN_VCENTER | ALIGN_HCENTER)
+#define ALIGN_NONE    (ALIGN_TOP | ALIGN_LEFT)
+#define ALIGN_CENTER  (ALIGN_VCENTER | ALIGN_HCENTER)
 
-#define SCALING_NONE 0
+#define SCALING_NONE  0
 #define SCALING_RATIO 1
 
 /// GSKit CLUT base struct. This should've been in gsKit from the start :)
@@ -84,7 +84,7 @@ void rmGetScreenExtentsNative(int *w, int *h);
 void rmGetScreenExtents(int *w, int *h);
 
 /** Invalidate a texture so it will be re-transferred to VRAM the next time.
-* @param txt The texture to invalidate */
+ * @param txt The texture to invalidate */
 void rmInvalidateTexture(GSTEXTURE *txt);
 
 /** Unload texture from texture manager, performance optimization */
@@ -117,7 +117,7 @@ void rmSetDisplayOffset(int x, int y);
 void rmSetOverscan(int overscan);
 
 /** Sets the aspect ratio correction for the upcoming operations.
-* When set, it will treat all pixmap widths/heights (not positions) as scaled with the ratios provided */
+ * When set, it will treat all pixmap widths/heights (not positions) as scaled with the ratios provided */
 void rmSetAspectRatio(enum rm_aratio dar);
 
 /** Widescreen scaling */
@@ -141,7 +141,7 @@ int rmUnScaleX(int x);
 /** Scale y from native to 480 resolution */
 int rmUnScaleY(int y);
 
-//Returns H-sync frequency in KHz
+// Returns H-sync frequency in KHz
 unsigned char rmGetHsync(void);
 
 #endif

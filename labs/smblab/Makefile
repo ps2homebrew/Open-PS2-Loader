@@ -37,7 +37,7 @@ smsutils.s:
 smstcpip.s:
 	$(MAKE) -C ../../modules/network/SMSTCPIP
 	$(BIN2S) ../../modules/network/SMSTCPIP/SMSTCPIP.irx smstcpip.s smstcpip_irx
-		
+
 smsmap.s:
 	$(MAKE) -C ../../modules/network/SMSMAP
 	$(BIN2S) ../../modules/network/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx

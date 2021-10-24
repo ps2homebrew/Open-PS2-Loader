@@ -30,18 +30,21 @@ enum UI_ITEMS {
     CFG_HDDGAMELISTCACHE,
     CFG_EXITTO,
     CFG_DEFDEVICE,
-    CFG_USBMODE,
+    CFG_BDMMODE,
     CFG_HDDMODE,
     CFG_ETHMODE,
     CFG_APPMODE,
+    CFG_ENABLEILK,
+    CFG_ENABLEMX4SIO,
     CFG_LASTPLAYED,
     CFG_LBL_AUTOSTARTLAST,
     CFG_AUTOSTARTLAST,
     CFG_SELECTBUTTON,
     CFG_ENWRITEOP,
-    CFG_USBPREFIX,
+    CFG_BDMPREFIX,
     CFG_ETHPREFIX,
     CFG_HDDSPINDOWN,
+    BLOCKDEVICE_BUTTON,
 
     ABOUT_TITLE,
     ABOUT_BUILD_DETAILS,
@@ -129,6 +132,7 @@ enum UI_ITEMS {
     NETUPD_BTN_START,
     NETUPD_BTN_CANCEL,
 #ifdef PADEMU
+    PADEMU_GLOBAL_BUTTON,
     PADCFG_PADEMU_SOURCE,
     PADCFG_PADEMU_CONFIG,
     PADCFG_PADEMU_ENABLE,
@@ -163,7 +167,7 @@ enum UI_ITEMS {
 #endif
 };
 
-#define COMPAT_NOEXIT 0x70000000
+#define COMPAT_NOEXIT       0x70000000
 #define COMPAT_LOADFROMDISC (COMPAT_LOADFROMDISC_ID | COMPAT_NOEXIT)
 
 #define COMPAT_VMC1_ACTION (COMPAT_VMC1_ACTION_ID | COMPAT_NOEXIT)
@@ -179,6 +183,7 @@ extern struct UIItem diaPadEmuInfo[];
 extern struct UIItem diaNetConfig[];
 extern struct UIItem diaUIConfig[];
 extern struct UIItem diaAudioConfig[];
+extern struct UIItem diaControllerConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaVMCConfig[];
 extern struct UIItem diaGSConfig[];
@@ -189,5 +194,6 @@ extern struct UIItem diaAbout[];
 extern struct UIItem diaVMC[];
 extern struct UIItem diaNetCompatUpdate[];
 extern struct UIItem diaParentalLockConfig[];
+extern struct UIItem diaBlockDevicesConfig[];
 
 #endif

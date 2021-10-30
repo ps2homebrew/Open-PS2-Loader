@@ -1,12 +1,12 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: Sept. 2, 2021
+# Last update: Oct. 30, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
 Änderungen speichern
 Zurück
 Netzwerkeinstellungen
-Fortgeschrittene Optionen
+Erweiterte Optionen
 <keine werte>
 Einstellungen gespeichert in %s
 Fehler beim Schreiben der Einstellungen!
@@ -53,7 +53,7 @@ Bitte warten
 Fehler beim Laden der Spiel-ID
 Automatische Sortierung
 Fehler beim Laden der Sprachdatei
-Debug Colors
+Debug Farben
 Kein Controller erkannt, warte...
 Cover Art
 Breitbild
@@ -62,10 +62,10 @@ Lade Konfiguration
 Speichere Konfiguration
 Peripherie starten
 Aktual.
-BDM Start Mode
+BDM Start Modus
 HDD Start Modus
 ETH Start Modus
-Anwendungen Menü Anzeigen
+Menü -Anwendungen- Anzeigen
 Automatisch
 Manuell
 Starte NBD Server
@@ -99,7 +99,7 @@ Umbenennen
 Löschen
 Ausführen
 Anzeige Einstellungen
-Write Operations
+Schreib Operatoren
 Merke zuletzt gespieltes Spiel
 Auswahltaste
 Fehler, das Spiel ist fragmentiert
@@ -168,7 +168,7 @@ ETH Geschwindigkeitsmodus
 10Mbit Full-duplex
 10Mbit Half-duplex
 GSM Einstellungen
-GSM Selector
+GSM Auswählen
 Schaltet GSM AN oder AUS
 Erzwungener benutzerdefinierter Bildschirmmodus
 H-POS
@@ -202,7 +202,7 @@ Automatischer Start in %i s...
 Automatischer Start
 Wert in Sekunden, 0 um Auto-start zu deaktivieren
 PS2 Logo
-Wird für ein gültiges Disc-Logo angezeigt, dass der Region der Konsole entspricht.
+Disc-Logo wird nur angezeigt, wenn es mit der Region der Konsole übereinstimmt.
 PADEMU konfigurieren
 Einstellungen Pad Emulator
 Pad Emulator
@@ -235,10 +235,10 @@ Bluetooth Adapter ist voll kompatibel mit DS3/DS4 Controller.
 Bluetooth Adapter funktioniert evtl nicht korrekt mit DS3/DS4 Controller.
 Multitap Emulation
 Schaltet die Multitap emulation An/Aus für das ausgewählte Spiel.
-Multitap emulator an Anschluss
+Multitap Emulator an Anschluss
 Wähle Anschluss für Multitap emulation.
-Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Fake DS3 Behelfslösung
+Manche fake DS3s brauchen eine Umgehungslösung, diese option schaltet sie ein.
 Emuliere Feld-spiegelung
 Fix für Spiele, die Fehler unter progressivem Video modus haben.
 Einstellungen Kindersicherung
@@ -251,17 +251,17 @@ Erstellungsoptionen:
 Fehler - Dieses Passwort kann nicht benutzt werden.
 VMC %s Datei ist fragmentiert. Weiter mit Memory Card in steckplatz %d?
 Audio Einstellungen
-Sound Effects
-Boot Sound
+Soundeffekte
+Startsound
 Lautstärke Soundeffekte
 Lautstärke Startsound
 Änderung des Video signals übernehmen?
 Spieleliste zwischenspeichern (HDD)
-Notifications
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Benachrichtigungen
+Konfiguration geladen von %s
+Thema geladen von %s
+Sprache geladen von %s
+%s partition gemountet.
 Optionen
 Spiel-Einstellungen gespeichert.
 %s Einstellungen entfernt.
@@ -277,15 +277,15 @@ Genre
 Veröffentlichung
 Entwickler
 Beschreibung
-Block Devices
+Blockspeichergeräte
 Controller einstellungen
-Turn on/off Block Device Manager.
-Turn on/off Block Devices (e.g. USB).
-USB Games
-iLink Games
-MX4SIO Games
+Schaltet Blockspeichergerät An/Aus
+Schaltet Blockspeichergeräte An/Aus (bsp. USB)
+USB Spiele
+iLink Spiele
+MX4SIO Spiele
 PS1 Spiele
-PS1 Spiele Bildschirmeinstellungs-modus
+Menü -PS1 Spiele- Anzeigen
 POPSTARTER.ELF nicht gefunden bei '%s'!
 VCD Datei '%s' nicht gefunden!
 Fehler beim umbenennen der Datei.

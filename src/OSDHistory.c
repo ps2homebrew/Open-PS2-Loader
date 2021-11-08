@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <sys/fcntl.h>
 #include <sys/unistd.h>
+#include <libmc.h>
+#include <libmc-common.h>
 
 #include "include/util.h"
 #include "include/OSDHistory.h"
@@ -124,13 +126,19 @@ static u16 GetTimestamp(void)
 int AddHistoryRecord(const char *name)
 {
     struct HistoryEntry HistoryEntries[MAX_HISTORY_ENTRIES], *NewEntry, OldHistoryEntry;
-    int i, value, LeastUsedRecord, LeastUsedRecordLaunchCount, LeastUsedRecordTimestamp, NewLaunchCount, result;
+    int i, value, LeastUsedRecord, LeastUsedRecordLaunchCount, LeastUsedRecordTimestamp, NewLaunchCount, result, mcType;
     u8 BlankSlotList[MAX_HISTORY_ENTRIES];
     int NumBlankSlots, NumSlotsUsed, IsNewRecord;
     char SystemRegionLetter;
     char path[32];
 
     DEBUG_PRINTF("Adding history record: %s\n", name);
+
+    // Don't write history for ps1 cards
+    mcGetInfo(0, 0, &mcType, 0, 0);
+    mcSync(0, NULL, &result);
+    if (mcType == sceMcTypePS1)
+        return -1;
 
     // For simplicity, create the data folder immediately if the history file does not exist (unlike the original).
     sprintf(path, "mc0:/%s", GetSystemDataPath());

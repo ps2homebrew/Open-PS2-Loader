@@ -1708,6 +1708,7 @@ static void autoLaunchHDDGame(char *argv[])
     LOG_ENABLE();
 
     hddLoadModules();
+    InitConsoleRegionData();
 
     ret = configReadMulti(CONFIG_ALL);
     if (CONFIG_ALL & CONFIG_OPL) {

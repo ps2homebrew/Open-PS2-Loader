@@ -416,9 +416,6 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                 memset(*list, 0, sizeof(base_game_info_t) * count);
 
                 while (size > 0) {
-                    int ulfd = 1;
-                    u8 part;
-                    unsigned int name_checksum;
                     base_game_info_t *g = &(*list)[id++];
 
                     // populate game entry in list even if entry corrupted
@@ -435,20 +432,23 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                     g->media = GameEntry.media;
                     g->format = GAME_FORMAT_USBLD;
                     g->sizeMB = 0;
-                    name_checksum = USBA_crc32(g->name);
 
-                    // TODO: size calculation is very slow
-                    // implmented some caching, or do not touch at all
+                    /* TODO: size calculation is very slow
+                    implmented some caching, or do not touch at all */
 
-                    // calculate total size for individual game
-                    // for (part = 0; part < g->parts && ulfd >= 0; part++) {
-                    //     snprintf(path, sizeof(path), "%sul.%08X.%s.%02x", prefix, name_checksum, g->startup, part);
-                    //     ulfd = openFile(path, O_RDONLY);
-                    //     if (ulfd >= 0) {
-                    //         g->sizeMB += (getFileSize(ulfd) >> 20);
-                    //         close(ulfd);
-                    //     }
-                    // }
+                    //calculate total size for individual game
+                    /*int ulfd = 1;
+                    u8 part;
+                    unsigned int name_checksum = USBA_crc32(g->name);
+
+                    for (part = 0; part < g->parts && ulfd >= 0; part++) {
+                        snprintf(path, sizeof(path), "%sul.%08X.%s.%02x", prefix, name_checksum, g->startup, part);
+                        ulfd = openFile(path, O_RDONLY);
+                        if (ulfd >= 0) {
+                            g->sizeMB += (getFileSize(ulfd) >> 20);
+                            close(ulfd);
+                        }
+                    }*/
                 }
             }
         }

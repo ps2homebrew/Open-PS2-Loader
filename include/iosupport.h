@@ -93,18 +93,11 @@ typedef struct
     /// 0 = General refresh, which means that it will be refreshed every MENU_GENERAL_UPDATE_DELAY frames, regardless of whether automatic refresh is enabled or not.
     int updateDelay;
 
-    /// item description
-    char *text;
-
     /// item description in localised form (used if value is not negative)
     int (*itemTextId)(void);
 
-    /// @return path to applications storage on the device (set callback to NULL if not applicable).
-    void (*itemGetAppsPath)(char *path, int max);
-
-    void (*itemGetLegacyAppsPath)(char *path, int max);
-
-    void (*itemGetLegacyAppsInfo)(char *path, int max, char *name);
+    /// @return path to device prefix (set callback to NULL if not applicable).
+    char *(*itemGetPrefix)(void);
 
     void (*itemInit)(void);
 

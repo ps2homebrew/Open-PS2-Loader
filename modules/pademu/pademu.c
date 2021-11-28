@@ -7,6 +7,7 @@
 */
 
 #include "pademu.h"
+#include "padmacro.h"
 
 #ifdef BT
 
@@ -93,16 +94,32 @@ extern struct irx_export_table _exp_pademu;
 
 int _start(int argc, char *argv[])
 {
+    union
+    {
+        struct
+        {
+            u8 pad_enable;
+            u8 pad_vibration;
+            u8 mtap_enabled : 1;
+            u8 mtap_port    : 1;
+            u8 pad_options  : 1;
+        };
+        int raw;
+    } PadEmuSettings_local;
     u8 pad_vibration = 0x03;
 
     pad_enable = 0x03;
 
     if (argc > 1) {
-        pad_enable = argv[1][0];
-        pad_vibration = argv[1][1];
-        mtap_enabled = argv[1][2] & 1;
-        mtap_port = (argv[1][2] >> 1) & 1;
-        pad_options = (argv[1][2] >> 2) & 1; // enable workaround for fake ds3
+        mips_memcpy(&PadEmuSettings_local.raw, argv[1], 4);
+        pad_enable = PadEmuSettings_local.pad_enable;
+        pad_vibration = PadEmuSettings_local.pad_vibration;
+        mtap_enabled = PadEmuSettings_local.mtap_enabled;
+        mtap_port = PadEmuSettings_local.mtap_port;
+        pad_options = PadEmuSettings_local.pad_options; // enable workaround for fake ds3
+        u32 macro_settings = 0xAB;
+        mips_memcpy(&macro_settings, argv[1] + 4, 4);
+        padMacroInit(macro_settings);
     }
 
     if (RegisterLibraryEntries(&_exp_pademu) != 0) {

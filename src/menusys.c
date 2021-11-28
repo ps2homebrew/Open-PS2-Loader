@@ -41,6 +41,7 @@ enum GAME_MENU_IDs {
     GAME_VMC_SETTINGS,
 #ifdef PADEMU
     GAME_PADEMU_SETTINGS,
+    GAME_PADMACRO_SETTINGS,
 #endif
     GAME_SAVE_CHANGES,
     GAME_TEST_CHANGES,
@@ -237,6 +238,7 @@ void menuInitGameMenu(void)
     submenuAppendItem(&gameMenu, -1, NULL, GAME_VMC_SETTINGS, _STR_VMC_SCREEN);
 #ifdef PADEMU
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADEMU_SETTINGS, _STR_PADEMUCONFIG);
+    submenuAppendItem(&gameMenu, -1, NULL, GAME_PADMACRO_SETTINGS, _STR_PADMACROCONFIG);
 #endif
     submenuAppendItem(&gameMenu, -1, NULL, GAME_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_TEST_CHANGES, _STR_TEST);
@@ -853,6 +855,7 @@ void menuHandleInputMenu()
             if (menuCheckParentalLock() == 0) {
 #ifdef PADEMU
                 guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
+                guiGameSavePadMacroGlobalConfig(configGetByType(CONFIG_GAME));
                 saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
 #else
                 saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
@@ -1019,7 +1022,7 @@ void menuRenderGameMenu()
         fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
         y += spacing;
 #ifdef PADEMU
-        if (cp == 4 || cp == 6)
+        if (cp == 5 || cp == 7)
             y += spacing / 2; // leave a blank space before rendering Save & Remove Settings.
 #else
         if (cp == 3 || cp == 5)
@@ -1073,6 +1076,8 @@ void menuHandleInputGameMenu()
 #ifdef PADEMU
         } else if (menuID == GAME_PADEMU_SETTINGS) {
             guiGameShowPadEmuConfig(0);
+        } else if (menuID == GAME_PADMACRO_SETTINGS) {
+            guiGameShowPadMacroConfig(0);
 #endif
         } else if (menuID == GAME_SAVE_CHANGES) {
             if (guiGameSaveConfig(itemConfig, selected_item->item->userdata))

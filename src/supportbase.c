@@ -436,7 +436,7 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                     /* TODO: size calculation is very slow
                     implmented some caching, or do not touch at all */
 
-                    //calculate total size for individual game
+                    // calculate total size for individual game
                     /*int ulfd = 1;
                     u8 part;
                     unsigned int name_checksum = USBA_crc32(g->name);
@@ -601,6 +601,8 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     gPadEmuSource = 0;
     gEnablePadEmu = 0;
     gPadEmuSettings = 0;
+    gPadMacroSource = 0;
+    gPadMacroSettings = 0;
 
     if (configGetInt(configSet, CONFIG_ITEM_PADEMUSOURCE, &gPadEmuSource)) {
         configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
@@ -608,6 +610,12 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     } else {
         configGetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
         configGetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, &gPadEmuSettings);
+    }
+
+    if (configGetInt(configSet, CONFIG_ITEM_PADMACROSOURCE, &gPadMacroSource)) {
+        configGetInt(configSet, CONFIG_ITEM_PADMACROSETTINGS, &gPadMacroSettings);
+    } else {
+        configGetInt(configGame, CONFIG_ITEM_PADMACROSETTINGS, &gPadMacroSettings);
     }
 #endif
 

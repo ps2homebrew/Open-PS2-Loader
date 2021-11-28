@@ -283,3 +283,16 @@ Engellenen Cihazları (örn. USB) açın/kapatın.
 USB Oyunları
 iLink Oyunları
 MX4SIO Oyunları
+Configure PADMACRO
+Pad macro Settings
+Pad macros
+Analog slow-down:
+Reduce range of analog stick when button is pressed
+Left stick
+Right stick
+Analog axis invert:
+Invert analog stick axis
+Turbo button speed
+How fast to press the button when turbo is active
+While button pressed
+Toggled by button

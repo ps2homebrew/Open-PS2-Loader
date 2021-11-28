@@ -14,6 +14,7 @@
 #include "include/cheatman.h"
 #include "include/system.h"
 #include "include/guigame.h"
+#include "include/ds34common.h"
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -38,6 +39,24 @@ static int CheatMode;
 #ifdef PADEMU
 static int EnablePadEmu;
 static int PadEmuSettings;
+static union
+{
+    struct
+    {
+        unsigned int left_stick_slowdown  : 4;
+        unsigned int right_stick_slowdown : 4;
+        unsigned int l_slowdown_enable    : 1;
+        unsigned int l_slowdown_toggle    : 1;
+        unsigned int r_slowdown_enable    : 1;
+        unsigned int r_slowdown_toggle    : 1;
+        unsigned int lx_invert            : 1;
+        unsigned int ly_invert            : 1;
+        unsigned int rx_invert            : 1;
+        unsigned int ry_invert            : 1;
+        unsigned int turbo_speed          : 2;
+    };
+    int raw;
+} PadMacroSettings;
 #endif
 
 static char hexid[32];
@@ -52,6 +71,7 @@ static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGa
 static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame);
 #ifdef PADEMU
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame);
+static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *configGame);
 #endif
 
 int guiGameAltStartupNameHandler(char *text, int maxLen)
@@ -456,6 +476,57 @@ static const char *PadEmuPorts_enums[][5] = {
     {"2A", "2B", "2C", "2D", NULL},
 };
 
+#define BtnBit_Off 16
+// This enum, along with lookup tables, can be re-used anywhere an enum containing all PS2 buttons is necessary.
+static const char *button_names_enum[] = {
+    "Off",
+    "Up", "Down", "Left", "Right",
+    "L1", "R1", "L2", "R2",
+    "Cross", "Circle", "Square", "Triangle",
+    "L3", "R3", "Start", "Select",
+    NULL};
+
+static const char button_enum_to_bit_number[] = {
+    BtnBit_Off, // Off
+    DS2BtnBit_Up,
+    DS2BtnBit_Down,
+    DS2BtnBit_Left,
+    DS2BtnBit_Right,
+    DS2BtnBit_L1,
+    DS2BtnBit_R1,
+    DS2BtnBit_L2,
+    DS2BtnBit_R2,
+    DS2BtnBit_Cross,
+    DS2BtnBit_Circle,
+    DS2BtnBit_Square,
+    DS2BtnBit_Triangle,
+    DS2BtnBit_L3,
+    DS2BtnBit_R3,
+    DS2BtnBit_Start,
+    DS2BtnBit_Select,
+};
+
+static const char bit_number_to_button_enum[] = {
+    [BtnBit_Off] = 0, // Off
+    [DS2BtnBit_Up] = 1,
+    [DS2BtnBit_Down] = 2,
+    [DS2BtnBit_Left] = 3,
+    [DS2BtnBit_Right] = 4,
+    [DS2BtnBit_L1] = 5,
+    [DS2BtnBit_R1] = 6,
+    [DS2BtnBit_L2] = 7,
+    [DS2BtnBit_R2] = 8,
+    [DS2BtnBit_Cross] = 9,
+    [DS2BtnBit_Circle] = 10,
+    [DS2BtnBit_Square] = 11,
+    [DS2BtnBit_Triangle] = 12,
+    [DS2BtnBit_L3] = 13,
+    [DS2BtnBit_R3] = 14,
+    [DS2BtnBit_Start] = 15,
+    [DS2BtnBit_Select] = 16,
+};
+
+
 static u8 ds3_mac[6];
 static u8 dg_mac[6];
 static char ds3_str[18];
@@ -472,6 +543,7 @@ static int dg_discon = 0;
 static int ver_set = 0, feat_set = 0;
 
 static int forceGlobalPadEmu;
+static int forceGlobalPadMacro;
 
 static char *bdaddr_to_str(u8 *bdaddr, char *addstr)
 {
@@ -740,6 +812,80 @@ void guiGameShowPadEmuConfig(int forceGlobal)
     }
 }
 
+static int guiGamePadMacroUpdater(int modified)
+{
+    int previousSource = gPadMacroSource;
+    diaGetInt(diaPadMacroConfig, PADMACRO_CFG_SOURCE, &gPadMacroSource);
+
+    // update GUI to display per-game or global settings if changed
+    if (previousSource != gPadMacroSource && gPadMacroSource == SETTINGS_GLOBAL) {
+        config_set_t *configSet = gameMenuLoadConfig(diaPadMacroConfig);
+        configRemoveKey(configSet, CONFIG_ITEM_PADMACROSOURCE);
+        guiGameLoadPadMacroConfig(configSet, configGetByType(CONFIG_GAME));
+    } else if (previousSource != gPadMacroSource && gPadMacroSource == SETTINGS_PERGAME) {
+        config_set_t *configSet = gameMenuLoadConfig(diaPadMacroConfig);
+        configSetInt(configSet, CONFIG_ITEM_PADMACROSOURCE, gPadMacroSource);
+        guiGameLoadPadMacroConfig(configSet, configGetByType(CONFIG_GAME));
+    }
+
+    int slowdown_l, slowdown_r;
+    diaGetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_L, &slowdown_l);
+    PadMacroSettings.l_slowdown_enable = slowdown_l != 0 ? 1 : 0;
+    PadMacroSettings.left_stick_slowdown = button_enum_to_bit_number[slowdown_l];
+
+    diaGetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_R, &slowdown_r);
+    PadMacroSettings.r_slowdown_enable = slowdown_r != 0 ? 1 : 0;
+    PadMacroSettings.right_stick_slowdown = button_enum_to_bit_number[slowdown_r];
+
+    int toggle_l, toggle_r;
+    diaGetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_TOGGLE_L, &toggle_l);
+    PadMacroSettings.l_slowdown_toggle = toggle_l;
+    diaGetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_TOGGLE_R, &toggle_r);
+    PadMacroSettings.r_slowdown_toggle = toggle_r;
+
+    int lx_invert, ly_invert, rx_invert, ry_invert;
+    diaGetInt(diaPadMacroConfig, PADMACRO_INVERT_LX, &lx_invert);
+    PadMacroSettings.lx_invert = lx_invert;
+    diaGetInt(diaPadMacroConfig, PADMACRO_INVERT_LY, &ly_invert);
+    PadMacroSettings.ly_invert = ly_invert;
+    diaGetInt(diaPadMacroConfig, PADMACRO_INVERT_RX, &rx_invert);
+    PadMacroSettings.rx_invert = rx_invert;
+    diaGetInt(diaPadMacroConfig, PADMACRO_INVERT_RY, &ry_invert);
+    PadMacroSettings.ry_invert = ry_invert;
+
+    int turbo_speed;
+    diaGetInt(diaPadMacroConfig, PADMACRO_TURBO_SPEED, &turbo_speed);
+    PadMacroSettings.turbo_speed = 4 - turbo_speed;
+
+    return 0;
+}
+
+void guiGameShowPadMacroConfig(int forceGlobal)
+{
+    const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
+    forceGlobalPadMacro = forceGlobal;
+    diaSetEnabled(diaPadMacroConfig, PADMACRO_CFG_SOURCE, !forceGlobalPadMacro);
+
+    if (forceGlobalPadMacro) {
+        guiGameLoadPadMacroConfig(NULL, configGetByType(CONFIG_GAME));
+    }
+
+    diaSetEnum(diaPadMacroConfig, PADMACRO_CFG_SOURCE, settingsSource);
+    diaSetEnum(diaPadMacroConfig, PADMACRO_SLOWDOWN_L, button_names_enum);
+    diaSetEnum(diaPadMacroConfig, PADMACRO_SLOWDOWN_R, button_names_enum);
+    const char *toggle_enum[] = {_l(_STR_ACT_WHILE_PRESSED), _l(_STR_ACT_TOGGLED), NULL};
+    diaSetEnum(diaPadMacroConfig, PADMACRO_SLOWDOWN_TOGGLE_L, toggle_enum);
+    diaSetEnum(diaPadMacroConfig, PADMACRO_SLOWDOWN_TOGGLE_R, toggle_enum);
+
+    int result = -1;
+    while (result != 0) {
+        result = diaExecuteDialog(diaPadMacroConfig, result, 1, &guiGamePadMacroUpdater);
+
+        if (result == UIID_BTN_OK)
+            break;
+    }
+}
+
 static int guiGameSavePadEmuGameConfig(config_set_t *configSet, int result)
 {
     if (gPadEmuSource == SETTINGS_PERGAME) {
@@ -760,6 +906,19 @@ static int guiGameSavePadEmuGameConfig(config_set_t *configSet, int result)
     return result;
 }
 
+static int guiGameSavePadMacroGameConfig(config_set_t *configSet, int result)
+{
+    if (gPadMacroSource == SETTINGS_PERGAME) {
+        result = configSetInt(configSet, CONFIG_ITEM_PADMACROSOURCE, gPadMacroSource);
+        if (PadMacroSettings.raw != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_PADMACROSETTINGS, PadMacroSettings.raw);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_PADMACROSETTINGS);
+    }
+
+    return result;
+}
+
 void guiGameSavePadEmuGlobalConfig(config_set_t *configGame)
 {
     if (gPadEmuSource == SETTINGS_GLOBAL) {
@@ -767,6 +926,13 @@ void guiGameSavePadEmuGlobalConfig(config_set_t *configGame)
 
         configSetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
         configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
+    }
+}
+
+void guiGameSavePadMacroGlobalConfig(config_set_t *configGame)
+{
+    if (gPadMacroSource == SETTINGS_GLOBAL) {
+        configSetInt(configGame, CONFIG_ITEM_PADMACROSETTINGS, PadMacroSettings.raw);
     }
 }
 #endif
@@ -901,6 +1067,8 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
     /// PADEMU ///
     result = guiGameSavePadEmuGameConfig(configSet, result);
     guiGameSavePadEmuGlobalConfig(configGame);
+    result = guiGameSavePadMacroGameConfig(configSet, result);
+    guiGameSavePadMacroGlobalConfig(configGame);
 #endif
 
     diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
@@ -938,6 +1106,7 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         // PADEMU
         configRemoveKey(configGame, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configGame, CONFIG_ITEM_PADEMUSETTINGS);
+        configRemoveKey(configGame, CONFIG_ITEM_PADMACROSETTINGS);
 #endif
         saveConfig(CONFIG_GAME, 0);
     }
@@ -970,6 +1139,7 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
+        configRemoveKey(configSet, CONFIG_ITEM_PADMACROSETTINGS);
 #endif
         // VMC
         configRemoveVMC(configSet, 0);
@@ -1086,6 +1256,43 @@ static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *confi
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
 }
+
+static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *configGame)
+{
+    PadMacroSettings.raw = 0;
+    gPadMacroSource = 0;
+
+    configGetInt(configGame, CONFIG_ITEM_PADMACROSETTINGS, &PadMacroSettings.raw);
+    // override global with per-game settings if available and selected.
+    if (!forceGlobalPadMacro) {
+        configGetInt(configSet, CONFIG_ITEM_PADMACROSOURCE, &gPadMacroSource);
+        if (gPadMacroSource == SETTINGS_PERGAME) {
+            if (!configGetInt(configSet, CONFIG_ITEM_PADMACROSETTINGS, &PadMacroSettings.raw))
+                PadMacroSettings.raw = 0;
+        }
+    }
+
+    diaSetInt(diaPadMacroConfig, PADMACRO_CFG_SOURCE, gPadMacroSource);
+
+    int slowdown_l_ui = 0, slowdown_r_ui = 0;
+    if (PadMacroSettings.l_slowdown_enable) {
+        slowdown_l_ui = bit_number_to_button_enum[PadMacroSettings.left_stick_slowdown];
+    }
+
+    if (PadMacroSettings.r_slowdown_enable) {
+        slowdown_r_ui = bit_number_to_button_enum[PadMacroSettings.right_stick_slowdown];
+    }
+
+    diaSetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_L, slowdown_l_ui);
+    diaSetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_R, slowdown_r_ui);
+    diaSetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_TOGGLE_L, PadMacroSettings.l_slowdown_toggle);
+    diaSetInt(diaPadMacroConfig, PADMACRO_SLOWDOWN_TOGGLE_R, PadMacroSettings.r_slowdown_toggle);
+    diaSetInt(diaPadMacroConfig, PADMACRO_INVERT_LX, PadMacroSettings.lx_invert);
+    diaSetInt(diaPadMacroConfig, PADMACRO_INVERT_LY, PadMacroSettings.ly_invert);
+    diaSetInt(diaPadMacroConfig, PADMACRO_INVERT_RX, PadMacroSettings.rx_invert);
+    diaSetInt(diaPadMacroConfig, PADMACRO_INVERT_RY, PadMacroSettings.ry_invert);
+    diaSetInt(diaPadMacroConfig, PADMACRO_TURBO_SPEED, 4 - PadMacroSettings.turbo_speed);
+}
 #endif
 
 // loads defaults if no config found
@@ -1119,6 +1326,7 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     guiGameLoadCheatsConfig(configSet, configGame);
 #ifdef PADEMU
     guiGameLoadPadEmuConfig(configSet, configGame);
+    guiGameLoadPadMacroConfig(configSet, configGame);
 #endif
     /// Find out the current game ID ///
     hexid[0] = '\0';

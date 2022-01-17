@@ -74,6 +74,7 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
         return -1;
     cflags = htonl(cflags);
 
+    DEBUGLOG("client flags %d\n", cflags);
     if (cflags != gflags) {
         LOG("Unsupported client flags %d\n", cflags);
         return -1;
@@ -106,7 +107,7 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
             "NBD_OPT_LIST_META_CONTEXT",
             "NBD_OPT_SET_META_CONTEXT",
         };
-        LOG("%s\n", NBD_OPTIONS[new_opt.option]);
+        DEBUGLOG("%s\n", NBD_OPTIONS[new_opt.option]);
 #endif
         new_opt.optlen = htonl(new_opt.optlen);
 
@@ -122,15 +123,16 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
                 struct nbd_export_name_option_reply handshake_finish;
                 //temporary workaround
                 if (new_opt.optlen > 0) {
-                    *ctx = nbd_context_getDefaultExportByName(ctxs, (const char *)&nbd_buffer);
+                    *ctx = getExportByName(ctxs, (const char *)&nbd_buffer);
                 } else
-                    *ctx = nbd_context_getDefaultExportByName(ctxs, gdefaultexport);
+                    *ctx = getExportByName(ctxs, gdefaultexport);
                 //TODO: is that correct ?
                 if (*ctx == NULL)
                     *ctx = ctxs[0];
                 handshake_finish.exportsize = htonll((*ctx)->export_size);
                 handshake_finish.eflags = htons((*ctx)->eflags);
                 memset(handshake_finish.zeroes, 0, sizeof(handshake_finish.zeroes));
+                // NBD_FLAG_C_NO_ZEROES not defined by nbd-protocol.h, another useless term from proto.md
                 size = send(client_socket, &handshake_finish,
                             (cflags & NBD_FLAG_NO_ZEROES) ? offsetof(struct nbd_export_name_option_reply, zeroes) : sizeof handshake_finish, 0);
                 return NBD_OPT_EXPORT_NAME;
@@ -351,10 +353,7 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
                 return 0;
 
             case NBD_CMD_FLUSH:
-                if (nbd_flush(ctx) == 0)
-                    error = NBD_SUCCESS;
-                else
-                    error = NBD_EIO;
+                error = (nbd_flush(ctx) == 0) ? NBD_SUCCESS : NBD_EIO;
                 reply.error = ntohl(error);
                 r = send(client_socket, &reply, sizeof(struct nbd_simple_reply),
                          0);

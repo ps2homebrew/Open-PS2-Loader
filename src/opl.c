@@ -1404,16 +1404,27 @@ static int loadLwnbdSvr(void)
 
     unloadPads();
     // sysReset(0); // usefull ? printf doesn't work with it.
+    // sysReset(SYS_LOAD_MC_MODULES);
 
     ret = ethLoadInitModules();
     if (ret == 0) {
         ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+        LOG("lwNBD ps2atad_irx : %d\n", ret);
         if (ret >= 0) {
+          ret = sysLoadModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL);
+          LOG("lwNBD mcman_irx : %d\n", ret);
+          sysLoadModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL);
+          LOG("lwNBD mcserv_irx : %d\n", ret);
+
+          if (ret >= 0) {
             ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 4, (char *)&gExportName);
+            // ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 0, NULL);
+            LOG("lwNBD lwnbdsvr_irx : %d\n", ret);
             if (ret >= 0)
                 ret = 0;
         }
     }
+  }
 
     padInit(0);
 

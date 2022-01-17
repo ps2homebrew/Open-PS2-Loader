@@ -200,6 +200,12 @@ Supported: Windows
 [WNBD client](https://cloudbase.it/ceph-for-windows/).
 Install, reboot, open elevated (with Administrator rights) [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/starting-windows-powershell?view=powershell-7.1#how-to-start-windows-powershell-on-earlier-versions-of-windows)
 
+list available export:
+
+```sh
+wnbd-client.exe list 192.168.1.22
+```
+
 connect:
 
 ```sh

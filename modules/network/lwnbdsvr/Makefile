@@ -1,5 +1,5 @@
 IOP_BIN = lwnbdsvr.irx
-IOP_OBJS = lwnbdsvr.o imports.o exports.o lwnbd.o nbd_protocol.o drivers/atad_d.o drivers/ioman_d.o
+IOP_OBJS = lwnbdsvr.o imports.o exports.o lwnbd.o nbd_protocol.o drivers/atad_d.o drivers/ioman_d.o drivers/mcman_d.o
 IOP_INCS += -I. -I../../iopcore/common -I../../../include/ -include platform-ps2.h -DAPP_NAME=\"lwnbdsvr\"
 
 ifeq ($(DEBUG),1)

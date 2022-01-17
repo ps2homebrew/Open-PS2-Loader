@@ -83,20 +83,20 @@ static int nbd_context_flush_(nbd_context const *const me)
     return 0U; /* to avoid compiler warnings */
 }
 
-/* search for the default export by name
+/* search for export by name
    return NULL if not found any.
 */
-nbd_context *nbd_context_getDefaultExportByName(nbd_context **nbd_contexts, const char *exportname)
+nbd_context *getExportByName(nbd_context **nbd_contexts, const char *exportname)
 {
     nbd_context **ptr_ctx = nbd_contexts;
     while (*ptr_ctx) {
         if (strncmp((*ptr_ctx)->export_name, exportname, 32) == 0) {
-            LOG("searched for \"%s\" ... found.\n", exportname);
+            // DEBUGLOG("searched for \"%s\" ... found.\n", exportname);
             return *ptr_ctx;
         }
         ptr_ctx++;
     }
-    LOG("searched for \"%s\" ... not found.\n", exportname);
+    // DEBUGLOG("searched for \"%s\" ... not found.\n", exportname);
     return NULL;
 }
 

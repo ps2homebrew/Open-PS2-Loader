@@ -138,7 +138,7 @@ static inline int nbd_flush(nbd_context const *const me)
 //Todo: make a real server object
 extern char gdefaultexport[];
 extern uint8_t nbd_buffer[];
-nbd_context *nbd_context_getDefaultExportByName(nbd_context **nbd_contexts, const char *exportname);
+nbd_context *getExportByName(nbd_context **nbd_contexts, const char *exportname);
 
 #ifdef __cplusplus
 }

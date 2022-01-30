@@ -13,12 +13,15 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        apk add build-base git zip gawk
+        apk add build-base git zip gawk python3 py3-pip
 
     - name: git checkout
       uses: actions/checkout@v2
 
     - run: git fetch --prune --unshallow
+
+    - name: Install Python packages
+      run: pip3 install -r requirements.txt
 
     - name: Compile -> make clean release
       run: make --trace clean release
@@ -57,12 +60,15 @@ jobs:
     container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run: apk add build-base git zip gawk
+      run: apk add build-base git zip gawk python3 py3-pip
 
     - name: git checkout
       uses: actions/checkout@v2
 
     - run: git fetch --prune --unshallow
+
+    - name: Install Python packages
+      run: pip3 install -r requirements.txt
 
     - name: Get version
       id: version
@@ -91,12 +97,15 @@ jobs:
     container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run: apk add build-base git zip gawk
+      run: apk add build-base git zip gawk python3 py3-pip
 
     - name: git checkout
       uses: actions/checkout@v2
 
     - run: git fetch --prune --unshallow
+
+    - name: Install Python packages
+      run: pip3 install -r requirements.txt
 
     - name: Get version
       id: version
@@ -177,7 +186,7 @@ jobs:
           OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z
-          
+
     - name: Upload pre-release to Mega
       if: github.ref == 'refs/heads/master'
       uses: Difegue/action-megacmd@master

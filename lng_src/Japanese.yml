@@ -1,0 +1,406 @@
+comments: |-
+  Japanese translation by yamamotonew
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Japanese
+  SAVE_CHANGES: 設定を保存する
+  BACK: 戻る
+  NETCONFIG: ネットワーク設定
+  SHOW_ADVANCED_OPTS: 詳細オプション
+  NO_ITEMS: <未設定>
+  SETTINGS_SAVED:
+  - untranslated
+  - original: Settings saved to %s
+  ERROR_SAVING_SETTINGS: 設定保存中にエラーが発生しました
+  EXIT: 終了
+  SETTINGS: 設定
+  MENU: メニュー
+  BDM_GAMES: BDMゲーム
+  HDD_GAMES: HDDゲーム
+  NET_GAMES: ETHゲーム
+  APPS: アプリ
+  THEME: テーマ
+  LANGUAGE: 言語
+  CONFIRMATION_POFF: システムを終了し電源を切ります
+  CONFIRMATION_EXIT: ブラウザに戻りますか？
+  CONFIRMATION_CANCEL_UPDATE: 変更をキャンセルしますか？
+  HDD_NOT_CONNECTED_ERROR: '%d: HDDが接続されていません'
+  HDD_NOT_FORMATTED_ERROR: '%d: HDDがフォーマットされていません'
+  NETWORK_STARTUP_ERROR: '%d: ネットワーク開始エラー'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: ネットワークアダプタが接続されていません'
+  NETWORK_STARTUP_ERROR_CONN: '%d: SMBサーバに接続できません'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: SMBサーバにログインできません'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: SMBフォルダを開けません'
+  NETWORK_SHARE_LIST_ERROR: '%d: SMBゲームが見つかりません'
+  NETWORK_GAMES_LIST_ERROR: '%d: ゲームが見つかりません'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCPサーバが見つかりません'
+  NETWORK_ERROR_LINK_FAIL: '%d: ネットワーク接続が見つかりません'
+  'ON': オン
+  'OFF': オフ
+  OK:
+  - untranslated
+  - original: OK
+  SELECT: 選択
+  CANCEL: キャンセル
+  CIRCLE: O
+  CROSS: X
+  GAMES_LIST: ゲームリスト
+  COMPAT_SETTINGS: ゲーム設定
+  REMOVE_ALL_SETTINGS:
+  - untranslated
+  - original: Remove Settings
+  SCROLLING: 画面スクロール
+  SLOW: 遅い
+  MEDIUM: 普通
+  FAST: 速い
+  DEFDEVICE: 初期メニュー
+  LOAD_FROM_DISC: ディスクからロード
+  PLEASE_WAIT: お待ちください
+  ERROR_LOADING_ID: ゲームIDをロード中にエラーが発生しました
+  AUTOSORT: 自動的に並べ替え
+  ERR_LOADING_LANGFILE: 言語設定をロード中にエラーが発生しました
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: コントローラーが見つかりません。お待ちください…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: ワイドスクリーン
+  POWEROFF: 電源を切る
+  LOADING_SETTINGS: 設定をロード中
+  SAVING_SETTINGS: 設定を保存中
+  START_DEVICE: デバイスを開始
+  REFRESH: リフレッシュ
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: HDDデバイス開始モード
+  ETHMODE: ETHデバイス開始モード
+  APPMODE: アプリメニュー表示モード
+  AUTO: 自動
+  MANUAL: 手動
+  STARTNBD: NBDサーバを開始
+  STARTINGNBD: NBDサーバを開始します…
+  RUNNINGNBD: NBDサーバは開始しました
+  STARTFAILNBD: NBDサーバ開始に失敗しました
+  UNLOADNBD: NBDサーバを取消中…
+  EXITTO: IGRパス
+  BGCOLOR: 背景色
+  TXTCOLOR: 文字色
+  CAT_SMB_SERVER: '- SMBサーバ -'
+  IP_ADDRESS_TYPE: IPアドレスタイプ
+  IP_ADDRESS_TYPE_STATIC:
+  - untranslated
+  - original: Static
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IPアドレス
+  ADDRESS: アドレス
+  MASK: マスク
+  GATEWAY: ゲートウェイ
+  DNS_SERVER: DNSサーバ
+  PORT: ポート
+  SHARE: 共有名
+  USER: ユーザー名
+  PASSWORD: パスワード
+  NOT_SET: <未設定>
+  ADDRESS_TYPE: アドレスタイプ
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: OK
+  DELETE_WARNING: 削除すると元に戻せません。よろしいですか？
+  RENAME: 名前変更
+  DELETE: 削除
+  RUN: 実行
+  GFX_SETTINGS: 表示設定
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: 最後にプレイしたゲームを記憶する
+  SELECTBUTTON: セレクトボタン
+  ERR_FRAGMENTED: ゲームがデフラグされていません
+  ERR_FILE_INVALID: ゲーム（アプリ）を開始できませんでした
+  TEST:
+  - untranslated
+  - original: Test Changes
+  HINT_GUEST: GUESTでログインする場合は空欄
+  HINT_MODE1: 読み込み速度の補正
+  HINT_MODE2: データ読み込みをシンクロ化
+  HINT_MODE3: Syscallの解除
+  HINT_MODE4: 一部のムービーをスキップ
+  HINT_MODE5: 二層ディスク(DVD9)用設定
+  HINT_MODE6: IGRを無効化
+  HINT_VMC_SIZE: サイズを変更するとVMCはフォーマットされます
+  CREATE: VMCファイルを作成
+  START: 開始
+  MODIFY: 変更
+  ABORT: 中止
+  RESET: リセット
+  USE_GENERIC: 簡易VMC作成
+  VMC_SCREEN: VMC設定
+  VMC_NAME: ファイル名
+  SIZE: サイズ
+  VMC_STATUS: 状態
+  VMC_PROGRESS: 進行
+  VMC_FILE_EXISTS: VMCファイル作成済
+  VMC_FILE_ERROR: VMCファイルのサイズが正しくありません
+  VMC_FILE_NEW: VMCファイル未作成
+  ERR_VMC_CONTINUE: VMC %s でエラー。スロット %d のメモリカードを使いますか？
+  AUTOREFRESH: 自動リフレッシュ
+  ABOUT: OPLについて
+  DEVS: コーディング
+  QANDA: QAテスター
+  BDM_PREFIX: BDMプリフィクスパス
+  HINT_EXITPATH: IGR後に指定されたカスタムELFを実行します
+  HINT_SPINDOWN: 秒数指定。0で無効化
+  HDD_SPINDOWN: 自動HDDスピンダウン
+  VMODE: 画面モード
+  UICOLOR: ダイアログの色
+  SELCOLOR: 選択時の色
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO: インフォ
+  ALTSTARTUP: カスタムELF
+  COLOR_SELECTION: 表示色設定
+  RECONNECT: 再接続
+  HINT_SHARENAME: 全ての共有を表示する場合は空欄
+  ETH_PREFIX: ETHプリフィクスパス
+  BACKSPACE: 一文字消去
+  SPACE: スペース
+  ENTER: 決定
+  MODE: モード
+  VMC_SLOT1: VMCスロット1
+  VMC_SLOT2: VMCスロット2
+  GAME_ID: ゲームID
+  DMA_MODE: DMAモード
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1: モード 1
+  MODE2: モード 2
+  MODE3: モード 3
+  MODE4: モード 4
+  MODE5: モード 5
+  MODE6: モード 6
+  GSCONFIG: GSM設定
+  ETH_OPMODE: ETHリンクモード
+  ETH_100MFDX: 100Mbit full-duplex
+  ETH_100MHDX: 100Mbit half-duplex
+  ETH_10MFDX: 10Mbit full-duplex
+  ETH_10MHDX: 10Mbit half-duplex
+  GSM_SETTINGS: GSM設定
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: GSM設定をオン/オフ
+  HINT_GSMVMODE: 指定されたモードを常に有効化
+  XOFFSET: 水平調整
+  HINT_XOFFSET: 水平方向の表示位置を微調整
+  YOFFSET: 垂直調整
+  HINT_YOFFSET: 垂直方向の表示位置を微調整
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN: Overscan Adjustment
+  GSMSKIPVIDEOS: FMVスキップ
+  HINT_GSMSKIPVIDEOS: フルモーションムービーをスキップ
+  CHEAT_SETTINGS: チート設定
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: PS2RDチートをゲーム毎に指定
+  CHEATMODE: PS2RDチートモード
+  HINT_CHEATMODE: 自動/手動チート選択
+  CHEATMODEAUTO: 自動チート選択
+  CHEATMODESELECT: 手動チート選択
+  ERR_CHEATS_LOAD_FAILED: チートファイルを適用できませんでした
+  NO_CHEATS_FOUND: チートファイルが見つかりません
+  DL_DEFAULTS: デフォルト設定をダウンロード
+  NET_UPDATE: ネットワークアップデート
+  NET_UPDATE_ALL:
+  - untranslated
+  - original: Overwrite Existing Records
+  NET_UPDATE_FAILED: アップデートが失敗しました
+  NET_UPDATE_CONN_FAILED: アップデートサーバに接続できませんでした
+  NET_UPDATE_DONE: アップデート完了
+  NET_UPDATE_CANCELLED: アップデートは中止されました
+  CONFIRMATION_SETTINGS_UPDATE: ネットワークから設定をダウンロードしますか？
+  CUSTOMIZED_SETTINGS: カスタム設定
+  DOWNLOADED_DEFAULTS: デフォルト設定をダウンロード
+  AUTO_START_IN_N_SECS: あと %i 秒で自動的にスタートします
+  AUTOSTARTLAST: 自動スタート
+  HINT_AUTOSTARTLAST: 開始までの秒数を指定。0で無効化
+  PS2LOGO: PS2ロゴ
+  HINT_PS2LOGO: 本体リージョンとディスクが一致した場合のみ表示されます
+  PADEMUCONFIG: PADEMUの設定
+  PADEMU_SETTINGS: PADEMUの設定
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: ゲーム毎にPADEMUの有効/無効を指定
+  PADEMU_MODE: PADEMUモード
+  HINT_PADEMU_MODE: モードを選択
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'ポート番号:'
+  HINT_PAD_PORT: PADEMUを適用するポートを指定
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: ポート毎にPADEMUを適用
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: ポート毎に振動の有効/無効を指定
+  USBDG_MAC: 'BluetoothアダプタのMACアドレス:'
+  PAD_MAC: 'DSのペア設定MACアドレス　　　　:'
+  PAIR: ペア設定
+  PAIR_PAD: DSコントローラーをペア設定
+  HINT_PAIRPAD: BluetoothのMACアドレスを指定してDSコントローラーをペア設定
+  NOT_CONNECTED: 接続されていません
+  BTINFO: Bluetooth アダプタ情報
+  HINT_BTINFO: さらにサポートされている機能を表示
+  HCIVER:
+  - untranslated
+  - original: 'HCI Version:'
+  LMPVER:
+  - untranslated
+  - original: 'LMP Version:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES: 'サポート機能:'
+  'YES':
+  - untranslated
+  - original: 'Yes'
+  'NO':
+  - untranslated
+  - original: 'No'
+  BT_SUPPORTED: BluetoothアダプタはDS3 / DS4コントローラをサポートしています
+  BT_NOTSUPPORTED: BluetoothアダプタはDS3 / DS4コントローラをサポートしていません
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: 選択したゲームのマルチタップエミュレーションをオン/オフにします
+  MTAP_PORT: マルチタップエミュレータのポート
+  HINT_MTAP_PORT: マルチタップエミュレーション用のポートを選択
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: FIELD反転をエミュレートする
+  HINT_GSM_FIELD_FIX: プログレッシブビデオモードでグリッチするゲームを修正しました
+  PARENLOCKCONFIG: パレンタルロック設定
+  PARENLOCK_PASSWORD: パレンタルロックパスワード
+  PARENLOCK_PASSWORD_HINT: パレンタルロックを無効にするには空白のままにします
+  PARENLOCK_ENTER_PASSWORD_TITLE: パレンタルロックパスワードを入力してください
+  PARENLOCK_PASSWORD_INCORRECT: パレンタルロックのパスワードが正しくありません
+  PARENLOCK_DISABLE_WARNING: パレンタルロックは無効です
+  BUILD_DETAILS: ビルドオプション：
+  PARENLOCK_INVALID_PASSWORD: エラー - このパスワードは使用できません
+  ERR_VMC_FRAGMENTED_CONTINUE: VMC ％s ファイルは破損しています。 スロット ％d のメモリカードに保存しますか？
+  AUDIO_SETTINGS: オーディオ設定
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: 効果音の音量
+  BOOT_SND_VOLUME: 起動音の音量
+  CFM_VMODE_CHG: ビデオモードの変更を確認しますか？
+  CACHE_HDD_GAME_LIST: ゲームリストをキャッシュ（HDD）
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED:
+  - untranslated
+  - original: Game settings saved.
+  GAME_SETTINGS_REMOVED:
+  - untranslated
+  - original: '%s settings removed.'
+  NET_UPDATE_HINT:
+  - untranslated
+  - original: Overwrites existing game compatibility settings when enabled.
+  SETTINGS_SOURCE:
+  - untranslated
+  - original: Settings Mode
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS:
+  - untranslated
+  - original: All
+  GAME_SETTINGS_PROMPT:
+  - untranslated
+  - original: Select settings to remove.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

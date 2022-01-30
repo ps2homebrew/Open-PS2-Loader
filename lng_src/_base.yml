@@ -1,0 +1,608 @@
+comment_for_template_header: |-
+  This file is a template for translators. This file's encoding must be UTF8.
+
+  Entry that has been translated looks like this:
+    LABEL: Some string goes here
+
+  Entry that is intentionally left untranslated looks like this:
+    LABEL:
+    - same
+    - original: Version of this string in English
+
+  Entry that is not yet translated looks like this:
+    LABEL:
+    - untranslated
+    - original: Version of this string in English
+
+  To translate an untranslated entry, simply delete the two lines below the label
+  and replace them with text in target language. To mark the entry as intentionally
+  untranslated, replace "untranslated" with "same".
+  It might be necessary to put your text in quotes if it contains a colon (`:`) or it's a text
+  like "Yes" or "No". See YAML documentation for details. If in doubt, just quote the text.
+
+  Important: if your language require some custom glyphs, you should provide a corresponding
+  TTF/OTF font file too. By default, OPL only comes with the "basic Latin" font built-in.
+
+  Once the translation is complete, you can submit it to the development team.
+
+  To use your custom language with OPL, simply copy the .lng file into your mc?:/OPL or LNG folder
+  (File must start with the "lang_" prefix and have the ".lng" extension)
+
+  Finally, don't put too many comments in your file, it will waste space and increases loading
+  time. One single comment line on top (e.g. "name <yourmail@address.com>") should be enough.
+
+  Thanks for your work.
+comments_for_template_labels:
+  LOCALE: Put here the English name of your language (will be displayed in the OPL Settings menu), in standard latin characters.
+enum_name: _STR_IDS
+enum_label_prefix: _STR_
+string_array_name: internalEnglish
+string_count_label: LANG_STR_COUNT
+string_array_specifiers: ''
+gui_strings:
+- comment: Localized language name
+  label: LOCALE
+  string: English (internal)
+- label: SAVE_CHANGES
+  string: Save Changes
+- label: BACK
+  string: Back
+- label: NETCONFIG
+  string: Network Settings
+- label: SHOW_ADVANCED_OPTS
+  string: Advanced Options
+- label: NO_ITEMS
+  string: <no values>
+- label: SETTINGS_SAVED
+  string: Settings saved to %s
+- label: ERROR_SAVING_SETTINGS
+  string: Error writing settings!
+- label: EXIT
+  string: Exit
+- label: SETTINGS
+  string: Settings
+- label: MENU
+  string: Menu
+- label: BDM_GAMES
+  string: BDM Games
+- label: HDD_GAMES
+  string: HDD Games
+- label: NET_GAMES
+  string: ETH Games
+- label: APPS
+  string: Apps
+- label: THEME
+  string: Theme
+- label: LANGUAGE
+  string: Language
+- label: CONFIRMATION_POFF
+  string: The system will be powered off.
+- label: CONFIRMATION_EXIT
+  string: Exit to Browser?
+- label: CONFIRMATION_CANCEL_UPDATE
+  string: Cancel updating?
+- label: HDD_NOT_CONNECTED_ERROR
+  string: '%d: HardDisk Drive not detected.'
+- label: HDD_NOT_FORMATTED_ERROR
+  string: '%d: HardDisk Drive not formatted.'
+- comment: Generic network error message.
+  label: NETWORK_STARTUP_ERROR
+  string: '%d: Network startup error.'
+- label: NETWORK_STARTUP_ERROR_NETIF
+  string: '%d: No network adaptor detected.'
+- label: NETWORK_STARTUP_ERROR_CONN
+  string: '%d: Cannot connect to SMB server.'
+- label: NETWORK_STARTUP_ERROR_LOGON
+  string: '%d: Cannot log into SMB server.'
+- label: NETWORK_STARTUP_ERROR_SHARE
+  string: '%d: Cannot open SMB share.'
+- label: NETWORK_SHARE_LIST_ERROR
+  string: '%d: Cannot list SMB shares.'
+- label: NETWORK_GAMES_LIST_ERROR
+  string: '%d: Cannot list games.'
+- label: NETWORK_ERROR_DHCP_FAIL
+  string: '%d: DHCP server unavailable.'
+- label: NETWORK_ERROR_LINK_FAIL
+  string: '%d: No network connection.'
+- label: 'ON'
+  string: 'On'
+- label: 'OFF'
+  string: 'Off'
+- label: OK
+  string: OK
+- label: SELECT
+  string: Select
+- label: CANCEL
+  string: Cancel
+- label: CIRCLE
+  string: Circle
+- label: CROSS
+  string: Cross
+- label: GAMES_LIST
+  string: Games List
+- label: COMPAT_SETTINGS
+  string: Game Settings
+- label: REMOVE_ALL_SETTINGS
+  string: Remove Settings
+- label: SCROLLING
+  string: Scrolling Speed
+- label: SLOW
+  string: Slow
+- label: MEDIUM
+  string: Medium
+- label: FAST
+  string: Fast
+- label: DEFDEVICE
+  string: Default Menu
+- label: LOAD_FROM_DISC
+  string: Load From Disc
+- label: PLEASE_WAIT
+  string: Please wait.
+- label: ERROR_LOADING_ID
+  string: Error while loading the Game ID.
+- label: AUTOSORT
+  string: Automatic Sorting
+- label: ERR_LOADING_LANGFILE
+  string: Error loading the language file.
+- label: DEBUG
+  string: Debug Colors
+- label: NO_CONTROLLER
+  string: No controller detected, waiting...
+- label: COVERART
+  string: Cover Art
+- label: WIDE_SCREEN
+  string: Widescreen
+- label: POWEROFF
+  string: Power Off
+- label: LOADING_SETTINGS
+  string: Loading config...
+- label: SAVING_SETTINGS
+  string: Saving config...
+- label: START_DEVICE
+  string: Start Device
+- label: REFRESH
+  string: Refresh
+- label: BDMMODE
+  string: BDM Start Mode
+- label: HDDMODE
+  string: HDD Device Start Mode
+- label: ETHMODE
+  string: ETH Device Start Mode
+- label: APPMODE
+  string: Applications Start Mode
+- label: AUTO
+  string: Auto
+- label: MANUAL
+  string: Manual
+- label: STARTNBD
+  string: Start NBD Server
+- label: STARTINGNBD
+  string: NBD Server starting...
+- label: RUNNINGNBD
+  string: NBD Server running...
+- label: STARTFAILNBD
+  string: Failed to start NBD Server.
+- label: UNLOADNBD
+  string: NBD Server unloading...
+- label: EXITTO
+  string: IGR Path
+- label: BGCOLOR
+  string: Background Color
+- label: TXTCOLOR
+  string: Text Color
+- label: CAT_SMB_SERVER
+  string: '- SMB Server -'
+- label: IP_ADDRESS_TYPE
+  string: IP Address Type
+- label: IP_ADDRESS_TYPE_STATIC
+  string: Static
+- label: IP_ADDRESS_TYPE_DHCP
+  string: DHCP
+- label: IP_ADDRESS
+  string: IP Address
+- label: ADDRESS
+  string: Address
+- label: MASK
+  string: Mask
+- label: GATEWAY
+  string: Gateway
+- label: DNS_SERVER
+  string: DNS Server
+- label: PORT
+  string: Port
+- label: SHARE
+  string: Share
+- label: USER
+  string: User
+- label: PASSWORD
+  string: Password
+- label: NOT_SET
+  string: <not set>
+- label: ADDRESS_TYPE
+  string: Address Type
+- label: ADDR_TYPE_IP
+  string: IP
+- label: ADDR_TYPE_NETBIOS
+  string: NetBIOS
+- label: ACCEPT
+  string: Accept
+- label: DELETE_WARNING
+  string: Item will be permanently deleted, continue?
+- label: RENAME
+  string: Rename
+- label: DELETE
+  string: Delete
+- label: RUN
+  string: Run
+- label: GFX_SETTINGS
+  string: Display Settings
+- label: ENABLE_WRITE
+  string: Write Operations
+- label: LASTPLAYED
+  string: Remember Last Played Game
+- label: SELECTBUTTON
+  string: Select Button
+- label: ERR_FRAGMENTED
+  string: Error, the game is fragmented.
+- label: ERR_FILE_INVALID
+  string: Error, could not run the item.
+- label: TEST
+  string: Test Changes
+- label: HINT_GUEST
+  string: Leave empty for GUEST auth.
+- label: HINT_MODE1
+  string: Accurate Reads
+- label: HINT_MODE2
+  string: Synchronous Mode
+- label: HINT_MODE3
+  string: Unhook Syscalls
+- label: HINT_MODE4
+  string: Skip Videos
+- label: HINT_MODE5
+  string: Emulate DVD-DL
+- label: HINT_MODE6
+  string: Disable IGR
+- label: HINT_VMC_SIZE
+  string: Changing the size will reformat the VMC.
+- label: CREATE
+  string: Create
+- label: START
+  string: Start
+- label: MODIFY
+  string: Modify
+- label: ABORT
+  string: Abort
+- label: RESET
+  string: Reset
+- label: USE_GENERIC
+  string: Use Generic
+- label: VMC_SCREEN
+  string: Configure VMC
+- label: VMC_NAME
+  string: Name
+- label: SIZE
+  string: Size
+- label: VMC_STATUS
+  string: Status
+- label: VMC_PROGRESS
+  string: Progress
+- label: VMC_FILE_EXISTS
+  string: VMC file exists.
+- label: VMC_FILE_ERROR
+  string: Invalid VMC file, size is incorrect.
+- label: VMC_FILE_NEW
+  string: VMC file needs to be created.
+- label: ERR_VMC_CONTINUE
+  string: Error accessing VMC %s. Continue with the Memory Card in slot %d?
+- label: AUTOREFRESH
+  string: Automatic Refresh
+- label: ABOUT
+  string: About
+- label: DEVS
+  string: Coders
+- label: QANDA
+  string: Quality Assurance
+- label: BDM_PREFIX
+  string: BDM Prefix Path
+- label: HINT_EXITPATH
+  string: Boots custom ELF after an IGR.
+- label: HINT_SPINDOWN
+  string: Value in minute(s), 0 to disable spin down.
+- label: HDD_SPINDOWN
+  string: Automatic HDD Spin Down
+- label: VMODE
+  string: Video Mode
+- label: UICOLOR
+  string: Dialog Color
+- label: SELCOLOR
+  string: Selected Color
+- label: RESETCOLOR
+  string: Reset Colors
+- label: INFO
+  string: Info
+- label: ALTSTARTUP
+  string: Custom ELF
+- label: COLOR_SELECTION
+  string: Color Selection
+- label: RECONNECT
+  string: Reconnect
+- label: HINT_SHARENAME
+  string: Leave empty to list shares.
+- label: ETH_PREFIX
+  string: ETH Prefix Path
+- label: BACKSPACE
+  string: Backspace
+- label: SPACE
+  string: Space
+- label: ENTER
+  string: Enter
+- label: MODE
+  string: Mode
+- label: VMC_SLOT1
+  string: VMC Slot 1
+- label: VMC_SLOT2
+  string: VMC Slot 2
+- label: GAME_ID
+  string: Game ID
+- label: DMA_MODE
+  string: DMA Mode
+- label: VSYNC
+  string: V-Sync
+- label: MODE1
+  string: Mode 1
+- label: MODE2
+  string: Mode 2
+- label: MODE3
+  string: Mode 3
+- label: MODE4
+  string: Mode 4
+- label: MODE5
+  string: Mode 5
+- label: MODE6
+  string: Mode 6
+- label: GSCONFIG
+  string: Configure GSM
+- label: ETH_OPMODE
+  string: Ethernet Link Mode
+- label: ETH_100MFDX
+  string: 100Mbit Full-duplex
+- label: ETH_100MHDX
+  string: 100Mbit Half-duplex
+- label: ETH_10MFDX
+  string: 10Mbit Full-duplex
+- label: ETH_10MHDX
+  string: 10Mbit Half-duplex
+- label: GSM_SETTINGS
+  string: GSM Settings
+- label: ENABLEGSM
+  string: GSM Selector
+- label: HINT_ENABLEGSM
+  string: Toggles GSM on/off.
+- label: HINT_GSMVMODE
+  string: Forced custom display mode.
+- label: XOFFSET
+  string: H-POS
+- label: HINT_XOFFSET
+  string: Horizontal adjustment.
+- label: YOFFSET
+  string: V-POS
+- label: HINT_YOFFSET
+  string: Vertical adjustment.
+- label: OVERSCAN
+  string: Overscan
+- label: HINT_OVERSCAN
+  string: Overscan adjustment.
+- label: GSMSKIPVIDEOS
+  string: FMV Skip
+- label: HINT_GSMSKIPVIDEOS
+  string: Skips full motion videos.
+- label: CHEAT_SETTINGS
+  string: Cheat Settings
+- label: ENABLECHEAT
+  string: PS2RD Cheat Engine
+- label: HINT_ENABLECHEAT
+  string: Lets PS2RD Cheat Engine patch your game.
+- label: CHEATMODE
+  string: PS2RD Cheat Engine Mode
+- label: HINT_CHEATMODE
+  string: Auto select or select game cheats.
+- label: CHEATMODEAUTO
+  string: Auto Select Cheats
+- label: CHEATMODESELECT
+  string: Select Game Cheats
+- label: ERR_CHEATS_LOAD_FAILED
+  string: 'Error: failed to load cheat file.'
+- label: NO_CHEATS_FOUND
+  string: No cheats found.
+- label: DL_DEFAULTS
+  string: Download Defaults
+- label: NET_UPDATE
+  string: Network Update
+- label: NET_UPDATE_ALL
+  string: Overwrite Existing Records
+- label: NET_UPDATE_FAILED
+  string: Update failed.
+- label: NET_UPDATE_CONN_FAILED
+  string: Failed to connect to update server.
+- label: NET_UPDATE_DONE
+  string: Update completed.
+- label: NET_UPDATE_CANCELLED
+  string: Update cancelled.
+- label: CONFIRMATION_SETTINGS_UPDATE
+  string: Download settings from the network?
+- label: CUSTOMIZED_SETTINGS
+  string: Customized Settings
+- label: DOWNLOADED_DEFAULTS
+  string: Downloaded Defaults
+- label: AUTO_START_IN_N_SECS
+  string: Auto start in %i s...
+- label: AUTOSTARTLAST
+  string: Auto Start
+- label: HINT_AUTOSTARTLAST
+  string: Value in second(s), 0 to disable auto start.
+- label: PS2LOGO
+  string: PS2 Logo
+- label: HINT_PS2LOGO
+  string: Displayed for a valid disc logo matching the console's region.
+- label: PADEMUCONFIG
+  string: Configure PADEMU
+- label: PADEMU_SETTINGS
+  string: Pad Emulator Settings
+- label: PADEMU_ENABLE
+  string: Pad Emulator
+- label: HINT_PADEMU_ENABLE
+  string: Turns on/off Pad Emulator for selected game.
+- label: PADEMU_MODE
+  string: Pad Emulator Mode
+- label: HINT_PADEMU_MODE
+  string: Select Pad Emulator mode.
+- label: DS34USB_MODE
+  string: DualShock3/4 USB
+- label: DS34BT_MODE
+  string: DualShock3/4 BT
+- label: PADPORT
+  string: 'Settings For Port:'
+- label: HINT_PAD_PORT
+  string: Select Pad Emulator port for settings.
+- label: PADEMU_PORT
+  string: Emulation
+- label: HINT_PADEMU_PORT
+  string: Turns on/off Pad Emulator for selected port.
+- label: PADEMU_VIB
+  string: Vibration
+- label: HINT_PADEMU_VIB
+  string: Turns on/off vibration for Pad Emulator selected port.
+- label: USBDG_MAC
+  string: 'USB Bluetooth Adapter MAC Address:'
+- label: PAD_MAC
+  string: 'DS Controller Paired To MAC Address:'
+- label: PAIR
+  string: Pair
+- label: PAIR_PAD
+  string: Pair DS Controller
+- label: HINT_PAIRPAD
+  string: Pair DS controller with Bluetooth adapter MAC address.
+- label: NOT_CONNECTED
+  string: Not Connected
+- label: BTINFO
+  string: Bluetooth Adapter Information
+- label: HINT_BTINFO
+  string: Shows more information and supported features.
+- label: HCIVER
+  string: 'HCI Version:'
+- label: LMPVER
+  string: 'LMP Version:'
+- label: MANUFACTURER
+  string: 'Manufacturer ID:'
+- label: SUPFEATURES
+  string: 'Supported Features:'
+- label: 'YES'
+  string: 'Yes'
+- label: 'NO'
+  string: 'No'
+- label: BT_SUPPORTED
+  string: Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+- label: BT_NOTSUPPORTED
+  string: Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+- label: MTAP_ENABLE
+  string: Multitap Emulation
+- label: HINT_MTAP_ENABLE
+  string: Turns on/off Multitap emulation for selected game.
+- label: MTAP_PORT
+  string: 'Multitap Emulator On Port:'
+- label: HINT_MTAP_PORT
+  string: Select port for Multitap emulation.
+- label: PADEMU_WORKAROUND
+  string: Fake DS3 Workaround
+- label: HINT_PADEMU_WORKAROUND
+  string: Some fake DS3s need a workaround, this option will enable it.
+- label: GSM_FIELD_FIX
+  string: Emulate FIELD Flipping
+- label: HINT_GSM_FIELD_FIX
+  string: Fix for games that glitch under progressive video modes.
+- label: PARENLOCKCONFIG
+  string: Parental Lock Settings
+- label: PARENLOCK_PASSWORD
+  string: Parental Lock Password
+- label: PARENLOCK_PASSWORD_HINT
+  string: Leave blank to disable the parental lock.
+- label: PARENLOCK_ENTER_PASSWORD_TITLE
+  string: Enter Parental Lock Password
+- label: PARENLOCK_PASSWORD_INCORRECT
+  string: Parental lock password incorrect.
+- label: PARENLOCK_DISABLE_WARNING
+  string: Parental lock disabled.
+- label: BUILD_DETAILS
+  string: 'Build Options:'
+- label: PARENLOCK_INVALID_PASSWORD
+  string: Error - this password cannot be used.
+- label: ERR_VMC_FRAGMENTED_CONTINUE
+  string: VMC %s file is fragmented. Continue with Memory Card in slot %d?
+- label: AUDIO_SETTINGS
+  string: Audio Settings
+- label: SFX
+  string: Sound Effects
+- label: BOOT_SND
+  string: Boot Sound
+- label: SFX_VOLUME
+  string: Sound Effects Volume
+- label: BOOT_SND_VOLUME
+  string: Boot Sound Volume
+- label: CFM_VMODE_CHG
+  string: Confirm video mode change?
+- label: CACHE_HDD_GAME_LIST
+  string: Cache Game List (HDD)
+- label: ENABLE_NOTIFICATIONS
+  string: Notifications
+- label: CFG_NOTIFICATION
+  string: Config loaded from %s
+- label: THM_NOTIFICATION
+  string: Theme loaded from %s
+- label: LNG_NOTIFICATION
+  string: Language loaded from %s
+- label: PARTITION_NOTIFICATION
+  string: '%s partition mounted.'
+- label: OPTIONS
+  string: Options
+- label: GAME_SETTINGS_SAVED
+  string: Game settings saved.
+- label: GAME_SETTINGS_REMOVED
+  string: '%s settings removed.'
+- label: NET_UPDATE_HINT
+  string: Overwrites existing game compatibility settings when enabled.
+- label: SETTINGS_SOURCE
+  string: Settings Mode
+- label: GLOBAL_SETTINGS
+  string: Global
+- label: PERGAME_SETTINGS
+  string: Per Game
+- label: ALL_SETTINGS
+  string: All
+- label: GAME_SETTINGS_PROMPT
+  string: Select settings to remove.
+- label: FORUM_DETAILS
+  string: 'Support Forums:'
+- label: INFO_TITLE
+  string: Title
+- label: INFO_GENRE
+  string: Genre
+- label: INFO_RELEASE
+  string: Release
+- label: INFO_DEVELOPER
+  string: Developer
+- label: INFO_DESCRIPTION
+  string: Description
+- label: BLOCKDEVICE_SETTINGS
+  string: Block Devices
+- label: CONTROLLER_SETTINGS
+  string: Controller Settings
+- label: HINT_BDM_START
+  string: Turn on/off Block Device Manager.
+- label: HINT_BLOCK_DEVICES
+  string: Turn on/off Block Devices (e.g. USB).
+- label: USB_GAMES
+  string: USB Games
+- label: ILINK_GAMES
+  string: iLink Games
+- label: MX4SIO_GAMES
+  string: MX4SIO Games

@@ -1,0 +1,306 @@
+comments: |-
+  Russian translation by druchapucha & frodosumkin
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Russian
+  SAVE_CHANGES: Сохранить настройки
+  BACK: Назад
+  NETCONFIG: Конфигурация сети
+  SHOW_ADVANCED_OPTS: Расширенные опции
+  NO_ITEMS: <не указано>
+  SETTINGS_SAVED: Сохранено на %s
+  ERROR_SAVING_SETTINGS: Ошибка сохранения настроек!
+  EXIT: Выход
+  SETTINGS: Настройки
+  MENU: Меню
+  BDM_GAMES: BDM-Игры
+  HDD_GAMES: HDD-Игры
+  NET_GAMES: Сетевые игры
+  APPS: Приложения
+  THEME: Тема
+  LANGUAGE: Язык
+  CONFIRMATION_POFF: Выключить консоль.
+  CONFIRMATION_EXIT: Выйти в браузер?
+  CONFIRMATION_CANCEL_UPDATE: Отменить обновление?
+  HDD_NOT_CONNECTED_ERROR: '%d: Жесткий диск не опознан'
+  HDD_NOT_FORMATTED_ERROR: '%d: Жесткий диск не отформатирован'
+  NETWORK_STARTUP_ERROR: '%d: Ошибка настройки сети'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Не удается найти сетевой адаптер'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Не удается найти сетевой ресурс или подключиться
+    к нему'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Не удается войти на сетевой ресурс с указанными
+    учетными данными'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Не удается открыть сетевой ресурс'
+  NETWORK_SHARE_LIST_ERROR: '%d: Не удается открыть список с сетевого ресурса'
+  NETWORK_GAMES_LIST_ERROR: '%d: Не удается открыть список'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCP сервер недоступен'
+  NETWORK_ERROR_LINK_FAIL: '%d: Отсутствует подключение к сети'
+  'ON': Вкл
+  'OFF': Выкл
+  OK: Ок
+  SELECT: Выбор
+  CANCEL: Отмена
+  CIRCLE: Круг
+  CROSS: Крест
+  GAMES_LIST: Список игр
+  COMPAT_SETTINGS: Конфиг. Игры
+  REMOVE_ALL_SETTINGS: Сбросить настройки
+  SCROLLING: Прокрутка
+  SLOW: Медленная
+  MEDIUM: Средняя
+  FAST: Быстрая
+  DEFDEVICE: Меню по умолчанию
+  LOAD_FROM_DISC: Загрузка с диска
+  PLEASE_WAIT: Пожалуйста, подождите
+  ERROR_LOADING_ID: Ошибка загрузки Game ID
+  AUTOSORT: Автоматическая прокрутка
+  ERR_LOADING_LANGFILE: Ошибка загрузки языкового файла
+  DEBUG: Отладочные цвета
+  NO_CONTROLLER: Контроллер не обнаружен, ожидание…
+  COVERART: Обложки
+  WIDE_SCREEN: Широкий экран
+  POWEROFF: Выключить консоль
+  LOADING_SETTINGS: Загрузка настроек
+  SAVING_SETTINGS: Сохранение настроек
+  START_DEVICE: Запуск устройства
+  REFRESH: Обновить
+  BDMMODE: Режим запуска игр с BDM
+  HDDMODE: Режим запуска игр с HDD
+  ETHMODE: Режим поиска Сетевого ресурса
+  APPMODE: Отобразить меню Приложений
+  AUTO: Авто
+  MANUAL: Вручную
+  STARTNBD: Запуск NBD сервера
+  STARTINGNBD: NBD сервер запускается…
+  RUNNINGNBD: NBD сервер запущен…
+  STARTFAILNBD: Нажмите кнопку [X], чтобы прервать работу NBD сервера
+  UNLOADNBD: Остановка NBD сервера…
+  EXITTO: ELF при вызове IGR
+  BGCOLOR: Цвет фона
+  TXTCOLOR: Цвет обычного текста
+  CAT_SMB_SERVER: '- Сервер SMB -'
+  IP_ADDRESS_TYPE: Тип IP-адреса
+  IP_ADDRESS_TYPE_STATIC: Статичный
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IP-адрес
+  ADDRESS: Адрес
+  MASK: Маска подсети
+  GATEWAY: Шлюз
+  DNS_SERVER: DNS сервер
+  PORT: Порт
+  SHARE: Сетевая папка
+  USER: Пользователь
+  PASSWORD: Пароль
+  NOT_SET: <не указано>
+  ADDRESS_TYPE: Тип адреса
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Принять
+  DELETE_WARNING: Объект будет безвозвратно удален. Продолжить?
+  RENAME: Переим.
+  DELETE: Удалить
+  RUN: Запустить
+  GFX_SETTINGS: Настройки экрана
+  ENABLE_WRITE: Операции записи
+  LASTPLAYED: Запоминать последнюю игру
+  SELECTBUTTON: Кнопка выбор
+  ERR_FRAGMENTED: Ошибка, игра фрагментирована
+  ERR_FILE_INVALID: Ошибка, невозможно запустить объект!
+  TEST: Проверка изменений
+  HINT_GUEST: Оставьте пустым для гостевого доступа
+  HINT_MODE1: Аккуратное чтение
+  HINT_MODE2: Режим синхронизации
+  HINT_MODE3: Разблокировать системные вызовы
+  HINT_MODE4: Пропуск видео
+  HINT_MODE5: Эмулировать DVD-DL
+  HINT_MODE6: Отключить использование IGR
+  HINT_VMC_SIZE: При изменении размера, VMC переформатируется
+  CREATE: Создать
+  START: Старт
+  MODIFY: Изменить
+  ABORT: Отменить
+  RESET: Сбросить
+  USE_GENERIC: Использовать обычную
+  VMC_SCREEN: Настройка VMC
+  VMC_NAME: Имя
+  SIZE: Размер
+  VMC_STATUS: Статус
+  VMC_PROGRESS: Прогресс
+  VMC_FILE_EXISTS: VMC файл существует
+  VMC_FILE_ERROR: Поврежденный VMC файл, неправильный размер
+  VMC_FILE_NEW: Необходимо создать VMC файл
+  ERR_VMC_CONTINUE: Ошибка с VMC %s, использовать физическую карту (слот %d)?
+  AUTOREFRESH: Автоматическое обновление
+  ABOUT: О программе
+  DEVS: Кодеры
+  QANDA: Гарантия качества
+  BDM_PREFIX: Префикс пути для BDM
+  HINT_EXITPATH: Загрузить другой ELF, после IGR
+  HINT_SPINDOWN: Значение в минутах, 0 для отключения функции
+  HDD_SPINDOWN: Автоматическое отключение HDD
+  VMODE: Видеорежим
+  UICOLOR: Цвет текста
+  SELCOLOR: Выбранный цвет
+  RESETCOLOR: Сбросить цвета
+  INFO: Инфо
+  ALTSTARTUP: Пользовательский ELF
+  COLOR_SELECTION: Выбор цвета
+  RECONNECT: Переподключиться
+  HINT_SHARENAME: Оставьте пустым для вывода списка
+  ETH_PREFIX: Префикс пути для сетевого ресурса
+  BACKSPACE: Удалить
+  SPACE: Пробел
+  ENTER: Ввод
+  MODE: Режим
+  VMC_SLOT1: VMC слот 1
+  VMC_SLOT2: VMC слот 2
+  GAME_ID: ID игры
+  DMA_MODE: Режим DMA
+  VSYNC: Вертикальная синхронизация
+  MODE1: Режим 1
+  MODE2: Режим 2
+  MODE3: Режим 3
+  MODE4: Режим 4
+  MODE5: Режим 5
+  MODE6: Режим 6
+  GSCONFIG: Конфигурация GSM
+  ETH_OPMODE: Скорость подключения и режим дуплекса
+  ETH_100MFDX: 100 Мбит и полный дуплекс
+  ETH_100MHDX: 100 Мбит и полудуплекс
+  ETH_10MFDX: 10 Мбит и полный дуплекс
+  ETH_10MHDX: 10 Мбит и полудуплекс
+  GSM_SETTINGS: Настройки GSM
+  ENABLEGSM: Переключатель GSM
+  HINT_ENABLEGSM: Принудительно задействует GSM с указанными ниже параметрами
+  HINT_GSMVMODE: Принудительно задействует пользовательский режим
+  XOFFSET: Отступить влево или вправо
+  HINT_XOFFSET: Горизонтальное положение
+  YOFFSET: Отступить вверх или вниз
+  HINT_YOFFSET: Вертикальное положение
+  OVERSCAN: Вылет развёртки
+  HINT_OVERSCAN: Регулировать вылет развёртки
+  GSMSKIPVIDEOS: Пропуск FMV
+  HINT_GSMSKIPVIDEOS: Пропускать Full Motion видео
+  CHEAT_SETTINGS: Настройка читов
+  ENABLECHEAT: Читы PS2RD
+  HINT_ENABLECHEAT: PS2RD пропатчит вашу игру
+  CHEATMODE: Режим читов PS2RD
+  HINT_CHEATMODE: Автоматический выбор или выберите чит для игры
+  CHEATMODEAUTO: Автоматический выбор читов
+  CHEATMODESELECT: Выбрать чит для игры
+  ERR_CHEATS_LOAD_FAILED: Ошибка, файл с читами не загружен
+  NO_CHEATS_FOUND: Не найдено ни читы
+  DL_DEFAULTS: Загрузка стандартных
+  NET_UPDATE: Обновление из Интернет
+  NET_UPDATE_ALL: Перезаписывать существующие настройки
+  NET_UPDATE_FAILED: Не удалось загрузить.
+  NET_UPDATE_CONN_FAILED: Не удалось соединится с сервером.
+  NET_UPDATE_DONE: Обновление завершено.
+  NET_UPDATE_CANCELLED: Обновление отменено.
+  CONFIRMATION_SETTINGS_UPDATE: Загрузить настройки из Интернет?
+  CUSTOMIZED_SETTINGS: Пользовательские настройки
+  DOWNLOADED_DEFAULTS: Загрузка Стандартных
+  AUTO_START_IN_N_SECS: Автозапуск через %i s…
+  AUTOSTARTLAST: Автозапуск
+  HINT_AUTOSTARTLAST: Значение в секундах(ы), 0 чтобы выключить автопуск…
+  PS2LOGO: Логотип PS2
+  HINT_PS2LOGO: Отображается при совпадении регионов диска и консоли.
+  PADEMUCONFIG: Настроить PADEMU
+  PADEMU_SETTINGS: Настройки Pad эмулятора
+  PADEMU_ENABLE: Эмуляция котнтроллеров
+  HINT_PADEMU_ENABLE: Вкл/вык эмуляцию контроллеров для выбранной игры.
+  PADEMU_MODE: Режим эмуляции контроллеров
+  HINT_PADEMU_MODE: Выбрать режим эмуляции контроллеров.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Настройки для порта:'
+  HINT_PAD_PORT: Выбрать настройки для порта Pad эмулятора.
+  PADEMU_PORT: Эмуляция
+  HINT_PADEMU_PORT: Вкл/вык эмуляцию контроллеров для выбранного порта.
+  PADEMU_VIB: Вибрация
+  HINT_PADEMU_VIB: Вкл/вык вибрацию в выбранном порте Pad эмулятора.
+  USBDG_MAC: 'MAC-адрес USB Bluetooth адаптера:'
+  PAD_MAC: 'DS контроллер подключился к MAC-адресу:'
+  PAIR: Синхронизация
+  PAIR_PAD: Синхронизировать DS контроллер
+  HINT_PAIRPAD: Синхронизировать DS контроллер с MAC-адресом Bluetooth адаптера.
+  NOT_CONNECTED: Не подключено
+  BTINFO: Информация о Bluetooth адаптер
+  HINT_BTINFO: Показать больше информации и поддерживаемые функции
+  HCIVER: 'HCI версия:'
+  LMPVER: 'LMP версия:'
+  MANUFACTURER: 'ID производителя:'
+  SUPFEATURES: 'Поддерживаемые функции:'
+  'YES': Да
+  'NO': Нет
+  BT_SUPPORTED: Bluetooth адаптер должен быть совместим с DS3/DS4 контроллерами.
+  BT_NOTSUPPORTED: Bluetooth адаптер может работать неправильно с DS3/DS4 контроллерами.
+  MTAP_ENABLE: Эмуляция Multitap
+  HINT_MTAP_ENABLE: Вкл/выкл эмуляцию Multitap для выбранной игры.
+  MTAP_PORT: 'Эмуляция Multitap на порте:'
+  HINT_MTAP_PORT: Выбрать порт для Multitap эмуляции.
+  PADEMU_WORKAROUND: Временное решение для неоригинальных DS3
+  HINT_PADEMU_WORKAROUND: Некоторые неоригинальные DS3 требуют особый режим, включаемый
+    этой опцией.
+  GSM_FIELD_FIX: Эмулировать ОБЛАСТЬ обзора
+  HINT_GSM_FIELD_FIX: Исправление для игр, где есть проблема с прогрессивным режимом.
+  PARENLOCKCONFIG: Настроить родительский контроль
+  PARENLOCK_PASSWORD: Пароль для родительского контроля
+  PARENLOCK_PASSWORD_HINT: Не заполняйте, чтобы выключить родительский контроль.
+  PARENLOCK_ENTER_PASSWORD_TITLE: Родительский контроль, введите пароль
+  PARENLOCK_PASSWORD_INCORRECT: Родительский контроль, неверный пароль.
+  PARENLOCK_DISABLE_WARNING: Родительский контроль выключен.
+  BUILD_DETAILS: 'Опции сборки:'
+  PARENLOCK_INVALID_PASSWORD: Ошибка - этот пароль не может быть использован.
+  ERR_VMC_FRAGMENTED_CONTINUE: VMC %s файл фрагментирован. Продолжить с картой памяти
+    в слоте %d?
+  AUDIO_SETTINGS: Настройки звука
+  SFX: Звуковый эффекты
+  BOOT_SND: Звук загрузки
+  SFX_VOLUME: Громкость звуковых эффектов
+  BOOT_SND_VOLUME: Громкость звука загрузки
+  CFM_VMODE_CHG: Изменить режим видео?
+  CACHE_HDD_GAME_LIST: Кэширование списка игр (HDD)
+  ENABLE_NOTIFICATIONS: Уведомления
+  CFG_NOTIFICATION: Настройки загружены из %s
+  THM_NOTIFICATION: Тема загружена из %s
+  LNG_NOTIFICATION: Перевод загружен из %s
+  PARTITION_NOTIFICATION: '%s раздел диска смонтирован.'
+  OPTIONS: Настройки
+  GAME_SETTINGS_SAVED: Настройки игры сохранены.
+  GAME_SETTINGS_REMOVED: '%s настройки удалены.'
+  NET_UPDATE_HINT: Перезапись существующих настроек совместимости игр, если вкл.
+  SETTINGS_SOURCE: Режим настроек
+  GLOBAL_SETTINGS: Глобальные
+  PERGAME_SETTINGS: Для игры
+  ALL_SETTINGS: Все
+  GAME_SETTINGS_PROMPT: Выберите настройки для удаления.
+  FORUM_DETAILS: 'Форумы поддержки:'
+  INFO_TITLE: Название
+  INFO_GENRE: Жанр
+  INFO_RELEASE: Выпуск
+  INFO_DEVELOPER: Разработчик
+  INFO_DESCRIPTION: Описание
+  BLOCKDEVICE_SETTINGS: Блочные устройства
+  CONTROLLER_SETTINGS: Настройки контроллеров
+  HINT_BDM_START: Вкл/выкл менеджер блочных устройств.
+  HINT_BLOCK_DEVICES: Вкл/выкл блочные устройства (например USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

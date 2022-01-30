@@ -1,0 +1,364 @@
+comments: |-
+  Simplified Chinese translation by eyu2007
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Simplified Chinese
+  SAVE_CHANGES: 保存设置
+  BACK: 返回
+  NETCONFIG: 网络设置
+  SHOW_ADVANCED_OPTS: 进阶设置
+  NO_ITEMS: <无数值>
+  SETTINGS_SAVED: 设置保存到 %s
+  ERROR_SAVING_SETTINGS: 写入设置错误!
+  EXIT: 离开
+  SETTINGS: 设置
+  MENU: 选单
+  BDM_GAMES: BDM 游戏
+  HDD_GAMES: HDD 游戏
+  NET_GAMES: ETH 游戏
+  APPS: 应用程序
+  THEME: 主题
+  LANGUAGE: 语言
+  CONFIRMATION_POFF: 系统电源将会关闭.
+  CONFIRMATION_EXIT: 退出到浏览界面?
+  CONFIRMATION_CANCEL_UPDATE: 取消更新?
+  HDD_NOT_CONNECTED_ERROR: '%d: 检测不到硬盘'
+  HDD_NOT_FORMATTED_ERROR: '%d: 硬盘没有格式化'
+  NETWORK_STARTUP_ERROR: '%d: 启动网络错误'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: 检测不到网卡'
+  NETWORK_STARTUP_ERROR_CONN: '%d: 无法连接 SMB 服务器'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: 无法登入 SMB 服务器'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: 无法开启 SMB 共享'
+  NETWORK_SHARE_LIST_ERROR: '%d: 无法罗列 SMB 共享清单'
+  NETWORK_GAMES_LIST_ERROR: '%d: 无法列出游戏清单'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCP 服务器不存在'
+  NETWORK_ERROR_LINK_FAIL: '%d: 无网络连接'
+  'ON': 开启
+  'OFF': 关闭
+  OK: 确定
+  SELECT: 选择
+  CANCEL: 取消
+  CIRCLE: O
+  CROSS: X
+  GAMES_LIST: 游戏列表
+  COMPAT_SETTINGS: 游戏设置
+  REMOVE_ALL_SETTINGS: 删除设置
+  SCROLLING: 滚动
+  SLOW: 较慢
+  MEDIUM: 中等
+  FAST: 较快
+  DEFDEVICE: 默认选单
+  LOAD_FROM_DISC: 从光盘中读取
+  PLEASE_WAIT: 请稍后
+  ERROR_LOADING_ID: 读取 游戏 ID 时出错
+  AUTOSORT: 自动滚动
+  ERR_LOADING_LANGFILE: 读取语言文件时出错
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: 未检测到摇杆, 等待中…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: 宽屏幕
+  POWEROFF: 关机
+  LOADING_SETTINGS: 设置读取中
+  SAVING_SETTINGS: 设置储存中
+  START_DEVICE: 启动设备
+  REFRESH: 重新整理
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: HDD 设备启动模式
+  ETHMODE: ETH 设备启动模式
+  APPMODE: 应用程序启动模式
+  AUTO: 自动
+  MANUAL: 手动
+  STARTNBD: 启动 NBD 服务
+  STARTINGNBD: NBD 服务启动中…
+  RUNNINGNBD: NBD 服务正在运行…
+  STARTFAILNBD: 启动 NBD 服务时出错.
+  UNLOADNBD: NBD 服务未能读取…
+  EXITTO: IGR 位置
+  BGCOLOR: 背景颜色
+  TXTCOLOR: 文字颜色
+  CAT_SMB_SERVER: '- SMB 服务器 -'
+  IP_ADDRESS_TYPE: IP 地址模式
+  IP_ADDRESS_TYPE_STATIC: 静态
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IP 地址
+  ADDRESS: 地址
+  MASK: 子网掩码
+  GATEWAY: 网关
+  DNS_SERVER: DNS 服务器
+  PORT: 端口
+  SHARE: 共享
+  USER: 使用者
+  PASSWORD: 密码
+  NOT_SET: <无设置>
+  ADDRESS_TYPE: 地址格式
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: 允许
+  DELETE_WARNING: 项目将被永久删除, 继续吗?
+  RENAME: 重新命名
+  DELETE: 删除
+  RUN: 运行
+  GFX_SETTINGS: 显示设置
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: 记住最后一个玩的游戏
+  SELECTBUTTON: 选定键
+  ERR_FRAGMENTED: 错误, 游戏有碎片
+  ERR_FILE_INVALID: 错误, 无法运行该项目
+  TEST: 测试修改
+  HINT_GUEST: GUEST验证留空.
+  HINT_MODE1: 精确读取
+  HINT_MODE2: 同步模式
+  HINT_MODE3: 脱开系统调用
+  HINT_MODE4: 跳过 videos
+  HINT_MODE5: 模拟 DVD-DL
+  HINT_MODE6: 禁用 IGR
+  HINT_VMC_SIZE: 改变大小将会重新格式化 VMC
+  CREATE: 生成
+  START: 开始
+  MODIFY: 变更
+  ABORT: 放弃
+  RESET: 重置
+  USE_GENERIC: 使用通用
+  VMC_SCREEN: 设置 VMC
+  VMC_NAME: 名称
+  SIZE: 大小
+  VMC_STATUS: 状态
+  VMC_PROGRESS: 进度
+  VMC_FILE_EXISTS: VMC 档案已存在
+  VMC_FILE_ERROR: 无效的 VMC 档案, 大小有误
+  VMC_FILE_NEW: 需要建立VMC 档案
+  ERR_VMC_CONTINUE: VMC %s 出错, 继续使用物理记忆卡吗 (slot %d)?
+  AUTOREFRESH: 自动重新整理
+  ABOUT: 关于
+  DEVS: 程序
+  QANDA: 测试
+  BDM_PREFIX: BDM 前缀路径
+  HINT_EXITPATH: 自定义IGR启动文件
+  HINT_SPINDOWN: 数值以分钟计,设为 0 禁用降速
+  HDD_SPINDOWN: 自动 HDD 降速
+  VMODE: 影片模式
+  UICOLOR: 对话框颜色
+  SELCOLOR: 被选定颜色
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO: 讯息
+  ALTSTARTUP: 自定义 ELF
+  COLOR_SELECTION: 颜色选项
+  RECONNECT: 重新连接
+  HINT_SHARENAME: 留空列出共享清单
+  ETH_PREFIX: ETH 前缀路径
+  BACKSPACE: 退格
+  SPACE: 空格
+  ENTER: 回车
+  MODE: 模式
+  VMC_SLOT1: VMC 插槽 1
+  VMC_SLOT2: VMC 插槽 2
+  GAME_ID: 游戏 ID
+  DMA_MODE: DMA 模式
+  VSYNC: 垂直同步
+  MODE1: 模式 1
+  MODE2: 模式 2
+  MODE3: 模式 3
+  MODE4: 模式 4
+  MODE5: 模式 5
+  MODE6: 模式 6
+  GSCONFIG: 配置 GSM
+  ETH_OPMODE: 以太网链接模式
+  ETH_100MFDX: 100Mbit 全双工
+  ETH_100MHDX: 100Mbit 半双工
+  ETH_10MFDX: 10Mbit 全双工
+  ETH_10MHDX: 10Mbit 半双工
+  GSM_SETTINGS: GSM 设置
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: 切换 GSM 开或关
+  HINT_GSMVMODE: 强制自定义显示模式
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: 水平调整
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: 垂直调整
+  OVERSCAN: 过扫
+  HINT_OVERSCAN: 过扫调节
+  GSMSKIPVIDEOS: 跳过 FMV
+  HINT_GSMSKIPVIDEOS: 跳过全动态视频
+  CHEAT_SETTINGS: 金手指设置
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: 允许 PS2RD 金手指引擎对你的游戏进行补丁
+  CHEATMODE: PS2RD 金手指引擎模式
+  HINT_CHEATMODE: 自动或手动选择游戏金手指
+  CHEATMODEAUTO: 自动选择金手指
+  CHEATMODESELECT: 手动选择金手指
+  ERR_CHEATS_LOAD_FAILED: '错误: 读取金手指文件出错'
+  NO_CHEATS_FOUND: 未发现金手指文件
+  DL_DEFAULTS: 下载默认值
+  NET_UPDATE: 网络更新
+  NET_UPDATE_ALL: 覆盖现有记录
+  NET_UPDATE_FAILED: 更新失败.
+  NET_UPDATE_CONN_FAILED: 连结更新服务器失败.
+  NET_UPDATE_DONE: 更新已完成.
+  NET_UPDATE_CANCELLED: 更新已取消.
+  CONFIRMATION_SETTINGS_UPDATE: 从网络上下载设置?
+  CUSTOMIZED_SETTINGS: 自定义设置
+  DOWNLOADED_DEFAULTS: 已下载默认值
+  AUTO_START_IN_N_SECS: 将自动于 %i 秒后启动…
+  AUTOSTARTLAST: 自动启动
+  HINT_AUTOSTARTLAST: 以秒为单位,设为 0 来禁用自动启动
+  PS2LOGO: PS2 标志
+  HINT_PS2LOGO: 只显示与控制台区域匹配的有效磁盘标识
+  PADEMUCONFIG: 配置PADEMU
+  PADEMU_SETTINGS: Pad模拟器设置
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: 为选定的游戏开启/关闭pad模拟调节。
+  PADEMU_MODE: Pad模拟器模式
+  HINT_PADEMU_MODE: 选择Pad模拟器模式。
+  DS34USB_MODE: 有线连接
+  DS34BT_MODE: 蓝牙连接
+  PADPORT: '设置端口:'
+  HINT_PAD_PORT: 选择Pad模拟器端口
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: 打开/关闭选定端口的模拟器
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: 打开/关闭选定端口的振动。
+  USBDG_MAC: 'USB蓝牙适配器MAC地址:'
+  PAD_MAC: 'D  S 手 柄   MAC地址:'
+  PAIR: 配对
+  PAIR_PAD: 配对DS手柄
+  HINT_PAIRPAD: 蓝牙适配器和DS手柄进行MAC地址配对。
+  NOT_CONNECTED: 没有连接
+  BTINFO: 蓝牙适配器信息
+  HINT_BTINFO: 显示更多的信息和支持的特性
+  HCIVER: 'HCI版本:'
+  LMPVER: 'LMP版本:'
+  MANUFACTURER: '制造商ID:'
+  SUPFEATURES: '支持的功能:'
+  'YES': 是
+  'NO': 否
+  BT_SUPPORTED: 蓝牙适配器应该完全兼容DS3/DS4手柄
+  BT_NOTSUPPORTED: 蓝牙适配器可能无法与DS3/DS4手柄匹配
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: 打开/关闭这个游戏的多重模拟.
+  MTAP_PORT: 多重模拟端口
+  HINT_MTAP_PORT: 选择进行多重模拟的端口
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: 模拟播片扫描方式切换
+  HINT_GSM_FIELD_FIX: 修正逐行模式下视频播放有问题的游戏.
+  PARENLOCKCONFIG: 家长锁设置
+  PARENLOCK_PASSWORD: 家长锁密码
+  PARENLOCK_PASSWORD_HINT: 留空将不启用家长锁.
+  PARENLOCK_ENTER_PASSWORD_TITLE: 输入家长锁密码
+  PARENLOCK_PASSWORD_INCORRECT: 家长锁密码不正确.
+  PARENLOCK_DISABLE_WARNING: 已禁用家长锁.
+  BUILD_DETAILS: '创建选项:'
+  PARENLOCK_INVALID_PASSWORD: 错误-无法使用此密码.
+  ERR_VMC_FRAGMENTED_CONTINUE: vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
+  AUDIO_SETTINGS: 音频设置
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: 音效音量
+  BOOT_SND_VOLUME: 启动音量
+  CFM_VMODE_CHG: 确认视频模式更改？
+  CACHE_HDD_GAME_LIST: 缓存游戏列表 (硬盘)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED: 游戏设置已保存。
+  GAME_SETTINGS_REMOVED: '%s设置已删除。'
+  NET_UPDATE_HINT: 启用时覆盖现有的游戏兼容性设置。
+  SETTINGS_SOURCE: 设置模式
+  GLOBAL_SETTINGS: 全局
+  PERGAME_SETTINGS: 当前游戏
+  ALL_SETTINGS: 全部
+  GAME_SETTINGS_PROMPT: 选择要删除的设置。
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

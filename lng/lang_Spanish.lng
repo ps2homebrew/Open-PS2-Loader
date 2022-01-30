@@ -69,7 +69,7 @@ Manual
 Iniciar servidor NBD
 Iniciando servidor NBD...
 Servidor NBD conectado...
-Error al iniciar el servidor NBD. 
+Error al iniciar el servidor NBD.
 Cerrando servidor NBD...
 Ruta del IGR
 Color de fondo
@@ -235,7 +235,7 @@ Emulación Multitap
 Activa/Desactiva la emulación Multitap para el juego seleccionado
 Emulación Multitap en el puerto:
 Selecciona puerto para la emulación Multitap
-Solución alternativa para los DS3 falsos 
+Solución alternativa para los DS3 falsos
 Algunos DS3 falsos necesitan una solución alternativa, esta opción la activa
 Emular alternancia de valores de CAMPO
 Solución para juegos que fallan bajo modos de vídeo progresivos.

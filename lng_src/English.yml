@@ -1,0 +1,882 @@
+comments: |-
+  This file is a template for translators. This file's encoding must be UTF8.
+
+  Entry that has been translated looks like this:
+    LABEL: Some string goes here
+
+  Entry that is intentionally left untranslated looks like this:
+    LABEL:
+    - same
+    - original: Version of this string in English
+
+  Entry that is not yet translated looks like this:
+    LABEL:
+    - untranslated
+    - original: Version of this string in English
+
+  To translate an untranslated entry, simply delete the two lines below the label
+  and replace them with text in target language. To mark the entry as intentionally
+  untranslated, replace "untranslated" with "same".
+  It might be necessary to put your text in quotes if it contains a colon (`:`) or it's a text
+  like "Yes" or "No". See YAML documentation for details. If in doubt, just quote the text.
+
+  Important: if your language require some custom glyphs, you should provide a corresponding
+  TTF/OTF font file too. By default, OPL only comes with the "basic Latin" font built-in.
+
+  Once the translation is complete, you can submit it to the development team.
+
+  To use your custom language with OPL, simply copy the .lng file into your mc?:/OPL or LNG folder
+  (File must start with the "lang_" prefix and have the ".lng" extension)
+
+  Finally, don't put too many comments in your file, it will waste space and increases loading
+  time. One single comment line on top (e.g. "name <yourmail@address.com>") should be enough.
+
+  Thanks for your work.
+translations:
+  LOCALE:
+  - untranslated
+  - original: English template
+  - comment: Put here the English name of your language (will be displayed in the OPL Settings menu), in standard latin characters.
+  SAVE_CHANGES:
+  - untranslated
+  - original: Save Changes
+  BACK:
+  - untranslated
+  - original: Back
+  NETCONFIG:
+  - untranslated
+  - original: Network Settings
+  SHOW_ADVANCED_OPTS:
+  - untranslated
+  - original: Advanced Options
+  NO_ITEMS:
+  - untranslated
+  - original: <no values>
+  SETTINGS_SAVED:
+  - untranslated
+  - original: Settings saved to %s
+  ERROR_SAVING_SETTINGS:
+  - untranslated
+  - original: Error writing settings!
+  EXIT:
+  - untranslated
+  - original: Exit
+  SETTINGS:
+  - untranslated
+  - original: Settings
+  MENU:
+  - untranslated
+  - original: Menu
+  BDM_GAMES:
+  - untranslated
+  - original: BDM Games
+  HDD_GAMES:
+  - untranslated
+  - original: HDD Games
+  NET_GAMES:
+  - untranslated
+  - original: ETH Games
+  APPS:
+  - untranslated
+  - original: Apps
+  THEME:
+  - untranslated
+  - original: Theme
+  LANGUAGE:
+  - untranslated
+  - original: Language
+  CONFIRMATION_POFF:
+  - untranslated
+  - original: The system will be powered off.
+  CONFIRMATION_EXIT:
+  - untranslated
+  - original: Exit to Browser?
+  CONFIRMATION_CANCEL_UPDATE:
+  - untranslated
+  - original: Cancel updating?
+  HDD_NOT_CONNECTED_ERROR:
+  - untranslated
+  - original: '%d: HardDisk Drive not detected.'
+  HDD_NOT_FORMATTED_ERROR:
+  - untranslated
+  - original: '%d: HardDisk Drive not formatted.'
+  NETWORK_STARTUP_ERROR:
+  - untranslated
+  - original: '%d: Network startup error.'
+  NETWORK_STARTUP_ERROR_NETIF:
+  - untranslated
+  - original: '%d: No network adaptor detected.'
+  NETWORK_STARTUP_ERROR_CONN:
+  - untranslated
+  - original: '%d: Cannot connect to SMB server.'
+  NETWORK_STARTUP_ERROR_LOGON:
+  - untranslated
+  - original: '%d: Cannot log into SMB server.'
+  NETWORK_STARTUP_ERROR_SHARE:
+  - untranslated
+  - original: '%d: Cannot open SMB share.'
+  NETWORK_SHARE_LIST_ERROR:
+  - untranslated
+  - original: '%d: Cannot list SMB shares.'
+  NETWORK_GAMES_LIST_ERROR:
+  - untranslated
+  - original: '%d: Cannot list games.'
+  NETWORK_ERROR_DHCP_FAIL:
+  - untranslated
+  - original: '%d: DHCP server unavailable.'
+  NETWORK_ERROR_LINK_FAIL:
+  - untranslated
+  - original: '%d: No network connection.'
+  'ON':
+  - untranslated
+  - original: 'On'
+  'OFF':
+  - untranslated
+  - original: 'Off'
+  OK:
+  - untranslated
+  - original: OK
+  SELECT:
+  - untranslated
+  - original: Select
+  CANCEL:
+  - untranslated
+  - original: Cancel
+  CIRCLE:
+  - untranslated
+  - original: Circle
+  CROSS:
+  - untranslated
+  - original: Cross
+  GAMES_LIST:
+  - untranslated
+  - original: Games List
+  COMPAT_SETTINGS:
+  - untranslated
+  - original: Game Settings
+  REMOVE_ALL_SETTINGS:
+  - untranslated
+  - original: Remove Settings
+  SCROLLING:
+  - untranslated
+  - original: Scrolling Speed
+  SLOW:
+  - untranslated
+  - original: Slow
+  MEDIUM:
+  - untranslated
+  - original: Medium
+  FAST:
+  - untranslated
+  - original: Fast
+  DEFDEVICE:
+  - untranslated
+  - original: Default Menu
+  LOAD_FROM_DISC:
+  - untranslated
+  - original: Load From Disc
+  PLEASE_WAIT:
+  - untranslated
+  - original: Please wait.
+  ERROR_LOADING_ID:
+  - untranslated
+  - original: Error while loading the Game ID.
+  AUTOSORT:
+  - untranslated
+  - original: Automatic Sorting
+  ERR_LOADING_LANGFILE:
+  - untranslated
+  - original: Error loading the language file.
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER:
+  - untranslated
+  - original: No controller detected, waiting...
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN:
+  - untranslated
+  - original: Widescreen
+  POWEROFF:
+  - untranslated
+  - original: Power Off
+  LOADING_SETTINGS:
+  - untranslated
+  - original: Loading config...
+  SAVING_SETTINGS:
+  - untranslated
+  - original: Saving config...
+  START_DEVICE:
+  - untranslated
+  - original: Start Device
+  REFRESH:
+  - untranslated
+  - original: Refresh
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE:
+  - untranslated
+  - original: HDD Device Start Mode
+  ETHMODE:
+  - untranslated
+  - original: ETH Device Start Mode
+  APPMODE:
+  - untranslated
+  - original: Applications Start Mode
+  AUTO:
+  - untranslated
+  - original: Auto
+  MANUAL:
+  - untranslated
+  - original: Manual
+  STARTNBD:
+  - untranslated
+  - original: Start NBD Server
+  STARTINGNBD:
+  - untranslated
+  - original: NBD Server starting...
+  RUNNINGNBD:
+  - untranslated
+  - original: NBD Server running...
+  STARTFAILNBD:
+  - untranslated
+  - original: Failed to start NBD Server.
+  UNLOADNBD:
+  - untranslated
+  - original: NBD Server unloading...
+  EXITTO:
+  - untranslated
+  - original: IGR Path
+  BGCOLOR:
+  - untranslated
+  - original: Background Color
+  TXTCOLOR:
+  - untranslated
+  - original: Text Color
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE:
+  - untranslated
+  - original: IP Address Type
+  IP_ADDRESS_TYPE_STATIC:
+  - untranslated
+  - original: Static
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS:
+  - untranslated
+  - original: IP Address
+  ADDRESS:
+  - untranslated
+  - original: Address
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER:
+  - untranslated
+  - original: DNS Server
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE:
+  - untranslated
+  - original: Share
+  USER:
+  - untranslated
+  - original: User
+  PASSWORD:
+  - untranslated
+  - original: Password
+  NOT_SET:
+  - untranslated
+  - original: <not set>
+  ADDRESS_TYPE:
+  - untranslated
+  - original: Address Type
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT:
+  - untranslated
+  - original: Accept
+  DELETE_WARNING:
+  - untranslated
+  - original: Item will be permanently deleted, continue?
+  RENAME:
+  - untranslated
+  - original: Rename
+  DELETE:
+  - untranslated
+  - original: Delete
+  RUN:
+  - untranslated
+  - original: Run
+  GFX_SETTINGS:
+  - untranslated
+  - original: Display Settings
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED:
+  - untranslated
+  - original: Remember Last Played Game
+  SELECTBUTTON:
+  - untranslated
+  - original: Select Button
+  ERR_FRAGMENTED:
+  - untranslated
+  - original: Error, the game is fragmented.
+  ERR_FILE_INVALID:
+  - untranslated
+  - original: Error, could not run the item.
+  TEST:
+  - untranslated
+  - original: Test Changes
+  HINT_GUEST:
+  - untranslated
+  - original: Leave empty for GUEST auth.
+  HINT_MODE1:
+  - untranslated
+  - original: Accurate Reads
+  HINT_MODE2:
+  - untranslated
+  - original: Synchronous Mode
+  HINT_MODE3:
+  - untranslated
+  - original: Unhook Syscalls
+  HINT_MODE4:
+  - untranslated
+  - original: Skip Videos
+  HINT_MODE5:
+  - untranslated
+  - original: Emulate DVD-DL
+  HINT_MODE6:
+  - untranslated
+  - original: Disable IGR
+  HINT_VMC_SIZE:
+  - untranslated
+  - original: Changing the size will reformat the VMC.
+  CREATE:
+  - untranslated
+  - original: Create
+  START:
+  - untranslated
+  - original: Start
+  MODIFY:
+  - untranslated
+  - original: Modify
+  ABORT:
+  - untranslated
+  - original: Abort
+  RESET:
+  - untranslated
+  - original: Reset
+  USE_GENERIC:
+  - untranslated
+  - original: Use Generic
+  VMC_SCREEN:
+  - untranslated
+  - original: Configure VMC
+  VMC_NAME:
+  - untranslated
+  - original: Name
+  SIZE:
+  - untranslated
+  - original: Size
+  VMC_STATUS:
+  - untranslated
+  - original: Status
+  VMC_PROGRESS:
+  - untranslated
+  - original: Progress
+  VMC_FILE_EXISTS:
+  - untranslated
+  - original: VMC file exists.
+  VMC_FILE_ERROR:
+  - untranslated
+  - original: Invalid VMC file, size is incorrect.
+  VMC_FILE_NEW:
+  - untranslated
+  - original: VMC file needs to be created.
+  ERR_VMC_CONTINUE:
+  - untranslated
+  - original: Error accessing VMC %s. Continue with the Memory Card in slot %d?
+  AUTOREFRESH:
+  - untranslated
+  - original: Automatic Refresh
+  ABOUT:
+  - untranslated
+  - original: About
+  DEVS:
+  - untranslated
+  - original: Coders
+  QANDA:
+  - untranslated
+  - original: Quality Assurance
+  BDM_PREFIX:
+  - untranslated
+  - original: BDM Prefix Path
+  HINT_EXITPATH:
+  - untranslated
+  - original: Boots custom ELF after an IGR.
+  HINT_SPINDOWN:
+  - untranslated
+  - original: Value in minute(s), 0 to disable spin down.
+  HDD_SPINDOWN:
+  - untranslated
+  - original: Automatic HDD Spin Down
+  VMODE:
+  - untranslated
+  - original: Video Mode
+  UICOLOR:
+  - untranslated
+  - original: Dialog Color
+  SELCOLOR:
+  - untranslated
+  - original: Selected Color
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO:
+  - untranslated
+  - original: Info
+  ALTSTARTUP:
+  - untranslated
+  - original: Custom ELF
+  COLOR_SELECTION:
+  - untranslated
+  - original: Color Selection
+  RECONNECT:
+  - untranslated
+  - original: Reconnect
+  HINT_SHARENAME:
+  - untranslated
+  - original: Leave empty to list shares.
+  ETH_PREFIX:
+  - untranslated
+  - original: ETH Prefix Path
+  BACKSPACE:
+  - untranslated
+  - original: Backspace
+  SPACE:
+  - untranslated
+  - original: Space
+  ENTER:
+  - untranslated
+  - original: Enter
+  MODE:
+  - untranslated
+  - original: Mode
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID:
+  - untranslated
+  - original: Game ID
+  DMA_MODE:
+  - untranslated
+  - original: DMA Mode
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1:
+  - untranslated
+  - original: Mode 1
+  MODE2:
+  - untranslated
+  - original: Mode 2
+  MODE3:
+  - untranslated
+  - original: Mode 3
+  MODE4:
+  - untranslated
+  - original: Mode 4
+  MODE5:
+  - untranslated
+  - original: Mode 5
+  MODE6:
+  - untranslated
+  - original: Mode 6
+  GSCONFIG:
+  - untranslated
+  - original: Configure GSM
+  ETH_OPMODE:
+  - untranslated
+  - original: Ethernet Link Mode
+  ETH_100MFDX:
+  - untranslated
+  - original: 100Mbit Full-duplex
+  ETH_100MHDX:
+  - untranslated
+  - original: 100Mbit Half-duplex
+  ETH_10MFDX:
+  - untranslated
+  - original: 10Mbit Full-duplex
+  ETH_10MHDX:
+  - untranslated
+  - original: 10Mbit Half-duplex
+  GSM_SETTINGS:
+  - untranslated
+  - original: GSM Settings
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM:
+  - untranslated
+  - original: Toggles GSM on/off.
+  HINT_GSMVMODE:
+  - untranslated
+  - original: Forced custom display mode.
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET:
+  - untranslated
+  - original: Horizontal adjustment.
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET:
+  - untranslated
+  - original: Vertical adjustment.
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN:
+  - untranslated
+  - original: Overscan adjustment.
+  GSMSKIPVIDEOS:
+  - untranslated
+  - original: FMV Skip
+  HINT_GSMSKIPVIDEOS:
+  - untranslated
+  - original: Skips full motion videos.
+  CHEAT_SETTINGS:
+  - untranslated
+  - original: Cheat Settings
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT:
+  - untranslated
+  - original: Lets PS2RD Cheat Engine patch your game.
+  CHEATMODE:
+  - untranslated
+  - original: PS2RD Cheat Engine Mode
+  HINT_CHEATMODE:
+  - untranslated
+  - original: Auto select or select game cheats.
+  CHEATMODEAUTO:
+  - untranslated
+  - original: Auto Select Cheats
+  CHEATMODESELECT:
+  - untranslated
+  - original: Select Game Cheats
+  ERR_CHEATS_LOAD_FAILED:
+  - untranslated
+  - original: 'Error: failed to load cheat file.'
+  NO_CHEATS_FOUND:
+  - untranslated
+  - original: No cheats found.
+  DL_DEFAULTS:
+  - untranslated
+  - original: Download Defaults
+  NET_UPDATE:
+  - untranslated
+  - original: Network Update
+  NET_UPDATE_ALL:
+  - untranslated
+  - original: Overwrite Existing Records
+  NET_UPDATE_FAILED:
+  - untranslated
+  - original: Update failed.
+  NET_UPDATE_CONN_FAILED:
+  - untranslated
+  - original: Failed to connect to update server.
+  NET_UPDATE_DONE:
+  - untranslated
+  - original: Update completed.
+  NET_UPDATE_CANCELLED:
+  - untranslated
+  - original: Update cancelled.
+  CONFIRMATION_SETTINGS_UPDATE:
+  - untranslated
+  - original: Download settings from the network?
+  CUSTOMIZED_SETTINGS:
+  - untranslated
+  - original: Customized Settings
+  DOWNLOADED_DEFAULTS:
+  - untranslated
+  - original: Downloaded Defaults
+  AUTO_START_IN_N_SECS:
+  - untranslated
+  - original: Auto start in %i s...
+  AUTOSTARTLAST:
+  - untranslated
+  - original: Auto Start
+  HINT_AUTOSTARTLAST:
+  - untranslated
+  - original: Value in second(s), 0 to disable auto start.
+  PS2LOGO:
+  - untranslated
+  - original: PS2 Logo
+  HINT_PS2LOGO:
+  - untranslated
+  - original: Displayed for a valid disc logo matching the console's region.
+  PADEMUCONFIG:
+  - untranslated
+  - original: Configure PADEMU
+  PADEMU_SETTINGS:
+  - untranslated
+  - original: Pad Emulator Settings
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE:
+  - untranslated
+  - original: Turns on/off Pad Emulator for selected game.
+  PADEMU_MODE:
+  - untranslated
+  - original: Pad Emulator Mode
+  HINT_PADEMU_MODE:
+  - untranslated
+  - original: Select Pad Emulator mode.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT:
+  - untranslated
+  - original: 'Settings For Port:'
+  HINT_PAD_PORT:
+  - untranslated
+  - original: Select Pad Emulator port for settings.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT:
+  - untranslated
+  - original: Turns on/off Pad Emulator for selected port.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB:
+  - untranslated
+  - original: Turns on/off vibration for Pad Emulator selected port.
+  USBDG_MAC:
+  - untranslated
+  - original: 'USB Bluetooth Adapter MAC Address:'
+  PAD_MAC:
+  - untranslated
+  - original: 'DS Controller Paired To MAC Address:'
+  PAIR:
+  - untranslated
+  - original: Pair
+  PAIR_PAD:
+  - untranslated
+  - original: Pair DS Controller
+  HINT_PAIRPAD:
+  - untranslated
+  - original: Pair DS controller with Bluetooth adapter MAC address.
+  NOT_CONNECTED:
+  - untranslated
+  - original: Not Connected
+  BTINFO:
+  - untranslated
+  - original: Bluetooth Adapter Information
+  HINT_BTINFO:
+  - untranslated
+  - original: Shows more information and supported features.
+  HCIVER:
+  - untranslated
+  - original: 'HCI Version:'
+  LMPVER:
+  - untranslated
+  - original: 'LMP Version:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES:
+  - untranslated
+  - original: 'Supported Features:'
+  'YES':
+  - untranslated
+  - original: 'Yes'
+  'NO':
+  - untranslated
+  - original: 'No'
+  BT_SUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+  BT_NOTSUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE:
+  - untranslated
+  - original: Turns on/off Multitap emulation for selected game.
+  MTAP_PORT:
+  - untranslated
+  - original: 'Multitap Emulator On Port:'
+  HINT_MTAP_PORT:
+  - untranslated
+  - original: Select port for Multitap emulation.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX:
+  - untranslated
+  - original: Emulate FIELD Flipping
+  HINT_GSM_FIELD_FIX:
+  - untranslated
+  - original: Fix for games that glitch under progressive video modes.
+  PARENLOCKCONFIG:
+  - untranslated
+  - original: Parental Lock Settings
+  PARENLOCK_PASSWORD:
+  - untranslated
+  - original: Parental Lock Password
+  PARENLOCK_PASSWORD_HINT:
+  - untranslated
+  - original: Leave blank to disable the parental lock.
+  PARENLOCK_ENTER_PASSWORD_TITLE:
+  - untranslated
+  - original: Enter Parental Lock Password
+  PARENLOCK_PASSWORD_INCORRECT:
+  - untranslated
+  - original: Parental lock password incorrect.
+  PARENLOCK_DISABLE_WARNING:
+  - untranslated
+  - original: Parental lock disabled.
+  BUILD_DETAILS:
+  - untranslated
+  - original: 'Build Options:'
+  PARENLOCK_INVALID_PASSWORD:
+  - untranslated
+  - original: Error - this password cannot be used.
+  ERR_VMC_FRAGMENTED_CONTINUE:
+  - untranslated
+  - original: VMC %s file is fragmented. Continue with Memory Card in slot %d?
+  AUDIO_SETTINGS:
+  - untranslated
+  - original: Audio Settings
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME:
+  - untranslated
+  - original: Sound Effects Volume
+  BOOT_SND_VOLUME:
+  - untranslated
+  - original: Boot Sound Volume
+  CFM_VMODE_CHG:
+  - untranslated
+  - original: Confirm video mode change?
+  CACHE_HDD_GAME_LIST:
+  - untranslated
+  - original: Cache Game List (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED:
+  - untranslated
+  - original: Game settings saved.
+  GAME_SETTINGS_REMOVED:
+  - untranslated
+  - original: '%s settings removed.'
+  NET_UPDATE_HINT:
+  - untranslated
+  - original: Overwrites existing game compatibility settings when enabled.
+  SETTINGS_SOURCE:
+  - untranslated
+  - original: Settings Mode
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS:
+  - untranslated
+  - original: All
+  GAME_SETTINGS_PROMPT:
+  - untranslated
+  - original: Select settings to remove.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

@@ -1,0 +1,353 @@
+comments: |-
+  Persian translation by saeid0035 (RTL version)
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Persian
+  SAVE_CHANGES: ذﺧﻴﺮه ﺗﻐﻴﻴﺮات
+  BACK: ﺑﺮﮔﺸﺖ
+  NETCONFIG: ﺗﻨﻈﻴﻤﺎﺕ ﺷﺒﻜﻪ
+  SHOW_ADVANCED_OPTS: ﮔﺰﻴﻨﻪ ﻫﺎی ﭘﻴﺸﺮﻓﺘﻪ
+  NO_ITEMS: +ﺑﺪون ﻣﻘﺪار+
+  SETTINGS_SAVED: ذﺧﻴﺮه ﺷﺪ %s ﺗﻨﻈﻴﻤﺎﺕ در
+  ERROR_SAVING_SETTINGS: '!در ﻧﻮﺷﺘﻦ ﺗﻨﻈﻴﻤﺎت ﻣﺸﻜﻠﻲ ﭘﻴﺶ آﻣﺪ'
+  EXIT: ﺧﺮوج
+  SETTINGS: ﺗﻨﻈﻴﻤﺎت
+  MENU: ﻣﻨﻮ
+  BDM_GAMES: BDM ﺑﺎزی ﻫﺎی
+  HDD_GAMES: HDD ﺑﺎزی ﻫﺎی
+  NET_GAMES: ETH ﺑﺎزی ﻫﺎی
+  APPS: ﺑﺮﻧﺎﻣﻪ ﻫﺎ
+  THEME: ﭘﻮﺳﺘﻪ
+  LANGUAGE: زﺑﺎن
+  CONFIRMATION_POFF: آﯾﺎ ﻣﺎﯾﻞ ﺑﻪ ﺧﺎﻣﻮﺵ ﻛﺮﺩﻥ ﻛﻨﺴﻮﻝ ﻣﻴﺒﺎﺷﻴﺪ؟
+  CONFIRMATION_EXIT: ﺧﺮوج ﺑﻪ ﻣﺮورﮔﺮ؟
+  CONFIRMATION_CANCEL_UPDATE: آﭘﺪﻳﺖ ﺷﺪن ﻟﻐﻮ ﺷﻮد؟
+  HDD_NOT_CONNECTED_ERROR: :%d دراﻳﻮ ﻫﺎرد دﻳﺴﮏ ﺗﺸﺨﻴﺺ داده ﻧﺸﺪ
+  HDD_NOT_FORMATTED_ERROR: :%d دراﻳﻮ ﻫﺎرد دﻳﺴﮏ ﻓﺮﻣﺖ ﻧﺸﺪه اﺳﺖ
+  NETWORK_STARTUP_ERROR: :%d راه اﻧﺪازی ﺷﺒﻜﻪ ﺑﺎ ﻣﺸﻜﻞ ﻣﻮاﺟﻪ ﺷﺪ
+  NETWORK_STARTUP_ERROR_NETIF: :%d ﻫﻴﭻ آداﭘﺘﻮر ﺷﺒﻜﻪ ای ﻳﺎﻓﺖ ﻧﺸﺪ
+  NETWORK_STARTUP_ERROR_CONN: :%d اﻣﻜﺎن ﭘﺬﻳﺮ ﻧﻴﺴﺖ SMB اﺗﺼﺎل ﺑﻪ ﺳﺮور
+  NETWORK_STARTUP_ERROR_LOGON: :%d اﻣﻜﺎن ﭘﺬﻳﺮ ﻧﻴﺴﺖ SMB ورود ﺑﻪ ﺳﺮور
+  NETWORK_STARTUP_ERROR_SHARE: :%d اﻣﻜﺎن ﭘﺬﻳﺮ ﻧﻴﺴﺖ SMB ﺑﺎزﻛﺮدن اﺷﺘﺮاک
+  NETWORK_SHARE_LIST_ERROR: :%d اﻣﻜﺎن ﭘﺬﻳﺮ ﻧﻴﺴﺖ SMB ﺑﺎزﻛﺮدن اﺷﺘﺮاک ﻫﺎی
+  NETWORK_GAMES_LIST_ERROR: :%d ﻟﻴﺴﺖ ﻛﺮدن ﺑﺎزی ﻫﺎ اﻣﻜﺎن ﭘﺬﻳﺮ ﻧﻴﺴﺖ
+  NETWORK_ERROR_DHCP_FAIL: :%d در دﺴﺘﺮس ﻧﻴﺴﺖ DHCP ﺳﺮور
+  NETWORK_ERROR_LINK_FAIL: :%d ﻫﻴﭻ اﺗﺼﺎل ﺷﺒﻜﻪ ای وﺟﻮد ﻧﺪارد
+  'ON': روﺷﻦ
+  'OFF': ﺧﺎﻣﻮش
+  OK: ﺣﻠﻪ
+  SELECT: اﻧﺘﺨﺎب
+  CANCEL: ﻟﻐﻮ
+  CIRCLE: داﻳﺮه
+  CROSS: ﺿﺮﺑﺪر
+  GAMES_LIST: ﻟﻴﺴﺖ ﺑﺎزی ﻫﺎ
+  COMPAT_SETTINGS: ﺗﻨﻈﻴﻤﺎت ﺑﺎزی ﻫﺎ
+  REMOVE_ALL_SETTINGS: ﭘﺎﮎ ﮐﺮﺩﻥ ﺗﻨﻈﻴﻤﺎﺕ
+  SCROLLING: ﺳﺮﻋﺖ اﺳﻜﺮول
+  SLOW: آﻫﺴﺘﻪ
+  MEDIUM: ﻣﻌﻤﻮﻟﻲ
+  FAST: ﺳﺮﻳﻊ
+  DEFDEVICE: ﻣﻨﻮ ﭘﻴﺸﻔﺮض
+  LOAD_FROM_DISC: ﺑﺎرﮔﺰاری از دﻳﺴﮏ
+  PLEASE_WAIT: ﻟﻄﻔﺎ ﻣﻨﺘﻈﺮ ﺑﻤﺎﻨﻴﺪ
+  ERROR_LOADING_ID: در ﻫﻨﮕﺎم ﺑﺎرﮔﺬاری ﺷﻨﺎﺳﻪ ﺑﺎزی ﻣﺸﻜﻠﻲ ﭘﻴﺶ آﻣﺪه
+  AUTOSORT: ﺗﺮﺗﻴﺐ دادن ﺧﻮدﻛﺎر
+  ERR_LOADING_LANGFILE: درﻫﻨﮕﺎم ﺑﺎرﮔﺬاری ﻓﺎﻴﻞ زﺑﺎن ﻣﺸﻜﻠﻲ ﭘﻴﺶ آﻣﺪ
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: …ﻫﻴﭻ ﻛﻨﺘﺮﻟﺮی ﭘﻴﺪا ﻧﺸﺪ ﻣﻨﺘﻈﺮ ﺑﻤﺎﻧﻴﺪ
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: ﺻﻔﺤﻪ ﻛﺸﻴﺪه
+  POWEROFF: ﺧﺎﻣﻮش ﻛﺮدن
+  LOADING_SETTINGS: درﺣﺎل ﺑﺎرﮔﺬاری ﭘﻴﻜﺮﺑﻨﺪی
+  SAVING_SETTINGS: درﺣﺎل ذﺧﻴﺮه ﭘﻴﻜﺮﺑﻨﺪی
+  START_DEVICE: دﺳﺘﮕﺎه ﺷﺮوع ﻛﻨﻨﺪه
+  REFRESH: ﺗﺎزه ﺳﺎزی
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: HDD ﺣﺎﻟﺖ ﺷﺮوع دﺳﺘﮕﺎه
+  ETHMODE: ETH ﺣﺎﻟﺖ ﺷﺮوع دﺳﺘﮕﺎه
+  APPMODE: ﻧﺸﺎن دادن ﻣﻨﻮ ﺑﺮﻧﺎﻣﻪ ﻫﺎ
+  AUTO: ﺧﻮدﻛﺎر
+  MANUAL: دﺳﺘﻲ
+  STARTNBD: NBD ﺷﺮوع ﺳﺮور
+  STARTINGNBD: …درﺣﺎل راه اﻧﺪازی ﻣﻴﺒﺎﺷﺪ NBD ﺳﺮور
+  RUNNINGNBD: …درﺣﺎل اﺟﺮا ﻣﻴﺒﺎﺷﺪ NBD ﺳﺮور
+  STARTFAILNBD: ﺷﻜﺴﺖ ﺧﻮرد NBD راه اﻧﺪازی ﺳﺮور
+  UNLOADNBD: …درﺣﺎل ﺗﺨﻠﻴﻪ ﻣﻴﺒﺎﺷﺪ NBD ﺳﺮور
+  EXITTO: IGR ﻣﺴﻴﺮ
+  BGCOLOR: رﻧﮓ ﭘﺲ زﻣﻴﻨﻪ
+  TXTCOLOR: رﻧﮓ ﻣﺘﻮن
+  CAT_SMB_SERVER: '- SMB ﺳﺮور -'
+  IP_ADDRESS_TYPE: ﻧﻮع آدرس آﻳﭙﻲ
+  IP_ADDRESS_TYPE_STATIC: اﻳﺴﺘﺎ
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: آدرس آﻳﭙﻲ
+  ADDRESS: آدرس
+  MASK: ﭘﻮﺷﺶ
+  GATEWAY: دروازه
+  DNS_SERVER: DNS ﺳﺮور
+  PORT: ﭘﻮرت
+  SHARE: اﺷﺘﺮاک
+  USER: ﻧﺎم ﻛﺎرﺑﺮی
+  PASSWORD: ﻛﻠﻤﻪ ﻋﺒﻮر
+  NOT_SET: +ﺗﻌﻴﻴﻦ ﻧﺸﺪه+
+  ADDRESS_TYPE: ﻧﻮع آدرس
+  ADDR_TYPE_IP: آﻳﭙﻲ
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: ﭘﺬﻳﺮﻓﺘﻦ
+  DELETE_WARNING: آﻳﺘﻢ ﺑﻄﻮر ﻛﺎﻣﻞ ﭘﺎک ﻣﻴﺸﻮد اداﻣﻪ ﻣﻴﺪﻫﻴﺪ؟
+  RENAME: ﺗﻐﻴﻴﺮﻧﺎم
+  DELETE: ﭘﺎک ﻛﺮدن
+  RUN: اﺟﺮا
+  GFX_SETTINGS: ﺗﻨﻈﻴﻤﺎت ﻧﻤﺎﻳﺸﮕﺮ
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: ﺑﻪ ﻳﺎد داﺷﺘﻦ آﺧﺮﻳﻦ ﺑﺎزی اﻧﺟﺎم ﺷﺪه
+  SELECTBUTTON: دﻛﻤﻪ ی اﻧﺘﺨﺎب
+  ERR_FRAGMENTED: ﻣﺸﻜﻠﻲ ﺑﻪ وﺟﻮد آﻣﺪه ﻓﺎﻳﻞ ﻫﺎی ﺑﺎزی ﺑﻪ ﻫﻢ رﻳﺨﺘﻪ اﺳﺖ
+  ERR_FILE_INVALID: ﻣﺸﻜﻠﻲ ﭘﻴﺶ آﻣﺪه اﺟﺮای آﻳﺘﻢ اﻣﻜﺎن ﭘﺬﻳﺮ ﻧﻴﺴﺖ
+  TEST: ﺗﺴﺖ ﺗﻐﻴﺮﺍﺕ
+  HINT_GUEST: ﺑﺮای ورود ﺑﻪ ﺻﻮرت ﻧﺎﺷﻨﺎس ﺧﺎﻟﻲ ﺑﮕﺬارﻳﺪ.
+  HINT_MODE1:
+  - untranslated
+  - original: Accurate Reads
+  HINT_MODE2: Synchronous ﺣﺎﻟﺖ
+  HINT_MODE3: Syscalls ﺑﺎزﻛﺮدن
+  HINT_MODE4: رد ﻛﺮدن وﻳﺪﻳﻮ ﻫﺎ
+  HINT_MODE5: DVD-DL ﺷﺒﻴﻪ ﺳﺎزی
+  HINT_MODE6: IGR ﻏﻴﺮﻓﻌﺎل ﻛﺮدن
+  HINT_VMC_SIZE: ﺗﻐﻴﻴﺮ اﻧﺪازه ﻛﺎرت ﺣﺎﻓﻈﻪ ی ﻣﺟﺎزی را ﻓﺮﻣﺖ ﻣﻴﻜﻨﺪ
+  CREATE: ﺳﺎﺧﺘﻦ
+  START: ﺷﺮوع
+  MODIFY: ﺗﻐﻴﺮ دادن
+  ABORT: ﻗﻄﻊ ﻛﺮدن
+  RESET: ﺑﺎز ﻧﺸﺎﻧﺪن
+  USE_GENERIC: generic اﺳﺘﻔﺎده از
+  VMC_SCREEN: ﭘﻴﻜﺮﺑﻨﺪی ﺣﺎﻓﻈﻪ ﻣﺟﺎزی
+  VMC_NAME: ﻧﺎم
+  SIZE: اﻧﺪازه
+  VMC_STATUS: وﺿﻌﻴﺖ
+  VMC_PROGRESS: ﭘﻴﺸﺮﻓﺖ
+  VMC_FILE_EXISTS: ﻓﺎﻳﻞ ﺣﺎﻓﻈﻪ ﻣﺟﺎزی ﻣﻮﺟﻮد اﺳﺖ
+  VMC_FILE_ERROR: ﻓﺎﻳﻞ ﺣﺎﻓﻈﻪ ﻣﺟﺎزی ﻧﺎﻣﻌﺘﺒﺮ اﺳﺖ اﻧﺪازه درﺳﺖ ﻧﻴﺴﺖ
+  VMC_FILE_NEW: ﻓﺎﻳﻞ ﺣﺎﻓﻈﻪ ﻣﺟﺎزی ﻧﻴﺎز ﺑﻪ ﺳﺎﺧﺘﻪ ﺷﺪن دارد
+  ERR_VMC_CONTINUE: اداﻣﻪ ﻣﻴﺪﻫﻴﺪ؟ %s ﻣﺸﻜﻠﻰ ﭘﻴﺶ ﺁﻣﺪه ﺑﺎ ﺣﺎﻓﻈﻪ ﻓﻴﺰﻳﻜﻰ درﮔﺎه %s در ﺩﺳﺘﺮﺳﻰ
+    ﺑﻪ ﺣﺎﻓﻈﻪ ﻣﺠﺎﺯﻯ
+  AUTOREFRESH: ﺗﺎزه ﺳﺎزی ﺧﻮدﻛﺎر
+  ABOUT: درﺑﺎره
+  DEVS: ﺑرﻧﺎﻣﻪ ﻧﻮﻳﺴﺎن
+  QANDA: ﺗﺴﺖ ﻛﻴﻔﻴﺖ
+  BDM_PREFIX: BDM ﻣﺴﻴﺮ ﺗﺮﺟﻴﺤﻲ
+  HINT_EXITPATH: IGR ﺳﻔﺎرﺷﻲ ﺑﻌﺪ از ELF اﺟﺮای ﻓﺎﻳﻞ
+  HINT_SPINDOWN: ﻣﻘﺪار در دﻗﻴﻘﻪ, 0 ﺑﺮای ﭼﺮﺧﺶ ﭘﺎﻳﻴﻦ
+  HDD_SPINDOWN: HDD ﻛﺎﻫﺶ ﭼﺮﺧﺶ ﺧﻮدﻛﺎر
+  VMODE: ﺣﺎﻟﺖ وﻳﺪﻳﻮ
+  UICOLOR: رﻧﮓ دﻳﺎﻟﻮگ ﻫﺎ
+  SELCOLOR: رﻧﮓ اﻧﺘﺨﺎب ﺷﺪه ﻫﺎ
+  RESETCOLOR: ﺑﺎﺯ ﻧﺸﺎﻧﻰ ﺭﻧﮓ ﮪﺎ
+  INFO: اﻃﻠﺎﻋﺎت
+  ALTSTARTUP: ﺳﻔﺎرﺷﻲ ELF ﻓﺎﻳﻞ
+  COLOR_SELECTION: اﻧﺘﺨﺎب رﻧﮓ
+  RECONNECT: اﺗﺼﺎل ﻣﺠﺪد
+  HINT_SHARENAME: ﺑﺮای ﻟﻴﺴﺖ ﻛﺮدن اﺷﺘﺮاک ﻫﺎ ﺧﺎﻟﻲ ﺑﮕﺬارﻳﺪ
+  ETH_PREFIX: ETH ﻣﺴﻴﺮ ﺗﺮﺟﻴﺤﻲ
+  BACKSPACE: ﭘﺎک ﻛﺮدن
+  SPACE: ﻓﺎﺻﻠﻪ
+  ENTER: اﻳﻨﺘﺮ
+  MODE: ﺣﺎﻟﺖ
+  VMC_SLOT1: درﮔﺎه ﺣﺎﻓﻈﻪ ﻣﺟﺎزی 1
+  VMC_SLOT2: درﮔﺎه ﺣﺎﻓﻈﻪ ﻣﺟﺎزی 2
+  GAME_ID: ﺷﻨﺎﺳﻪ ﺑﺎزی
+  DMA_MODE: DMA ﺣﺎﻟﺖ
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1: ﺣﺎﻟﺖ 1
+  MODE2: ﺣﺎﻟﺖ 2
+  MODE3: ﺣﺎﻟﺖ 3
+  MODE4: ﺣﺎﻟﺖ 4
+  MODE5: ﺣﺎﻟﺖ 5
+  MODE6: ﺣﺎﻟﺖ 6
+  GSCONFIG: GSM ﭘﻴﻜﺮﺑﻨﺪی
+  ETH_OPMODE: ﺣﺎﻟﺖ ارﺗﺒﺎط اﻳﻨﺘﺮﻧﺖ
+  ETH_100MFDX: 100 ﻣﮕﺎﺑﻴﺖ ﻛﺎﻣﻠﺎ ﻣﻀﺎﻋﻒ
+  ETH_100MHDX: 100 ﻣﮕﺎﺑﻴﺖ ﻧﻴﻤﻪ ﻣﻀﺎﻋﻒ
+  ETH_10MFDX: 10 ﻣﮕﺎﺑﻴﺖ ﻛﺎﻣﻠﺎ ﻣﻀﺎﻋﻒ
+  ETH_10MHDX: 10 ﻣﮕﺎﺑﻴﺖ ﻧﻴﻤﻪ ﻣﻀﺎﻋﻒ
+  GSM_SETTINGS: GSM ﺗﻨﻈﻴﻤﺎت
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: GSM روﺷﻦ ﻳﺎ ﺧﺎﻣﻮش ﻛﺮدن
+  HINT_GSMVMODE: اﺟﺒﺎر ﺑﻪ ﻧﻤﺎﻳﺸﮕﺮ ﺳﻔﺎرﺷﻲ
+  XOFFSET: H ﻣﻮﻘﻌﻴﺖ
+  HINT_XOFFSET: ﺗﻨﻈﻴﻢ ﺣﺎﻟﺖ اﻓﻘﻲ
+  YOFFSET: V ﻣﻮﻘﻌﻴﺖ
+  HINT_YOFFSET: ﺗﻨﻈﻴﻢ ﺣﺎﻟﺖ ﻋﻤﻮدی
+  OVERSCAN: ﺑﺰرگ ﻛﺮدن ﺗﺼﻮﻳﺮ
+  HINT_OVERSCAN: ﺗﻨﻈﻴﻢ ﻣﻴﺰان ﺑﺰرگ ﻛﺮدن ﺗﺼﻮﻳﺮ
+  GSMSKIPVIDEOS: FMV ﭘﺮﻳﺪن از
+  HINT_GSMSKIPVIDEOS: ﭘﺮﻳﺪن از ﻛﺎت ﺳﻴﻦ ﻫﺎ
+  CHEAT_SETTINGS: ﺗﻨﻈﻴﻤﺎت ﻛﺪ ﺗﻘﻠﺐ
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: ﺑﺎزی ﺷﻤﺎرا ﭘﭻ ﻛﻨﺪ PS2RD ﺑﮕﺬارﻳﺪ ﺗﺎ ﻣﻮﺗﻮر ﻛﺪ ﺗﻘﻠﺐ
+  CHEATMODE: PS2RD ﺣﺎﻟﺖ ﻣﻮﺗﻮر ﻛﺪ ﺗﻘﻠﺐ
+  HINT_CHEATMODE: اﻧﺘﺨﺎب ﺧﻮدﻛﺎر و ﻳﺎ اﻧﺘﺨﺎب دﺳﺘﻲ رﻣﺰ ﺗﻘﻠﺐ ﺑﺎزی
+  CHEATMODEAUTO: اﻧﺘﺨﺎب ﺧﻮدﻛﺎر رﻣﺰ ﺗﻘﻠﺐ
+  CHEATMODESELECT: اﻧﺘﺨﺎب دﺳﺘﻲ رﻣﺰ ﺑﺎزی
+  ERR_CHEATS_LOAD_FAILED: در ﺑﺎرﮔﺬاری ﻓﺎﻳﻞ ﻛﺪ ﺗﻘﻠﺐ ﻣﺸﻜﻠﻲ ﭘﻴﺶ آﻣﺪه
+  NO_CHEATS_FOUND: ﻫﻴﭻ ﻛﺪ ﺗﻘﻠﺒﻲ ﻳﺎﻓﺖ ﻧﺸﺪ
+  DL_DEFAULTS: داﻧﻠﻮد ﭘﻴﺶ ﻓﺮض ﻫﺎ
+  NET_UPDATE: آﭘﺪﻳﺖ از ﻃﺮﻳﻖ ﺷﺒﻜﻪ
+  NET_UPDATE_ALL: ﺭﻭﻧﻮﻳﺳﻰ ﺑﺮ ﺳﻮﺍﺑﻖ ﻣﻮﺟﻮﺩ
+  NET_UPDATE_FAILED: آﭘﺪﻳﺖ ﺷﻜﺴﺖ ﺧﻮرد.
+  NET_UPDATE_CONN_FAILED: در اﺗﺼﺎل ﺑﻪ ﺳﺮور آﭘﺪﻳﺖ ﻣﺸﻜﻠﻲ ﭘﻴﺶ آﻣﺪه.
+  NET_UPDATE_DONE: اﭘﺪﻳﺖ ﺗﻜﻤﻴﻞ ﺷﺪ.
+  NET_UPDATE_CANCELLED: آﭘﺪﻳﺖ ﻟﻐﻮ ﺷﺪ.
+  CONFIRMATION_SETTINGS_UPDATE: ﺗﻨﻈﻴﻤﺎت از ﺷﺒﻜﻪ داﻧﻠﻮد ﺷﻮد؟
+  CUSTOMIZED_SETTINGS: ﺗﻨﻈﻴﻤﺎت ﺷﺨﺼﻲ ﺳﺎزی ﺷﺪه
+  DOWNLOADED_DEFAULTS: ﭘﻴﺶ ﻓﺮض ﻫﺎ داﻧﻠﻮد ﺷﺪ
+  AUTO_START_IN_N_SECS: …ﺛﺎﻧﻴﻪ %i ﺷﺮوع ﺧﻮدﻛﺎر در
+  AUTOSTARTLAST: ﺷﺮوع ﺧﻮدﻛﺎر
+  HINT_AUTOSTARTLAST: ﻣﻘﺪار در ﺛﺎﻧﻴﻪ, 0 ﺑﺮای ﻏﻴﺮﻓﻌﺎل ﻛﺮدن ﺷﺮوع ﺧﻮدﻛﺎر
+  PS2LOGO: ﻟﻮﮔﻮ ﭘﻠﻲ اﺳﺘﻴﺸﻦ 2
+  HINT_PS2LOGO: ﺑﺮﺍﻯ ﺩﻳﺴﮏ ﻫﺎﻯ ﻣﻌﺘﺒﺮﻯ ﻛﻪ ﺑﺎ ﺭﻳﺠﻦ ﻛﻨﺴﻮﻝ ﻫﻤﺨﻮﺍﻧﻰ ﺩﺍﺭﻧﺪ ﻧﺸﺎﻥ ﺩﺍﺩﻩ ﻣﻰ ﺷﻮﺩ.
+  PADEMUCONFIG: ﭘﻴﻜﺮﺑﻨﺪی ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ
+  PADEMU_SETTINGS: ﺗﻨﻈﻴﻤﺎت ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: روﺷن و ﻳﺎ ﺧﺎﻣﻮش ﻛﺮدن ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ ﺑﺮای ﺑﺎزی ﻫﺎی اﻧﺘﺨﺎب ﺷﺪه.
+  PADEMU_MODE: ﺣﺎﻟﺖ ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ
+  HINT_PADEMU_MODE: اﻧﺘﺨﺎب ﺣﺎﻟﺖ ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ.
+  DS34USB_MODE: USB ﻛﻨﺘﺮﻟﺮ ﭘﻠﻲ اﺳﺘﻴﺸﻦ 3/4 از ﻃﺮﻴﻖ
+  DS34BT_MODE: ﻛﻨﺘﺮﻟﺮ ﭘﻠﻲ اﺳﺘﻴﺸﻦ 3/4 از ﻃﺮﻴﻖ ﺑﻠﻮﺗﻮث
+  PADPORT: 'ﺗﻨﻈﻴﻤﺎت ﺑﺮای درﮔﺎه:'
+  HINT_PAD_PORT: درﮔﺎه ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ را ﺑﺮای ﺗﻨﻈﻴﻤﺎت اﻧﺘﺨﺎب ﻛﻨﻴﺪ.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: روﺷﻦ و ﻳﺎ ﺧﺎﻣﻮش ﻛﺮدن ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ ﺑﺮای درﮔﺎه ﻫﺎی اﻧﺘﺨﺎب ﺷﺪه.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: ﻓﻌﺎل ﻳﺎ ﻏﻴﺮﻓﻌﺎل ﻛﺮدن وﻳﺒﺮه ی ﺷﺒﻴﻪ ﺳﺎز ﻛﻨﺘﺮﻟﺮ ﺑﺮای دﺮﮔﺎه ﻫﺎی اﻧﺘﺨﺎب
+    ﺷﺪه.
+  USBDG_MAC: :USB ﻣﮏ آدرس آداﭘﺘﻮر ﺑﻠﻮﺗﻮث
+  PAD_MAC: 'ﻛﻨﺘﺮﻟﺮ ﭘﻠﻲ اﺳﺘﻴﺸﻦ ﺟﻔﺖ ﺷﺪه اﺳﺖ ﺑﺎ ﻣﮏ آدرس:'
+  PAIR: ﺟﻔﺖ ﻛﺮدن
+  PAIR_PAD: ﺟﻔﺖ ﻛﺮدن ﻛﻨﺘﺮﻟﺮ ﻫﺎی ﭘﻠﻲ اﺳﺘﻴﺸﻦ
+  HINT_PAIRPAD: ﺟﻔﺖ ﻛﺮدن ﻛﻨﺘﺮﻟﺮ ﭘﻠﻲ اﺳﺘﻴﺸﻦ ﺑﺎ ﻣﮏ آدرس آداﭘﺘﻮر ﺑﻠﻮﺗﻮث.
+  NOT_CONNECTED: ﻣﺘﺼﻞ ﻧﺸﺪ
+  BTINFO: اﻃﻠﺎﻋﺎت آداﭘﺘﻮر ﺑﻠﻮﺗﻮث
+  HINT_BTINFO: ﻧﺸﺎن دادن اﻃﻠﺎﻋﺎت ﺑﻴﺸﺘﺮ و ﻗﺎﺑﻠﻴﺖ ﻫﺎی ﭘﺸﺘﻴﺒﺎﻧﻲ ﺷﺪه
+  HCIVER: :HCI ﻧﺴﺨﻪ ی
+  LMPVER: :LMP ﻧﺴﺨﻪ ی
+  MANUFACTURER: :ﺷﻨﺎﺳﻪ ﺗﻮﻟﻴﺪ ﻛﻨﻨﺪه
+  SUPFEATURES: :ﻗﺎﺑﻠﻴﺖ ﻫﺎی ﭘﺸﺘﻴﺒﺎﻧﻲ ﺷﺪه
+  'YES': ﺑﻠﻪ
+  'NO': ﺧﻴﺮ
+  BT_SUPPORTED: .آداﭘﺘﻮر ﺑﻠﻮﺗﻮث ﺑﺎﻳﺪ ﺑﻪ ﺻﻮرت ﻛﺎﻣﻞ ﺑﺎ ﻛﻨﺘﺮﻟﺮ ﻫﺎی ﭘﻠﻲ اﺳﺘﻴﺸﻦ 3 و 4 ﺳﺎزﮔﺎر
+    ﺑﺎﺷﺪ
+  BT_NOTSUPPORTED: .آداﭘﺘﻮر ﺑﻠﻮﺗﻮث ﺷﺎﻳﺪ ﺑﺎ ﻛﻨﺘﺮﻟﺮ ﻫﺎی ﭘﻠﻲ اﺳﺘﻴﺸﻦ 3 و4 ﻛﺎر ﻧﻜﻨﺪ
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: .روﺷﻦ و ﻳﺎ ﺧﺎﻣﻮش ﻛﺮدن ﺷﺒﻴﻪ ﺳﺎزی ﻓﺸﺮدن ﻫﻤﺰﻣﺎن ﭼﻨﺪ ﻛﻠﻴﺪ ﺑﺮای ﺑﺎزی
+    ﻫﺎی اﻧﺘﺨﺎب ﺷﺪه
+  MTAP_PORT: ﺷﺒﻴﻪ ﺳﺎزی ﻓﺸﺮدن ﻫﻤﺰﻣﺎن ﭼﻨﺪ ﻛﻠﻴﺪ در درﮔﺎه
+  HINT_MTAP_PORT: .اﻧﺘﺨﺎب درﮔﺎه ﺑﺮای ﺷﺒﻴﻪ ﺳﺎزی ﻓﺸﺮدن ﻫﻤﺰﻣﺎن ﭼﻨﺪ ﻛﻠﻴﺪ
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: FIELD flipping ﺷﺒﻴﻪ ﺳﺎزی
+  HINT_GSM_FIELD_FIX: .ﮔﻠﻴﭻ دارﻧﺪ progressive درﺳﺖ ﻛﺮدن ﺑﺎزی ﻫﺎیی ﻛﻪ در ﺣﺎﻟﺖ وﻳﺪﻳﻮ
+  PARENLOCKCONFIG: ﺗﻨﻈﻴﻤﺎت ﻗﻔﻞ واﻟﺪﻳﻦ
+  PARENLOCK_PASSWORD: رﻣﺰ ﻋﺒﻮر ﻗﻔﻞ واﻟﺪﻳﻦ
+  PARENLOCK_PASSWORD_HINT: .ﺑﺮای ﻏﻴﺮﻓﻌﺎل ﻛﺮدن ﻗﻔﻞ واﻟﺪﻳﻦ ﺧﺎﻟﻲ ﮔﺬاﺷﺗﻪ ﺷﻮد
+  PARENLOCK_ENTER_PASSWORD_TITLE: رﻣﺰ ﻋﺒﻮر ﻗﻔﻞ واﻟﺪﻳﻦ را وارد ﻛﻨﻴﺪ
+  PARENLOCK_PASSWORD_INCORRECT: .رﻣﺰ ﻋﺒﻮر ﻗﻔﻞ واﻟﺪﻳﻦ ﻧﺎدرﺳﺖ اﺳﺖ
+  PARENLOCK_DISABLE_WARNING: .ﻗﻔﻞ واﻟﺪﻳﻦ ﻏﻴﺮﻓﻌﺎل ﺷﺪ
+  BUILD_DETAILS: :ﮔﺰﻳﻨﻪ ﻫﺎی ﺳﺎﺧﺖ
+  PARENLOCK_INVALID_PASSWORD: .ﻣﺸﻜﻠﻲ ﭘﻴﺶ آﻣﺪه - اﻳﻦ رﻣﺰ ﻋﺒﻮر ﻧﻤﻴﺘﻮاﻧﺪ اﺳﺘﻔﺎده ﺷﻮد
+  ERR_VMC_FRAGMENTED_CONTINUE: ؟ %d دﭼﺎر ﺑﻬﻢ رﻳﺨﺘﮕﻲ ﺷﺪه اﺳﺖ. اداﻣﻪ ﺑﺎ ﺣﺎﻓﻈﻪ ی ﻓﻴﺰﻳﻜﻲ
+    درﮔﺎه %s ﻓﺎﻳﻞ ﺣﺎﻓﻈﻪ ﻣﺠﺎزی
+  AUDIO_SETTINGS: ﺗﻨﻈﻴﻤﺎت ﺻﺪا
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: درﺟﻪ ﺻﺪا ﺟﻠﻮه ﻫﺎی ﺻﻮﺗﻲ
+  BOOT_SND_VOLUME: درﺟﻪ ی ﺻﺪای ﺑﻮت
+  CFM_VMODE_CHG: ﺗﻐﻴﻴﺮ ﺣﺎﻟﺖ وﻳﺪﻳﻮ را ﺗﺎﻳﻴﺪ ﻣﻴﻜﻨﻴﺪ؟
+  CACHE_HDD_GAME_LIST: (HDD) ﻛﺶ ﻓﻬﺮﺳﺖ ﺑﺎزی ﻫﺎ
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED: ﺗﻨﻈﻴﻤﺎﺕ ﺑﺎﺯﻯ ﺫﺧﻴﺮﻩ ﺷﺪ
+  GAME_SETTINGS_REMOVED: '%s ﭘﺎﮎ ﺷﺪ %s ﺗﻨﻈﻴﻤﺎﺕ'
+  NET_UPDATE_HINT: ﺭﻭ ﻧﻮﻳﺴﻰ ﺗﻨﻈﻴﻤﺎﺕ ﺳﺎﺯﮔﺎﺭ ﺑﺎ ﺑﺎﺯﻯ ﻫﻨﮕﺎﻢ ﻓﻌﺎﻝ ﺑﻮﺩﻥ
+  SETTINGS_SOURCE: ﺣﺎﻟﺖ ﺗﻨﻈﻴﻤﺎﺕ
+  GLOBAL_SETTINGS: ﺳﺮﺍﺭﻯ
+  PERGAME_SETTINGS: ﻣﺨﺼﻮﺹ ﻫﺮ ﺑﺎﺯﻯ
+  ALL_SETTINGS: ﻫﻤﻪ
+  GAME_SETTINGS_PROMPT: ﺗﻨﻈﻴﻤﺎﺗﻰ ﻛﻪ ﻣﻴﺨﻮﺍﻫﻴﺪ ﭘﺎﮎ ﮐﻨﻴﺪ ﺍﻧﺘﺨﺎﺏ ﮐﻨﻴﺪ
+  FORUM_DETAILS: :ﻓﺮﻡ ﻫﺎﻯ ﭘﺸﺘﻴﺒﺎﻧﻰ ﺷﺪﻩ
+  INFO_TITLE: ﻋﻨﻮﺍﻥ
+  INFO_GENRE: ﮊﺍﻧﺮ
+  INFO_RELEASE: ﺗﺎﺭﻳﺦ ﻋﺮﺿﻪ
+  INFO_DEVELOPER: ﺳﺎﺯﻧﺪﻩ
+  INFO_DESCRIPTION: ﺗﻮﺿﻴﺤﺎﺕ
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

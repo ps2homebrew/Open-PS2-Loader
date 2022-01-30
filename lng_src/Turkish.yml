@@ -1,0 +1,317 @@
+comments: |-
+  Turkish translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
+  Turkish translation by Serdar Sağlam 2021 All translations have been revised and corrected.
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Turkish
+  SAVE_CHANGES: Değişiklikleri Kaydet
+  BACK: Geri
+  NETCONFIG: Ağ Ayarları
+  SHOW_ADVANCED_OPTS: Gelişmiş Seçenekler
+  NO_ITEMS: <değer yok>
+  SETTINGS_SAVED: Ayarlar şuraya kaydedildi %s
+  ERROR_SAVING_SETTINGS: Ayarlar yazılırken hata!
+  EXIT: Çıkış
+  SETTINGS: Ayarlar
+  MENU: Menü
+  BDM_GAMES: BDM Oyunlar
+  HDD_GAMES: HDD Oyunlar
+  NET_GAMES: ETH Oyunlar
+  APPS: Uygulamalar
+  THEME: Tema
+  LANGUAGE: Dil
+  CONFIRMATION_POFF: Sistem kapatılacaktır.
+  CONFIRMATION_EXIT: Tarayıcıya Çıkılsın mı?
+  CONFIRMATION_CANCEL_UPDATE: Güncelleme iptal edilsin mi?
+  HDD_NOT_CONNECTED_ERROR: '%d: Sabit Disk algılanmadı.'
+  HDD_NOT_FORMATTED_ERROR: '%d: Sabit Disk biçimlendirilmemiş.'
+  NETWORK_STARTUP_ERROR: '%d: Ağ başlatma hatası.'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Ağ bağdaştırıcısı algılanmadı.'
+  NETWORK_STARTUP_ERROR_CONN: '%d: SMB sunucusuna bağlanılamıyor.'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: SMB sunucusunda oturum açılamıyor.'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: SMB paylaşımı açılamıyor.'
+  NETWORK_SHARE_LIST_ERROR: '%d: SMB paylaşımları listelenemiyor.'
+  NETWORK_GAMES_LIST_ERROR: '%d: Oyunlar listelenemiyor.'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCP sunucusu kullanılamıyor.'
+  NETWORK_ERROR_LINK_FAIL: '%d: Ağ bağlantısı yok.'
+  'ON': Açık
+  'OFF': Kapalı
+  OK: Tamam
+  SELECT: Seç
+  CANCEL: İptal
+  CIRCLE: Daire
+  CROSS: Çarpı
+  GAMES_LIST: Oyun Listesi
+  COMPAT_SETTINGS: Oyun Ayarları
+  REMOVE_ALL_SETTINGS: Ayarları Kaldır
+  SCROLLING: Kaydırma Hızı
+  SLOW: Yavaş
+  MEDIUM: Orta
+  FAST: Hızlı
+  DEFDEVICE: Varsayılan Menü
+  LOAD_FROM_DISC: Diskten Yükle
+  PLEASE_WAIT: Lütfen bekleyin.
+  ERROR_LOADING_ID: Oyun Kimliği yüklenirken hata oluştu.
+  AUTOSORT: Otomatik Sırala
+  ERR_LOADING_LANGFILE: Dil dosyası yüklenirken hata oluştu.
+  DEBUG: Hata Ayıklama Renkleri
+  NO_CONTROLLER: Denetleyici algılanmadı, bekliyor…
+  COVERART: Kapak Resmi
+  WIDE_SCREEN: Geniş Ekran
+  POWEROFF: Kapat
+  LOADING_SETTINGS: Yapılandırma yükleniyor…
+  SAVING_SETTINGS: Yapılandırma kaydediliyor…
+  START_DEVICE: Cihazı Başlat
+  REFRESH: Yenile
+  BDMMODE: BDM Başlangıç Kipi
+  HDDMODE: HDD Başlangıç Kipi
+  ETHMODE: ETH Başlangıç Kipi
+  APPMODE: Uygulamalar Başlangıç ​​Kipi
+  AUTO: Otomatik
+  MANUAL: El ile
+  STARTNBD: NBD Sunucusunu Başlat
+  STARTINGNBD: NBD Sunucusu başlatılıyor…
+  RUNNINGNBD: NBD Sunucusu çalışıyor…
+  STARTFAILNBD: NBD Sunucusu başlatılamadı.
+  UNLOADNBD: NBD Sunucusu durduruluyor…
+  EXITTO: IGR Yolu
+  BGCOLOR: Arkaplan Rengi
+  TXTCOLOR: Yazı Rengi
+  CAT_SMB_SERVER: '- SMB Sunucu -'
+  IP_ADDRESS_TYPE: IP Adresi Türü
+  IP_ADDRESS_TYPE_STATIC: Statik
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IP Adresi
+  ADDRESS: Adres
+  MASK: Maske
+  GATEWAY: Ağ Geçidi
+  DNS_SERVER: DNS Sunucu
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE: Paylaşım
+  USER: Kullanıcı
+  PASSWORD: Parola
+  NOT_SET: <ayarlanmadı>
+  ADDRESS_TYPE: Adres Türü
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Onayla
+  DELETE_WARNING: Öge kalıcı olarak silinecek, devam edilsin mi?
+  RENAME: Adlandır
+  DELETE: Sil
+  RUN: Çalıştır
+  GFX_SETTINGS: Görüntü Ayarları
+  ENABLE_WRITE: İşlemleri Yaz
+  LASTPLAYED: Son Oynanan Oyunu Hatırla
+  SELECTBUTTON: Seç Düğmesi
+  ERR_FRAGMENTED: Hata, oyun parçalandı.
+  ERR_FILE_INVALID: Hata, öge çalıştırılamadı.
+  TEST: Değişiklikleri Dene
+  HINT_GUEST: Misafir yetkilendirmesi için boş bırakın.
+  HINT_MODE1: Doğru Okumalar
+  HINT_MODE2: Eş Zamanlı Kip
+  HINT_MODE3: Sistem Çağrılarını Kaldır
+  HINT_MODE4: Videoları Atla
+  HINT_MODE5: DVD-DL Etkinleştir
+  HINT_MODE6: IGR Devre Dışı
+  HINT_VMC_SIZE: Boyut değiştirilmesi VMC'yi yeniden biçimlendirir.
+  CREATE: Oluştur
+  START: Başlat
+  MODIFY: Düzenle
+  ABORT: İptal
+  RESET: Sıfırla
+  USE_GENERIC: Genel Kullan
+  VMC_SCREEN: VMC'yi Yapılandır
+  VMC_NAME: İsim
+  SIZE: Boyut
+  VMC_STATUS: Durum
+  VMC_PROGRESS: İlerleyiş
+  VMC_FILE_EXISTS: VMC dosyası var.
+  VMC_FILE_ERROR: Geçersiz VMC dosyası, boyut yanlış.
+  VMC_FILE_NEW: VMC dosyasının oluşturulması gerekiyor.
+  ERR_VMC_CONTINUE: VMC'ye erişim hatası %s. Yuvadaki bellek kartı ile devam edilsin
+    mi %d?
+  AUTOREFRESH: Otomatik Yenileme
+  ABOUT: Hakkında
+  DEVS: Kodlayıcılar
+  QANDA: Kalite Güvencesi
+  BDM_PREFIX: BDM Önek Yolu
+  HINT_EXITPATH: Bir IGR'den sonra özel ELF başlatır.
+  HINT_SPINDOWN: Dakika olarak değer, iptal etmek için 0 girin.
+  HDD_SPINDOWN: Otomatik Sabit Disk Durdurma
+  VMODE: Video Kipi
+  UICOLOR: İletişim Rengi
+  SELCOLOR: Seçim Rengi
+  RESETCOLOR: Renkleri Sıfırla
+  INFO: Bilgi
+  ALTSTARTUP: Özel ELF
+  COLOR_SELECTION: Renk Seçimi
+  RECONNECT: Yeniden Bağlan
+  HINT_SHARENAME: Paylaşımları listelemek için boş bırakın.
+  ETH_PREFIX: ETH Önek Yolu
+  BACKSPACE: Geri Tuşu
+  SPACE: Boşluk Tuşu
+  ENTER: Enter Tuşu
+  MODE: Kip
+  VMC_SLOT1: VMC Yuva 1
+  VMC_SLOT2: VMC Yuva 2
+  GAME_ID: Oyun ID
+  DMA_MODE: DMA Kipi
+  VSYNC: Dikey Eşitleme
+  MODE1: Kip 1
+  MODE2: Kip 2
+  MODE3: Kip 3
+  MODE4: Kip 4
+  MODE5: Kip 5
+  MODE6: Kip 6
+  GSCONFIG: GSM'yi Yapılandır
+  ETH_OPMODE: Ethernet Link Kipi
+  ETH_100MFDX:
+  - untranslated
+  - original: 100Mbit Full-duplex
+  ETH_100MHDX:
+  - untranslated
+  - original: 100Mbit Half-duplex
+  ETH_10MFDX:
+  - untranslated
+  - original: 10Mbit Full-duplex
+  ETH_10MHDX:
+  - untranslated
+  - original: 10Mbit Half-duplex
+  GSM_SETTINGS: GSM Ayarları
+  ENABLEGSM: GSM Seçici
+  HINT_ENABLEGSM: GSM'i açar/kapatır.
+  HINT_GSMVMODE: Zorunlu özel görüntüleme kipi.
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: Yatay ayar.
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: Dikey ayar.
+  OVERSCAN: Aşırı Tarama
+  HINT_OVERSCAN: Aşırı tarama ayar.
+  GSMSKIPVIDEOS: FMV Atla
+  HINT_GSMSKIPVIDEOS: Tam hareketli videoları atlar.
+  CHEAT_SETTINGS: Hile Ayarları
+  ENABLECHEAT: PS2RD Hile Motoru
+  HINT_ENABLECHEAT: PS2RD Hile Motorunun oyun yamalamasına izin verin.
+  CHEATMODE: PS2RD Hile Motoru Kipi
+  HINT_CHEATMODE: Oyun hilelerini otomatik olarak girin veya seçin.
+  CHEATMODEAUTO: Otomatik Hile Seçimi
+  CHEATMODESELECT: Oyun Hile Seçimi
+  ERR_CHEATS_LOAD_FAILED: 'Hata: hile dosyası yüklenemedi.'
+  NO_CHEATS_FOUND: Hile bulunamadı.
+  DL_DEFAULTS: Varsayılanları İndir
+  NET_UPDATE: Ağ Güncellemesi
+  NET_UPDATE_ALL: Mevcut Kayıtların Üzerine Yaz
+  NET_UPDATE_FAILED: Güncellene başarısız.
+  NET_UPDATE_CONN_FAILED: Güncelleme sunucusuna bağlanılamadı.
+  NET_UPDATE_DONE: Güncelleme tamamlandı.
+  NET_UPDATE_CANCELLED: Güncelleme iptal edildi.
+  CONFIRMATION_SETTINGS_UPDATE: Ayarlar ağdan indirilsin mi?
+  CUSTOMIZED_SETTINGS: Özelleştirilmiş Ayarlar
+  DOWNLOADED_DEFAULTS: İndirilen Varsayılanlar
+  AUTO_START_IN_N_SECS: '%i içinde otomatik başlat…'
+  AUTOSTARTLAST: Otomatik Başlat
+  HINT_AUTOSTARTLAST: Otomatik başlatmayı kapatmak için saniye cinsinden değer, 0.
+  PS2LOGO:
+  - untranslated
+  - original: PS2 Logo
+  HINT_PS2LOGO: Konsolun bölgesiyle eşleşen geçerli bir disk logosu için görüntülenir.
+  PADEMUCONFIG: PADEMU Yapılandır
+  PADEMU_SETTINGS: Pad Emülatör Ayarları
+  PADEMU_ENABLE: Pad Emülatör
+  HINT_PADEMU_ENABLE: Seçilen oyun için Pad Emülatörü açar/kapatır.
+  PADEMU_MODE: Pad Emülatör Kipi
+  HINT_PADEMU_MODE: Pad Emülatör kipini seçin.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Port Ayarları:'
+  HINT_PAD_PORT: Ayarlar için Pad Emülatör portunu seçin.
+  PADEMU_PORT: Emülatör
+  HINT_PADEMU_PORT: Seçilen port için Pad Emülatörü açar/kapatır.
+  PADEMU_VIB: Titreşim
+  HINT_PADEMU_VIB: Pad Emülatör seçili port için titreşimi açar/kapatır.
+  USBDG_MAC: 'USB Bluetooth Adaptörü MAC Adresi:'
+  PAD_MAC: 'MAC Adresiyle Eşleştirilmiş DS Denetleyicisi:'
+  PAIR: Eşleştir
+  PAIR_PAD: DS Denetleyicisi Eşleştir
+  HINT_PAIRPAD: DS denetleyicisini Bluetooth adaptörü MAC adresiyle eşleştirin.
+  NOT_CONNECTED: Bağlı Değil
+  BTINFO: Bluetooth Adaptör Bilgileri
+  HINT_BTINFO: Daha fazla bilgi ve desteklenen özellikleri gösterir.
+  HCIVER: 'HCI Sürümü:'
+  LMPVER: 'LMP Sürümü:'
+  MANUFACTURER: 'Üretici Firma ID:'
+  SUPFEATURES: 'Desteklenen Özellikler:'
+  'YES': Evet
+  'NO': Hayır
+  BT_SUPPORTED: Bluetooth adaptörü, DS3/DS4 denetleyicileriyle tam uyumlu olmalıdır.
+  BT_NOTSUPPORTED: Bluetooth adaptörü, DS3/DS4 denetleyicileriyle düzgün çalışmayabilir.
+  MTAP_ENABLE: Multitap Emülatör
+  HINT_MTAP_ENABLE: Seçilen oyun için Multitap Emülatörü açar/kapatır.
+  MTAP_PORT: 'Multitap Emülatör Portu:'
+  HINT_MTAP_PORT: Multitap emülatörü için port seçin.
+  PADEMU_WORKAROUND: Sahte DS3 Geçici Çözümü
+  HINT_PADEMU_WORKAROUND: Bazı sahte DS3'ler için geçici çözüme ihtiyacı vardır, bu
+    seçenek etkinleştirecektir.
+  GSM_FIELD_FIX: Alan Çevirme Emülatörü
+  HINT_GSM_FIELD_FIX: Aşamalı video kiplerinde hata veren oyunlar için düzeltme.
+  PARENLOCKCONFIG: Yetişkin Kilidi Ayarları
+  PARENLOCK_PASSWORD: Yetişkin Kilidi Parolası
+  PARENLOCK_PASSWORD_HINT: Yetişkin kilidini devre dışı bırakmak için boş bırakın.
+  PARENLOCK_ENTER_PASSWORD_TITLE: Yetişkin Kilidi Parolasını Girin
+  PARENLOCK_PASSWORD_INCORRECT: Yetişkin kilidi parolası yanlış.
+  PARENLOCK_DISABLE_WARNING: Yetişkin kilidi devre dışı.
+  BUILD_DETAILS: 'Yapı Seçenekleri:'
+  PARENLOCK_INVALID_PASSWORD: Hata - bu parola kullanılamaz.
+  ERR_VMC_FRAGMENTED_CONTINUE: VMC %s dosyası bozulmuş. %d yuvasındaki Bellek Kartı
+    ile devam edilsin mi?
+  AUDIO_SETTINGS: Ses Ayarları
+  SFX: Ses Efektleri
+  BOOT_SND: Önyükleme Sesi
+  SFX_VOLUME: Ses Efektleri Seviyesi
+  BOOT_SND_VOLUME: Önyükleme Sesi Seviyesi
+  CFM_VMODE_CHG: Video kipi değişikliği onaylansın mı?
+  CACHE_HDD_GAME_LIST: Önbellek Oyun Listesi (HDD)
+  ENABLE_NOTIFICATIONS: Bildirimler
+  CFG_NOTIFICATION: Yapılandırma şuradan yüklendi %s
+  THM_NOTIFICATION: Tema şuradan yüklendi %s
+  LNG_NOTIFICATION: Dil şuradan yüklendi %s
+  PARTITION_NOTIFICATION: '%s bölümü takıldı.'
+  OPTIONS: Seçenekler
+  GAME_SETTINGS_SAVED: Oyun ayarları kaydedildi.
+  GAME_SETTINGS_REMOVED: '%s ayarları kaldırıldı.'
+  NET_UPDATE_HINT: Etkinleştirildiğinde mevcut oyun uyumluluğu ayarlarının üzerine
+    yazar.
+  SETTINGS_SOURCE: Ayarlar Kipi
+  GLOBAL_SETTINGS: Genel
+  PERGAME_SETTINGS: Oyuna Özel
+  ALL_SETTINGS: Tümü
+  GAME_SETTINGS_PROMPT: Kaldırılacak ayarları seçin.
+  FORUM_DETAILS: 'Destek Forumları:'
+  INFO_TITLE: Başlık
+  INFO_GENRE: Tür
+  INFO_RELEASE: Tarih
+  INFO_DEVELOPER: Geliştirici
+  INFO_DESCRIPTION: Açıklama
+  BLOCKDEVICE_SETTINGS: Cihazları Engelle
+  CONTROLLER_SETTINGS: Denetleyici Ayarları
+  HINT_BDM_START: Cihaz Engelleme Yöneticisi aç/kapat.
+  HINT_BLOCK_DEVICES: Engellenen Cihazları (örn. USB) açın/kapatın.
+  USB_GAMES: USB Oyunları
+  ILINK_GAMES: iLink Oyunları
+  MX4SIO_GAMES: MX4SIO Oyunları

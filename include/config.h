@@ -37,6 +37,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_DMA          "$DMA"
 #define CONFIG_ITEM_DNAS         "$DNAS"
 #define CONFIG_ITEM_CONFIGSOURCE "$ConfigSource"
+#define CONFIG_ITEM_CORE_VERSION "$Core"
 
 // Per-Game GSM keys. -Bat-
 #define CONFIG_ITEM_GSMSOURCE   "$GSMSource"

@@ -39,9 +39,7 @@ enum GAME_MENU_IDs {
     GAME_CHEAT_SETTINGS,
     GAME_GSM_SETTINGS,
     GAME_VMC_SETTINGS,
-#ifdef PADEMU
     GAME_PADEMU_SETTINGS,
-#endif
     GAME_SAVE_CHANGES,
     GAME_TEST_CHANGES,
     GAME_REMOVE_CHANGES,
@@ -235,9 +233,7 @@ void menuInitGameMenu(void)
     submenuAppendItem(&gameMenu, -1, NULL, GAME_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_GSM_SETTINGS, _STR_GSCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_VMC_SETTINGS, _STR_VMC_SCREEN);
-#ifdef PADEMU
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADEMU_SETTINGS, _STR_PADEMUCONFIG);
-#endif
     submenuAppendItem(&gameMenu, -1, NULL, GAME_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_TEST_CHANGES, _STR_TEST);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_REMOVE_CHANGES, _STR_REMOVE_ALL_SETTINGS);
@@ -851,12 +847,9 @@ void menuHandleInputMenu()
             guiShowAbout();
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
-#ifdef PADEMU
                 guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
                 saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
-#else
-                saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
-#endif
+
                 menuSetParentalLockCheckState(1); // Re-enable parental lock check.
             }
         } else if (id == MENU_EXIT) {
@@ -1018,13 +1011,9 @@ void menuRenderGameMenu()
         // render, advance
         fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
         y += spacing;
-#ifdef PADEMU
+
         if (cp == 4 || cp == 6)
             y += spacing / 2; // leave a blank space before rendering Save & Remove Settings.
-#else
-        if (cp == 3 || cp == 5)
-            y += spacing / 2;
-#endif
     }
 
     // hints
@@ -1070,10 +1059,8 @@ void menuHandleInputGameMenu()
             guiGameShowGSConfig();
         } else if (menuID == GAME_VMC_SETTINGS) {
             guiGameShowVMCMenu(selected_item->item->current->item.id, selected_item->item->userdata);
-#ifdef PADEMU
         } else if (menuID == GAME_PADEMU_SETTINGS) {
             guiGameShowPadEmuConfig(0);
-#endif
         } else if (menuID == GAME_SAVE_CHANGES) {
             if (guiGameSaveConfig(itemConfig, selected_item->item->userdata))
                 configSetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_USER);

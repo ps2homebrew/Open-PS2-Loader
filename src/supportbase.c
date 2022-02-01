@@ -595,7 +595,6 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
 
     InitCheatsConfig(configSet);
 
-#ifdef PADEMU
     config_set_t *configGame = configGetByType(CONFIG_GAME);
 
     gPadEmuSource = 0;
@@ -609,7 +608,6 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         configGetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
         configGetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, &gPadEmuSettings);
     }
-#endif
 
     *patchindex = i;
 
@@ -743,7 +741,7 @@ static void sbCreateFoldersFromList(const char *path, const char **folders)
 
 void sbCreateFolders(const char *path, int createDiscImgFolders)
 {
-    const char *basicFolders[] = {"CFG", "THM", "LNG", "ART", "VMC", "CHT", "APPS", NULL};
+    const char *basicFolders[] = {"CFG", "THM", "LNG", "ART", "VMC", "CHT", "APPS", "CORES", NULL};
     const char *discImgFolders[] = {"CD", "DVD", NULL};
 
     sbCreateFoldersFromList(path, basicFolders);

@@ -15,10 +15,8 @@
 #include "include/system.h"
 #include "include/guigame.h"
 
-#ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
-#endif
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioDevctl("genvmc:", ***)
@@ -26,6 +24,8 @@
 static int configSourceID;
 static int dmaMode;
 static int compatMode;
+static int compatModeCount;
+static int coreID;
 
 static int EnableGSM;
 static int GSMVMode;
@@ -35,10 +35,9 @@ static int GSMFIELDFix;
 
 static int EnableCheat;
 static int CheatMode;
-#ifdef PADEMU
+
 static int EnablePadEmu;
 static int PadEmuSettings;
-#endif
 
 static char hexid[32];
 static char altStartup[32];
@@ -50,9 +49,7 @@ static char configSource[128];
 // forward declarations.
 static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame);
 static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame);
-#ifdef PADEMU
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame);
-#endif
 
 int guiGameAltStartupNameHandler(char *text, int maxLen)
 {
@@ -435,7 +432,6 @@ void guiGameShowCheatConfig(void)
 }
 
 // PADEMU
-#ifdef PADEMU
 // from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
 static char *bt_ver_str[] = {
     "1.0b",
@@ -769,11 +765,43 @@ void guiGameSavePadEmuGlobalConfig(config_set_t *configGame)
         configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
     }
 }
-#endif
+
+static int guiGameCompatUpdater(int modified)
+{
+    if (modified) {
+        int i;
+
+        diaGetInt(diaCompatConfig, COMPAT_CORE_VERSION, &coreID);
+        if (oplCoreHasExtraModes(coreID)) {
+            compatModeCount = 8;
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_7_STR, 1);
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 6, 1);
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_8_STR, 1);
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 7, 1);
+        } else {
+            compatModeCount = 6;
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_7_STR, 0);
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 6, 0);
+            diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 6, 0);
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_8_STR, 0);
+            diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 7, 0);
+            diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 7, 0);
+        }
+
+        compatMode = 0;
+        for (i = 0; i < compatModeCount; ++i) {
+            int mdpart;
+            diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + i, &mdpart);
+            compatMode |= (mdpart ? 1 : 0) << i;
+        }
+    }
+
+    return 0;
+}
 
 void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 {
-    int i;
+    compatModeCount = 6;
 
     if (support->flags & MODE_FLAG_COMPAT_DMA) {
         const char *dmaModes[] = {"MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0", "UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", NULL};
@@ -783,15 +811,10 @@ void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configS
         diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
     }
 
-    int result = diaExecuteDialog(diaCompatConfig, -1, 1, NULL);
-    if (result) {
-        compatMode = 0;
-        for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
-            int mdpart;
-            diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + i, &mdpart);
-            compatMode |= (mdpart ? 1 : 0) << i;
-        }
+    diaSetEnum(diaCompatConfig, COMPAT_CORE_VERSION, (const char **)oplGetCoreGuiList());
 
+    int result = diaExecuteDialog(diaCompatConfig, -1, 1, guiGameCompatUpdater);
+    if (result) {
         if (result == COMPAT_LOADFROMDISC) {
             if (sysGetDiscID(hexDiscID) >= 0)
                 diaSetString(diaCompatConfig, COMPAT_GAMEID, hexDiscID);
@@ -806,6 +829,8 @@ void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configS
         diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
         diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup, sizeof(altStartup));
     }
+
+    oplSetGuiCoreValue(coreID);
 }
 
 // sets variables without writing to users cfg file.. follow up with menuSaveConfig() to write
@@ -816,11 +841,16 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
     config_set_t *configGame = configGetByType(CONFIG_GAME);
 
     compatMode = 0;
-    for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
+    for (i = 0; i < compatModeCount; ++i) {
         int mdpart;
         diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + i, &mdpart);
         compatMode |= (mdpart ? 1 : 0) << i;
     }
+
+    if (compatMode != 0)
+        result = configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
+    else
+        configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 
     if (support->flags & MODE_FLAG_COMPAT_DMA) {
         diaGetInt(diaCompatConfig, COMPAT_DMA, &dmaMode);
@@ -830,10 +860,11 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
             configRemoveKey(configSet, CONFIG_ITEM_DMA);
     }
 
-    if (compatMode != 0)
-        result = configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
+    diaGetInt(diaCompatConfig, COMPAT_CORE_VERSION, &coreID);
+    if (coreID != 0)
+        result = configSetStr(configSet, CONFIG_ITEM_CORE_VERSION, oplGetCoreValue());
     else
-        configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+        configRemoveKey(configSet, CONFIG_ITEM_CORE_VERSION);
 
     /// GSM ///
     diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);
@@ -897,11 +928,9 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
         configSetInt(configGame, CONFIG_ITEM_CHEATMODE, CheatMode);
     }
 
-#ifdef PADEMU
     /// PADEMU ///
     result = guiGameSavePadEmuGameConfig(configSet, result);
     guiGameSavePadEmuGlobalConfig(configGame);
-#endif
 
     diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
     if (hexid[0] != '\0')
@@ -934,11 +963,10 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         configRemoveKey(configGame, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMFIELDFIX);
 
-#ifdef PADEMU
         // PADEMU
         configRemoveKey(configGame, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configGame, CONFIG_ITEM_PADEMUSETTINGS);
-#endif
+
         saveConfig(CONFIG_GAME, 0);
     }
 }
@@ -951,6 +979,7 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
         configRemoveKey(configSet, CONFIG_ITEM_DNAS);
         configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
+        configRemoveKey(configSet, CONFIG_ITEM_CORE_VERSION);
 
         // GSM
         configRemoveKey(configSet, CONFIG_ITEM_GSMSOURCE);
@@ -965,12 +994,11 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 
-#ifdef PADEMU
         // PADEMU
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
-#endif
+
         // VMC
         configRemoveVMC(configSet, 0);
         configRemoveVMC(configSet, 1);
@@ -1050,7 +1078,6 @@ static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *confi
     diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
 }
 
-#ifdef PADEMU
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame)
 {
     EnablePadEmu = 0;
@@ -1086,7 +1113,6 @@ static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *confi
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
 }
-#endif
 
 // loads defaults if no config found
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
@@ -1109,17 +1135,39 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     } else
         diaSetInt(diaCompatConfig, COMPAT_DMA, 0);
 
+    const char *temp;
+    coreID = 0;
+    if (configGetStr(configSet, CONFIG_ITEM_CORE_VERSION, &temp))
+        coreID = oplFindCoreGuiID(temp);
+
+    oplSetGuiCoreValue(coreID);
+    diaSetInt(diaCompatConfig, COMPAT_CORE_VERSION, coreID);
+
+    if (oplCoreHasExtraModes(coreID)) {
+        compatModeCount = 8;
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_7_STR, 1);
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 6, 1);
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_8_STR, 1);
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 7, 1);
+    } else {
+        compatModeCount = 6;
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_7_STR, 0);
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 6, 0);
+        diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 6, 0);
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_8_STR, 0);
+        diaSetVisible(diaCompatConfig, COMPAT_MODE_BASE + 7, 0);
+        diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 7, 0);
+    }
+
     compatMode = 0;
     configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
-    for (i = 0; i < COMPAT_MODE_COUNT; ++i)
+    for (i = 0; i < compatModeCount; ++i)
         diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
     guiGameLoadGSMConfig(configSet, configGame);
-
     guiGameLoadCheatsConfig(configSet, configGame);
-#ifdef PADEMU
     guiGameLoadPadEmuConfig(configSet, configGame);
-#endif
+
     /// Find out the current game ID ///
     hexid[0] = '\0';
     configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));

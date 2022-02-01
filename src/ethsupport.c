@@ -264,6 +264,9 @@ static void ethInitSMB(void)
         sprintf(path, "%sLNG", ethPrefix);
         lngAddLanguages(path, "\\", ethGameList.mode);
 
+        sprintf(path, "%sCORES", ethPrefix);
+        oplAddCores(path, "\\");
+
         sbCreateFolders(ethPrefix, 1);
     } else if (gPCShareName[0] || !(gNetworkStartup >= ERROR_ETH_SMB_OPENSHARE)) {
         ethDisplayErrorStatus();
@@ -587,6 +590,16 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         return;
     }
 
+    const char *temp;
+    int coreID = 0;
+    if (configGetStr(configSet, CONFIG_ITEM_CORE_VERSION, &temp))
+        coreID = oplFindCoreGuiID(temp);
+
+    oplSetGuiCoreValue(coreID);
+    oplGetCoreFiles(coreID, ETH_MODE);
+
+    void **mcemu_irx = coreFile[SMB_MCEMU_IRX].data;
+    int mcirx_size = coreFile[SMB_MCEMU_IRX].size;
     char vmc_name[32];
     int vmc_id, size_mcemu_irx = 0;
     smb_vmc_infos_t smb_vmc_infos;
@@ -616,11 +629,11 @@ static void ethLaunchGame(int id, config_set_t *configSet)
             }
         }
 
-        for (i = 0; i < size_smb_mcemu_irx; i++) {
-            if (((u32 *)&smb_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
+        for (i = 0; i < mcirx_size; i++) {
+            if (((u32 *)mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
                 if (smb_vmc_infos.active)
-                    size_mcemu_irx = size_smb_mcemu_irx;
-                memcpy(&((u32 *)&smb_mcemu_irx)[i], &smb_vmc_infos, sizeof(smb_vmc_infos_t));
+                    size_mcemu_irx = mcirx_size;
+                memcpy(&((u32 *)mcemu_irx)[i], &smb_vmc_infos, sizeof(smb_vmc_infos_t));
                 break;
             }
         }
@@ -631,7 +644,9 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         saveConfig(CONFIG_LAST, 0);
     }
 
-    compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
+    void **irx = coreFile[SMB_CDVDMAN_IRX].data;
+    int irx_size = coreFile[SMB_CDVDMAN_IRX].size;
+    compatmask = sbPrepare(game, configSet, irx_size, irx, &i);
 
     if ((result = sbLoadCheats(ethPrefix, game->startup)) < 0) {
         switch (result) {
@@ -643,7 +658,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         }
     }
 
-    settings = (struct cdvdman_settings_smb *)((u8 *)(&smb_cdvdman_irx) + i);
+    settings = (struct cdvdman_settings_smb *)((u8 *)irx + i);
 
     switch (game->format) {
         case GAME_FORMAT_OLD_ISO:
@@ -699,9 +714,10 @@ static void ethLaunchGame(int id, config_set_t *configSet)
 
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
+
     deinit(NO_EXCEPTION, ETH_MODE); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
-    sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
+    sysLaunchLoaderElf(filename, "ETH_MODE", irx_size, irx, size_mcemu_irx, mcemu_irx, EnablePS2Logo, compatmask);
 }
 
 static config_set_t *ethGetConfig(int id)

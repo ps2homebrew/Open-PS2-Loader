@@ -343,6 +343,15 @@ struct UIItem diaCompatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_COMPAT_SETTINGS}}},
     {UI_SPLITTER},
 
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_CORE_SELECT}}},
+    {UI_SPACER},
+    {UI_ENUM, COMPAT_CORE_VERSION, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_COMPAT_MODES}}},
+    {UI_BREAK},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}},
     {UI_SPACER},
     {UI_BOOL, COMPAT_MODE_BASE, 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}},
@@ -367,6 +376,15 @@ struct UIItem diaCompatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}},
     {UI_SPACER},
     {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, COMPAT_MODE_7_STR, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE7}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE + 6, 1, 1, _STR_HINT_MODE7, -10, 0, {.intvalue = {0, 0}}},
+    {UI_SPACER},
+    {UI_LABEL, COMPAT_MODE_8_STR, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     {UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
@@ -530,7 +548,6 @@ struct UIItem diaCheatConfig[] = {
     // end of dialog
     {UI_TERMINATOR}};
 
-#ifdef PADEMU
 struct UIItem diaPadEmuConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMU_SETTINGS}}},
     {UI_SPLITTER},
@@ -783,7 +800,6 @@ struct UIItem diaPadEmuInfo[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 // About Menu
 struct UIItem diaAbout[] = {
@@ -942,11 +958,11 @@ struct UIItem diaControllerConfig[] = {
     {UI_SPACER},
     {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
-#ifdef PADEMU
     {UI_BREAK},
+
     {UI_BUTTON, PADEMU_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
     {UI_BREAK},
-#endif
+
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},

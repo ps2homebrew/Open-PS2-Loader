@@ -289,6 +289,12 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "USB Games",
     "iLink Games",
     "MX4SIO Games",
+    "Compatibility Modes",
+    "Core Version",
+    "High Module Storage",
+    "Hide DEV9 Module",
+    "Mode 7",
+    "Mode 8",
 };
 
 static int guiLangID = 0;

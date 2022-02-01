@@ -49,10 +49,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rtl: ["", RTL=1]
-        pademu: ["", PADEMU=1]
-        igs: ["", IGS=1]
-        t10k: ["", DTL_T10000=1]
+        rtl: [RTL=0, RTL=1]
+        pademu: [PADEMU=0, PADEMU=1]
+        igs: [IGS=0, IGS=1]
+        t10k: [DTL_T10000=0, DTL_T10000=1]
     runs-on: ubuntu-latest
     container: ps2dev/ps2dev:latest
     steps:

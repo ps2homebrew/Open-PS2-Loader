@@ -1,0 +1,388 @@
+comments: |-
+  Croatian translation by Blacky5678
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Croatian
+  SAVE_CHANGES: Spremi Promjene
+  BACK: Natrag
+  NETCONFIG:
+  - untranslated
+  - original: Network Settings
+  SHOW_ADVANCED_OPTS: Napredne Postavke
+  NO_ITEMS: <nema vrijednosti>
+  SETTINGS_SAVED: Postavke spremljene u %s
+  ERROR_SAVING_SETTINGS: Greska zapisivanja postavki!
+  EXIT: Izlaz
+  SETTINGS: Postavke
+  MENU: Izbornik
+  BDM_GAMES: BDM Igre
+  HDD_GAMES: HDD Igre
+  NET_GAMES: ETH Igre
+  APPS: Aplikacije
+  THEME: Teme
+  LANGUAGE: Jezik
+  CONFIRMATION_POFF: Sistem ce se ugasiti.
+  CONFIRMATION_EXIT: Izaci u Preglednik?
+  CONFIRMATION_CANCEL_UPDATE: Otkazati azuriranje?
+  HDD_NOT_CONNECTED_ERROR: '%d: Hard Disk nije primijecen.'
+  HDD_NOT_FORMATTED_ERROR: '%d: Hard Disk nije formatiran.'
+  NETWORK_STARTUP_ERROR: '%d: Greska pokretanja mreze.'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Mrezni adapter nije primijecen.'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Nemoguce se spojiti na SMB server.'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Nemoguce se ulogirati na SMB server.'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Nemoguce otvoriti SMB dijeljenje.'
+  NETWORK_SHARE_LIST_ERROR: '%d: Nemoguce izlistati SMB dijeljenja.'
+  NETWORK_GAMES_LIST_ERROR: '%d: Nemoguce izlistati igre.'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCP server nije dostupan.'
+  NETWORK_ERROR_LINK_FAIL: '%d: Nema mrezne konekcije.'
+  'ON': Uklj.
+  'OFF': Isklj.
+  OK: U redu
+  SELECT: Odaberi
+  CANCEL: Otkazi
+  CIRCLE: Krug
+  CROSS: Kriz
+  GAMES_LIST: Lista Igara
+  COMPAT_SETTINGS: Postavke Igre
+  REMOVE_ALL_SETTINGS: Ukloni Postavke
+  SCROLLING: Izlistati
+  SLOW: Sporo
+  MEDIUM: Srednje
+  FAST: Brzo
+  DEFDEVICE: Uobicajeni Izbornik
+  LOAD_FROM_DISC: Ucitaj sa diska
+  PLEASE_WAIT: Molimo, sacekajte.
+  ERROR_LOADING_ID: Greska tijekom ucitavanja ID-a igre.
+  AUTOSORT: Automatsko Sortiranje
+  ERR_LOADING_LANGFILE: Greska ucitavanja jezicne datoteke.
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: Kontroler nije primijecen, cekanje…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: Siroki Zaslon
+  POWEROFF: Ugasi
+  LOADING_SETTINGS: Ucitavanje konfiguracije…
+  SAVING_SETTINGS: Spremanje konfiguracije…
+  START_DEVICE: Zapocni Uredaj
+  REFRESH: Osvjezi
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: Pocetni Nacin HDD Uredaja
+  ETHMODE: Pocetni Nacin ETH Uredaja
+  APPMODE: Nacin Prikaza Aplikacijskog Izbornika
+  AUTO: Automatski
+  MANUAL: Rucno
+  STARTNBD: Zapocni NBD Server
+  STARTINGNBD: Zapocinjanje NBD Servera…
+  RUNNINGNBD: Pokretanje NBD Servera…
+  STARTFAILNBD: Neuspjesno zapocinjanje NBD Servera.
+  UNLOADNBD: Gasenje NBD Server…
+  EXITTO: IGR Putanja
+  BGCOLOR: Boja Pozadine
+  TXTCOLOR: Boja Teksta
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: Vrsta IP Adrese
+  IP_ADDRESS_TYPE_STATIC: Staticna
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IP Adresa
+  ADDRESS: Adresa
+  MASK: Maska
+  GATEWAY: Propusnica
+  DNS_SERVER:
+  - untranslated
+  - original: DNS Server
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE: Dijeli
+  USER: Korisnik
+  PASSWORD: Lozinka
+  NOT_SET: <nije postavljeno>
+  ADDRESS_TYPE: Vrsta Adrese
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Prihvati
+  DELETE_WARNING: Stavka ce biti trajno obrisana, nastaviti?
+  RENAME: Preimenuj
+  DELETE: Obrisi
+  RUN: Pokreni
+  GFX_SETTINGS: Postavke Zaslona
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: Zapamti Zadnju Upaljenu Igru
+  SELECTBUTTON: Tipka za Odabir
+  ERR_FRAGMENTED: Greska, igra je fragmentirana.
+  ERR_FILE_INVALID: Greska, nije moguce pokrenuti ovu stavku.
+  TEST: Testiraj Promjene
+  HINT_GUEST: Ostavi prazno za autent. GOSTA
+  HINT_MODE1: Tocna Citanja
+  HINT_MODE2: Sinkronizacijski Nacin
+  HINT_MODE3: Otkaci Syscalls
+  HINT_MODE4: Preskoci Videe
+  HINT_MODE5: Emuliraj DVD-DL
+  HINT_MODE6: Onemoguci IGR
+  HINT_VMC_SIZE: Mijenjanje velice ce preurediti VMC.
+  CREATE: Stvori
+  START: Zapocni
+  MODIFY: Izmjeni
+  ABORT: Prekini
+  RESET: Resetiraj
+  USE_GENERIC: Koristi Genericki
+  VMC_SCREEN: Konfiguriraj VMC
+  VMC_NAME: Ime
+  SIZE: Velicina
+  VMC_STATUS:
+  - untranslated
+  - original: Status
+  VMC_PROGRESS: Napredak
+  VMC_FILE_EXISTS: VMC datoteka vec postoji.
+  VMC_FILE_ERROR: Nevazeca VMC datoteka, velicina nije tocna.
+  VMC_FILE_NEW: VMC datoteka treba biti stvorena.
+  ERR_VMC_CONTINUE: Greska pristupanja VMC %s. Nastaviti sa Memory Cardom u slotu
+    %d?
+  AUTOREFRESH: Automatsko Osvjezavanje
+  ABOUT: O
+  DEVS: Koderi
+  QANDA: Osiguranje Kvalitete
+  BDM_PREFIX: Putanja BDM Prefiksa
+  HINT_EXITPATH: Pokrece prilagodeni ELF nakon IGR-a.
+  HINT_SPINDOWN: Vrijednost u minutama, 0 za onemogucivanje zavrtanja.
+  HDD_SPINDOWN: Automatsko Zavrtanje HDD-a
+  VMODE: Video Nacin
+  UICOLOR: Boja Dijaloga
+  SELCOLOR: Odabrana Boja
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO:
+  - untranslated
+  - original: Info
+  ALTSTARTUP: Prilagodeni ELF
+  COLOR_SELECTION: Odabir Boje
+  RECONNECT: Ponovno spoji
+  HINT_SHARENAME: Ostavi prazno za listu dijeljenja.
+  ETH_PREFIX: Putanja ETH Prefiksa
+  BACKSPACE: Brisanje
+  SPACE: Razmak
+  ENTER: Unesi
+  MODE: Nacin
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID: ID Igre
+  DMA_MODE: DMA Nacin
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1: Nacin 1
+  MODE2: Nacin 2
+  MODE3: Nacin 3
+  MODE4: Nacin 4
+  MODE5: Nacin 5
+  MODE6: Nacin 6
+  GSCONFIG: Konfiguriraj GSM
+  ETH_OPMODE: Nacin Povezivanja Etherneta
+  ETH_100MFDX: 100Mbit Puni-dupleks
+  ETH_100MHDX: 100Mbit Pola-dupleksa
+  ETH_10MFDX: 10Mbit Puni-dupleks
+  ETH_10MHDX: 10Mbit Pola-dupleksa
+  GSM_SETTINGS: GSM Postavke
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Uklj./Isklj. GSM
+  HINT_GSMVMODE: Forsirani prilagodeni nacin ekrana.
+  XOFFSET: H-POZ
+  HINT_XOFFSET: Horizontalno nastimavanje.
+  YOFFSET: V-POZ
+  HINT_YOFFSET: Vertikalno nastimavanje.
+  OVERSCAN: Skaliranje
+  HINT_OVERSCAN: Nastimavanje skaliranja.
+  GSMSKIPVIDEOS: Preskoci FMV
+  HINT_GSMSKIPVIDEOS: Preskakanje FMV-a
+  CHEAT_SETTINGS: Postavke Varanja
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Dopusti PS2RD Cheat Engine da zakrpa tvoju igru.
+  CHEATMODE: Nacin PS2RD Cheat Engine
+  HINT_CHEATMODE: Automatski odabir ili odaberi varanja za igru.
+  CHEATMODEAUTO: Automatski Odaberi Varanja
+  CHEATMODESELECT: Odaberi Varanja Igre
+  ERR_CHEATS_LOAD_FAILED: 'Greska: neuspjelo ucitavanje datoteke varanja.'
+  NO_CHEATS_FOUND: Varnaje nije pronadeno.
+  DL_DEFAULTS: Preuzmi Uobicajeno
+  NET_UPDATE: Mrezno Azuriranje
+  NET_UPDATE_ALL: Prepisi Postojece Zapise
+  NET_UPDATE_FAILED: Azuriranje nije uspjelo.
+  NET_UPDATE_CONN_FAILED: Neuspjesno spajanje na server azuriranja.
+  NET_UPDATE_DONE: Azuriranje zavrseno.
+  NET_UPDATE_CANCELLED: Azuriranje otkazano.
+  CONFIRMATION_SETTINGS_UPDATE: Preuzmi postavke sa mreze?
+  CUSTOMIZED_SETTINGS: Prilagodene Postavke
+  DOWNLOADED_DEFAULTS: Preuzeto Uobicajeno
+  AUTO_START_IN_N_SECS: Automatski zapocni za %i s…
+  AUTOSTARTLAST: Automatski zapocni
+  HINT_AUTOSTARTLAST: Vrijednost u sekundama, 0 za onemogucavanje automatskog pocetka.
+  PS2LOGO:
+  - untranslated
+  - original: PS2 Logo
+  HINT_PS2LOGO:
+  - untranslated
+  - original: Displayed for a valid disc logo matching the console's region.
+  PADEMUCONFIG: Konfiguriraj PADEMU
+  PADEMU_SETTINGS: Postavke Pad Emulatora
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Uklj./Isklj. Pad Emulator za odabranu igru.
+  PADEMU_MODE: Nacin Pad Emulatora
+  HINT_PADEMU_MODE: Odabire nacin Pad Emulatora.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Postavke Za Port:'
+  HINT_PAD_PORT: Odaberi port za postavke Pad Emulatora.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Uklj./Isklj. Pad Emulator za odabrani port.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Uklj./Isklj. vibraciju za odabrani port Pad Emulatora.
+  USBDG_MAC: 'MAC Adresa USB Bluetooth Adaptera:'
+  PAD_MAC: 'DS Kontroler uparen na MAC Adresu:'
+  PAIR: Upari
+  PAIR_PAD: Upari DS Kontroler
+  HINT_PAIRPAD: Upari DS kontroler sa MAC adresom Bluetooth adaptera.
+  NOT_CONNECTED: Nije Spojeno
+  BTINFO: Informacije Bluetooth Adaptera
+  HINT_BTINFO: Prikazuje vise informacija i podrzana svojstva.
+  HCIVER: 'HCI Verzija:'
+  LMPVER: 'LMP Verzija:'
+  MANUFACTURER: 'ID Proizvodaca:'
+  SUPFEATURES: 'Podrzana Svojstva:'
+  'YES': Da
+  'NO': Ne
+  BT_SUPPORTED: Bluetooth adapter bi trebao biti potpuno kompatibilan sa DS3/DS4 kontrolerom.
+  BT_NOTSUPPORTED: Bluetooth adapter mozda nece raditi ispravno sa DS3/DS4 kontrolerom.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: Uklj./Isklj. emulaciju Multitapa za odabranu igru.
+  MTAP_PORT: 'Emulator Multitapa na Portu:'
+  HINT_MTAP_PORT: Odaberi port za emulaciju Multitapa.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emuliraj preklapanje FIELD-a
+  HINT_GSM_FIELD_FIX: Zakrpe za igre koje se kvare pod progresivnim video nacinom.
+  PARENLOCKCONFIG: Postavke Roditeljskog Zakljucavanja
+  PARENLOCK_PASSWORD: Lozinka Roditeljskog Zakljucavanja
+  PARENLOCK_PASSWORD_HINT: Ostavi prazno za onemogucavanje roditeljskog zakljucavanja.
+  PARENLOCK_ENTER_PASSWORD_TITLE: Unesi Lozinku Roditeljskog Zakljucavanja
+  PARENLOCK_PASSWORD_INCORRECT: Lozinka roditeljskog zakljucavanja nije tocna.
+  PARENLOCK_DISABLE_WARNING: Roditeljsko zakljucavanje je onemoguceno.
+  BUILD_DETAILS: 'Izgradi Postavke:'
+  PARENLOCK_INVALID_PASSWORD: Greska - ova lozinka se ne moze koristiti.
+  ERR_VMC_FRAGMENTED_CONTINUE: VMC %s datoteka je fragmentirana. Nastaviti sa Memory
+    Cardom u slotu %d?
+  AUDIO_SETTINGS: Postavke Zvuka
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: Glasnoca Zvucnih Efekata
+  BOOT_SND_VOLUME: Glasnoca Zvuka Pokretanja
+  CFM_VMODE_CHG: Potvrdi promjenu video nacina?
+  CACHE_HDD_GAME_LIST: Predmemorija Liste Igara (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED: Postavke igre su spremljene.
+  GAME_SETTINGS_REMOVED: '%s postavke su uklonjene.'
+  NET_UPDATE_HINT: Prepisivanje postojecih postavki kompatibilnosti igre kada je omoguceno.
+  SETTINGS_SOURCE: Nacin Postavki
+  GLOBAL_SETTINGS: Globalno
+  PERGAME_SETTINGS: Po Igri
+  ALL_SETTINGS: Sve
+  GAME_SETTINGS_PROMPT: Odaberi postavke za ukloniti.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

@@ -1,0 +1,354 @@
+comments: |-
+  Greek Translation by RivalK93 (Discord:RivalK93#1970). Last update: Jan. 26, 2020.
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Greek
+  SAVE_CHANGES: Αποθήκευση Αλλαγών
+  BACK: Πίσω
+  NETCONFIG: Ρυθμίσεις Δικτύου
+  SHOW_ADVANCED_OPTS: Σύνθετες Επιλογές
+  NO_ITEMS: <κενό>
+  SETTINGS_SAVED: Αποθήκευση ρυθμίσεων σε %s
+  ERROR_SAVING_SETTINGS: Σφάλμα κατά την εγγραφή των ρυθμίσεων!
+  EXIT: Έξοδος
+  SETTINGS: Ρυθμίσεις
+  MENU: Μενού
+  BDM_GAMES: Παιχνίδια BDM
+  HDD_GAMES: Παιχνίδια HDD
+  NET_GAMES: Παιχνίδια ETH
+  APPS: Εφαρμογές
+  THEME: Θέμα
+  LANGUAGE: Γλώσσα
+  CONFIRMATION_POFF: Το σύστημα θα απενεργοποιηθεί.
+  CONFIRMATION_EXIT: Έξοδος στο Browser;
+  CONFIRMATION_CANCEL_UPDATE: Ακύρωση ενημέρωσης;
+  HDD_NOT_CONNECTED_ERROR: '%d: Δεν εντοπίστηκε Σκληρός Δίσκος.'
+  HDD_NOT_FORMATTED_ERROR: '%d: Ο Σκληρός Δίσκος δεν έχει διαμορφωθεί.'
+  NETWORK_STARTUP_ERROR: '%d: Σφάλμα εκκίνησης Δικτύου.'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Δεν εντοπίστηκε Προσαρμογέας Δικτύου.'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Αδυναμία σύνδεσης με τον εξυπηρετητή SMB.'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Αδυναμία login στον εξυπηρετητή SMB.'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Αδυναμία ανοίγματος κοινής χρήσης SMB.'
+  NETWORK_SHARE_LIST_ERROR: '%d: Αδυναμία απαρίθμησης κοινόχρηστων SMB.'
+  NETWORK_GAMES_LIST_ERROR: '%d: Αδυναμία απαρίθμησης παιχνιδιών.'
+  NETWORK_ERROR_DHCP_FAIL: '%d: Ο εξυπηρετητής DHCP δεν είναι διαθέσιμος.'
+  NETWORK_ERROR_LINK_FAIL: '%d: Δεν υπάρχει σύνδεση δικτύου.'
+  'ON': Ναι
+  'OFF': Όχι
+  OK:
+  - untranslated
+  - original: OK
+  SELECT: Επιλογή
+  CANCEL: Άκυρο
+  CIRCLE: Ο
+  CROSS: Χ
+  GAMES_LIST: Λίστα Παιχνιδιών
+  COMPAT_SETTINGS: Ρυθμίσεις Παιχνιδιού
+  REMOVE_ALL_SETTINGS: Κατάργηση Ρυθμίσεων
+  SCROLLING: Κύλιση
+  SLOW: Αργή
+  MEDIUM: Κανονική
+  FAST: Γρήγορη
+  DEFDEVICE: Προεπιλεγμένο Μενού
+  LOAD_FROM_DISC: Φόρτωση από το Δίσκο
+  PLEASE_WAIT: Παρακαλώ περιμένετε.
+  ERROR_LOADING_ID: Σφάλμα κατά τη φόρτωση του ID του παιχνιδιού.
+  AUTOSORT: Αυτόματη Ταξινόμηση
+  ERR_LOADING_LANGFILE: Σφάλμα κατά τη φόρτωση του αρχείου γλώσσας.
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: Δεν εντοπίστηκε χειριστήριο, αναμονή…
+  COVERART: Εξώφυλλα
+  WIDE_SCREEN:
+  - untranslated
+  - original: Widescreen
+  POWEROFF: Απενεργοποίηση
+  LOADING_SETTINGS: Φόρτωση ρυθμίσεων…
+  SAVING_SETTINGS: Αποθήκευση ρυθμίσεων…
+  START_DEVICE: Εκκίνηση Συσκευής
+  REFRESH: Ανανέωση
+  BDMMODE: Λειτουργία εκκίνησης BDM
+  HDDMODE: Εκκίνηση Λειτουργίας HDD
+  ETHMODE: Εκκίνηση Λειτουργίας ETH
+  APPMODE: Εκκίνηση Μενού Εφαρμογών
+  AUTO: Αυτόματα
+  MANUAL: Μη αυτόματα
+  STARTNBD: Εκκίνηση Εξυπηρετητή NBD
+  STARTINGNBD: Γίνεται εκκίνηση Εξυπηρετητή NBD…
+  RUNNINGNBD: Λειτουργία Εξυπηρετητή NBD…
+  STARTFAILNBD: Αποτυχία εκκίνησης Εξυπηρετητή NBD.
+  UNLOADNBD: Αποφόρτωση Εξυπηρετητή NBD…
+  EXITTO: Προορισμός Μετά Από IGR
+  BGCOLOR: Χρώμα στο Φόντο
+  TXTCOLOR: Χρώμα Γραμματοσειράς
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: Τύπος Διεύθυνσης IP
+  IP_ADDRESS_TYPE_STATIC: Στατική
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: Διεύθυνση IP
+  ADDRESS: Διεύθυνση
+  MASK: Μάσκα Υποδικτύου
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER: Εξυπηρετητής DNS
+  PORT: Θύρα
+  SHARE: Κοινόχρηστο Στοιχείο
+  USER: Χρήστης
+  PASSWORD: Κωδικός
+  NOT_SET: <κενό>
+  ADDRESS_TYPE: Τύπος Διεύθυνσης
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Αποδοχή
+  DELETE_WARNING: Το αρχείο θα διαγραφεί οριστικά, συνέχεια;
+  RENAME: Μετονομασία
+  DELETE: Διαγραφή
+  RUN: Εκκίνηση
+  GFX_SETTINGS: Ρυθμίσεις Οθόνης
+  ENABLE_WRITE: Λειτουργίες εγγραφής
+  LASTPLAYED: Απομνημόνευση Τελευταίου Παιχνιδιού
+  SELECTBUTTON: Πλήκτρο Επιλογής
+  ERR_FRAGMENTED: Σφάλμα, το παιχνίδι είναι κατακερματισμένο.
+  ERR_FILE_INVALID: Σφάλμα, αδυναμία εκτέλεσης του αρχείου.
+  TEST: Δοκιμή Αλλαγών
+  HINT_GUEST: Αφήστε το κενό για δικαιώματα GUEST.
+  HINT_MODE1: Ακριβής Ανάγνωση
+  HINT_MODE2: Συγχρονισμένη Λειτουργία Ανάγνωσης
+  HINT_MODE3: Αποκοπή Syscalls
+  HINT_MODE4: Παράλειψη των Videos
+  HINT_MODE5: Προσομοίωση DVD-DoubleLayer Δίσκου
+  HINT_MODE6: Απενεργοποίηση In-Game-Reset(IGR)
+  HINT_VMC_SIZE: Αλλάζοντας το μέγεθος θα αναδιαμορφώστε τη VMC.
+  CREATE: Δημιουργία
+  START: Εκκίνηση
+  MODIFY: Τροποποίηση
+  ABORT: Ακύρωση
+  RESET: Επαναφορά
+  USE_GENERIC: VMC Γενικής Χρήσης
+  VMC_SCREEN: Ρύθμιση VMC
+  VMC_NAME: Όνομα
+  SIZE: Μέγεθος
+  VMC_STATUS: Κατάσταση
+  VMC_PROGRESS: Πρόοδος
+  VMC_FILE_EXISTS: Το αρχείο VMC υπάρχει ήδη.
+  VMC_FILE_ERROR: Μη έγκυρο αρχείο VMC, το μέγεθος είναι λάθος.
+  VMC_FILE_NEW: Πρέπει να δημιουργηθεί αρχείο VMC.
+  ERR_VMC_CONTINUE: Σφάλμα κατά την πρόσβαση σε VMC %s. Συνέχεια με την Κάρτα Μνήμης
+    στη θύρα %d;
+  AUTOREFRESH: Αυτόματη ανανέωση
+  ABOUT: Σχετικά
+  DEVS: Προγραμματιστές
+  QANDA: Διασφάλιση Ποιότητας
+  BDM_PREFIX: Πρόθεμα Μονοπατιού BDM
+  HINT_EXITPATH: Εκκίνηση του ορισμένου ELF μετά από In-Game-Reset.
+  HINT_SPINDOWN: Τιμή σε λεπτά, 0 για απενεργοποίηση του spin-down.
+  HDD_SPINDOWN: Αυτόματο Spin-Down του HDD
+  VMODE: Λειτουργία Βίντεο
+  UICOLOR: Χρώμα Μηνυμάτων
+  SELCOLOR: Χρώμα Επιλεγμένου
+  RESETCOLOR: Επαναφορά Χρωμάτων
+  INFO: Πληροφορίες
+  ALTSTARTUP: Προορισμένο ELF
+  COLOR_SELECTION: Επιλογή Χρώματος
+  RECONNECT: Επανασύνδεση
+  HINT_SHARENAME: Αφήστε το κενό για απαρίθμηση κοινόχρηστων.
+  ETH_PREFIX: Πρόθεμα Μονοπατιού ETH
+  BACKSPACE: Σβήσιμο
+  SPACE: Κενό
+  ENTER: ΟΚ
+  MODE: Λειτουργία
+  VMC_SLOT1: VMC Θέση 1
+  VMC_SLOT2: VMC Θέση 2
+  GAME_ID: ID Παιχνιδιού
+  DMA_MODE: Λειτουργία DMA
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1:
+  - untranslated
+  - original: Mode 1
+  MODE2:
+  - untranslated
+  - original: Mode 2
+  MODE3:
+  - untranslated
+  - original: Mode 3
+  MODE4:
+  - untranslated
+  - original: Mode 4
+  MODE5:
+  - untranslated
+  - original: Mode 5
+  MODE6:
+  - untranslated
+  - original: Mode 6
+  GSCONFIG: Ρύθμιση GSM
+  ETH_OPMODE: Λειτουργία Σύνδεσης Ethernet
+  ETH_100MFDX:
+  - untranslated
+  - original: 100Mbit Full-duplex
+  ETH_100MHDX:
+  - untranslated
+  - original: 100Mbit Half-duplex
+  ETH_10MFDX:
+  - untranslated
+  - original: 10Mbit Full-duplex
+  ETH_10MHDX:
+  - untranslated
+  - original: 10Mbit Half-duplex
+  GSM_SETTINGS: Ρυθμίσεις GSM
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Ενεργοποιεί/απενεργοποιεί το GSM.
+  HINT_GSMVMODE: Εξαναγκασμένη προσαρμογή λειτουργίας οθόνης.
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: Οριζόντια ρύθμιση οθόνης.
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: Κάθετη ρύθμιση οθόνης.
+  OVERSCAN: Περιθώρια
+  HINT_OVERSCAN: Προσαρμογή των περιθωρίων
+  GSMSKIPVIDEOS: Παράλειψη FMV
+  HINT_GSMSKIPVIDEOS: Παράλειψη των βίντεο πλήρους κίνησης.
+  CHEAT_SETTINGS: Ρυθμίσεις Cheats
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Patchάρισμα των παιχνιδιών από το PS2RD.
+  CHEATMODE: Λειτουργία PS2RD
+  HINT_CHEATMODE: Αυτόματη/μη αυτόματη επιλογή cheats των παιχνιδιών.
+  CHEATMODEAUTO: Αυτόματη Επιλογή Cheats
+  CHEATMODESELECT: Μη αυτόματη Επιλογή Cheats
+  ERR_CHEATS_LOAD_FAILED: 'Σφάλμα: Αποτυχία φόρτωσης αρχείου Cheats.'
+  NO_CHEATS_FOUND: Δε βρέθηκαν cheats.
+  DL_DEFAULTS: Λήψη Προεπιλεγμένων
+  NET_UPDATE: Ενημέρωση Δικτύου
+  NET_UPDATE_ALL: Αντικατάσταση Υπαρχόντων Εγγραφών
+  NET_UPDATE_FAILED: Η ενημέρωση απέτυχε.
+  NET_UPDATE_CONN_FAILED: Αποτυχία σύνδεσης σε εξυπηρετητή ενημέρωσης.
+  NET_UPDATE_DONE: Η ενημέρωση ολοκληρώθηκε.
+  NET_UPDATE_CANCELLED: Η ενημέρωση ακυρώθηκε.
+  CONFIRMATION_SETTINGS_UPDATE: Λήψη ρυθμίσεων από το δίκτυο;
+  CUSTOMIZED_SETTINGS: Προσαρμοσμένες Ρυθμίσεις
+  DOWNLOADED_DEFAULTS: Έγινε λήψη των προεπιλεγμένων
+  AUTO_START_IN_N_SECS: Αυτόματη εκκίνηση σε %i"…
+  AUTOSTARTLAST: Αυτόματη Εκκίνηση
+  HINT_AUTOSTARTLAST: Τιμή σε δευτερόλεπτα, 0 για μη αυτόματη εκκίνηση.
+  PS2LOGO: Λογότυπο PS2
+  HINT_PS2LOGO: Εμφάνιση μόνο για συμβατά λογότυπα δίσκων που ταιριάζουν με το console
+    region.
+  PADEMUCONFIG: Ρυθμίσεις PadEmu
+  PADEMU_SETTINGS: Ρυθμίσεις Προσομοιωτή Χειριστηρίου
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Ενεργοποιεί/απενεργοποιεί τον Προσομοιωτή Χειριστηρίου.
+  PADEMU_MODE: Τύπος Προσομοίωσης
+  HINT_PADEMU_MODE: Επιλέξτε τον τύπο προσομοίωσης του χειριστηρίου.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Ρυθμίσεις για Θύρα:'
+  HINT_PAD_PORT: Επιλέξτε τη θύρα προσομοιωτή προς ρύθμιση.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Ενεργοποιεί/απενεργοποιεί την προσομοίωση για τη συγκεκριμένη
+    θύρα.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Ενεργοποιεί/απενεργοποιεί τη δόνηση για τη συγκεκριμένη θύρα.
+  USBDG_MAC: 'Διεύθυνση MAC του Προσαρμογέα BT:'
+  PAD_MAC: 'Διεύθυνση MAC του Χειριστηρίου DS:'
+  PAIR: Σύζευξη
+  PAIR_PAD: Σύζευξη με Χειριστήριο DualShock
+  HINT_PAIRPAD: Σύζευξη του προσαρμογέα BlueTooth με το χειριστήριο DualShock.
+  NOT_CONNECTED: Μη συνδεδεμένο
+  BTINFO: Πληροφορίες Προσαρμογέα BlueTooth
+  HINT_BTINFO: Εμφανίζει περισσότερες πληροφορίες και υποστηριζόμενες λειτουργίες.
+  HCIVER: 'Έκδοση HCI:'
+  LMPVER: 'Έκδοση LMP:'
+  MANUFACTURER: 'ID κατασκευαστή:'
+  SUPFEATURES: 'Υποστηριζόμενες Λειτουργίες:'
+  'YES': Ναι
+  'NO': Όχι
+  BT_SUPPORTED: Ο προσαρμογέας BlueTooth θα πρέπει να είναι πλήρως συμβατός με ελεγκτές
+    DS3/DS4.
+  BT_NOTSUPPORTED: Ο προσαρμογέας Bluetooth ενδέχεται να μη λειτουργεί σωστά με τα
+    χειριστήρια DS3/DS4.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: Ενεργοποιεί/απενεργοποιεί την εξομοίωση Multitap.
+  MTAP_PORT: 'Εξομοιωτής Multitap στη Θύρα:'
+  HINT_MTAP_PORT: Επιλέξτε θύρα για εξομοίωση Multitap.
+  PADEMU_WORKAROUND: Λύση για μούφα DS3
+  HINT_PADEMU_WORKAROUND: Κάποια μούφα DS3 χρειάζονται πατέντα, αυτό την απενεργοποιεί.
+  GSM_FIELD_FIX: Εξομοίωση Αντιστροφής του ΠΕΔΙΟΥ
+  HINT_GSM_FIELD_FIX: Επιδιόρθωση για παιχνίδια που glitchάρουν υπό progressive video
+    modes.
+  PARENLOCKCONFIG: Ρυθμίσεις Γονικού Κλειδώματος
+  PARENLOCK_PASSWORD: Κωδικός Πρόσβασης Γονικού Κλειδώματος
+  PARENLOCK_PASSWORD_HINT: Αφήστε το κενό για να απενεργοποιήσετε το γονικό κλείδωμα.
+  PARENLOCK_ENTER_PASSWORD_TITLE: Εισάγετε τον Κωδικό Γονικού Κλειδώματος
+  PARENLOCK_PASSWORD_INCORRECT: Εσφαλμένος κωδικός γονικού κλειδώματος.
+  PARENLOCK_DISABLE_WARNING: Το γονικό κλείδωμα είναι απενεργοποιημένο.
+  BUILD_DETAILS: 'Επιλογές Build:'
+  PARENLOCK_INVALID_PASSWORD: Σφάλμα - αυτός ο κωδικός πρόσβασης δεν μπορεί να χρησιμοποιηθεί.
+  ERR_VMC_FRAGMENTED_CONTINUE: Το αρχείο VMC %s είναι κατακερματισμένο. Συνέχεια με
+    την Κάρτα Μνήμης στην υποδοχή %d;
+  AUDIO_SETTINGS: Ρυθμίσεις Ήχου
+  SFX: Ηχητικά Εφέ
+  BOOT_SND: Ήχος Εκκίνησης
+  SFX_VOLUME: Ένταση Ηχητικών Εφέ
+  BOOT_SND_VOLUME: Ένταση Ήχου Εκκίνησης
+  CFM_VMODE_CHG: Επιβεβαίωση αλλαγής της λειτουργίας βίντεο;
+  CACHE_HDD_GAME_LIST: Caching Λίστας Παιχνιδιών (HDD)
+  ENABLE_NOTIFICATIONS: Ειδοποιήσεις
+  CFG_NOTIFICATION: Φόρτωση ρυθμίσεων από %s
+  THM_NOTIFICATION: Φόρτωση θέματος από %s
+  LNG_NOTIFICATION: Φόρτωση γλώσσας από %s
+  PARTITION_NOTIFICATION: Σύνδεση διαμερίσματος %s.
+  OPTIONS: Επιλογές
+  GAME_SETTINGS_SAVED: Οι ρυθμίσεις παιχνιδιού αποθηκεύτηκαν.
+  GAME_SETTINGS_REMOVED: Οι ρυθμίσεις %s καταργήθηκαν.
+  NET_UPDATE_HINT: Αν είναι ενεργό, αντικαθιστά τις υπάρχουσες ρυθμίσεις συμβατότητας
+    παιχνιδιού.
+  SETTINGS_SOURCE: Λειτουργία Ρυθμίσεων
+  GLOBAL_SETTINGS: Γενική
+  PERGAME_SETTINGS: Ανά Παιχνίδι
+  ALL_SETTINGS: Όλες
+  GAME_SETTINGS_PROMPT: Επιλέξτε ρυθμίσεις για κατάργηση.
+  FORUM_DETAILS: 'Forum Υποστήριξης:'
+  INFO_TITLE: Τίτλος
+  INFO_GENRE: Είδος
+  INFO_RELEASE: Κυκλοφορία
+  INFO_DEVELOPER: Προγραμματιστής
+  INFO_DESCRIPTION: Περιγραφή
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS: Ρυθμίσεις Χειριστηρίου
+  HINT_BDM_START: Ενεργοποιεί/απενεργοποιεί το Block Device Manager.
+  HINT_BLOCK_DEVICES: Ενεργοποιεί/απενεργοποιεί το Block Devices (π.χ. USB).
+  USB_GAMES: Παιχνίδια USB
+  ILINK_GAMES: Παιχνίδια iLink
+  MX4SIO_GAMES: Παιχνίδια MX4SIO

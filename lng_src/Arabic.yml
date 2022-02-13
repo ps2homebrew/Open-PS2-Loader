@@ -1,0 +1,457 @@
+comments: |-
+  Arabic Translation by LightWave - @http://psx-scene.com/forums/members/lightwave/
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Arabic
+  SAVE_CHANGES: تثبيت التغييرات
+  BACK: العودة
+  NETCONFIG: تثبيت و اعداد الشبكة
+  SHOW_ADVANCED_OPTS: اعدادات متقدمة
+  NO_ITEMS: <لا يوجد قيم>
+  SETTINGS_SAVED:
+  - untranslated
+  - original: Settings saved to %s
+  ERROR_SAVING_SETTINGS: هناك مشكلة في حفظ التغييرات
+  EXIT: الخروج
+  SETTINGS: الاعدادات
+  MENU: القائمة الرئيسية
+  BDM_GAMES: العاب BDM
+  HDD_GAMES: العاب HDD
+  NET_GAMES: لعاب ETH
+  APPS: برامج
+  THEME: تيمات
+  LANGUAGE: لغات
+  CONFIRMATION_POFF: سيتم ايقاف تشغيل النظام
+  CONFIRMATION_EXIT:
+  - untranslated
+  - original: Exit to Browser?
+  CONFIRMATION_CANCEL_UPDATE: الغاء التحديث ?
+  HDD_NOT_CONNECTED_ERROR: '%d: لم يتم العثور على القرص الصلب'
+  HDD_NOT_FORMATTED_ERROR: '%d: القرص المضغوط غير منسق'
+  NETWORK_STARTUP_ERROR: '%d: هناك مشكل في اعداد الشبكة'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: لم يتم العثور على محول الشبكة'
+  NETWORK_STARTUP_ERROR_CONN: '%d: لا يمكن التواصل مع خدمة SMB'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: لا يمجن التسجيل في خدمة SMB'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: لا يمكن فتح حصة SMB'
+  NETWORK_SHARE_LIST_ERROR: '%d: لا يمكن فتح قائمة حصص SMB'
+  NETWORK_GAMES_LIST_ERROR: '%d: لا يمكن فتح قائمة الالعاب'
+  NETWORK_ERROR_DHCP_FAIL: '%d: السيرفر DHCP غير موجود'
+  NETWORK_ERROR_LINK_FAIL: '%d: لا يوجد اتصال في الشبكة'
+  'ON': اشغال
+  'OFF': ايقاف
+  OK: تم
+  SELECT: اختيار
+  CANCEL: الغاء
+  CIRCLE: دائرة
+  CROSS: ضرب
+  GAMES_LIST: قائمة الالعاب
+  COMPAT_SETTINGS: اعدادات اللعبة
+  REMOVE_ALL_SETTINGS:
+  - untranslated
+  - original: Remove Settings
+  SCROLLING: التمرير
+  SLOW: ثقيل
+  MEDIUM: متوسط
+  FAST: سريع
+  DEFDEVICE: القائمة الافتراضية
+  LOAD_FROM_DISC: شحن من القرص
+  PLEASE_WAIT: يرجى الانتظار
+  ERROR_LOADING_ID: هناك مشكل في شحن هوية اللعبة
+  AUTOSORT: الفرز الاوتوماتيكي
+  ERR_LOADING_LANGFILE: هناك مشكل  في شحن ملف اللغات
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: لم يتم وجود على وحدة التحكم
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: شاشة واسعة
+  POWEROFF: ايقاف
+  LOADING_SETTINGS: شحن الاعدادات
+  SAVING_SETTINGS: حفظ الاعدادات
+  START_DEVICE: تشغيل الجهاز
+  REFRESH: اعادة تنشيط
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: طريقة تشغيل الجهاز HDD
+  ETHMODE: طريقة تشغيل الجهاز ETH
+  APPMODE: طريقة تشغيل الجهاز البرامج
+  AUTO: تلقائي
+  MANUAL: يدوي
+  STARTNBD: تشغيل الخادم NBD
+  STARTINGNBD: بداية تشغسل الخادم NBD …
+  RUNNINGNBD: الخادم NBD في حالة تشغيل …
+  STARTFAILNBD: لم يتم تشغسل الخادم NBD
+  UNLOADNBD: تفريغ الخادم NBD …
+  EXITTO: مكان IGR
+  BGCOLOR: لون الخلفية
+  TXTCOLOR: لون الكتابة
+  CAT_SMB_SERVER: '- السيرفر SMB -'
+  IP_ADDRESS_TYPE: نوع عنوان الي بي
+  IP_ADDRESS_TYPE_STATIC: ساكن
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: عنوان الاي بي
+  ADDRESS: العنوان
+  MASK: القناع
+  GATEWAY: البوابة
+  DNS_SERVER: السيرفرDNS
+  PORT: المحطة
+  SHARE: الحصص
+  USER: المستخدم
+  PASSWORD: كلمة السر
+  NOT_SET: <غير مضبوط>
+  ADDRESS_TYPE: نوع العنوان
+  ADDR_TYPE_IP: اي بي
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: قبول
+  DELETE_WARNING: سيتم حذفه نهائيا ةهل ستكمل?
+  RENAME: تغيير الاسم
+  DELETE: حذف
+  RUN: تشغيل
+  GFX_SETTINGS: اعدادات العرض
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: التذكير باخر لعبة
+  SELECTBUTTON: زر الاختيار
+  ERR_FRAGMENTED: اللعبة مجزئة
+  ERR_FILE_INVALID: غير ممكن تشغيل العنوان
+  TEST:
+  - untranslated
+  - original: Test Changes
+  HINT_GUEST: ترك الفراغ لGUEST
+  HINT_MODE1: قراءة دقيقة
+  HINT_MODE2: الطريقة المتزامنة
+  HINT_MODE3: حل Syscalls
+  HINT_MODE4: Skip videos
+  HINT_MODE5: تقليد DVD-DL
+  HINT_MODE6: الغاء IGR
+  HINT_VMC_SIZE: تغيير الحجم يؤدي الى حذف ال VMC
+  CREATE: صنع
+  START: بدء
+  MODIFY: تغيير
+  ABORT: الغاء
+  RESET: إعادة تعيين
+  USE_GENERIC: استخدام عام
+  VMC_SCREEN: اعداد VMC
+  VMC_NAME: الاسم
+  SIZE: الحجم
+  VMC_STATUS: الحالة
+  VMC_PROGRESS: التقدم
+  VMC_FILE_EXISTS: ملف VMC موجود
+  VMC_FILE_ERROR: ملف فاسد , حجمه غير صحيح
+  VMC_FILE_NEW: يجب صنع ملف VMC
+  ERR_VMC_CONTINUE:
+  - untranslated
+  - original: Error accessing VMC %s. Continue with the Memory Card in slot %d?
+  AUTOREFRESH: تحديث اوتوماتيكي
+  ABOUT: معلومات حول …
+  DEVS: المبرمجون
+  QANDA: ضمان الجودة
+  BDM_PREFIX: مكان بادئة BDM
+  HINT_EXITPATH: Boots Custom ELF after an IGR
+  HINT_SPINDOWN: النسبة في الدقيقة, 0 للالغاء التدوير باستمرار
+  HDD_SPINDOWN: الدوران المستمر الاوتوماتيكي لل HDD
+  VMODE: طريقة الفيديو
+  UICOLOR: لون الكتابة
+  SELCOLOR: اللون المختار
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO: المعلومات
+  ALTSTARTUP: تخصيص ELF
+  COLOR_SELECTION: اختيار الالوان
+  RECONNECT: اعادة الاتصال
+  HINT_SHARENAME: ترك الفراغ لادراج الملفات المقسمة
+  ETH_PREFIX: مكان بادئة ETH
+  BACKSPACE: الرجوع
+  SPACE: فراغ
+  ENTER: دخول
+  MODE: طريقة
+  VMC_SLOT1: فتحة VMC 1
+  VMC_SLOT2: فتحة VMC 2
+  GAME_ID: هوية اللعبة
+  DMA_MODE: DMA طريقة
+  VSYNC: مزامنة اوتوماتيكية
+  MODE1: طريقة 1
+  MODE2: طريقة 2
+  MODE3: طريقة 3
+  MODE4: طريقة 4
+  MODE5: طريقة 5
+  MODE6: طريقة 6
+  GSCONFIG: اعداداتGSM
+  ETH_OPMODE: طريقة صلة الايثرنيت
+  ETH_100MFDX: 100Mbit full-duplex
+  ETH_100MHDX: 100Mbit half-duplex
+  ETH_10MFDX: 10Mbit full-duplex
+  ETH_10MHDX: 10Mbit half-duplex
+  GSM_SETTINGS: اعداداتGSM
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: تبديل GSM ON او OFF
+  HINT_GSMVMODE: اجبار طريقة الشاشة المستبدلة
+  XOFFSET: موضع افقي
+  HINT_XOFFSET: تعديل افقي
+  YOFFSET: موضع عمودي
+  HINT_YOFFSET: تعديل عمودي
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN: Overscan Adjustment
+  GSMSKIPVIDEOS: تخطي FMV
+  HINT_GSMSKIPVIDEOS: بتخطى FMV
+  CHEAT_SETTINGS: اعدادات قائمة الغش
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: تدع PS2RD لتصحيح الالعاب
+  CHEATMODE: PS2RD
+  HINT_CHEATMODE: اختيار اوتوماتيكي او اختيار قائمة الغش
+  CHEATMODEAUTO: اختيار اوتوماتيكي لقائمة الغش للالعاب
+  CHEATMODESELECT: اختيار قائمة الغش للالعاب
+  ERR_CHEATS_LOAD_FAILED: هنك مشكلة في شحن ملف الغش
+  NO_CHEATS_FOUND: لا يوجد قائمة الغش لهذه اللعبة
+  DL_DEFAULTS: تحميل الافتراضيات
+  NET_UPDATE: التحديث عن طريق الشبكة
+  NET_UPDATE_ALL:
+  - untranslated
+  - original: Overwrite Existing Records
+  NET_UPDATE_FAILED: فشل التحديث
+  NET_UPDATE_CONN_FAILED: فشل في الاتصال بسيرفر التحديث
+  NET_UPDATE_DONE: انتهى التحديث
+  NET_UPDATE_CANCELLED: الغي التحديث
+  CONFIRMATION_SETTINGS_UPDATE: تحميل الاعدادات من الانترنيت ?
+  CUSTOMIZED_SETTINGS: اعدادات مغيرة
+  DOWNLOADED_DEFAULTS: تحميل الافتراضيات
+  AUTO_START_IN_N_SECS: البدء%i الاوتوماتيكي في  ثانية…
+  AUTOSTARTLAST: البدء الاوتوماتيكي
+  HINT_AUTOSTARTLAST: النسبة في الدقيقة, 0 للالغاء التدوير باستمرار
+  PS2LOGO:
+  - untranslated
+  - original: PS2 Logo
+  HINT_PS2LOGO: (Only displayed for a valid disc logo which matches the console's
+    region)
+  PADEMUCONFIG:
+  - untranslated
+  - original: Configure PADEMU
+  PADEMU_SETTINGS:
+  - untranslated
+  - original: Pad Emulator Settings
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Turns on/off PadEmulator for selected game.
+  PADEMU_MODE: Pad Emulator mode
+  HINT_PADEMU_MODE:
+  - untranslated
+  - original: Select Pad Emulator mode.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Settings for port:'
+  HINT_PAD_PORT:
+  - untranslated
+  - original: Select Pad Emulator port for settings.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT:
+  - untranslated
+  - original: Turns on/off Pad Emulator for selected port.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB:
+  - untranslated
+  - original: Turns on/off vibration for Pad Emulator selected port.
+  USBDG_MAC: 'Usb bluetooth adapter mac address:'
+  PAD_MAC: 'DS Controller paired to mac address:'
+  PAIR:
+  - untranslated
+  - original: Pair
+  PAIR_PAD:
+  - untranslated
+  - original: Pair DS Controller
+  HINT_PAIRPAD: Pair DS Controller with bluetooth adapter mac address.
+  NOT_CONNECTED: Not connected
+  BTINFO: Bluetooth adapter information
+  HINT_BTINFO: Shows more information and supported features
+  HCIVER:
+  - untranslated
+  - original: 'HCI Version:'
+  LMPVER:
+  - untranslated
+  - original: 'LMP Version:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES: 'Support features:'
+  'YES':
+  - untranslated
+  - original: 'Yes'
+  'NO':
+  - untranslated
+  - original: 'No'
+  BT_SUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+  BT_NOTSUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+  MTAP_ENABLE: Multitap emulation
+  HINT_MTAP_ENABLE:
+  - untranslated
+  - original: Turns on/off Multitap emulation for selected game.
+  MTAP_PORT: Multitap emulator on port
+  HINT_MTAP_PORT:
+  - untranslated
+  - original: Select port for Multitap emulation.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emulate FIELD flipping
+  HINT_GSM_FIELD_FIX:
+  - untranslated
+  - original: Fix for games that glitch under progressive video modes.
+  PARENLOCKCONFIG:
+  - untranslated
+  - original: Parental Lock Settings
+  PARENLOCK_PASSWORD:
+  - untranslated
+  - original: Parental Lock Password
+  PARENLOCK_PASSWORD_HINT:
+  - untranslated
+  - original: Leave blank to disable the parental lock.
+  PARENLOCK_ENTER_PASSWORD_TITLE:
+  - untranslated
+  - original: Enter Parental Lock Password
+  PARENLOCK_PASSWORD_INCORRECT:
+  - untranslated
+  - original: Parental lock password incorrect.
+  PARENLOCK_DISABLE_WARNING:
+  - untranslated
+  - original: Parental lock disabled.
+  BUILD_DETAILS:
+  - untranslated
+  - original: 'Build Options:'
+  PARENLOCK_INVALID_PASSWORD:
+  - untranslated
+  - original: Error - this password cannot be used.
+  ERR_VMC_FRAGMENTED_CONTINUE:
+  - untranslated
+  - original: VMC %s file is fragmented. Continue with Memory Card in slot %d?
+  AUDIO_SETTINGS:
+  - untranslated
+  - original: Audio Settings
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME:
+  - untranslated
+  - original: Sound Effects Volume
+  BOOT_SND_VOLUME:
+  - untranslated
+  - original: Boot Sound Volume
+  CFM_VMODE_CHG:
+  - untranslated
+  - original: Confirm video mode change?
+  CACHE_HDD_GAME_LIST:
+  - untranslated
+  - original: Cache Game List (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED:
+  - untranslated
+  - original: Game settings saved.
+  GAME_SETTINGS_REMOVED:
+  - untranslated
+  - original: '%s settings removed.'
+  NET_UPDATE_HINT:
+  - untranslated
+  - original: Overwrites existing game compatibility settings when enabled.
+  SETTINGS_SOURCE:
+  - untranslated
+  - original: Settings Mode
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS:
+  - untranslated
+  - original: All
+  GAME_SETTINGS_PROMPT:
+  - untranslated
+  - original: Select settings to remove.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

@@ -1,0 +1,381 @@
+comments: |-
+  Swedish translation by Flaya
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Swedish
+  SAVE_CHANGES: Spara ändringar
+  BACK: Tillbaka
+  NETCONFIG: Nätverkskonfig
+  SHOW_ADVANCED_OPTS: Avancerad Konfig
+  NO_ITEMS: <Inga värden>
+  SETTINGS_SAVED: Inställningar sparade till %s
+  ERROR_SAVING_SETTINGS: Fel vid skrivning av inställningar!
+  EXIT: Avsluta
+  SETTINGS: Inställning
+  MENU: Meny
+  BDM_GAMES: BDM Spel
+  HDD_GAMES: HDD Spel
+  NET_GAMES: ETH Spel
+  APPS: Appar
+  THEME: Tema
+  LANGUAGE: Språk
+  CONFIRMATION_POFF: Systemet stängs av.
+  CONFIRMATION_EXIT: Avsluta till huvudmeny?
+  CONFIRMATION_CANCEL_UPDATE: Avbryt uppdatering?
+  HDD_NOT_CONNECTED_ERROR: '%d: Ingen Hårddisk hittad'
+  HDD_NOT_FORMATTED_ERROR: '%d: Hårddisken ej formatterad'
+  NETWORK_STARTUP_ERROR: '%d: Nätverk startup error'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Ingen nätverksadapter funnen'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Kan inte ansluta till SMB-server'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Kan inte logga in på SMB-server'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Kan inte öppna SMB-mapp'
+  NETWORK_SHARE_LIST_ERROR: '%d: Kan inte lista SMB-mappar'
+  NETWORK_GAMES_LIST_ERROR: '%d: Kan inte lista spel'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCP servern är otillgänglig'
+  NETWORK_ERROR_LINK_FAIL: '%d: Ingen nätverksanslutning'
+  'ON': På
+  'OFF': Av
+  OK:
+  - untranslated
+  - original: OK
+  SELECT: Välj
+  CANCEL: Avbryt
+  CIRCLE: Cirkel
+  CROSS: Kryss
+  GAMES_LIST: Spel-lista
+  COMPAT_SETTINGS: Spelinst.
+  REMOVE_ALL_SETTINGS: Ta bort inställningar
+  SCROLLING: Bläddra
+  SLOW: Sakta
+  MEDIUM: Medel
+  FAST: Snabb
+  DEFDEVICE: Grundmeny
+  LOAD_FROM_DISC: Ladda från skiva
+  PLEASE_WAIT: Vänta
+  ERROR_LOADING_ID: Fel vid laddning av Game ID
+  AUTOSORT: Automatisk sortering
+  ERR_LOADING_LANGFILE: Fel vid inläsning av språkfilen
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: Ingen kontroll upptäcks , vänta …
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: Bredbild
+  POWEROFF: Stäng av
+  LOADING_SETTINGS: Ladda config
+  SAVING_SETTINGS: Spara config
+  START_DEVICE: Starta enheten
+  REFRESH: Uppdatera
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: HDD enhet startläge
+  ETHMODE: ETH enhet startläge
+  APPMODE: APP-meny visningsläge
+  AUTO:
+  - untranslated
+  - original: Auto
+  MANUAL: Manuell
+  STARTNBD: Starta NBD Server
+  STARTINGNBD: NBD Server Startar …
+  RUNNINGNBD: NBD Server Running…
+  STARTFAILNBD: Kan inte starta NBD server.
+  UNLOADNBD: NBD Server Stängs…
+  EXITTO: Utgång till
+  BGCOLOR: Bakgrundsfärg
+  TXTCOLOR: Textfärg
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: IP Address typ
+  IP_ADDRESS_TYPE_STATIC: Statisk
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IP
+  ADDRESS:
+  - untranslated
+  - original: Address
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER:
+  - untranslated
+  - original: DNS Server
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE: Delning
+  USER: Användare
+  PASSWORD: Lösenord
+  NOT_SET: <Ej angett>
+  ADDRESS_TYPE: Address typ
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Acceptera
+  DELETE_WARNING: Objektet ska tas bort permanent , fortsätta?
+  RENAME: Byt namn
+  DELETE: Radera
+  RUN: Kör
+  GFX_SETTINGS: Skärminställningar
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: Kom ihåg senast spelade spel
+  SELECTBUTTON: Välj knapp
+  ERR_FRAGMENTED: Fel, spelet är fragmenterat
+  ERR_FILE_INVALID: Fel, kunde inte köra posten
+  TEST: Testa ändringar
+  HINT_GUEST: Lämna tomt för Gäst konto.
+  HINT_MODE1: Korrekt läsning
+  HINT_MODE2: Synkroniseringsläge
+  HINT_MODE3: Släpp Syscalls
+  HINT_MODE4: Skippa Videos
+  HINT_MODE5: Emulera DVD-DL
+  HINT_MODE6: Inaktivera IGR
+  HINT_VMC_SIZE: Ändra storleken kommer att formatera om VMC
+  CREATE: Skapa
+  START:
+  - untranslated
+  - original: Start
+  MODIFY: Ändra
+  ABORT: Avbryt
+  RESET: Återställ
+  USE_GENERIC: Använd generiska
+  VMC_SCREEN: Konfigurera VMC
+  VMC_NAME: Namn
+  SIZE: Storlek
+  VMC_STATUS:
+  - untranslated
+  - original: Status
+  VMC_PROGRESS: Framsteg
+  VMC_FILE_EXISTS: VMC fil existerar
+  VMC_FILE_ERROR: Ogiltig VMC fil, felaktig storlek
+  VMC_FILE_NEW: VMC filen måste skapas
+  ERR_VMC_CONTINUE: Felaktig åtkomst till VMC%s. Använd Minneskort i port %d?
+  AUTOREFRESH: Automatisk uppdatering
+  ABOUT: Om
+  DEVS: Kodare
+  QANDA: Kvalitetstestare
+  BDM_PREFIX: BDM prefix sökväg
+  HINT_EXITPATH: Laddar vald ELF efter en IGR
+  HINT_SPINDOWN: Värde i minut (er), 0 för att inaktivera nerspinn
+  HDD_SPINDOWN: Automatisk HDD nerspinn
+  VMODE: Videoläge
+  UICOLOR: Dialog färg
+  SELCOLOR: Vald färg
+  RESETCOLOR: Återställ Färger
+  INFO:
+  - untranslated
+  - original: Info
+  ALTSTARTUP:
+  - untranslated
+  - original: Custom ELF
+  COLOR_SELECTION: Färgval
+  RECONNECT: Återanslut
+  HINT_SHARENAME: Lämna tomt för att lista delning
+  ETH_PREFIX: ETH prefix sökväg
+  BACKSPACE: Backsteg
+  SPACE: Mellanslag
+  ENTER:
+  - untranslated
+  - original: Enter
+  MODE: Läge
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID: Spel-ID
+  DMA_MODE: DMA Läge
+  VSYNC: V - Sync
+  MODE1: Läge 1
+  MODE2: Läge 2
+  MODE3: Läge 3
+  MODE4: Läge 4
+  MODE5: Läge 5
+  MODE6: Läge 6
+  GSCONFIG: Konfigurera GSM
+  ETH_OPMODE: Ethernet hastighet och duplex
+  ETH_100MFDX: 100Mbit full duplex
+  ETH_100MHDX: 100Mbit halv duplex
+  ETH_10MFDX: 10Mbit full duplex
+  ETH_10MHDX: 10Mbit halv duplex
+  GSM_SETTINGS: GSM inställningar
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: GSM PÅ eller AV
+  HINT_GSMVMODE: Videoläge tvingas
+  XOFFSET: Horisontell position
+  HINT_XOFFSET: Ställer Horisontell offset
+  YOFFSET: Vertikal position
+  HINT_YOFFSET: Ställer Vertikal förskjutning
+  OVERSCAN: Överskanning
+  HINT_OVERSCAN: Överskanning justering
+  GSMSKIPVIDEOS: Skippa FMV
+  HINT_GSMSKIPVIDEOS: Skippar Full Motion Video
+  CHEAT_SETTINGS: Inställningar Fusk
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Tillåter PS2RD patcha dina spel
+  CHEATMODE: PS2RD Fusk Motor Läge
+  HINT_CHEATMODE: Autovälj eller Välj spel fusk
+  CHEATMODEAUTO: Autovälj Fusk
+  CHEATMODESELECT: Välj Fusk
+  ERR_CHEATS_LOAD_FAILED: 'Fel: kunde inte ladda Fuskfilen'
+  NO_CHEATS_FOUND: Inga fusk funna
+  DL_DEFAULTS: Hämta standard
+  NET_UPDATE: Nätverksuppdatering
+  NET_UPDATE_ALL: Skriv över befintliga
+  NET_UPDATE_FAILED: Uppdatering misslyckad
+  NET_UPDATE_CONN_FAILED: Kunde inte ansluta till servern
+  NET_UPDATE_DONE: Uppdatering klar
+  NET_UPDATE_CANCELLED: Uppdatering avbruten
+  CONFIRMATION_SETTINGS_UPDATE: Hämta inställningar från nätverket?
+  CUSTOMIZED_SETTINGS: Modifierade inställningar
+  DOWNLOADED_DEFAULTS: Hämtade standard
+  AUTO_START_IN_N_SECS: Autostart om %i s…
+  AUTOSTARTLAST: Autostart
+  HINT_AUTOSTARTLAST: Värde i sekund(er), 0 inaktiverar Autostart
+  PS2LOGO:
+  - untranslated
+  - original: PS2 Logo
+  HINT_PS2LOGO: Visas bara när skivavbilden matchar konsolens region
+  PADEMUCONFIG: Konfigurera PADEMU
+  PADEMU_SETTINGS: Pad Emulator Inställningar
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Slå av/på PadEmulator för valt spel.
+  PADEMU_MODE: Pad Emulator läge
+  HINT_PADEMU_MODE: Vlj Pad Emulator läge.
+  DS34USB_MODE: DualShock3 / 4 USB
+  DS34BT_MODE: DualShock3 / 4 BT
+  PADPORT: 'Inställningar för port:'
+  HINT_PAD_PORT: Välj Pad Emulator port för inställningar.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Slå av/på Pad Emulator för vald port.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Slå av/på vibration för Pad Emulator vald port.
+  USBDG_MAC: 'Usb bluetooth adapter mac address:'
+  PAD_MAC: 'DS Controller kopplad till MAC-adress:'
+  PAIR: Parkoppla
+  PAIR_PAD: Para DS Controller
+  HINT_PAIRPAD: Para DS-kontroller med Bluetooth-adapter MAC-adress.
+  NOT_CONNECTED: Ej ansluten
+  BTINFO: Bluetooth-adapterinformation
+  HINT_BTINFO: Visar mer information och funktioner som stöds
+  HCIVER: 'HCI-version:'
+  LMPVER: 'LMP-version:'
+  MANUFACTURER: 'Tillverkarens ID:'
+  SUPFEATURES: 'Supportfunktioner:'
+  'YES': Ja
+  'NO': Nej
+  BT_SUPPORTED: Bluetooth-adaptern ska vara fullt kompatibel med DS3 / DS4-kontroller.
+  BT_NOTSUPPORTED: Bluetooth-adaptern kanske inte fungerar korrekt med DS3 / DS4-kontroller.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: Slår på / av multitap emulering för valt spel.
+  MTAP_PORT: Multitap emulator på porten
+  HINT_MTAP_PORT: Välj port för multitap emulering.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emulera FIELD vändning
+  HINT_GSM_FIELD_FIX: Fix för spel med problem i progressivt läge.
+  PARENLOCKCONFIG: Föräldrakontroll
+  PARENLOCK_PASSWORD: Lösenord för föräldrakontroll
+  PARENLOCK_PASSWORD_HINT: Ange inget för att inaktivera funktionen
+  PARENLOCK_ENTER_PASSWORD_TITLE: Ange lösenord för föräldrakontroll
+  PARENLOCK_PASSWORD_INCORRECT: Fel lösenord för föräldrakontroll
+  PARENLOCK_DISABLE_WARNING: Föräldrakontroll inaktiverat
+  BUILD_DETAILS: 'Bygg-Alternativ:'
+  PARENLOCK_INVALID_PASSWORD: Fel - lösenordet kan ej användas.
+  ERR_VMC_FRAGMENTED_CONTINUE: VMC %s filen är fragmenterad. Använd minneskort i port
+    %d?
+  AUDIO_SETTINGS: Ljudinställningar
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: Ljudeffektsvolym
+  BOOT_SND_VOLUME: Uppstartsljudsvolym
+  CFM_VMODE_CHG: Bekräfta ändring av videoläge?
+  CACHE_HDD_GAME_LIST: Lägg Spellista i Cache (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED: Spelinställningar sparade.
+  GAME_SETTINGS_REMOVED: '%s inställningar borttagna'
+  NET_UPDATE_HINT: Skriver över befintliga spelinställningar om aktiverad.
+  SETTINGS_SOURCE: Inställningsläge
+  GLOBAL_SETTINGS: Globalt
+  PERGAME_SETTINGS: Per Sper
+  ALL_SETTINGS: Alla
+  GAME_SETTINGS_PROMPT: Välj inställningar att ta bort.
+  FORUM_DETAILS: 'Support-Forum:'
+  INFO_TITLE: Titel
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE: Lansering
+  INFO_DEVELOPER: Utvecklare
+  INFO_DESCRIPTION: Beskrivning
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

@@ -1,0 +1,490 @@
+comments: |-
+  Laotian translation by blackbutterfly (Anousith Phompida <noum_terry@hotmail.com>)
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Laotian
+  SAVE_CHANGES: ບັນທຶກການປ່ຽນແປງ
+  BACK: ກັບຄືນ
+  NETCONFIG: ກຳນົດຄ່າທາງດ້ານ Network
+  SHOW_ADVANCED_OPTS: ທາງເລືອກສຳລັບການຕັ້ງຄ່າຂັ້ນສູງ
+  NO_ITEMS: <ບໍ່ມີຄ່າໃດໆ>
+  SETTINGS_SAVED:
+  - untranslated
+  - original: Settings saved to %s
+  ERROR_SAVING_SETTINGS: ການຂຽນການຕັ້ງຄ່າມີຂໍ້ຜິດພາດ!
+  EXIT: ອອກຈາກໂປຣແກຣມ
+  SETTINGS: ການຕັ້ງຄ່າ
+  MENU: ເມນູ
+  BDM_GAMES: ຫຼິ້ນເກມຜ່ານ BDM
+  HDD_GAMES: ຫຼິ້ນເກມຜ່ານ Hard Disk
+  NET_GAMES: ຫຼິ້ນເກມຜ່ານ Network
+  APPS: ໂປຣແກຣມຕ່າງໆ
+  THEME: ຄຸນລັກສະນະຮູບຮ່າງ
+  LANGUAGE: ພາສາ
+  CONFIRMATION_POFF: ລະບົບຈະຖືກປິດການໃຊ້ງານ
+  CONFIRMATION_EXIT: ອອກໄປສູ່ໜ້າ Browser
+  CONFIRMATION_CANCEL_UPDATE: ຍົກເລີກການອັບເດດ?
+  HDD_NOT_CONNECTED_ERROR: '%d: ບໍ່ສາມາດຄົ້ນຫາ HardDisk ໄດ້'
+  HDD_NOT_FORMATTED_ERROR: '%d: HardDisk ຍັງບໍ່ທັນໄດ້ Format'
+  NETWORK_STARTUP_ERROR: '%d: ການເລີ່ມຕົ້ນຂອງ Network ມີຂໍ້ຜິດພາດ'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: ບໍ່ສາມາດຄົ້ນຫາ Network Adapter ໄດ້'
+  NETWORK_STARTUP_ERROR_CONN: '%d: ບໍ່ສາມາດເຊື່ອມຕໍ່ SMB server ໄດ້'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: ບໍ່ສາມາດເຂົ້າລະບົບ SMB server ໄດ້'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: ບໍ່ສາມາດເປີດ SMB share ໄດ້'
+  NETWORK_SHARE_LIST_ERROR: '%d: ບໍ່ສາມາດສະແດງລາຍຊື່ SMB shares'
+  NETWORK_GAMES_LIST_ERROR: '%d: ບໍ່ສາມາດສະແດງລາຍຊື່ເກມຕ່າງໆໄດ້'
+  NETWORK_ERROR_DHCP_FAIL: '%d: ບໍ່ມີ DHCP server'
+  NETWORK_ERROR_LINK_FAIL: '%d: ບໍ່ມີການເຊື່ອມຕໍ່ Network ເກີດຂຶ້ນ'
+  'ON': ເປີດ
+  'OFF': ປິດ
+  OK: ຕົກລົງ
+  SELECT: ເລືອກ
+  CANCEL: ຍົກເລີກ
+  CIRCLE: ວົງມົນ
+  CROSS: ຄູນ
+  GAMES_LIST: ໄປທີ່ລາຍຊື່ເກມ
+  COMPAT_SETTINGS: ຕັ້ງຄ່າໃຫ້ເກມນີ້
+  REMOVE_ALL_SETTINGS:
+  - untranslated
+  - original: Remove Settings
+  SCROLLING: ການເລື່ອນ
+  SLOW: ຊ້າໆ
+  MEDIUM: ປານກາງ
+  FAST: ໄວ
+  DEFDEVICE: ເມນູພື້ນຖານ
+  LOAD_FROM_DISC: ໂຫຼດຈາກແຜ່ນ
+  PLEASE_WAIT: ກະລຸນາລໍຖ້າ
+  ERROR_LOADING_ID: ເກີດຂໍ້ຜິດພາດໃນຂະນະທີ່ໂຫຼດເກມ ID
+  AUTOSORT: ລຽງລຳດັບລາຍຊື່ເກມແບບອັດຕະໂນມັດ
+  ERR_LOADING_LANGFILE: ເກີດຂໍ້ຜິດພາດໃນຂະນະທີ່ໂຫຼດ File ພາສາ
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: ບໍ່ສາມາດກວດພົບມືເກມ, ກະລຸນາລໍຖ້າ…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: ຈໍໍກວ້າງ
+  POWEROFF: ປິດເຄື່ອງ
+  LOADING_SETTINGS: ກຳລັງໂຫຼດການຕັ້ງຄ່າ
+  SAVING_SETTINGS: ກຳລັງບັນທຶກການຕັ້ງຄ່າ
+  START_DEVICE: ເປີດໃຊ້ອຸປະກອນເຊື່ອມຕໍ່
+  REFRESH: ເອີ້ນຄືນໃໝ່
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Hard Disk
+  ETHMODE: ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Network
+  APPMODE: ໂໝດ ຕ່າງໆສຳລັບໂປຣແກຣມ
+  AUTO: ອັດຕະໂນມັດ
+  MANUAL: ເລືອກເອງ
+  STARTNBD: ເປີດໃຊ້ NBD Server
+  STARTINGNBD: NBD Server ກຳລັງເລີ່ມໃຊ້ງານ…
+  RUNNINGNBD: NBD Server ກໍາລັງດໍາເນີນການ…
+  STARTFAILNBD:
+  - untranslated
+  - original: Failed to start NBD Server.
+  UNLOADNBD: NBD Server ກໍາລັງຢຸດການໃຊ້ງານ…
+  EXITTO: IGR path
+  BGCOLOR: ສີຂອງພື້ນຫຼັງ
+  TXTCOLOR: ສີຂອງຂໍ້ຄວາມ
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: ປະເພດຂອງ IP address
+  IP_ADDRESS_TYPE_STATIC: ຄ່າຄົງທີ່
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: ເລກ IP address
+  ADDRESS: ທີ່ຢູ່
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER:
+  - untranslated
+  - original: DNS Server
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE:
+  - untranslated
+  - original: Share
+  USER: ຜູ້ໃຊ້
+  PASSWORD: ລະຫັດຜ່ານ
+  NOT_SET: <ບໍ່ມີຄ່າທີ່ຖືກຕັ້ງ>
+  ADDRESS_TYPE: ປະເພດຂອງທີ່ຢູ່
+  ADDR_TYPE_IP: ເລກ IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: ຍອມຮັບ
+  DELETE_WARNING: ສິ່ງທີ່ເລືອກຈະຖືກລຶບຈາກລະບົບແບບຖາວອນ, ດຳເນີນການຕໍ່ຫຼືບໍ່?
+  RENAME: ປ່ຽນຊື່
+  DELETE: ລົບ
+  RUN: ຫຼິ້ນເກມນີ້
+  GFX_SETTINGS: ຕັ້ງຄ່າການສະແດງຜົນ
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: ໃຫ້ລະບົບຈື່ເກມທີ່ຫຼິ້ນໄປຄັ້ງສຸດທ້າຍ
+  SELECTBUTTON: ເລືອກປຸ່ມ
+  ERR_FRAGMENTED: ເກີດຂໍ້ຜິດພາດ, ເກມນີ້ມີ fragmentation. ກະລຸນາ Defragment ເກມນີ້ກ່ອນ
+  ERR_FILE_INVALID: ເກີດຂໍ້ຜິດພາດ, ບໍ່ສາມາດເປີດໃຊ້ງານໄດ້
+  TEST:
+  - untranslated
+  - original: Test Changes
+  HINT_GUEST: ບໍ່ມີຄ່າກຳນົດໃດໆສຳລັບການເຂົ້າເຖິງຂອງ GUEST
+  HINT_MODE1: ອ່ານແບບຖືກຕ້ອງແມ່ນຍຳ
+  HINT_MODE2: ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
+  HINT_MODE3:
+  - untranslated
+  - original: Unhook Syscalls
+  HINT_MODE4: ຂ້າມການຫຼິ້ນວິດິໂອ
+  HINT_MODE5: ປະມວນຜົນ DVD-DL
+  HINT_MODE6:
+  - untranslated
+  - original: Disable IGR
+  HINT_VMC_SIZE: ການປ່ຽນຂະໜາດຈະເຮັດໃຫ້ VMC(ກ້ອນເຊບສະເໝືອນຈິງ) ຖືກ format ໃໝ່
+  CREATE: ສ້າງ
+  START:
+  - untranslated
+  - original: Start
+  MODIFY: ແກ້ໄຂ
+  ABORT: ຢຸດ
+  RESET: ຕັ້ງຄ່າໃໝ່
+  USE_GENERIC: ໃຊ້ຄ່າທົ່ວໄປ
+  VMC_SCREEN: ກຳນົດຄ່າໃຫ້ VMC(ກ້ອນເຊບສະເໝືອນຈິງ)
+  VMC_NAME: ຊື່
+  SIZE: ຂະໜາດ
+  VMC_STATUS: ສະຖານະ
+  VMC_PROGRESS: ລະດັບ
+  VMC_FILE_EXISTS: ມີ File ຂອງ VMC ຢູ່ແລ້ວ
+  VMC_FILE_ERROR: ຂະໜາດຂອງ File VMC ບໍ່ຖືກຕ້ອງ
+  VMC_FILE_NEW: File VMC(ກ້ອນເຊບສະເໝືອນຈິງ) ຈະຕ້ອງຖືກສ້າງຂຶ້ນ
+  ERR_VMC_CONTINUE:
+  - untranslated
+  - original: Error accessing VMC %s. Continue with the Memory Card in slot %d?
+  AUTOREFRESH: ເອີ້ນຄືນໃໝ່ແບບອັດຕະໂນມັດ
+  ABOUT: ກ່ຽວກັບໂປຣແກຣມ
+  DEVS: ກຸ່ມນັກພັດທະນາໂປຣແກຣມ
+  QANDA: ການປະກັນໃນຄຸນະພາບ
+  BDM_PREFIX: BDM prefix path
+  HINT_EXITPATH: ປະມວນຜົນ ELF ຫຼັງຈາກ IGR
+  HINT_SPINDOWN: ໃສ່ຄ່າເປັນນາທີ, ເລືອກ 0 ເພື່ອປິດການຢຸດໝຸນຮອບ
+  HDD_SPINDOWN: ການຢຸດຮອບໝູນອັດຕະໂນມັດຂອງ Hard Disk
+  VMODE: ໂໝດວິດິໂອ
+  UICOLOR: ສີ Dialog
+  SELCOLOR: ສີທີ່ຖືກເລືອກ
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO: ຂໍ້ມູນ
+  ALTSTARTUP: ELF ທີ່ຖືກປັບແຕ່ງເອງ
+  COLOR_SELECTION: ເລືອກສີ
+  RECONNECT: ເຊື່ອມຕໍ່ອີກຄັ້ງ
+  HINT_SHARENAME: ບໍ່ມີຄ່າກຳນົດໃດໆຕໍ່ການສະແດງລາຍການທີ່ເປີດ share
+  ETH_PREFIX: ETH prefix path
+  BACKSPACE:
+  - untranslated
+  - original: Backspace
+  SPACE:
+  - untranslated
+  - original: Space
+  ENTER:
+  - untranslated
+  - original: Enter
+  MODE: ໂໝດ
+  VMC_SLOT1: VMC(ກ້ອນເຊບສະເໝືອນຈິງ) ຊ່ອງ 1
+  VMC_SLOT2: VMC(ກ້ອນເຊບສະເໝືອນຈິງ) ຊ່ອງ 2
+  GAME_ID:
+  - untranslated
+  - original: Game ID
+  DMA_MODE:
+  - untranslated
+  - original: DMA Mode
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1: ໂໝດ  1
+  MODE2: ໂໝດ  2
+  MODE3: ໂໝດ  3
+  MODE4: ໂໝດ  4
+  MODE5: ໂໝດ  5
+  MODE6: ໂໝດ  6
+  GSCONFIG: ກຳນົດຄ່າ GSM
+  ETH_OPMODE: ໂໝດການເຊື່ອມຕໍ່ຂອງສາຍ LAN
+  ETH_100MFDX: ສົ່ງຂໍ້ມູນ 100Mbit ແບບ full-duplex
+  ETH_100MHDX: ສົ່ງຂໍ້ມູນ 100Mbit ແບບ half-duplex
+  ETH_10MFDX: ສົ່ງຂໍ້ມູນ 10Mbit ແບບ full-duplex
+  ETH_10MHDX: ສົ່ງຂໍ້ມູນ 10Mbit ແບບ half-duplex
+  GSM_SETTINGS: ການຕັ້ງຄ່າ GSM
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Toggles GSM ເປີດ ຫຼື ປິດ
+  HINT_GSMVMODE: ບັງຄັບໃຊ້ໂໝດການສະແດງຜົນທີ່ປັບແຕ່ງເອງ
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: ການປັບແຕ່ງຄ່າສະແດງຜົນຕາມແນວນອນ
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: ການປັບແຕ່ງຄ່າສະແດງຜົນຕາມແນວຕັ້ງ
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN: Overscan Adjustment
+  GSMSKIPVIDEOS: ຂ້າມຂັ້ນຕອນ FMV
+  HINT_GSMSKIPVIDEOS: ຂ້າມຂັ້ນຕອນສະແດງພາບເຄື່ອນໄຫວ Full Video
+  CHEAT_SETTINGS: ຕັ້ງຄ່າການໂກງເກມ
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: ອະນຸຍາດໃຫ້ ຄຳສັ່ງໂກງເກມ PS2RD ເຂົ້າເຖິງເກມຂອງເຈົ້າ
+  CHEATMODE: ໂໝດຂອງ ຄຳສັ່ງໂກງເກມ PS2RD
+  HINT_CHEATMODE: ເລືອກການໂກງແບບອັດຕະໂນມັດ ຫຼື ເລືອກເອງ
+  CHEATMODEAUTO: ເລືອກການໂກງແບບອັດຕະໂນມັດ
+  CHEATMODESELECT: ເລືອກການໂກງແບບເລືອກເອງ
+  ERR_CHEATS_LOAD_FAILED: 'ເກີດຂໍ້ຜິດພາດ: ລົ້ມເຫຼວທີ່ຈະໂຫຼດ File ໂກງ'
+  NO_CHEATS_FOUND: ບໍ່ພົບ File ໂກງເກມໃດໆ
+  DL_DEFAULTS: ດາວໂຫຼດຄ່າມາດຕະຖານ
+  NET_UPDATE: ອັບເດດ Network
+  NET_UPDATE_ALL:
+  - untranslated
+  - original: Overwrite Existing Records
+  NET_UPDATE_FAILED: ການອັບເດດເກີດຂໍ້ຜິດພາດ.
+  NET_UPDATE_CONN_FAILED: ການເຊື່ອມຕໍ່ເພື່ອອັບເດດ Server ບໍ່ສົມບູນ.
+  NET_UPDATE_DONE: ການອັບເດດສົມບູນ.
+  NET_UPDATE_CANCELLED: ອັບເດດຖືກຍົກເລີກ.
+  CONFIRMATION_SETTINGS_UPDATE: ດາວໂຫຼດການຕັ້ງຄ່າຈາກ Network?
+  CUSTOMIZED_SETTINGS: ການຕັ້ງຄ່າທີ່ຖືກປັບແຕ່ງ
+  DOWNLOADED_DEFAULTS: ຄ່າມາດຕະຖານທີ່ຖືກດາວໂຫຼດ
+  AUTO_START_IN_N_SECS: ເລີ່ມຕົ້ນອັດຕະໂນມັດ ພາຍໃນ %i ວິນາທີ…
+  AUTOSTARTLAST: ເປີດໃຊ້ແບບໂອໂຕ
+  HINT_AUTOSTARTLAST: ຕັ້ງຄ່າຫົວໜ່ວຍ ວິນາທີ, ໃສ່ 0 ເພື່ອປິດການເປີດໃຊ້ແບບໂອໂຕ
+  PS2LOGO:
+  - untranslated
+  - original: PS2 Logo
+  HINT_PS2LOGO: ຈະຖືກສະແດງຜົນ ກໍຕໍ່ເມື່ອໂລໂກ້ຂອງແຜ່ນຖືກຕ້ອງ ແລະ ສອດຄ່ອງຕາມໂຊນຂອງເຄື່ອງ
+  PADEMUCONFIG:
+  - untranslated
+  - original: Configure PADEMU
+  PADEMU_SETTINGS:
+  - untranslated
+  - original: Pad Emulator Settings
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Turns on/off PadEmulator for selected game.
+  PADEMU_MODE: Pad Emulator mode
+  HINT_PADEMU_MODE:
+  - untranslated
+  - original: Select Pad Emulator mode.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Settings for port:'
+  HINT_PAD_PORT:
+  - untranslated
+  - original: Select Pad Emulator port for settings.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT:
+  - untranslated
+  - original: Turns on/off Pad Emulator for selected port.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB:
+  - untranslated
+  - original: Turns on/off vibration for Pad Emulator selected port.
+  USBDG_MAC: 'Usb bluetooth adapter mac address:'
+  PAD_MAC: 'DS Controller paired to mac address:'
+  PAIR:
+  - untranslated
+  - original: Pair
+  PAIR_PAD:
+  - untranslated
+  - original: Pair DS Controller
+  HINT_PAIRPAD: Pair DS Controller with bluetooth adapter mac address.
+  NOT_CONNECTED: Not connected
+  BTINFO: Bluetooth adapter information
+  HINT_BTINFO: Shows more information and supported features
+  HCIVER:
+  - untranslated
+  - original: 'HCI Version:'
+  LMPVER:
+  - untranslated
+  - original: 'LMP Version:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES: 'Support features:'
+  'YES':
+  - untranslated
+  - original: 'Yes'
+  'NO':
+  - untranslated
+  - original: 'No'
+  BT_SUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+  BT_NOTSUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+  MTAP_ENABLE: Multitap emulation
+  HINT_MTAP_ENABLE:
+  - untranslated
+  - original: Turns on/off Multitap emulation for selected game.
+  MTAP_PORT: Multitap emulator on port
+  HINT_MTAP_PORT:
+  - untranslated
+  - original: Select port for Multitap emulation.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emulate FIELD flipping
+  HINT_GSM_FIELD_FIX:
+  - untranslated
+  - original: Fix for games that glitch under progressive video modes.
+  PARENLOCKCONFIG:
+  - untranslated
+  - original: Parental Lock Settings
+  PARENLOCK_PASSWORD:
+  - untranslated
+  - original: Parental Lock Password
+  PARENLOCK_PASSWORD_HINT:
+  - untranslated
+  - original: Leave blank to disable the parental lock.
+  PARENLOCK_ENTER_PASSWORD_TITLE:
+  - untranslated
+  - original: Enter Parental Lock Password
+  PARENLOCK_PASSWORD_INCORRECT:
+  - untranslated
+  - original: Parental lock password incorrect.
+  PARENLOCK_DISABLE_WARNING:
+  - untranslated
+  - original: Parental lock disabled.
+  BUILD_DETAILS:
+  - untranslated
+  - original: 'Build Options:'
+  PARENLOCK_INVALID_PASSWORD:
+  - untranslated
+  - original: Error - this password cannot be used.
+  ERR_VMC_FRAGMENTED_CONTINUE:
+  - untranslated
+  - original: VMC %s file is fragmented. Continue with Memory Card in slot %d?
+  AUDIO_SETTINGS:
+  - untranslated
+  - original: Audio Settings
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME:
+  - untranslated
+  - original: Sound Effects Volume
+  BOOT_SND_VOLUME:
+  - untranslated
+  - original: Boot Sound Volume
+  CFM_VMODE_CHG:
+  - untranslated
+  - original: Confirm video mode change?
+  CACHE_HDD_GAME_LIST:
+  - untranslated
+  - original: Cache Game List (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED:
+  - untranslated
+  - original: Game settings saved.
+  GAME_SETTINGS_REMOVED:
+  - untranslated
+  - original: '%s settings removed.'
+  NET_UPDATE_HINT:
+  - untranslated
+  - original: Overwrites existing game compatibility settings when enabled.
+  SETTINGS_SOURCE:
+  - untranslated
+  - original: Settings Mode
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS:
+  - untranslated
+  - original: All
+  GAME_SETTINGS_PROMPT:
+  - untranslated
+  - original: Select settings to remove.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

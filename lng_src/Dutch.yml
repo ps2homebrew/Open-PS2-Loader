@@ -1,0 +1,482 @@
+comments: |-
+  Dutch translation by PS2Gaming
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Dutch
+  SAVE_CHANGES: Wijzigingen opslaan
+  BACK: Terug
+  NETCONFIG: Netwerkconfiguratie
+  SHOW_ADVANCED_OPTS: Geavanceerde opties
+  NO_ITEMS: <geen waarde>
+  SETTINGS_SAVED:
+  - untranslated
+  - original: Settings saved to %s
+  ERROR_SAVING_SETTINGS: Fout bij schrijven van instellingen!
+  EXIT: Sluiten
+  SETTINGS: Instellingen
+  MENU:
+  - untranslated
+  - original: Menu
+  BDM_GAMES: BDM Spellen
+  HDD_GAMES: HDD Spellen
+  NET_GAMES: ETH Spellen
+  APPS:
+  - untranslated
+  - original: Apps
+  THEME: Thema's
+  LANGUAGE: Taal
+  CONFIRMATION_POFF: Het systeem zal worden uitgeschakeld.
+  CONFIRMATION_EXIT: OPL afsluiten?
+  CONFIRMATION_CANCEL_UPDATE: Updaten annuleren?
+  HDD_NOT_CONNECTED_ERROR: '%d: Harde schijf niet gedetecteerd'
+  HDD_NOT_FORMATTED_ERROR: '%d: Harde schijf niet geformateerd'
+  NETWORK_STARTUP_ERROR: '%d: Netwerk startfout'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Geen netwerkadapter gedetecteerd'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Kan niet verbinden met SMB server'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Kan niet inloggen bij SMB server'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Kan SMB-share niet openen'
+  NETWORK_SHARE_LIST_ERROR: '%d: Kan SMB-shares niet inlijsten'
+  NETWORK_GAMES_LIST_ERROR: '%d: Kan spellen niet inlijsten'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCP server niet beschikbaar'
+  NETWORK_ERROR_LINK_FAIL: '%d: Geen netwerkconnectie'
+  'ON': Aan
+  'OFF': Uit
+  OK:
+  - untranslated
+  - original: OK
+  SELECT: Select.
+  CANCEL: Annuleer
+  CIRCLE: Cirkel
+  CROSS: Kruis
+  GAMES_LIST: Spellenlijst
+  COMPAT_SETTINGS: Spelinstellingen
+  REMOVE_ALL_SETTINGS:
+  - untranslated
+  - original: Remove Settings
+  SCROLLING: Scrollen
+  SLOW: Langzaam
+  MEDIUM: Normaal
+  FAST: Snel
+  DEFDEVICE: Standaard menu
+  LOAD_FROM_DISC: Laad vanuit schijf
+  PLEASE_WAIT: Even geduld a.u.b.
+  ERROR_LOADING_ID: Fout tijdens laden van Spel ID
+  AUTOSORT: Automatisch sorteren
+  ERR_LOADING_LANGFILE: Fout bij laden van taalbestand
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: Geen controller gedetecteerd, wachtend…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: Breedbeeld
+  POWEROFF: Uitschakelen
+  LOADING_SETTINGS: Configuratie laden
+  SAVING_SETTINGS: Configuratie opslaan
+  START_DEVICE: Start apparaat
+  REFRESH: Vernieuwen
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: HDD-apparaat startmodus
+  ETHMODE: ETH-apparaat startmodus
+  APPMODE: Applicaties startmodus
+  AUTO:
+  - untranslated
+  - original: Auto
+  MANUAL: Handmatig
+  STARTNBD:
+  - untranslated
+  - original: Start NBD Server
+  STARTINGNBD: NBD Server starten…
+  RUNNINGNBD: NBD Server uitgevoerd…
+  STARTFAILNBD: Mislukt om NBD Server te starten.
+  UNLOADNBD: NBD Server lossen…
+  EXITTO: IGR pad
+  BGCOLOR: Achtergrondkleur
+  TXTCOLOR: Tekstkleur
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: IP-adres type
+  IP_ADDRESS_TYPE_STATIC: Statisch
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IP-adres
+  ADDRESS: Adres
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER:
+  - untranslated
+  - original: DNS Server
+  PORT: Poort
+  SHARE: Deel
+  USER: Gebruiker
+  PASSWORD: Wachtwoord
+  NOT_SET: <niet ingesteld>
+  ADDRESS_TYPE: Adrestype
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Accepteer
+  DELETE_WARNING: Item zal permanent verwijdert worden, doorgaan?
+  RENAME: Wijzig naam
+  DELETE: Verwijder
+  RUN: Uitvoeren
+  GFX_SETTINGS: Beeldinstellingen
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: Herinner laatst gespeelde spel
+  SELECTBUTTON: Selecteerknop
+  ERR_FRAGMENTED: Foutmelding, het spel is gefragmenteerd
+  ERR_FILE_INVALID: Foutmelding, kan het item niet uitvoeren
+  TEST:
+  - untranslated
+  - original: Test Changes
+  HINT_GUEST: Laat leeg voor GUEST auth.
+  HINT_MODE1: Accurate reads
+  HINT_MODE2: Synchrone modus
+  HINT_MODE3: Syscalls loshaken
+  HINT_MODE4: Videos overslaan
+  HINT_MODE5: Emuleer DVD-DL
+  HINT_MODE6: IGR uitschakelen
+  HINT_VMC_SIZE: Het wijzigen van de grootte zal VMC formatteren
+  CREATE: Creëer
+  START:
+  - untranslated
+  - original: Start
+  MODIFY: Aanpassen
+  ABORT: Afbreken
+  RESET:
+  - untranslated
+  - original: Reset
+  USE_GENERIC: Gebruik generieke
+  VMC_SCREEN: Configureer VMC
+  VMC_NAME: Naam
+  SIZE: Groote
+  VMC_STATUS:
+  - untranslated
+  - original: Status
+  VMC_PROGRESS: Voortgang
+  VMC_FILE_EXISTS: VMC-bestand bestaat
+  VMC_FILE_ERROR: Ongeldige VMC-bestand, grootte is incorrect
+  VMC_FILE_NEW: VMC-bestand moet gecreëerd worden
+  ERR_VMC_CONTINUE: Fout met VMC %s, voorzetten met fysieke MC (slot %d)?
+  AUTOREFRESH: Automatisch vernieuwen
+  ABOUT: Over
+  DEVS:
+  - untranslated
+  - original: Coders
+  QANDA: Kwaliteitsgarantie
+  BDM_PREFIX: BDM-prefix pad
+  HINT_EXITPATH: Start aangepaste ELF na een IGR
+  HINT_SPINDOWN: Waarde in minuten, 0 om spin down uit te schakelen
+  HDD_SPINDOWN: Automatische HDD spin down
+  VMODE: Videomodus
+  UICOLOR: Dialoogvensterkleur
+  SELCOLOR: Geselecteerde kleur
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO:
+  - untranslated
+  - original: Info
+  ALTSTARTUP: Aangepaste ELF
+  COLOR_SELECTION: Kleurselectie
+  RECONNECT: Opnieuw verbinden
+  HINT_SHARENAME: Laat leeg om het gedeelde in te lijsten
+  ETH_PREFIX: ETH-prefix pad
+  BACKSPACE:
+  - untranslated
+  - original: Backspace
+  SPACE:
+  - untranslated
+  - original: Space
+  ENTER:
+  - untranslated
+  - original: Enter
+  MODE: Modus
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID: Spel ID
+  DMA_MODE: DMA Modus
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1: Modus 1
+  MODE2: Modus 2
+  MODE3: Modus 3
+  MODE4: Modus 4
+  MODE5: Modus 5
+  MODE6: Modus 6
+  GSCONFIG: Configureer GSM
+  ETH_OPMODE: Ethernet link modus
+  ETH_100MFDX: 100Mbit full-duplex
+  ETH_100MHDX: 100Mbit half-duplex
+  ETH_10MFDX: 10Mbit full-duplex
+  ETH_10MHDX: 10Mbit half-duplex
+  GSM_SETTINGS: GSM instellingen
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Schakelt GSM AAN of UIT
+  HINT_GSMVMODE: Geforceerde aangepast beeldschermmodus
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: Horizontale aanpassing
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: Verticale aanpassing
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN: Overscan aanpassing
+  GSMSKIPVIDEOS: FMV overslaan
+  HINT_GSMSKIPVIDEOS: Slaat Full Motion Videos over
+  CHEAT_SETTINGS: Cheat instellingen
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Laat PS2RD Cheat Engine uw spellen patchen
+  CHEATMODE: PS2RD Cheat Engine Modus
+  HINT_CHEATMODE: Auto-selecteer of selecteer spelcheats
+  CHEATMODEAUTO: Auto-selecteer cheats
+  CHEATMODESELECT: Selecteer spelcheats
+  ERR_CHEATS_LOAD_FAILED: 'Foutmelding: mislukt om cheatbestand te laden'
+  NO_CHEATS_FOUND: Geen cheats gevonden
+  DL_DEFAULTS: Download standaardwaarden
+  NET_UPDATE: Netwerkupdate
+  NET_UPDATE_ALL:
+  - untranslated
+  - original: Overwrite Existing Records
+  NET_UPDATE_FAILED: Update mislukt.
+  NET_UPDATE_CONN_FAILED: Mislukt om te verbinden met update server.
+  NET_UPDATE_DONE: Update voltooid.
+  NET_UPDATE_CANCELLED: Update geannuleerd.
+  CONFIRMATION_SETTINGS_UPDATE: Download instellingen van het netwerk?
+  CUSTOMIZED_SETTINGS: Aangepaste instellingen
+  DOWNLOADED_DEFAULTS: Gedownloade standaardwaarden
+  AUTO_START_IN_N_SECS: Auto-start over %i s…
+  AUTOSTARTLAST: Auto-start
+  HINT_AUTOSTARTLAST: Waarde in seconde(n), 0 om auto-start uit te schakelen
+  PS2LOGO: PS2 logo
+  HINT_PS2LOGO: Alleen getoond voor geldige schijflogo die bij de console-regio past
+  PADEMUCONFIG: Configureer PADEMU
+  PADEMU_SETTINGS: Pad-emulator instellingen
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Schakelt Pad-emulator in/uit voor geselecteerde spel
+  PADEMU_MODE: Pad-emulator modus
+  HINT_PADEMU_MODE: Selecteer Pad-emulator modus.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Instellingen voor poort:'
+  HINT_PAD_PORT: Selecteer Pad-emulator poort voor instellingen.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Schakelt Pad-emulator in/uit voor geselecteerde poort.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Schakelt vibratie in/uit voor Pad-emulator geselecteerde poort.
+  USBDG_MAC: 'USB-bluetoothadapter mac-adres:'
+  PAD_MAC: 'DS-controller gepaard met mac-adres:'
+  PAIR: Paar
+  PAIR_PAD: Paar DS-controller
+  HINT_PAIRPAD: Paar DS-controller met bluetoothadapter mac-adres
+  NOT_CONNECTED: Niet verbonden
+  BTINFO: Bluetooth adapter information
+  HINT_BTINFO: Shows more information and supported features
+  HCIVER:
+  - untranslated
+  - original: 'HCI Version:'
+  LMPVER:
+  - untranslated
+  - original: 'LMP Version:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES: 'Support features:'
+  'YES':
+  - untranslated
+  - original: 'Yes'
+  'NO':
+  - untranslated
+  - original: 'No'
+  BT_SUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+  BT_NOTSUPPORTED:
+  - untranslated
+  - original: Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE:
+  - untranslated
+  - original: Turns on/off Multitap emulation for selected game.
+  MTAP_PORT: Multitap emulator on port
+  HINT_MTAP_PORT:
+  - untranslated
+  - original: Select port for Multitap emulation.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emulate FIELD flipping
+  HINT_GSM_FIELD_FIX:
+  - untranslated
+  - original: Fix for games that glitch under progressive video modes.
+  PARENLOCKCONFIG:
+  - untranslated
+  - original: Parental Lock Settings
+  PARENLOCK_PASSWORD:
+  - untranslated
+  - original: Parental Lock Password
+  PARENLOCK_PASSWORD_HINT:
+  - untranslated
+  - original: Leave blank to disable the parental lock.
+  PARENLOCK_ENTER_PASSWORD_TITLE:
+  - untranslated
+  - original: Enter Parental Lock Password
+  PARENLOCK_PASSWORD_INCORRECT:
+  - untranslated
+  - original: Parental lock password incorrect.
+  PARENLOCK_DISABLE_WARNING:
+  - untranslated
+  - original: Parental lock disabled.
+  BUILD_DETAILS:
+  - untranslated
+  - original: 'Build Options:'
+  PARENLOCK_INVALID_PASSWORD:
+  - untranslated
+  - original: Error - this password cannot be used.
+  ERR_VMC_FRAGMENTED_CONTINUE:
+  - untranslated
+  - original: VMC %s file is fragmented. Continue with Memory Card in slot %d?
+  AUDIO_SETTINGS:
+  - untranslated
+  - original: Audio Settings
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME:
+  - untranslated
+  - original: Sound Effects Volume
+  BOOT_SND_VOLUME:
+  - untranslated
+  - original: Boot Sound Volume
+  CFM_VMODE_CHG:
+  - untranslated
+  - original: Confirm video mode change?
+  CACHE_HDD_GAME_LIST:
+  - untranslated
+  - original: Cache Game List (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED:
+  - untranslated
+  - original: Game settings saved.
+  GAME_SETTINGS_REMOVED:
+  - untranslated
+  - original: '%s settings removed.'
+  NET_UPDATE_HINT:
+  - untranslated
+  - original: Overwrites existing game compatibility settings when enabled.
+  SETTINGS_SOURCE:
+  - untranslated
+  - original: Settings Mode
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS:
+  - untranslated
+  - original: All
+  GAME_SETTINGS_PROMPT:
+  - untranslated
+  - original: Select settings to remove.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

@@ -1,0 +1,407 @@
+comments: |-
+  Indonesian translation by verislasher completed by jbliz
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Indonesian
+  SAVE_CHANGES: Simpan Perubahan
+  BACK: Kembali
+  NETCONFIG: Konfigurasi jaringan
+  SHOW_ADVANCED_OPTS: Pilihan lanjutan
+  NO_ITEMS: <tak ada nilai>
+  SETTINGS_SAVED: Pengaturan disimpan pada %s
+  ERROR_SAVING_SETTINGS: Kesalahan penulisan setingan!
+  EXIT: Keluar
+  SETTINGS: Setingan
+  MENU:
+  - untranslated
+  - original: Menu
+  BDM_GAMES:
+  - untranslated
+  - original: BDM Games
+  HDD_GAMES:
+  - untranslated
+  - original: HDD Games
+  NET_GAMES:
+  - untranslated
+  - original: ETH Games
+  APPS: Aplikasi
+  THEME: Tema
+  LANGUAGE: Bahasa
+  CONFIRMATION_POFF: Sistem akan dimatikan.
+  CONFIRMATION_EXIT: Keluar ke Browser?
+  CONFIRMATION_CANCEL_UPDATE: Batal perbarui?
+  HDD_NOT_CONNECTED_ERROR: '%d: Harddisk tak terdeteksi'
+  HDD_NOT_FORMATTED_ERROR: '%d: Harddisk belum diformat'
+  NETWORK_STARTUP_ERROR: '%d: Kesalahan memulai jaringan'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Adaptor jaringan tak terdeteksi'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Tak dapat terhubung ke server SMB'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Tak bisa login ke server SMB'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Tak dapat membuka SMB bersama'
+  NETWORK_SHARE_LIST_ERROR: '%d: Tak ada daftar SMB bersama'
+  NETWORK_GAMES_LIST_ERROR: '%d: Tak ada daftar game'
+  NETWORK_ERROR_DHCP_FAIL: '%d: Server DHCP tidak tersedia'
+  NETWORK_ERROR_LINK_FAIL: '%d: Tak ada koneksi jaringan'
+  'ON': Hidup
+  'OFF': Mati
+  OK:
+  - untranslated
+  - original: OK
+  SELECT: Pilih
+  CANCEL: Batal
+  CIRCLE: Bulat
+  CROSS: Kali
+  GAMES_LIST: Daftar Game
+  COMPAT_SETTINGS: Setingan
+  REMOVE_ALL_SETTINGS: Hapus setingan
+  SCROLLING: Gulir
+  SLOW: Lambat
+  MEDIUM: Sedang
+  FAST: Cepat
+  DEFDEVICE: Menu standar
+  LOAD_FROM_DISC: Muat dari disk
+  PLEASE_WAIT: Mohon tunggu
+  ERROR_LOADING_ID: Kesalahan saat memuat ID Permainan
+  AUTOSORT: Penyortiran otomatis
+  ERR_LOADING_LANGFILE: Kesalahan memuat file bahasa
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: Tak ada kontroler terdeteksi, menunggu …
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: Layar lebar
+  POWEROFF: Matikan
+  LOADING_SETTINGS: Memuat konfigurasi
+  SAVING_SETTINGS: Menyimpan konfigurasi
+  START_DEVICE: Memulai perangkat
+  REFRESH: Segarkan
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: Memulai mode perangkat HDD
+  ETHMODE: Memulai mode perangkat ETH
+  APPMODE: Memulai mode Aplikasi
+  AUTO: Otomatis
+  MANUAL:
+  - untranslated
+  - original: Manual
+  STARTNBD: Mulai Server NBD
+  STARTINGNBD: Memulai Server NBD …
+  RUNNINGNBD: Menjalankan Server NBD…
+  STARTFAILNBD: Gagal memulai Server NBD.
+  UNLOADNBD: Mengembalikan Server NBD…
+  EXITTO: Pintasan IGR
+  BGCOLOR: Warna latar belakang
+  TXTCOLOR: Warna teks
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: Jenis alamat IP
+  IP_ADDRESS_TYPE_STATIC: Statis
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: Alamat IP
+  ADDRESS: Alamat
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER: Server DNS
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE: Bersama
+  USER: Pengguna
+  PASSWORD: Sandi
+  NOT_SET: <tidak diatur>
+  ADDRESS_TYPE: Tipe alamat
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Terima
+  DELETE_WARNING: Item akan dihapus secara permanen, lanjut?
+  RENAME: Ubah nama
+  DELETE: Hapus
+  RUN: Jalankan
+  GFX_SETTINGS: Setingan tampilan
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: Ingat pertandingan terakhir dimainkan
+  SELECTBUTTON: Pilih tombol
+  ERR_FRAGMENTED: Kesalahan, game terfragmentasi
+  ERR_FILE_INVALID: Kesalahan, tidak bisa menjalankan item
+  TEST: Uji Perubahan
+  HINT_GUEST: Tinggalkan kosong untuk Otent TAMU.
+  HINT_MODE1: Membaca akurat
+  HINT_MODE2: Mode Sinkronisasi
+  HINT_MODE3: Melepas kaitan syscalls
+  HINT_MODE4: Lewati video
+  HINT_MODE5: Emulasi DVD-DL
+  HINT_MODE6: Nonaktifkan IGR
+  HINT_VMC_SIZE: Mengubah ukuran akan memformat ulang VMC
+  CREATE: Membuat
+  START: Mulai
+  MODIFY: Modifikasi
+  ABORT: Batal
+  RESET:
+  - untranslated
+  - original: Reset
+  USE_GENERIC: Gunakan generik
+  VMC_SCREEN: Konfigurasi VMC
+  VMC_NAME: Nama
+  SIZE: Ukuran
+  VMC_STATUS:
+  - untranslated
+  - original: Status
+  VMC_PROGRESS: Kemajuan
+  VMC_FILE_EXISTS: Berkas VMC ada
+  VMC_FILE_ERROR: Berkas VMC cacat, ukuran salah
+  VMC_FILE_NEW: Berkas VMC harus dibuat
+  ERR_VMC_CONTINUE: Kesalahan dengan VMC %s, lanjutkan dengan MC fisik (Slot %d)?
+  AUTOREFRESH: Segarkan otomatis
+  ABOUT: Tentang
+  DEVS: Pengkode
+  QANDA: Kualitas jaminan
+  BDM_PREFIX: Awalan pintas BDM
+  HINT_EXITPATH: Jalankan ELF Kustom setelah IGR
+  HINT_SPINDOWN: Nilai dalam menit (s), 0 untuk menonaktifkan berhenti
+  HDD_SPINDOWN: HDD Otomatis berhenti
+  VMODE: Modus video
+  UICOLOR: Warna dialog
+  SELCOLOR: Warna  dipilih
+  RESETCOLOR: Atur Ulang Warna
+  INFO:
+  - untranslated
+  - original: Info
+  ALTSTARTUP: Kustom ELF
+  COLOR_SELECTION: Pemilihan warna
+  RECONNECT: Hubungkan kembali
+  HINT_SHARENAME: Kosongkan untuk daftar bersama
+  ETH_PREFIX: Awal pintasan ETH
+  BACKSPACE: Hapus
+  SPACE: Spasi
+  ENTER: OK
+  MODE:
+  - untranslated
+  - original: Mode
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID: ID Game
+  DMA_MODE: Mode DMA
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1:
+  - untranslated
+  - original: Mode 1
+  MODE2:
+  - untranslated
+  - original: Mode 2
+  MODE3:
+  - untranslated
+  - original: Mode 3
+  MODE4:
+  - untranslated
+  - original: Mode 4
+  MODE5:
+  - untranslated
+  - original: Mode 5
+  MODE6:
+  - untranslated
+  - original: Mode 6
+  GSCONFIG: Konfigurasi GSM
+  ETH_OPMODE: Mode tautan ethernet
+  ETH_100MFDX: 100Mbit rangkap penuh
+  ETH_100MHDX: 100Mbit setengah rangkap
+  ETH_10MFDX: 10Mbit rangkap penuh
+  ETH_10MHDX: 10Mbit setengah rangkap
+  GSM_SETTINGS: Setingan GSM
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Alih GSM ON atau OFF
+  HINT_GSMVMODE: Paksa Mode Tampilan Kustom
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: Penyesuaian horisontal
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: Penyesuaian Vertikal
+  OVERSCAN: Tampilan berlebih
+  HINT_OVERSCAN: Penyesuaian Tampilan berlebih
+  GSMSKIPVIDEOS: Lewati FMV
+  HINT_GSMSKIPVIDEOS: Lompati Video Gerakan Penuh
+  CHEAT_SETTINGS: Setingan Cheat
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Biarkan PS2RD Cheat Engine menambal permainan Anda
+  CHEATMODE: Modus PS2RD Cheat Engine
+  HINT_CHEATMODE: Pilih otomatis atau Pilih game cheats
+  CHEATMODEAUTO: Pilih otomatis game cheats
+  CHEATMODESELECT: Pilih game cheats
+  ERR_CHEATS_LOAD_FAILED: 'Kesalahan: gagal untuk memuat Berkas cheat'
+  NO_CHEATS_FOUND: Tak ada cheat ditemukan
+  DL_DEFAULTS: Unduhan default
+  NET_UPDATE: Pembaruan jaringan
+  NET_UPDATE_ALL: Timpa Rekaman Yang Ada
+  NET_UPDATE_FAILED: Pembaruan gagal
+  NET_UPDATE_CONN_FAILED: Gagal menyambungkan ke server pembaruan
+  NET_UPDATE_DONE: Perbarui selesai
+  NET_UPDATE_CANCELLED: Perbarui dibatalkan
+  CONFIRMATION_SETTINGS_UPDATE: Unduh pengaturan dari jaringan?
+  CUSTOMIZED_SETTINGS: Setingan disesuaikan
+  DOWNLOADED_DEFAULTS: Unduhan default
+  AUTO_START_IN_N_SECS: Mulai otomatis dalam %i s…
+  AUTOSTARTLAST: Mulai otomatis
+  HINT_AUTOSTARTLAST: Nilai dalam detik, 0 mencegah mulai otomatis
+  PS2LOGO: Logo PS2
+  HINT_PS2LOGO: Hanya ditampilkan untuk logo disc yang valid yang cocok dengan region
+    konsol
+  PADEMUCONFIG: Konfigurasi PADEMU
+  PADEMU_SETTINGS: Pengaturan Stik Emulator
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Hidup/matikan StikEmulator game dipilih.
+  PADEMU_MODE: mode Stik Emulator
+  HINT_PADEMU_MODE: Pilih mode Stik Emulator
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Setingan untuk port:'
+  HINT_PAD_PORT: Pilih port Stik Emulator untuk setingan
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Hidup/matikan Stik Emulator port dipilih
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Hidup/matikan getar Stik Emulator port dipilih
+  USBDG_MAC: Alamat mac adaptor bluetooth Usb
+  PAD_MAC: 'Pengontrol DS dipasangkan ke Alamat MAC:'
+  PAIR: Pasangan
+  PAIR_PAD: Pasangan Pengontrol DS
+  HINT_PAIRPAD: Pasangan Pengontrol DS dengan adaptor Alamat MAC Bluetooth.
+  NOT_CONNECTED: Tak tersambung
+  BTINFO: informasi adaptor Bluetooth
+  HINT_BTINFO: Tampilkan informasi lain dan fitur didukung
+  HCIVER: 'Versi HCI:'
+  LMPVER: 'Versi LMP:'
+  MANUFACTURER: 'ID Pabrikan:'
+  SUPFEATURES: 'Dukungan fitur:'
+  'YES': Ya
+  'NO': Tidak
+  BT_SUPPORTED: adapter Bluetooth harus sepenuhnya cocok dengan Pengontrol DS3/DS4.
+  BT_NOTSUPPORTED: adapter Bluetooth mungkin tidak bekerja dengan benar dengan Pengontrol
+    DS3/DS4.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: Aktifkan/NonAktifkan emulasi Multitap untuk game dipilih.
+  MTAP_PORT: emulator Multitap pada port
+  HINT_MTAP_PORT: Pilih port untuk emulasi Multitap.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emulasikan FIELD flipping
+  HINT_GSM_FIELD_FIX: Perbaiki Game yang bermasalah di mode video progresif.
+  PARENLOCKCONFIG: Seting kunci Parental
+  PARENLOCK_PASSWORD: Kata sandi kunci parental
+  PARENLOCK_PASSWORD_HINT: Kosongkan untuk non aktif kunci Parental.
+  PARENLOCK_ENTER_PASSWORD_TITLE: Masukkan kata sandi kuci Parental
+  PARENLOCK_PASSWORD_INCORRECT: Kesalahan kata sandi kunci Parental.
+  PARENLOCK_DISABLE_WARNING: Kunci Parental tidak aktif.
+  BUILD_DETAILS: 'Opsi Bentukan:'
+  PARENLOCK_INVALID_PASSWORD: Kesalahan - kata sandi tak bisa dipakai.
+  ERR_VMC_FRAGMENTED_CONTINUE: Berkas VMC %s terfragmentasi. Gunakan kartu memori
+    di slot %d?
+  AUDIO_SETTINGS: Pengaturan Audio
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: Volume efek suara
+  BOOT_SND_VOLUME: Volume suara Boot
+  CFM_VMODE_CHG: Konfirmasi perubahan mode video?
+  CACHE_HDD_GAME_LIST: Daftar Tembolok Game(HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED: Pengaturan Game disimpan.
+  GAME_SETTINGS_REMOVED: '%s setingan dihapus.'
+  NET_UPDATE_HINT: Timpa pengaturan kompatibilitas game yang ada ketika diaktifkan.
+  SETTINGS_SOURCE: Mode Setingan
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS: Seluruh
+  GAME_SETTINGS_PROMPT: Pilih setingan untuk dihapus.
+  FORUM_DETAILS: 'Forum Dukungan:'
+  INFO_TITLE: Judul
+  INFO_GENRE: Aliran
+  INFO_RELEASE: Rilis
+  INFO_DEVELOPER: Pengembang
+  INFO_DESCRIPTION: Deskripsi
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

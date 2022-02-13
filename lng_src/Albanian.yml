@@ -1,0 +1,352 @@
+comments: ''
+translations:
+  LOCALE: Albanian
+  SAVE_CHANGES: Ruaj Ndryshimet
+  BACK: Prapa
+  NETCONFIG: Cilësimet e Rrjetit
+  SHOW_ADVANCED_OPTS: Cilësimet e Avancuara
+  NO_ITEMS: <asnjë vlerë>
+  SETTINGS_SAVED: Cilësimet u ruajtën në %s
+  ERROR_SAVING_SETTINGS: Gabim në shkruarjen e cilësimeve!
+  EXIT: Dil
+  SETTINGS: Cilësimet
+  MENU:
+  - untranslated
+  - original: Menu
+  BDM_GAMES: Lojërat BDM
+  HDD_GAMES: Lojërat HDD
+  NET_GAMES: Lojërat ETH
+  APPS: Aplikacionet
+  THEME: Temë
+  LANGUAGE: Gjuha
+  CONFIRMATION_POFF: Sistemi do të fiket.
+  CONFIRMATION_EXIT: Dil tek Shfletuesi?
+  CONFIRMATION_CANCEL_UPDATE: Anulo përditësimin?
+  HDD_NOT_CONNECTED_ERROR: '%d: HardDisk nuk u gjet.'
+  HDD_NOT_FORMATTED_ERROR: '%d: HardDisk Drive not është i formatuar.'
+  NETWORK_STARTUP_ERROR: '%d: Gabim në nisjen e Rrjetit.'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Nuk u gjet asnjë Adapter Rrjeti.'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Nuk mund të lidhem me serverin SMB.'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Nuk mund të identifikohem me serverin SMB.'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Nuk mund të hap dot SMB share.'
+  NETWORK_SHARE_LIST_ERROR: '%d: Nuk mund të listoj SMB shares.'
+  NETWORK_GAMES_LIST_ERROR: '%d: Nuk mund të listoj lojërat.'
+  NETWORK_ERROR_DHCP_FAIL: '%d: Serveri DHCP është i paarritshëm.'
+  NETWORK_ERROR_LINK_FAIL: '%d: Nuk ka lidhje me Rrjetin.'
+  'ON': Ndezur
+  'OFF': Fikur
+  OK:
+  - untranslated
+  - original: OK
+  SELECT: Zgjidhe
+  CANCEL: Anulo
+  CIRCLE: Rreth
+  CROSS: Kryq
+  GAMES_LIST: Lista e Lojërave
+  COMPAT_SETTINGS: Cilësimet e Lojës
+  REMOVE_ALL_SETTINGS: Fshi Cilësimet
+  SCROLLING: Shpejtesia e Rrotullimit
+  SLOW: Ngadalë
+  MEDIUM: Normal
+  FAST: Shpejt
+  DEFDEVICE: Menuja Normale
+  LOAD_FROM_DISC: Ngarko nga Disku
+  PLEASE_WAIT: Ju Lutem Prisni.
+  ERROR_LOADING_ID: Gabim në ngarkimin e Game ID.
+  AUTOSORT: Renditje Automatike
+  ERR_LOADING_LANGFILE: Gabim në ngarkimin e skedarit të gjuhës.
+  DEBUG: Rregullo ngjyrat
+  NO_CONTROLLER: Nuk u gjet asnje levë, duke pritur…
+  COVERART: Arti i Kopertinës
+  WIDE_SCREEN: Ekran i Gjerë
+  POWEROFF: Fik
+  LOADING_SETTINGS: Duke ngarkuar konfigurimin…
+  SAVING_SETTINGS: Duke ruajtur konfigurimin…
+  START_DEVICE: Nise Paisjen
+  REFRESH: Rifresko
+  BDMMODE: Nisja BDM
+  HDDMODE: Nisja e paisjes HDD
+  ETHMODE: Nisja e paisjes ETH
+  APPMODE: Nisja e Aplikacioneve
+  AUTO: Automatike
+  MANUAL: Manuale
+  STARTNBD: Nis Serverin NBD
+  STARTINGNBD: Serveri NBD duke u nisur…
+  RUNNINGNBD: Serveri NBD duke punuar…
+  STARTFAILNBD: Dështoi të nisi Serverin NBD.
+  UNLOADNBD: Serveri NBD po shkarkohet…
+  EXITTO:
+  - untranslated
+  - original: IGR Path
+  BGCOLOR: Ngjyra e Sfondit
+  TXTCOLOR: Ngjyra e Tekstit
+  CAT_SMB_SERVER: '- Serveri SMB -'
+  IP_ADDRESS_TYPE: Lloji i Adresës IP
+  IP_ADDRESS_TYPE_STATIC: Statike
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: Adresa IP
+  ADDRESS: Adresa
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER: Serveri DNS
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE:
+  - untranslated
+  - original: Share
+  USER:
+  - untranslated
+  - original: User
+  PASSWORD:
+  - untranslated
+  - original: Password
+  NOT_SET: <nuk është vënë>
+  ADDRESS_TYPE: Lloji i Adresës
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Prano
+  DELETE_WARNING: Artikulli do të fshihet përfundimisht, vazhdo?
+  RENAME: Riemërto
+  DELETE: Fshi
+  RUN: Vazhdo
+  GFX_SETTINGS: Cilësimet e Ekranit
+  ENABLE_WRITE: Operacionet e Shkrimit
+  LASTPLAYED: Kujto lojën e luajtur së fundmi
+  SELECTBUTTON: Zgjidh Butonin
+  ERR_FRAGMENTED: Gabim, loja është e fragmentuar.
+  ERR_FILE_INVALID: Gabim, nuk mund të hap këtë artikull.
+  TEST: Testo Ndryshimet
+  HINT_GUEST: Lëre bosh per vërtetimin e MYSAFIRIT.
+  HINT_MODE1: Lexime të Sakta
+  HINT_MODE2: Mënyrë e Sinkronizuar
+  HINT_MODE3: Hiq Thirrjet e Sistemit
+  HINT_MODE4: Anashkalo Videot
+  HINT_MODE5: Imito DVD-DL
+  HINT_MODE6: Çaktivizo IGR
+  HINT_VMC_SIZE: Ndryshimi i madhësise ka për të formatuar Kartën e Memories Virtuale.
+  CREATE: Krijo
+  START: Fillo
+  MODIFY: Modifiko
+  ABORT: Aborto
+  RESET: Rivendos
+  USE_GENERIC: Përdor të përgjithshmen
+  VMC_SCREEN: Konfiguro Kartën e Memories Virtuale
+  VMC_NAME: Emri
+  SIZE: Hapësira
+  VMC_STATUS: Statusi
+  VMC_PROGRESS: Progresi
+  VMC_FILE_EXISTS: Karta e Memories Virtuale ekziston.
+  VMC_FILE_ERROR: Dosje e gabuar e KMV, madhësia është e pasaktë.
+  VMC_FILE_NEW: Dosja KMV duhet të krijohet.
+  ERR_VMC_CONTINUE: Gabim në aksesimin e KMV %s. Vazhdo me Kartën e Memories ne vendin
+    %d?
+  AUTOREFRESH: Rifreskim Automatik
+  ABOUT: Rreth
+  DEVS: Koduesit
+  QANDA: Kontroll Cilësie
+  BDM_PREFIX:
+  - untranslated
+  - original: BDM Prefix Path
+  HINT_EXITPATH: Nis një ELF te modifikuar pas një IGR.
+  HINT_SPINDOWN: Vlera ne minuta, 0 për të çaktivizuar fikjen e rrotullimit.
+  HDD_SPINDOWN: Fikja Automatike e Rrotullimit të HDD
+  VMODE: Mënyra e Videos
+  UICOLOR: Ngjyra e Dialogut
+  SELCOLOR: Ngjyra e Zgjedhur
+  RESETCOLOR: Rivendos Ngjyrat
+  INFO:
+  - untranslated
+  - original: Info
+  ALTSTARTUP: ELF i modifikuar
+  COLOR_SELECTION: Përzgjedhja e Ngjyrave
+  RECONNECT: Rilidhu
+  HINT_SHARENAME: Lëre bosh për te listuar te gjitha shpërndarjet.
+  ETH_PREFIX:
+  - untranslated
+  - original: ETH Prefix Path
+  BACKSPACE:
+  - untranslated
+  - original: Backspace
+  SPACE: Hapësira
+  ENTER: Hy
+  MODE: Metoda
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID: ID e Lojës
+  DMA_MODE: Mënyra DMA
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1: Menyra 1
+  MODE2: Menyra 2
+  MODE3: Menyra 3
+  MODE4: Menyra 4
+  MODE5: Menyra 5
+  MODE6: Menyra 6
+  GSCONFIG: Konfiguro GSM
+  ETH_OPMODE: Menyra e lidhjes me Ethernet
+  ETH_100MFDX:
+  - untranslated
+  - original: 100Mbit Full-duplex
+  ETH_100MHDX:
+  - untranslated
+  - original: 100Mbit Half-duplex
+  ETH_10MFDX:
+  - untranslated
+  - original: 10Mbit Full-duplex
+  ETH_10MHDX:
+  - untranslated
+  - original: 10Mbit Half-duplex
+  GSM_SETTINGS: Cilësimet GSM
+  ENABLEGSM: Zgjedhësi GSM
+  HINT_ENABLEGSM: Ndërron GSM fikur/ndezur.
+  HINT_GSMVMODE: Përforco Mënyrën e Paraqitjes së modifikuar.
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: Përshtatje Horizontale
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: Përshtatje Vertikale
+  OVERSCAN: Skanim i gjerë
+  HINT_OVERSCAN: Përshtatje e skanimit të gjerë
+  GSMSKIPVIDEOS: Anashkalo FMV
+  HINT_GSMSKIPVIDEOS: Anashkalon videot me lëvizje të plotë.
+  CHEAT_SETTINGS: Cilësimet e Hileve
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Lë PS2RD Cheat Engine të te ndryshoje lojën.
+  CHEATMODE: Menyra e PS2RD Cheat Engine
+  HINT_CHEATMODE: Zgjedhje Automatike apo zgjidh hilet e lojes.
+  CHEATMODEAUTO: Zgjidh Hilet Automatikisht
+  CHEATMODESELECT: Zgjidh Hilet e Lojes
+  ERR_CHEATS_LOAD_FAILED: 'Gabim: dështoi të ngarkojë dosjen e hiles.'
+  NO_CHEATS_FOUND: Nuk u gjet asnjë hile.
+  DL_DEFAULTS: Shkarko të parazgjedhurat
+  NET_UPDATE: Përditëso Rrjetin
+  NET_UPDATE_ALL: Rishkruaj Shënimet Ekzistuese
+  NET_UPDATE_FAILED: Përditësimi dështoi.
+  NET_UPDATE_CONN_FAILED: Dështoi të lidhet për të përditësuar serverin.
+  NET_UPDATE_DONE: Përditësimi u kompletua.
+  NET_UPDATE_CANCELLED: Përditësimi u anullua.
+  CONFIRMATION_SETTINGS_UPDATE: Shkarko cilësimet nga rrjeti?
+  CUSTOMIZED_SETTINGS: Cilësimet e modifikuara
+  DOWNLOADED_DEFAULTS: Shkarkimet e Parazgjedhura
+  AUTO_START_IN_N_SECS: Skanimi automatik në %i s…
+  AUTOSTARTLAST: Fillimi Automatik
+  HINT_AUTOSTARTLAST: Vlera ne sekonda(s), 0 për të fikur Fillimin Automatik.
+  PS2LOGO: Logoja PS2
+  HINT_PS2LOGO: Paraqitet për një logo të vlefshme të bashkangjitur me rajonin e konsolit.
+  PADEMUCONFIG: Konfiguro PADEMU
+  PADEMU_SETTINGS: Cilësimet e Pad Emulator
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Ndërron fikur/ndezur Pad Emulator për lojën e zgjedhur.
+  PADEMU_MODE: Mënyra e Pad Emulator
+  HINT_PADEMU_MODE: Mënyra e zgjedhjes së Pad Emulator.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Cilësimet Për Portën:'
+  HINT_PAD_PORT: Zgjidh porten e Pad Emulator për cilësimet.
+  PADEMU_PORT: Imitimi
+  HINT_PADEMU_PORT: Ndërron fikur/ndezur Pad Emulator për portën e zgjedhur.
+  PADEMU_VIB: Vibrimi
+  HINT_PADEMU_VIB: Nderron fikur/ndezur vibrimin për Pad Emulator në portën e zgjedhur.
+  USBDG_MAC: 'Adresa Mac e USB Bluetooth Adapter:'
+  PAD_MAC: 'DS Controller i çiftuar me Adresën MAC:'
+  PAIR: Çifto
+  PAIR_PAD: Çifto DS Controller
+  HINT_PAIRPAD: Çifto DS controller me adresën MAC të adapterit Bluetooth.
+  NOT_CONNECTED: Nuk është lidhur
+  BTINFO: Bluetooth Adapter Informacion
+  HINT_BTINFO: Tregon më shumë informacion dhe veçoritë e mbështetura.
+  HCIVER:
+  - untranslated
+  - original: 'HCI Version:'
+  LMPVER:
+  - untranslated
+  - original: 'LMP Version:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES: 'Veçoritë e Mbështetura:'
+  'YES': Po
+  'NO': Jo
+  BT_SUPPORTED: Adapteri Bluetooth duhet te jete plotesisht i pershtatshem me levat
+    DS3/DS4.
+  BT_NOTSUPPORTED: Adapteri Bluetooth mund te mos punoje sakte me levat DS3/DS4.
+  MTAP_ENABLE: Imitimi Multitap
+  HINT_MTAP_ENABLE: Nderron fikur/ndezur imitimin Multitap per lojen e zgjedhur.
+  MTAP_PORT: 'Imituesi Multitap ne Porten:'
+  HINT_MTAP_PORT: Zgjidh porten per imitimin Multitap.
+  PADEMU_WORKAROUND: Zgjidhje per DS3 Fallco.
+  HINT_PADEMU_WORKAROUND: Disa DS3 fallco duan nje zgjidhje, ky opsion do ta aktivizoje
+    ate.
+  GSM_FIELD_FIX: Imitio Rrokullisjen e FIELD
+  HINT_GSM_FIELD_FIX: Rregullimi per lojerat qe kan difekt ne Metoden e videos progresive.
+  PARENLOCKCONFIG: Cilesimet e Kycit Prinderor
+  PARENLOCK_PASSWORD: Password i Kycit Prinderor
+  PARENLOCK_PASSWORD_HINT: Lere bosh nese do ta fikesh kycin prinderor
+  PARENLOCK_ENTER_PASSWORD_TITLE: Vendos Passwordin per Kycin Prinderor
+  PARENLOCK_PASSWORD_INCORRECT: Passwordi i Kycit Prinderor eshte i gabuar.
+  PARENLOCK_DISABLE_WARNING: Kyci Prinderor u fik.
+  BUILD_DETAILS: 'Opsionet e Ndertimit:'
+  PARENLOCK_INVALID_PASSWORD: Gabim - ky password nuk mund te perdoret.
+  ERR_VMC_FRAGMENTED_CONTINUE: Dosja e VMC %s eshte e fragmentuar. Vazhdo me Karten
+    e Memories ne slot %d?
+  AUDIO_SETTINGS: Cilesimet Audio
+  SFX: Efektet e Zerit
+  BOOT_SND: Zeri i Ndezjes
+  SFX_VOLUME: Volum i Efektit te Zerit
+  BOOT_SND_VOLUME: Volum i Zerit te Ndezjes
+  CFM_VMODE_CHG: Konfirmo ndryshimin e menyres se videos?
+  CACHE_HDD_GAME_LIST: Ruaj Listen e Lojerave (HDD)
+  ENABLE_NOTIFICATIONS: Njoftimet
+  CFG_NOTIFICATION: Konfigurimi u ngarkua nga %s
+  THM_NOTIFICATION: Tema u ngarkua nga %s
+  LNG_NOTIFICATION: Gjuha u ngarkua nga %s
+  PARTITION_NOTIFICATION: Pjesa %s u montua.
+  OPTIONS: Opsionet
+  GAME_SETTINGS_SAVED: Cilesimet e lojes u ruajten.
+  GAME_SETTINGS_REMOVED: Cilesimet %s u hoqen.
+  NET_UPDATE_HINT: Mbishkruan cilesimet e pajtueshmerise se lojes kur aktivizohet.
+  SETTINGS_SOURCE: Menyra e Cilesimeve
+  GLOBAL_SETTINGS: Globale
+  PERGAME_SETTINGS: Per Loje
+  ALL_SETTINGS: Te gjitha
+  GAME_SETTINGS_PROMPT: Zgjidh cilesime per te hequr.
+  FORUM_DETAILS: 'Forumet e Suportuara:'
+  INFO_TITLE: Titulli
+  INFO_GENRE: Zhaner
+  INFO_RELEASE: Leshimi
+  INFO_DEVELOPER: Zhvilluesi
+  INFO_DESCRIPTION: Pershkrimi
+  BLOCKDEVICE_SETTINGS: Blloko Paisje
+  CONTROLLER_SETTINGS: Cilesimet e Leves
+  HINT_BDM_START: Nderron fikur/ndezur Menaxherin e Bllokuesit te Paisjes.
+  HINT_BLOCK_DEVICES: Nderron fikur/ndezur Pasijet e Bllokuara (p.sh. USB).
+  USB_GAMES: Lojërat USB
+  ILINK_GAMES: Lojërat iLink
+  MX4SIO_GAMES: Lojërat MX4SIO

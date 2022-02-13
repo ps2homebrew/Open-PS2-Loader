@@ -1,0 +1,371 @@
+comments: |-
+  Portuguese translation by danielb
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Portuguese
+  SAVE_CHANGES: Salvar alterações
+  BACK: Voltar
+  NETCONFIG: Configurações de Rede
+  SHOW_ADVANCED_OPTS: Opções avançadas
+  NO_ITEMS: <sem valores>
+  SETTINGS_SAVED: Configurações guardadas em %s
+  ERROR_SAVING_SETTINGS: Erro ao salvar configurações!
+  EXIT: Sair
+  SETTINGS: Configurações
+  MENU:
+  - untranslated
+  - original: Menu
+  BDM_GAMES: Jogos por BDM
+  HDD_GAMES: Jogos por HDD
+  NET_GAMES: Jogos por Rede
+  APPS: Aplicações
+  THEME: Temas
+  LANGUAGE: Idioma
+  CONFIRMATION_POFF: O sistema irá desligar.
+  CONFIRMATION_EXIT: Sair para o Navegador?
+  CONFIRMATION_CANCEL_UPDATE: Cancelar atualização?
+  HDD_NOT_CONNECTED_ERROR: '%d: Disco Rigido não detetado'
+  HDD_NOT_FORMATTED_ERROR: '%d: Disco Rigido não formatado'
+  NETWORK_STARTUP_ERROR: '%d: Erro ao iniciar rede'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Adaptador de Rede não detetado'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Não foi possível ligar ao servidor SMB'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Não foi possível efetuar login no servidor SMB'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Não foi possível abrir a partilha SMB'
+  NETWORK_SHARE_LIST_ERROR: '%d: Impossivel listar partilhas SMB'
+  NETWORK_GAMES_LIST_ERROR: '%d: Impossivel listar jogos'
+  NETWORK_ERROR_DHCP_FAIL: '%d: Servidor DHCP indisponivel'
+  NETWORK_ERROR_LINK_FAIL: '%d: Sem ligação de rede'
+  'ON': Ativ.
+  'OFF': Desactiv.
+  OK: Aceitar
+  SELECT: Selecionar
+  CANCEL: Cancelar
+  CIRCLE: Circulo
+  CROSS: Cruz
+  GAMES_LIST: Lista de Jogos
+  COMPAT_SETTINGS: Aj. do jogo
+  REMOVE_ALL_SETTINGS: Remover configurações
+  SCROLLING: Rolagem
+  SLOW: Lento
+  MEDIUM: Médio
+  FAST: Rápido
+  DEFDEVICE: Menu padrão
+  LOAD_FROM_DISC: Carregar do disco
+  PLEASE_WAIT: Por favor espere
+  ERROR_LOADING_ID: Erro ao carregar ID do jogo
+  AUTOSORT: Ordenar automaticamente
+  ERR_LOADING_LANGFILE: Erro ao carregar ficheiro de idioma
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: Comando não detectado, esperando…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: Ecrâ Panorâmico
+  POWEROFF: Desligar PS2
+  LOADING_SETTINGS: Carregando configurações
+  SAVING_SETTINGS: A guardar configurações…
+  START_DEVICE: Iniciar dispositivo
+  REFRESH: Atualizar
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: Modo de inicio para dispositivo HDD
+  ETHMODE: Modo de inicio para dispositivo Rede
+  APPMODE: Modo de inicio para Aplicações
+  AUTO: Automático
+  MANUAL:
+  - untranslated
+  - original: Manual
+  STARTNBD: Iniciar servidor NBD
+  STARTINGNBD: Servidor NBD a iniciar…
+  RUNNINGNBD: Servidor NBD a executar…
+  STARTFAILNBD: Erro a iniciar o servidor de NBD Dump.
+  UNLOADNBD: Servidor NBD a fechar…
+  EXITTO: Definir saída do IGR
+  BGCOLOR: Cor de fundo
+  TXTCOLOR: Cor do texto
+  CAT_SMB_SERVER: '- Servidor SMB -'
+  IP_ADDRESS_TYPE: Endereço IP
+  IP_ADDRESS_TYPE_STATIC: Estático
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: Endereço IP
+  ADDRESS: Endereço
+  MASK: Máscara de sub-rede
+  GATEWAY: Gateway padrão
+  DNS_SERVER: Servidor de DNS
+  PORT: Porta
+  SHARE: Partiha
+  USER: Utilizador
+  PASSWORD: Senha
+  NOT_SET: <não usado>
+  ADDRESS_TYPE: Tipo de Endereço
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Confirmar
+  DELETE_WARNING: O item será PERMANENTEMENTE apagado! Continuar?
+  RENAME: Renomear
+  DELETE: Apagar
+  RUN: Iniciar
+  GFX_SETTINGS: Configurações de Ecrâ
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: Lembrar último jogo executado
+  SELECTBUTTON: Botão de Seleção
+  ERR_FRAGMENTED: Erro, o jogo está fragmentado
+  ERR_FILE_INVALID: Erro, não foi possível iniciar o item
+  TEST: Testar Alterações
+  HINT_GUEST: Deixar vazio para ligar como convidado (GUEST)
+  HINT_MODE1: Carregar núcleo alternativo
+  HINT_MODE2: Modo Síncrono
+  HINT_MODE3: Desativar chamadas do sistema
+  HINT_MODE4: Saltar vídeos
+  HINT_MODE5: Emular DVD-DL
+  HINT_MODE6: Desativar IGR
+  HINT_VMC_SIZE: Alterar o tamanho (Irá reformatar o VMC!)
+  CREATE: Criar
+  START: Iniciar
+  MODIFY: Modificar
+  ABORT: Abortar
+  RESET: Resetar
+  USE_GENERIC: Usar genérico
+  VMC_SCREEN: Configurar VMC
+  VMC_NAME: Nome
+  SIZE: Tamanho
+  VMC_STATUS: Estado
+  VMC_PROGRESS: Progresso
+  VMC_FILE_EXISTS: Arquivo VMC já existe
+  VMC_FILE_ERROR: Arquivo VMC inválido, o tamanho está incorreto
+  VMC_FILE_NEW: Arquivo VMC precisa ser criado!
+  ERR_VMC_CONTINUE: Erro ao aceder ao VMC %s. Continuar com o Cartão de Memória na
+    ranhura %d?
+  AUTOREFRESH: Atualização automática
+  ABOUT: Créditos
+  DEVS: Desenvolvedores
+  QANDA: Controlo de qualidade
+  BDM_PREFIX: Prefixo de caminho BDM
+  HINT_EXITPATH: Iniciar ELF personalizado depois do IGR
+  HINT_SPINDOWN: Valor em minuto(s), 0 p/ desativar
+  HDD_SPINDOWN: Desligamento automático do HDD
+  VMODE: Modo de vídeo
+  UICOLOR: Cor do diálogo
+  SELCOLOR: Cor selecionada
+  RESETCOLOR: Reiniciar cores
+  INFO:
+  - untranslated
+  - original: Info
+  ALTSTARTUP: ELF personalizado
+  COLOR_SELECTION: Seleção de Cor
+  RECONNECT: Voltar A Lig.
+  HINT_SHARENAME: Deixar vazio para listar partilhas
+  ETH_PREFIX: Prefixo de caminho ETH
+  BACKSPACE: Retroceder
+  SPACE: Espaço
+  ENTER: Aceitar
+  MODE: Modo
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID: ID do Jogo
+  DMA_MODE: Modo DMA
+  VSYNC: Sincronização do vídeo
+  MODE1: Modo 1
+  MODE2: Modo 2
+  MODE3: Modo 3
+  MODE4: Modo 4
+  MODE5: Modo 5
+  MODE6: Modo 6
+  GSCONFIG: Configurar GSM
+  ETH_OPMODE: Velocidade Ethernet e sistema Duplex
+  ETH_100MFDX: 100Mbit full-duplex
+  ETH_100MHDX: 100Mbit half-duplex
+  ETH_10MFDX: 10Mbit full-duplex
+  ETH_10MHDX: 10Mbit half-duplex
+  GSM_SETTINGS: Opções do GSM
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Permitir que o GSM ative o modo de vídeo escolhido
+  HINT_GSMVMODE: Modo de vídeo a ser ativado
+  XOFFSET: Ajuste horizontal
+  HINT_XOFFSET: Definir compensação horizontal
+  YOFFSET: Ajuste vertical
+  HINT_YOFFSET: Definir compensação vertical
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN: Ajustar Overscan
+  GSMSKIPVIDEOS: Saltar FMV
+  HINT_GSMSKIPVIDEOS: Saltar vídeos
+  CHEAT_SETTINGS: Opções de Cheat
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Permite PS2RD Cheat Engine injetar código nos jogos.
+  CHEATMODE: Modo da PS2RD Cheat Engine
+  HINT_CHEATMODE: Auto-Selecionar ou Selecionar cheats de jogo
+  CHEATMODEAUTO: Auto-Selecionar cheats
+  CHEATMODESELECT: Selecionar cheats do jogo
+  ERR_CHEATS_LOAD_FAILED: 'Erro: falha ao abrir o ficheiro de Cheat'
+  NO_CHEATS_FOUND: Nenhum Cheat encontrado
+  DL_DEFAULTS: Pré-definições de download
+  NET_UPDATE: Atualização por Internet
+  NET_UPDATE_ALL: Substituir Registos Existentes
+  NET_UPDATE_FAILED: Atualizaçao falhou.
+  NET_UPDATE_CONN_FAILED: Falha a ligar ao servidor de atualização.
+  NET_UPDATE_DONE: Atualização completa.
+  NET_UPDATE_CANCELLED: Atualização cancelada.
+  CONFIRMATION_SETTINGS_UPDATE: Descarregar definições da Internet?
+  CUSTOMIZED_SETTINGS: Definições personalizadas
+  DOWNLOADED_DEFAULTS: Pré-definições de download
+  AUTO_START_IN_N_SECS: Início automático em %i s…
+  AUTOSTARTLAST: Auto iniciar
+  HINT_AUTOSTARTLAST: Valor em segundos, 0 para desativar
+  PS2LOGO: Logo PS2
+  HINT_PS2LOGO: Apenas é exibido para um disco válido e que seja da mesma região da
+    consola
+  PADEMUCONFIG: Configurar PADEMU
+  PADEMU_SETTINGS: Definições do Emulador de Comando
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Ligar/Desligar o emulador para o jogo selecionado.
+  PADEMU_MODE: Modo do Emulador de Comando
+  HINT_PADEMU_MODE: Selecione o modo do Emulador de Comando.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Definições para a porta:'
+  HINT_PAD_PORT: Selecione a porta do Emulador de Comando para as definições
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Ligar/Desligar o emulador para a porta selecionada.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Ligar/Desligar vibração na porta selecionada.
+  USBDG_MAC: 'Endereço MAC do adaptador Bluetooth USB:'
+  PAD_MAC: 'Comando DS emparelhado ao endereço MAC:'
+  PAIR: Emparelhar
+  PAIR_PAD: Emparelhar comando DS
+  HINT_PAIRPAD: Emparelhar comando DS com endereço MAC do adaptador Bluetooth.
+  NOT_CONNECTED: Não ligado
+  BTINFO: Informação do adaptador Bluetooth
+  HINT_BTINFO: Mostrar mais informação e recursos suportados
+  HCIVER: 'Versão HCI:'
+  LMPVER: 'Versão LMP:'
+  MANUFACTURER: 'ID do Fabricante:'
+  SUPFEATURES: 'Recursos suportados:'
+  'YES': Sim
+  'NO': Não
+  BT_SUPPORTED: O adaptador Bluetooth deve ser completamente compatível com comandos
+    DS3/DS4.
+  BT_NOTSUPPORTED: O adaptador Bluetooth pode não funcionar corretamente com comandos
+    DS3/DS4.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: Ligar/Desligar a emulação Multitap para o jogo selecionado
+  MTAP_PORT: Emulador Multitap na porta
+  HINT_MTAP_PORT: Selecionar porta para o emulador de Multitap.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emular inversão de CAMPO
+  HINT_GSM_FIELD_FIX: Correção para jogos que apresentam falhas nos modos de vídeo
+    progressivo.
+  PARENLOCKCONFIG: Definições do Controlo Parental
+  PARENLOCK_PASSWORD: Password do Controlo Parental
+  PARENLOCK_PASSWORD_HINT: Deixe em branco para desativar o Controlo Parental.
+  PARENLOCK_ENTER_PASSWORD_TITLE: Introduza a password do Controlo Parental
+  PARENLOCK_PASSWORD_INCORRECT: Password do Controlo Parental incorreta.
+  PARENLOCK_DISABLE_WARNING: Controlo Parental desativado.
+  BUILD_DETAILS: 'Opções de compilação:'
+  PARENLOCK_INVALID_PASSWORD: Erro - esta password não pode ser usada.
+  ERR_VMC_FRAGMENTED_CONTINUE: O ficheiro VMC %s está fragmentado. Continuar com o
+    Cartão de Memoria na ranhura %d?
+  AUDIO_SETTINGS: Definições de Áudio
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: Volume dos sons
+  BOOT_SND_VOLUME: Volume do som de arranque
+  CFM_VMODE_CHG: Confirmar alteração do modo de vídeo?
+  CACHE_HDD_GAME_LIST: Cache da lista de jogos (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED: Configurações do jogo guardadas.
+  GAME_SETTINGS_REMOVED: '%s configurações removidas.'
+  NET_UPDATE_HINT: Substitui configurações de compatibilidade de jogos existentes
+    quando ativado.
+  SETTINGS_SOURCE: Modo de configurações
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS: Por jogo
+  ALL_SETTINGS: Todos
+  GAME_SETTINGS_PROMPT: Selecione as configurações para remover.
+  FORUM_DETAILS: 'Fóruns de suporte:'
+  INFO_TITLE: Título
+  INFO_GENRE: Gênero
+  INFO_RELEASE: Data de lançamento
+  INFO_DEVELOPER: Desenvolvedor
+  INFO_DESCRIPTION: Descrição
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

@@ -1,0 +1,453 @@
+comments: |-
+  Vietnamese translation by zidane89
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Vietnamese
+  SAVE_CHANGES: Lưu thay đổi
+  BACK: Quay lại
+  NETCONFIG:
+  - untranslated
+  - original: Network Settings
+  SHOW_ADVANCED_OPTS: Tùy chọn nâng cao
+  NO_ITEMS: <không giá trị>
+  SETTINGS_SAVED:
+  - untranslated
+  - original: Settings saved to %s
+  ERROR_SAVING_SETTINGS: Không lưu được cài đặt!
+  EXIT: Thoát
+  SETTINGS: Cài đặt
+  MENU:
+  - untranslated
+  - original: Menu
+  BDM_GAMES: Trò chơi trên BDM
+  HDD_GAMES: Trò chơi trên HDD
+  NET_GAMES: Trò chơi qua ETH
+  APPS: Ứng dụng
+  THEME: Chủ đề
+  LANGUAGE: Ngôn ngữ
+  CONFIRMATION_POFF: Tắt nguồn hệ thống.
+  CONFIRMATION_EXIT: Thoát khỏi trình duyệt?
+  CONFIRMATION_CANCEL_UPDATE: Hủy bỏ các cập nhật?
+  HDD_NOT_CONNECTED_ERROR: '%d: Không phát hiện ổ cứng'
+  HDD_NOT_FORMATTED_ERROR: '%d: Ổ cứng chưa định dạng'
+  NETWORK_STARTUP_ERROR: '%d: Lỗi khởi chạy mạng'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Không có adaptor mạng'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Không thể kết nối đến SMB server'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Không thể đăng nhập vào SMB server'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Không mở được SMB share'
+  NETWORK_SHARE_LIST_ERROR: '%d: Không lấy được danh sách SMB shares'
+  NETWORK_GAMES_LIST_ERROR: '%d: Không lấy được danh sách trò chơi'
+  NETWORK_ERROR_DHCP_FAIL: '%d: Máy chủ DHCP không có sẵn'
+  NETWORK_ERROR_LINK_FAIL: '%d: Không có kết nối mạng'
+  'ON': Bật
+  'OFF': Tắt
+  OK:
+  - untranslated
+  - original: OK
+  SELECT: Chọn
+  CANCEL: Hủy
+  CIRCLE: Nút O
+  CROSS: Nút X
+  GAMES_LIST: Danh sách trò chơi
+  COMPAT_SETTINGS: Cài đặt Game
+  REMOVE_ALL_SETTINGS:
+  - untranslated
+  - original: Remove Settings
+  SCROLLING: Cuộn
+  SLOW: Chậm
+  MEDIUM: Thường
+  FAST: Nhanh
+  DEFDEVICE: Menu mặc định
+  LOAD_FROM_DISC: Nạp từ đĩa
+  PLEASE_WAIT: Vui lòng chờ
+  ERROR_LOADING_ID: Lỗi khi nạp Game ID
+  AUTOSORT: Tự động phân loại
+  ERR_LOADING_LANGFILE: Lỗi nạp tập tin ngôn ngữ
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: Không có cần điều khiển, đợi chút…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: Màn hình rộng
+  POWEROFF: Tắt máy
+  LOADING_SETTINGS: Nạp cấu hình
+  SAVING_SETTINGS: Lưu cấu hình
+  START_DEVICE: Chọn thiết bị lưu trò chơi
+  REFRESH: Làm mới
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: Chọn HDD
+  ETHMODE: Chọn ETH
+  APPMODE: Hiển thị menu ứng dụng
+  AUTO: Tự động
+  MANUAL: Thủ công
+  STARTNBD: Khởi chạy máy chủ NBD
+  STARTINGNBD: Máy chủ NBD khởi chạy…
+  RUNNINGNBD: Máy chủ NBD đang chạy…
+  STARTFAILNBD: khởi chạy máy chủ NBD thất bại.
+  UNLOADNBD: Không nạp được máy chủ NBD…
+  EXITTO: Vá IGR
+  BGCOLOR: Màu nền
+  TXTCOLOR: Màu chữ
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: Gõ địa chỉ IP
+  IP_ADDRESS_TYPE_STATIC: Tĩnh
+  IP_ADDRESS_TYPE_DHCP: Động
+  IP_ADDRESS: Địa chỉ IP
+  ADDRESS: Địa chỉ
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER:
+  - untranslated
+  - original: DNS Server
+  PORT: Cổng
+  SHARE:
+  - untranslated
+  - original: Share
+  USER: Tên
+  PASSWORD: Mật khẩu
+  NOT_SET: <chưa cài>
+  ADDRESS_TYPE: Gõ địa chỉ
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Truy cập
+  DELETE_WARNING: Mục này sẽ bị xóa vĩnh viễn, tiếp tục?
+  RENAME: Đổi tên
+  DELETE: Xóa
+  RUN: Chạy
+  GFX_SETTINGS: Cài đặt hiển thị
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: Nhớ các cài đặt cuối cùng
+  SELECTBUTTON: Chọn nút
+  ERR_FRAGMENTED: Lỗi, trò chơi bị phân mảnh
+  ERR_FILE_INVALID: Error, không thể chạy mục này
+  TEST:
+  - untranslated
+  - original: Test Changes
+  HINT_GUEST: Để trống với quyền truy cập Khách.
+  HINT_MODE1: Đọc chính xác
+  HINT_MODE2: Chế độ đồng bộ
+  HINT_MODE3:
+  - untranslated
+  - original: Unhook Syscalls
+  HINT_MODE4: Bỏ qua các Video
+  HINT_MODE5: Giả lập DVD-DL
+  HINT_MODE6: Ngắt IGR
+  HINT_VMC_SIZE: Thay đổi dung lượng sẽ định dạng lại VMC
+  CREATE: Tạo
+  START: Bắt đầu
+  MODIFY: Sửa đổi
+  ABORT: Hủy
+  RESET: Cài lại
+  USE_GENERIC: Sử dụng chung
+  VMC_SCREEN: Cấu hình VMC
+  VMC_NAME: Tên
+  SIZE: Dung lượng
+  VMC_STATUS: Trạng thái
+  VMC_PROGRESS: Tiến hành
+  VMC_FILE_EXISTS: File VMC không tồn tại
+  VMC_FILE_ERROR: File VMC không hợp lệ, Dung lượng không đúng
+  VMC_FILE_NEW: File VMC cần được tạo
+  ERR_VMC_CONTINUE:
+  - untranslated
+  - original: Error accessing VMC %s. Continue with the Memory Card in slot %d?
+  AUTOREFRESH: Tự động làm tươi
+  ABOUT: Thông tin
+  DEVS:
+  - untranslated
+  - original: Coders
+  QANDA: Đảm bảo chất lượng
+  BDM_PREFIX: BDM prefix path
+  HINT_EXITPATH: Boots Custom ELF after an IGR
+  HINT_SPINDOWN: Giá trị tính bằng phút(s), 0 tắt chế độ chờ HDD
+  HDD_SPINDOWN: HDD tự động chờ
+  VMODE: Chế độ Video
+  UICOLOR: Màu hộp thoại
+  SELCOLOR: Chọn màu
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO: Thông tin
+  ALTSTARTUP: Tùy chỉnh ELF
+  COLOR_SELECTION: Màu sắc lựa chọn
+  RECONNECT: Kết nối lại
+  HINT_SHARENAME: Leave empty to list shares
+  ETH_PREFIX: ETH prefix path
+  BACKSPACE: Xóa
+  SPACE: Cách
+  ENTER:
+  - untranslated
+  - original: Enter
+  MODE: Chế độ
+  VMC_SLOT1: VMC ở Khe 1
+  VMC_SLOT2: VMC ở Khe 2
+  GAME_ID:
+  - untranslated
+  - original: Game ID
+  DMA_MODE: Chế độ DMA
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1:
+  - untranslated
+  - original: Mode 1
+  MODE2:
+  - untranslated
+  - original: Mode 2
+  MODE3:
+  - untranslated
+  - original: Mode 3
+  MODE4:
+  - untranslated
+  - original: Mode 4
+  MODE5:
+  - untranslated
+  - original: Mode 5
+  MODE6:
+  - untranslated
+  - original: Mode 6
+  GSCONFIG: Cấu hình GSM
+  ETH_OPMODE:
+  - untranslated
+  - original: Ethernet Link Mode
+  ETH_100MFDX:
+  - untranslated
+  - original: 100Mbit Full-duplex
+  ETH_100MHDX:
+  - untranslated
+  - original: 100Mbit Half-duplex
+  ETH_10MFDX:
+  - untranslated
+  - original: 10Mbit Full-duplex
+  ETH_10MHDX:
+  - untranslated
+  - original: 10Mbit Half-duplex
+  GSM_SETTINGS: Cài đặt GSM
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Bật hoặc tắt GSM
+  HINT_GSMVMODE: Chế độ hiển thị tùy chỉnh bắt buộc
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: Điều chỉnh theo chiều ngang
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: Điều chỉnh theo chiều dọc
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN: Overscan Adjustment
+  GSMSKIPVIDEOS: Bỏ qua FMV
+  HINT_GSMSKIPVIDEOS: Bỏ qua Full Motion Videos
+  CHEAT_SETTINGS: Cài đặt Cheat
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Hãy để PS2RD Cheat Engine vá vào trò chơi
+  CHEATMODE: Chế độ PS2RD Cheat Engine
+  HINT_CHEATMODE: Tự động chọn hoặc chọn trò chơi ăn gian
+  CHEATMODEAUTO: Tự động chọn cheats
+  CHEATMODESELECT: Chọn cheats trò chơi
+  ERR_CHEATS_LOAD_FAILED: 'Lỗi: nạp tệp ăn gian thất bại'
+  NO_CHEATS_FOUND: Không thấy cheat
+  DL_DEFAULTS: Tải về mặc định
+  NET_UPDATE:
+  - untranslated
+  - original: Network Update
+  NET_UPDATE_ALL:
+  - untranslated
+  - original: Overwrite Existing Records
+  NET_UPDATE_FAILED: Cập nhật thất bại.
+  NET_UPDATE_CONN_FAILED: Không thể kết nối đến máy chủ để cập nhật.
+  NET_UPDATE_DONE: Cập nhật hoàn thành.
+  NET_UPDATE_CANCELLED: Hủy cập nhật.
+  CONFIRMATION_SETTINGS_UPDATE: Tải về cài đặt qua mạng?
+  CUSTOMIZED_SETTINGS: Cài đặt tùy chỉnh
+  DOWNLOADED_DEFAULTS: Tải về mặc định
+  AUTO_START_IN_N_SECS: Tự khởi động trong %i s…
+  AUTOSTARTLAST: Tự khởi động
+  HINT_AUTOSTARTLAST: đơn vị bằng giây(s), 0 để ngắt tự khởi động
+  PS2LOGO: Logo PS2
+  HINT_PS2LOGO:
+  - untranslated
+  - original: Displayed for a valid disc logo matching the console's region.
+  PADEMUCONFIG: Cấu hình PADEMU
+  PADEMU_SETTINGS: Cài đặt giả lập tay cầm
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Bật/tắt PadEmulator cho trò chơi đã chọn.
+  PADEMU_MODE: Chế độ Pad Emulator
+  HINT_PADEMU_MODE: Chọn chế độ Pad Emulator.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Cài đặt cổng:'
+  HINT_PAD_PORT: Chọn cổng cài đặt Pad Emulator.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Bật/tắt Pad Emulator cổng đã chọn.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Bật/tắt rung Pad Emulator cho cổng đã chọn.
+  USBDG_MAC: 'Địa chỉ MAC của USB Bluetooth:'
+  PAD_MAC: 'Địa chỉ MAC của tay DS:'
+  PAIR: Ghép
+  PAIR_PAD: Ghép tay DS
+  HINT_PAIRPAD: Ghép tay DS với Bluetooth adapter MAC address.
+  NOT_CONNECTED: Không kết nối
+  BTINFO: Thông tin Bluetooth adapter
+  HINT_BTINFO: Hiện thông tin và tính năng hỗ trợ
+  HCIVER: 'Phiên bản HCI:'
+  LMPVER: 'Phiên bản LMP:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES: 'Tính năng hỗ trợ:'
+  'YES':
+  - untranslated
+  - original: 'Yes'
+  'NO':
+  - untranslated
+  - original: 'No'
+  BT_SUPPORTED: Bluetooth adapter phải tương thích với tay cầm DS3/DS4.
+  BT_NOTSUPPORTED: Bluetooth adapter có thể không hoạt động chính xác với tay cầm
+    DS3/DS4.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: Bật/tắt giả lập Multitap cho trò chơi đã chọn.
+  MTAP_PORT: Giả lập Multitap tại cổng
+  HINT_MTAP_PORT: Chọn cổng giả lập Multitap.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: Emulate FIELD flipping
+  HINT_GSM_FIELD_FIX: Khắc phục các game bị trục trặc trong chế độ progressive modes.
+  PARENLOCKCONFIG: Cài đặt khóa phụ huynh
+  PARENLOCK_PASSWORD: Mật khẩu khóa
+  PARENLOCK_PASSWORD_HINT: Để trống để vô hiệu hóa khóa phụ huynh.
+  PARENLOCK_ENTER_PASSWORD_TITLE: Nhập mật khẩu
+  PARENLOCK_PASSWORD_INCORRECT: Mật khẩu khóa không chính xác.
+  PARENLOCK_DISABLE_WARNING: Khóa phụ huynh bị vô hiệu hóa.
+  BUILD_DETAILS: 'Tùy chọn Build:'
+  PARENLOCK_INVALID_PASSWORD: Lỗi - mật khẩu này không thể sử dụng.
+  ERR_VMC_FRAGMENTED_CONTINUE: Tệp VMC %s bị phân mảnh. Tiếp tục với MC ở khe %d?
+  AUDIO_SETTINGS: Cài đặt âm thanh
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: Mức hiệu ứng âm thanh
+  BOOT_SND_VOLUME: Tăng mức âm lượng
+  CFM_VMODE_CHG: Thay đổi chế độ video?
+  CACHE_HDD_GAME_LIST: Cache danh sách trò chơi (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED:
+  - untranslated
+  - original: Game settings saved.
+  GAME_SETTINGS_REMOVED:
+  - untranslated
+  - original: '%s settings removed.'
+  NET_UPDATE_HINT:
+  - untranslated
+  - original: Overwrites existing game compatibility settings when enabled.
+  SETTINGS_SOURCE:
+  - untranslated
+  - original: Settings Mode
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS:
+  - untranslated
+  - original: All
+  GAME_SETTINGS_PROMPT:
+  - untranslated
+  - original: Select settings to remove.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE:
+  - untranslated
+  - original: Title
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE:
+  - untranslated
+  - original: Release
+  INFO_DEVELOPER:
+  - untranslated
+  - original: Developer
+  INFO_DESCRIPTION:
+  - untranslated
+  - original: Description
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

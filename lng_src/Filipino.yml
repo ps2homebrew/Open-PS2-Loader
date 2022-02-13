@@ -1,0 +1,423 @@
+comments: |-
+  Filipino translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
+  Fixed by Colton SIlva @ColtonSilvaonKnoxKontor
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Filipino
+  SAVE_CHANGES: I-save ang mga pagbabago
+  BACK: Likod
+  NETCONFIG: Network config
+  SHOW_ADVANCED_OPTS: Advanced na opsyon
+  NO_ITEMS: <Walang values>
+  SETTINGS_SAVED:
+  - untranslated
+  - original: Settings saved to %s
+  ERROR_SAVING_SETTINGS: Error sa pagsulat ng setting!
+  EXIT: Lumabas
+  SETTINGS:
+  - untranslated
+  - original: Settings
+  MENU:
+  - untranslated
+  - original: Menu
+  BDM_GAMES: BDM Laro
+  HDD_GAMES: HDD Laro
+  NET_GAMES: ETH Laro
+  APPS:
+  - untranslated
+  - original: Apps
+  THEME: Tema
+  LANGUAGE: Wika
+  CONFIRMATION_POFF: Ipa-power off ang system?.
+  CONFIRMATION_EXIT: Lumabas sa Browser?
+  CONFIRMATION_CANCEL_UPDATE: Kanselahin ang pag-update?
+  HDD_NOT_CONNECTED_ERROR: '%d: Hindi na-detect ang HardDisk Drive'
+  HDD_NOT_FORMATTED_ERROR: '%d: Hindi naka-format ang HardDisk Drive'
+  NETWORK_STARTUP_ERROR: '%d: Network startup error'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: Walang ma-detect na network adaptor'
+  NETWORK_STARTUP_ERROR_CONN: '%d: Hindi makakonekta sa SMB server'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: Hindi makapag-log in sa SMB server'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: Hindi mabuksan ang SMB ibahagi'
+  NETWORK_SHARE_LIST_ERROR: '%d: Hindi mailista ang SMB Shares'
+  NETWORK_GAMES_LIST_ERROR: '%d: Hindi mailista ang mga laro'
+  NETWORK_ERROR_DHCP_FAIL: '%d: Hindi available ang DHCP server'
+  NETWORK_ERROR_LINK_FAIL: '%d: Walang koneksyon sa network'
+  'ON': Naka-on
+  'OFF': Naka-off
+  OK: Ayos
+  SELECT: Piliin
+  CANCEL: Kansel
+  CIRCLE:
+  - untranslated
+  - original: Circle
+  CROSS:
+  - untranslated
+  - original: Cross
+  GAMES_LIST: Listahan
+  COMPAT_SETTINGS: Settings ng laro
+  REMOVE_ALL_SETTINGS: Alisin ang Settings
+  SCROLLING: Bilis ng scroll
+  SLOW: Mabagal
+  MEDIUM:
+  - untranslated
+  - original: Medium
+  FAST: Mabilis
+  DEFDEVICE: Default na menu
+  LOAD_FROM_DISC: Mag-load mula sa disc
+  PLEASE_WAIT: Mangyaring maghintay
+  ERROR_LOADING_ID: Nagkaroon ng error habang naglo-load ang ID ng Laro
+  AUTOSORT: Awtomatikong pag-uuri
+  ERR_LOADING_LANGFILE: Error sa paglo-load ng file na wika
+  DEBUG: Debug na kulay
+  NO_CONTROLLER: Controller Walang natukoy na , naghihintay…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: Malapad na screen
+  POWEROFF: Power-off
+  LOADING_SETTINGS: Nilo-load ang config
+  SAVING_SETTINGS: Sine-save ang config
+  START_DEVICE: Simulan ang aparato
+  REFRESH:
+  - untranslated
+  - original: Refresh
+  BDMMODE: BDM aparato simula mode
+  HDDMODE: HDD aparato simula mode
+  ETHMODE: ETH aparato simula mode
+  APPMODE: Mga application na simulan ang mode
+  AUTO: Awto
+  MANUAL: Manwal
+  STARTNBD: I-sart ang NBD Server
+  STARTINGNBD: NBD Server Starting…
+  RUNNINGNBD: NBD Server Running…
+  STARTFAILNBD: Bigong i- start ang NBD Server.
+  UNLOADNBD: NBD Server Unloading…
+  EXITTO: Lumabas sa
+  BGCOLOR: kulay ng background
+  TXTCOLOR: kulay ng teksto
+  CAT_SMB_SERVER:
+  - untranslated
+  - original: '- SMB Server -'
+  IP_ADDRESS_TYPE: uri ng IP address
+  IP_ADDRESS_TYPE_STATIC:
+  - untranslated
+  - original: Static
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: Adres ng IP
+  ADDRESS: Adres
+  MASK:
+  - untranslated
+  - original: Mask
+  GATEWAY:
+  - untranslated
+  - original: Gateway
+  DNS_SERVER:
+  - untranslated
+  - original: DNS Server
+  PORT:
+  - untranslated
+  - original: Port
+  SHARE: Magbahagi
+  USER: Gumagamit
+  PASSWORD:
+  - untranslated
+  - original: Password
+  NOT_SET: <Hindi nai-set>
+  ADDRESS_TYPE: Address type
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: Tanggapin
+  DELETE_WARNING: Item ay permanenteng tatanggalin, magpatuloy?
+  RENAME:
+  - untranslated
+  - original: Rename
+  DELETE: Alisin
+  RUN: Tumakbo
+  GFX_SETTINGS: Ipakita ang mga setting
+  ENABLE_WRITE: Operasyon ng pag-write
+  LASTPLAYED: Tandaan ang huling play ng laro
+  SELECTBUTTON: Select button
+  ERR_FRAGMENTED: Error, fragmented ang laro
+  ERR_FILE_INVALID: Error, hindi maaaring tumakbo ang item
+  TEST: Subukan
+  HINT_GUEST: Iwanang walang laman para sa Guest auth .
+  HINT_MODE1:
+  - untranslated
+  - original: Accurate Reads
+  HINT_MODE2: Synchronous na Mode
+  HINT_MODE3: Alisin sa pagkakakawit ng Syscalls
+  HINT_MODE4: 0 PSS mode
+  HINT_MODE5: I-emulate ang DVD-DL
+  HINT_MODE6: I-disable ang IGR
+  HINT_VMC_SIZE: Ang pagbabago ng laki ay i-reformat ang VMC
+  CREATE: Lumikha
+  START: Magsimula
+  MODIFY: Baguhin
+  ABORT: May pagpapalaglag
+  RESET: I-reset ang
+  USE_GENERIC: gumamit ng generic
+  VMC_SCREEN: I-configure ang VMC
+  VMC_NAME: Pangalan
+  SIZE: Laki
+  VMC_STATUS: Katayuan
+  VMC_PROGRESS: Pag-unlad
+  VMC_FILE_EXISTS: Umiiral ang VMC file
+  VMC_FILE_ERROR: Di-wastong VMC file , laki ay hindi tama
+  VMC_FILE_NEW: VMC file na kailangan upang malikha
+  ERR_VMC_CONTINUE: Bigong ma-access ang VMC %s. Magpatuloy gamit ang memory card
+    ng PS2 sa slot %d?
+  AUTOREFRESH: Awtomatikong i-refresh
+  ABOUT: Tungkol sa
+  DEVS: Mga coders
+  QANDA:
+  - untranslated
+  - original: Quality Assurance
+  BDM_PREFIX: BDM prefix path
+  HINT_EXITPATH: Ibo-boot ang Custom ELF pagtapos ng IGR
+  HINT_SPINDOWN: Value sa (mga) minuto, 0 upang huwag paganahin
+  HDD_SPINDOWN: Awtomatikong pababagalin ang HDD
+  VMODE: Mode ng bidyo
+  UICOLOR: Dialog ng kulay
+  SELCOLOR: Piniling kulay
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO: Impo
+  ALTSTARTUP:
+  - untranslated
+  - original: Custom ELF
+  COLOR_SELECTION: kulay ng seleksyon
+  RECONNECT: Muling kumonekta
+  HINT_SHARENAME: Iwanang walang laman upang ilista ang pagbabahagi
+  ETH_PREFIX: Path ng ETH prefix
+  BACKSPACE:
+  - untranslated
+  - original: Backspace
+  SPACE: Puwang
+  ENTER: Magpasok
+  MODE: Moda
+  VMC_SLOT1:
+  - untranslated
+  - original: VMC Slot 1
+  VMC_SLOT2:
+  - untranslated
+  - original: VMC Slot 2
+  GAME_ID: ID ng Laro
+  DMA_MODE:
+  - untranslated
+  - original: DMA Mode
+  VSYNC:
+  - untranslated
+  - original: V-Sync
+  MODE1:
+  - untranslated
+  - original: Mode 1
+  MODE2:
+  - untranslated
+  - original: Mode 2
+  MODE3:
+  - untranslated
+  - original: Mode 3
+  MODE4:
+  - untranslated
+  - original: Mode 4
+  MODE5:
+  - untranslated
+  - original: Mode 5
+  MODE6:
+  - untranslated
+  - original: Mode 6
+  GSCONFIG: I-configure ang GSM
+  ETH_OPMODE: Ethernet speed at duplex setting
+  ETH_100MFDX: 100Mbit full-duplex
+  ETH_100MHDX: 100Mbit half-duplex
+  ETH_10MFDX: 10Mbit full-duplex
+  ETH_10MHDX: 10Mbit half-duplex
+  GSM_SETTINGS: Settings ng GSM
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: Toggles GSM ON or OFF
+  HINT_GSMVMODE: Pwersahin ang Custom Display Mode
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: Horizontal Adjustment
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: Vertical Adjustment
+  OVERSCAN:
+  - untranslated
+  - original: Overscan
+  HINT_OVERSCAN: Overscan Adjustment
+  GSMSKIPVIDEOS:
+  - untranslated
+  - original: FMV Skip
+  HINT_GSMSKIPVIDEOS: I-skip ang Full Motion Videos
+  CHEAT_SETTINGS: Settings ng cheat
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: Ipa-patch ng PS2RD Cheat Engine ang iyong games
+  CHEATMODE:
+  - untranslated
+  - original: PS2RD Cheat Engine Mode
+  HINT_CHEATMODE: Awto. pagpili or pagpili ng game cheats
+  CHEATMODEAUTO: Awto. pagpili ng cheats
+  CHEATMODESELECT: Pagpili ng game cheats
+  ERR_CHEATS_LOAD_FAILED: 'Error: Bigong i-load ang Cheat File'
+  NO_CHEATS_FOUND: Walang makitang Cheat
+  DL_DEFAULTS: Download defaults
+  NET_UPDATE: I-update ang network
+  NET_UPDATE_ALL:
+  - untranslated
+  - original: Overwrite Existing Records
+  NET_UPDATE_FAILED: Bigong mag-update.
+  NET_UPDATE_CONN_FAILED: Bigong kumonekta sa update server.
+  NET_UPDATE_DONE: Kumpletong na-update.
+  NET_UPDATE_CANCELLED: Nakansela ang pag-update.
+  CONFIRMATION_SETTINGS_UPDATE: I-download ang settings mula sa network?
+  CUSTOMIZED_SETTINGS:
+  - untranslated
+  - original: Customized Settings
+  DOWNLOADED_DEFAULTS:
+  - untranslated
+  - original: Downloaded Defaults
+  AUTO_START_IN_N_SECS: Mag aawto-start ng %i s…
+  AUTOSTARTLAST: Auto start
+  HINT_AUTOSTARTLAST: Value sa segundo, 0 para i-disable auto start
+  PS2LOGO:
+  - untranslated
+  - original: PS2 Logo
+  HINT_PS2LOGO: Ididisplay ang valid disc logo kung tugma ito sa region na bersyon
+    ng laro
+  PADEMUCONFIG: I-configure ang PADEMU
+  PADEMU_SETTINGS:
+  - untranslated
+  - original: Pad Emulator Settings
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: Turns on/off PadEmulator para sa piling laro.
+  PADEMU_MODE: Mode ng Pad Emulator
+  HINT_PADEMU_MODE: Pumili ng Pad Emulator mode.
+  DS34USB_MODE:
+  - untranslated
+  - original: DualShock3/4 USB
+  DS34BT_MODE:
+  - untranslated
+  - original: DualShock3/4 BT
+  PADPORT: 'Settings para sa port:'
+  HINT_PAD_PORT: Pumili ng Pad Emulator port para sa settings.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: Turns on/off Pad Emulator para sa piling port.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: Turns on/off vibration ng Pad Emulator para sa piling port.
+  USBDG_MAC: 'Usb bluetooth adapter mac address:'
+  PAD_MAC: 'DS Controller paired to mac address:'
+  PAIR: I-pair
+  PAIR_PAD: I-pair ang DS Controller
+  HINT_PAIRPAD: I-pair ang DS Controller gamit ang bluetooth adapter mac address.
+  NOT_CONNECTED: Walang koneksyon
+  BTINFO: Impormasyon ng Bluetooth adapter
+  HINT_BTINFO: Ipakita ang impormation at supported features
+  HCIVER: 'Bersyon ng HCI:'
+  LMPVER: 'Bersyon ng LMP:'
+  MANUFACTURER:
+  - untranslated
+  - original: 'Manufacturer ID:'
+  SUPFEATURES: 'Suportadong mga features:'
+  'YES': Opo
+  'NO': Hindi
+  BT_SUPPORTED: Ang Bluetooth adapter ay daapat suportado ng DS3/DS4 controllers.
+  BT_NOTSUPPORTED: Ang Bluetooth adapter ay maaring hindi gumana sa DS3/DS4 controllers.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: Turns on/off Multitap emulation para sa piling game.
+  MTAP_PORT: Multitap emulator on port
+  HINT_MTAP_PORT: Pumili ng port para sa Multitap emulation.
+  PADEMU_WORKAROUND: Pagsasa-ayos ng Fake DS3
+  HINT_PADEMU_WORKAROUND: Nangangalangan ng fake DS3s ng pagsasa-ayos, Maie-enable
+    ng opsyon na ito.
+  GSM_FIELD_FIX: I-emulate ang FIELD flipping
+  HINT_GSM_FIELD_FIX: Aayusin ang laro na may isyu ng glitch sa progressive video
+    modes.
+  PARENLOCKCONFIG: Settings ng Parental Lock
+  PARENLOCK_PASSWORD:
+  - untranslated
+  - original: Parental Lock Password
+  PARENLOCK_PASSWORD_HINT: Hayaang nakablangko para ma-disable ang parental lock.
+  PARENLOCK_ENTER_PASSWORD_TITLE: I-enter ang Parental Lock Password
+  PARENLOCK_PASSWORD_INCORRECT: Ang Parental lock password ay mali.
+  PARENLOCK_DISABLE_WARNING:
+  - untranslated
+  - original: Parental lock disabled.
+  BUILD_DETAILS: 'Opsyon ng build:'
+  PARENLOCK_INVALID_PASSWORD: Error - Hindi maaring gamitin ang password na ito.
+  ERR_VMC_FRAGMENTED_CONTINUE: VMC %s na file ay fragmented. Magpatuloy gamit ang
+    Memory Card sa slot %d?
+  AUDIO_SETTINGS: Settings ng Audio
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: Volume ng Sound Effects
+  BOOT_SND_VOLUME: Volume ng Boot Sound
+  CFM_VMODE_CHG: Kumpirmahin "video mode change"?
+  CACHE_HDD_GAME_LIST:
+  - untranslated
+  - original: Cache Game List (HDD)
+  ENABLE_NOTIFICATIONS: Mga notification
+  CFG_NOTIFICATION: Nai-load ang config sa %s
+  THM_NOTIFICATION: Nai-load ang tema sa %s
+  LNG_NOTIFICATION: Nai-load ang wika sa %s
+  PARTITION_NOTIFICATION: Nai-mount na ang partisyon %s.
+  OPTIONS: Mga Opsyon
+  GAME_SETTINGS_SAVED: Nai-save ang "Game settings".
+  GAME_SETTINGS_REMOVED: '%s settings ay nai-alis.'
+  NET_UPDATE_HINT: Io-overwrite ang nakairal na game compatibility settings kapag
+    naka-enable.
+  SETTINGS_SOURCE:
+  - untranslated
+  - original: Settings Mode
+  GLOBAL_SETTINGS:
+  - untranslated
+  - original: Global
+  PERGAME_SETTINGS:
+  - untranslated
+  - original: Per Game
+  ALL_SETTINGS: Lahat
+  GAME_SETTINGS_PROMPT: Piliin ang settings para alisin.
+  FORUM_DETAILS:
+  - untranslated
+  - original: 'Support Forums:'
+  INFO_TITLE: Pamagat
+  INFO_GENRE:
+  - untranslated
+  - original: Genre
+  INFO_RELEASE: Nai-release
+  INFO_DEVELOPER: Debeloper
+  INFO_DESCRIPTION: Deskripsyon
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS: Settings ng Controller
+  HINT_BDM_START: I-turn on/off ang Block Device Manager.
+  HINT_BLOCK_DEVICES: I-turn on/off ang Block Devices (halimbawa. USB).
+  USB_GAMES: Games sa USB
+  ILINK_GAMES: Games sa iLink
+  MX4SIO_GAMES: Games sa MX4SIO

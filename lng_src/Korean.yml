@@ -1,0 +1,354 @@
+comments: |-
+  Korean translation by ddinghoya
+  For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+translations:
+  LOCALE: Korean
+  SAVE_CHANGES: 저장 변경
+  BACK: 뒤로
+  NETCONFIG: 네트워크 구성
+  SHOW_ADVANCED_OPTS: 고급 옵션
+  NO_ITEMS: <값 없음>
+  SETTINGS_SAVED: 설정이 %s 에 저장되었습니다.
+  ERROR_SAVING_SETTINGS: 설정 기록 중 에러!
+  EXIT: 종료
+  SETTINGS: 설정
+  MENU: 메뉴
+  BDM_GAMES: BDM 게임
+  HDD_GAMES: HDD 게임
+  NET_GAMES: ETH 게임
+  APPS: 응용프로그램
+  THEME: 테마
+  LANGUAGE: 언어
+  CONFIRMATION_POFF: 시스템 전원이 꺼집니다.
+  CONFIRMATION_EXIT: 브라우저를 종료합니까?
+  CONFIRMATION_CANCEL_UPDATE: 업데이트 취소합니까?
+  HDD_NOT_CONNECTED_ERROR: '%d: HDD를 검색할 수 없습니다'
+  HDD_NOT_FORMATTED_ERROR: '%d: HDD가 포맷되지 않았습니다'
+  NETWORK_STARTUP_ERROR: '%d: 네트워크 시작 오류'
+  NETWORK_STARTUP_ERROR_NETIF: '%d: 네트워크 아답터 감지 안됩니다'
+  NETWORK_STARTUP_ERROR_CONN: '%d: SMB 서버에 접속할 수 없습니다'
+  NETWORK_STARTUP_ERROR_LOGON: '%d: SMB 서버에 로그인할 수 없습니다'
+  NETWORK_STARTUP_ERROR_SHARE: '%d: SMB 공유를 열 수 없습니다'
+  NETWORK_SHARE_LIST_ERROR: '%d: SMB 공유 목록을 나열할 수 없습니다'
+  NETWORK_GAMES_LIST_ERROR: '%d: 게임 목록을 나열 할 수 없습니다'
+  NETWORK_ERROR_DHCP_FAIL: '%d: DHCP 서버가 존재하지 않습니다'
+  NETWORK_ERROR_LINK_FAIL: '%d: 네트워크에 접속할 수 없습니다'
+  'ON': 켜기
+  'OFF': 끄기
+  OK: 확인
+  SELECT: 선택
+  CANCEL: 취소
+  CIRCLE: O
+  CROSS: X
+  GAMES_LIST: 게임 목록
+  COMPAT_SETTINGS: 게임 설정
+  REMOVE_ALL_SETTINGS: 설정 삭제
+  SCROLLING: 스크롤 속도
+  SLOW: 느림
+  MEDIUM: 보통
+  FAST: 빠름
+  DEFDEVICE: 기본 메뉴
+  LOAD_FROM_DISC: 디스크 읽기
+  PLEASE_WAIT: 잠시만 기다리세요
+  ERROR_LOADING_ID: 게임 ID 불러오는 중 오류
+  AUTOSORT: 자동 정렬
+  ERR_LOADING_LANGFILE: 언어 파일 불러오는 중 오류
+  DEBUG:
+  - untranslated
+  - original: Debug Colors
+  NO_CONTROLLER: 컨트롤러가 없습니다. 대기 중…
+  COVERART:
+  - untranslated
+  - original: Cover Art
+  WIDE_SCREEN: 와이드화면
+  POWEROFF: 전원 끄기
+  LOADING_SETTINGS: 불러오기 설정
+  SAVING_SETTINGS: 저장 설정
+  START_DEVICE: 장치 시작
+  REFRESH: 새로 고침
+  BDMMODE:
+  - untranslated
+  - original: BDM Start Mode
+  HDDMODE: HDD 장치 시작 모드
+  ETHMODE: ETH 장치 시작 모드
+  APPMODE: 응용프로그램 시작 모드
+  AUTO: 자동
+  MANUAL: 수동
+  STARTNBD: NBD 서버 시작
+  STARTINGNBD: NBD 서버 시작 중…
+  RUNNINGNBD: NBD 서버 가동 중…
+  STARTFAILNBD: NBD 서버 시작 실패
+  UNLOADNBD: NBD 서버 업로딩 중…
+  EXITTO: IGR 경로
+  BGCOLOR: 배경 색상
+  TXTCOLOR: 문자 색상
+  CAT_SMB_SERVER: '- SMB 서버 -'
+  IP_ADDRESS_TYPE: IP 주소 형식
+  IP_ADDRESS_TYPE_STATIC:
+  - untranslated
+  - original: Static
+  IP_ADDRESS_TYPE_DHCP:
+  - untranslated
+  - original: DHCP
+  IP_ADDRESS: IP 주소
+  ADDRESS: 주소
+  MASK: 마스크
+  GATEWAY: 게이트웨이
+  DNS_SERVER: DNS 서버
+  PORT: 포트
+  SHARE: 공유
+  USER: 유저
+  PASSWORD: 비밀번호
+  NOT_SET: <설정 안됨>
+  ADDRESS_TYPE: 주소 형식
+  ADDR_TYPE_IP:
+  - untranslated
+  - original: IP
+  ADDR_TYPE_NETBIOS:
+  - untranslated
+  - original: NetBIOS
+  ACCEPT: 허용
+  DELETE_WARNING: 항목은 영구적으로 삭제됩니다, 계속합니까?
+  RENAME: 이름변경
+  DELETE: 삭제
+  RUN: 실행
+  GFX_SETTINGS: 디스플레이 설정
+  ENABLE_WRITE:
+  - untranslated
+  - original: Write Operations
+  LASTPLAYED: 마지막에 실행한 게임 기억
+  SELECTBUTTON: 버튼 선택
+  ERR_FRAGMENTED: 오류, 게임이 손상 되었습니다.
+  ERR_FILE_INVALID: 오류, 항목을 실행할 수 없습니다
+  TEST: 테스트 변경
+  HINT_GUEST: 게스트 권한을 위해 지움
+  HINT_MODE1: 정밀하게 읽음
+  HINT_MODE2: 동기화 모드
+  HINT_MODE3: 시스템 호출 해제
+  HINT_MODE4: 비디오 건너뛰기
+  HINT_MODE5: DV-DL 에뮬레이트
+  HINT_MODE6: IGR 비활성
+  HINT_VMC_SIZE: 크기 변경시 VMC 재포멧 됩니다.
+  CREATE: 생성
+  START: 시작
+  MODIFY: 수정
+  ABORT: 포기
+  RESET: 재설정
+  USE_GENERIC: 일반적 사용
+  VMC_SCREEN: VMC 구성
+  VMC_NAME: 이름
+  SIZE: 크기
+  VMC_STATUS: 현황
+  VMC_PROGRESS: 진행
+  VMC_FILE_EXISTS: VMC 파일 존재
+  VMC_FILE_ERROR: 잘못된 VMC 파일, 크기가 다릅니다.
+  VMC_FILE_NEW: VMC 파일이 생성되야 합니다.
+  ERR_VMC_CONTINUE: VMC %s 오류, 메모리카드(슬롯 %d)에서 계속합니까?
+  AUTOREFRESH: 자동 새로 고침
+  ABOUT: 오픈 PS2 로더 정보
+  DEVS: 개발자
+  QANDA: 품질 보증
+  BDM_PREFIX: BDM prefix 경로
+  HINT_EXITPATH: IGR 후 사용자 정의 ELF 부팅
+  HINT_SPINDOWN: 분 입력, 회전 멈추지 않으려면 0으로 설정
+  HDD_SPINDOWN: 자동 HDD 회전 멈춤
+  VMODE: 비디오 모드
+  UICOLOR: 대화상자 색상
+  SELCOLOR: 선택한 색상
+  RESETCOLOR:
+  - untranslated
+  - original: Reset Colors
+  INFO: 정보
+  ALTSTARTUP: 커스텀 ELF
+  COLOR_SELECTION: 색상 선택
+  RECONNECT: 재접속
+  HINT_SHARENAME: 목록 공유를 위해 지움
+  ETH_PREFIX: ETH prefix 경로
+  BACKSPACE: 백스페이스
+  SPACE: 스페이스
+  ENTER: 입력
+  MODE: 모드
+  VMC_SLOT1: VMC 슬롯 1
+  VMC_SLOT2: VMC 슬롯 2
+  GAME_ID: 게임 ID
+  DMA_MODE: DMA 모드
+  VSYNC: V-동기화
+  MODE1: 모드 1
+  MODE2: 모드 2
+  MODE3: 모드 3
+  MODE4: 모드 4
+  MODE5: 모드 5
+  MODE6: 모드 6
+  GSCONFIG: GSM 구성
+  ETH_OPMODE: 이더넷 링크 모드
+  ETH_100MFDX: 100Mbit full-duplex
+  ETH_100MHDX: 100Mbit half-duplex
+  ETH_10MFDX: 10Mbit full-duplex
+  ETH_10MHDX: 10Mbit half-duplex
+  GSM_SETTINGS: GSM 설정
+  ENABLEGSM:
+  - untranslated
+  - original: GSM Selector
+  HINT_ENABLEGSM: GSM 켜기 또는 끄기
+  HINT_GSMVMODE: 강제 커스텀 디스플레이 모드
+  XOFFSET:
+  - untranslated
+  - original: H-POS
+  HINT_XOFFSET: 수평 조정
+  YOFFSET:
+  - untranslated
+  - original: V-POS
+  HINT_YOFFSET: 수직 조정
+  OVERSCAN: 오버스캔
+  HINT_OVERSCAN: 오버스캔 조정
+  GSMSKIPVIDEOS: FMV 건너뛰기
+  HINT_GSMSKIPVIDEOS: 풀 모션 비디오 건너뛰기
+  CHEAT_SETTINGS: 치트 설정
+  ENABLECHEAT:
+  - untranslated
+  - original: PS2RD Cheat Engine
+  HINT_ENABLECHEAT: PS2RD 치트 엔진 패치 적용
+  CHEATMODE: PS2RD 치트 엔진 모드
+  HINT_CHEATMODE: 게임 치트 자동 선택 또는 선택
+  CHEATMODEAUTO: 치트 자동 선택
+  CHEATMODESELECT: 게임 치트 선택
+  ERR_CHEATS_LOAD_FAILED: '오류: 치트 파일 불러오기 실패'
+  NO_CHEATS_FOUND: 치트를 찾을 수 없음
+  DL_DEFAULTS: 다운로드 기본값
+  NET_UPDATE: 네트워크 업데이트
+  NET_UPDATE_ALL: 기존 레코드 덮어 쓰기
+  NET_UPDATE_FAILED: 업데이트 실패.
+  NET_UPDATE_CONN_FAILED: 업데이트 서버에 연결 실패.
+  NET_UPDATE_DONE: 업데이트 완료.
+  NET_UPDATE_CANCELLED: 업데이트 취소.
+  CONFIRMATION_SETTINGS_UPDATE: 네트워크에서 설정을 다운로드 합니까?
+  CUSTOMIZED_SETTINGS: 사용자 정의 설정
+  DOWNLOADED_DEFAULTS: 다운로드 받은 기본값
+  AUTO_START_IN_N_SECS: '%i 자동 시작…'
+  AUTOSTARTLAST: 자동 시작
+  HINT_AUTOSTARTLAST: 초 입력, 자동 시작하지 않으려면 0으로 설정
+  PS2LOGO: PS2 로고
+  HINT_PS2LOGO: 콘솔의 지역과 일치하는 유효한 디스크 로고만 표시
+  PADEMUCONFIG: PADEMU 구성
+  PADEMU_SETTINGS: 패드 에뮬레이터 설정
+  PADEMU_ENABLE:
+  - untranslated
+  - original: Pad Emulator
+  HINT_PADEMU_ENABLE: 선택된 게임 패드에뮬레이터 켬/끔.
+  PADEMU_MODE: 패드 에뮬레이터 모드
+  HINT_PADEMU_MODE: 패드 에뮬레이터 모드 선택
+  DS34USB_MODE: 듀얼쇼크3/4 USB
+  DS34BT_MODE: 듀얼쇼크3/4 BT
+  PADPORT: '포트 설정:'
+  HINT_PAD_PORT: 설정용 패드 에뮬레이터 포트 활성화.
+  PADEMU_PORT:
+  - untranslated
+  - original: Emulation
+  HINT_PADEMU_PORT: 선택된 포트 패드에뮬레이터 켬/끔.
+  PADEMU_VIB:
+  - untranslated
+  - original: Vibration
+  HINT_PADEMU_VIB: 패드 에뮬레이터에 선택된 포트 진동 켬/끔
+  USBDG_MAC: 'USB 블루투스 어답터 맥 주소:'
+  PAD_MAC: 'DS 컨트롤러 맥 주소와 페어링:'
+  PAIR: 페어링
+  PAIR_PAD: DS 컨트롤러 페어링
+  HINT_PAIRPAD: 블루투스 어댑터 맥 주소가 있는 DS 컨트롤러 페어
+  NOT_CONNECTED: 연결되지 않음
+  BTINFO: 블루투스 어댑터 정보
+  HINT_BTINFO: 더 많은 정보와 지원되는 기능을 보여줌.
+  HCIVER: 'HCI 버전:'
+  LMPVER: 'LMP 버전:'
+  MANUFACTURER: '제조업체 ID:'
+  SUPFEATURES: '지원 기능:'
+  'YES': 예
+  'NO': 아니오
+  BT_SUPPORTED: 블루투스 어댑터는 DS3/DS4 컨트롤러와 완벽하게 호환되어야 합니다.
+  BT_NOTSUPPORTED: 블루투스 어댑터가 DS3/DS4 컨트롤러에서 올바르게 작동하지 않을 수 있습니다.
+  MTAP_ENABLE:
+  - untranslated
+  - original: Multitap Emulation
+  HINT_MTAP_ENABLE: 선택한 게임을 위한 멀티탭 에뮬레이션 켬/끔.
+  MTAP_PORT: 포트상의 멀티탭 에뮬레이터
+  HINT_MTAP_PORT: 멀티탭 에뮬레이션을 위한 포트를 선택.
+  PADEMU_WORKAROUND:
+  - untranslated
+  - original: Fake DS3 Workaround
+  HINT_PADEMU_WORKAROUND:
+  - untranslated
+  - original: Some fake DS3s need a workaround, this option will enable it.
+  GSM_FIELD_FIX: 필드 뒤집기 에뮬레이션
+  HINT_GSM_FIELD_FIX: 프로그레시브 비디오 모드에서 결함이있는 게임 수정.
+  PARENLOCKCONFIG: 보호자 잠금 설정
+  PARENLOCK_PASSWORD: 보호자 잠금 비밀번호
+  PARENLOCK_PASSWORD_HINT: 보호자 잠금을 사용하지 않으려면 비워 둡니다.
+  PARENLOCK_ENTER_PASSWORD_TITLE: 보호자 암호 입력
+  PARENLOCK_PASSWORD_INCORRECT: 보호자 잠금 비밀번호가 올바르지 않습니다.
+  PARENLOCK_DISABLE_WARNING: 보호자 잠금이 비활성화되었습니다.
+  BUILD_DETAILS: '빌드 옵션:'
+  PARENLOCK_INVALID_PASSWORD: 오류 - 이 비밀번호를 사용할 수 없습니다.
+  ERR_VMC_FRAGMENTED_CONTINUE: VMC %s 파일이 조각화되었습니다. 슬롯 %d에서 메모리 카드를 계속 사용하겠습니까?
+  AUDIO_SETTINGS: 오디오 설정
+  SFX:
+  - untranslated
+  - original: Sound Effects
+  BOOT_SND:
+  - untranslated
+  - original: Boot Sound
+  SFX_VOLUME: 사운드 효과 볼륨
+  BOOT_SND_VOLUME: 부팅 사운드 볼륨
+  CFM_VMODE_CHG: 비디오 모드 변경을 확인하겠습니까?
+  CACHE_HDD_GAME_LIST: 캐쉬 게임 목록 (HDD)
+  ENABLE_NOTIFICATIONS:
+  - untranslated
+  - original: Notifications
+  CFG_NOTIFICATION:
+  - untranslated
+  - original: Config loaded from %s
+  THM_NOTIFICATION:
+  - untranslated
+  - original: Theme loaded from %s
+  LNG_NOTIFICATION:
+  - untranslated
+  - original: Language loaded from %s
+  PARTITION_NOTIFICATION:
+  - untranslated
+  - original: '%s partition mounted.'
+  OPTIONS:
+  - untranslated
+  - original: Options
+  GAME_SETTINGS_SAVED: 게임 설정이 저장되었습니다.
+  GAME_SETTINGS_REMOVED: '%s 설정이 제거되었습니다.'
+  NET_UPDATE_HINT: 활성화되면 기존 게임 호환성 설정을 덮어 씁니다.
+  SETTINGS_SOURCE: 설정 모드
+  GLOBAL_SETTINGS: 글로벌
+  PERGAME_SETTINGS: 게임별
+  ALL_SETTINGS: 모두
+  GAME_SETTINGS_PROMPT: 제거할 설정을 선택하십시오.
+  FORUM_DETAILS: '지원 포럼:'
+  INFO_TITLE: 타이틀
+  INFO_GENRE: 장르
+  INFO_RELEASE: 개정
+  INFO_DEVELOPER: 개발자
+  INFO_DESCRIPTION: 설명
+  BLOCKDEVICE_SETTINGS:
+  - untranslated
+  - original: Block Devices
+  CONTROLLER_SETTINGS:
+  - untranslated
+  - original: Controller Settings
+  HINT_BDM_START:
+  - untranslated
+  - original: Turn on/off Block Device Manager.
+  HINT_BLOCK_DEVICES:
+  - untranslated
+  - original: Turn on/off Block Devices (e.g. USB).
+  USB_GAMES:
+  - untranslated
+  - original: USB Games
+  ILINK_GAMES:
+  - untranslated
+  - original: iLink Games
+  MX4SIO_GAMES:
+  - untranslated
+  - original: MX4SIO Games

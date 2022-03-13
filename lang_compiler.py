@@ -123,7 +123,7 @@ def make_lng(
         if translation is None:
             print(f'WARNING: translation for {label} not found in {translation_filename}', file=sys.stderr)
             translation = string_def['string']
-        if isinstance(translation, str):
+        if not isinstance(translation, str):
             if "untranslated" not in translation and "same" not in translation:
                 print(f'WARNING: status unknown for {label} in {translation_filename}', file=sys.stderr)
 

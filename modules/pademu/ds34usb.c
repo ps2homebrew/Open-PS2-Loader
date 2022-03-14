@@ -9,6 +9,7 @@
 #include "thsemap.h"
 #include "ds34usb.h"
 #include "sys_utils.h"
+#include "padmacro.h"
 
 //#define DPRINTF(x...) printf(x)
 #define DPRINTF(x...)
@@ -257,11 +258,12 @@ static void DS3USB_init(int pad)
 
 #define MAX_DELAY 10
 
-static void readReport(u8 *data, int pad)
+static void readReport(u8 *data, int pad_idx)
 {
+    ds34usb_device *pad = &ds34pad[pad_idx];
     if (data[0]) {
 
-        if (ds34pad[pad].type == DS3) {
+        if (pad->type == DS3) {
             struct ds3report *report;
 
             report = (struct ds3report *)&data[2];
@@ -269,170 +271,77 @@ static void readReport(u8 *data, int pad)
             if (report->RightStickX == 0 && report->RightStickY == 0) // ledrumble cmd causes null report sometime
                 return;
 
-            ds34pad[pad].data[0] = ~report->ButtonStateL;
-            ds34pad[pad].data[1] = ~report->ButtonStateH;
+            pad->data[0] = ~report->ButtonStateL;
+            pad->data[1] = ~report->ButtonStateH;
 
-            ds34pad[pad].data[2] = report->RightStickX; // rx
-            ds34pad[pad].data[3] = report->RightStickY; // ry
-            ds34pad[pad].data[4] = report->LeftStickX;  // lx
-            ds34pad[pad].data[5] = report->LeftStickY;  // ly
+            translate_pad_ds3(report, &pad->ds2, 0);
+            padMacroPerform(&pad->ds2, report->PSButton);
 
-            ds34pad[pad].data[6] = report->PressureRight; // right
-            ds34pad[pad].data[7] = report->PressureLeft;  // left
-            ds34pad[pad].data[8] = report->PressureUp;    // up
-            ds34pad[pad].data[9] = report->PressureDown;  // down
+            if (report->PSButton) {                                    // display battery level
+                if (report->Select && (pad->btn_delay == MAX_DELAY)) { // PS + SELECT
+                    if (pad->analog_btn < 2)                           // unlocked mode
+                        pad->analog_btn = !pad->analog_btn;
 
-            ds34pad[pad].data[10] = report->PressureTriangle; // triangle
-            ds34pad[pad].data[11] = report->PressureCircle;   // circle
-            ds34pad[pad].data[12] = report->PressureCross;    // cross
-            ds34pad[pad].data[13] = report->PressureSquare;   // square
-
-            ds34pad[pad].data[14] = report->PressureL1; // L1
-            ds34pad[pad].data[15] = report->PressureR1; // R1
-            ds34pad[pad].data[16] = report->PressureL2; // L2
-            ds34pad[pad].data[17] = report->PressureR2; // R2
-
-            if (report->PSButtonState) {                                       // display battery level
-                if (report->Select && (ds34pad[pad].btn_delay == MAX_DELAY)) { // PS + SELECT
-                    if (ds34pad[pad].analog_btn < 2)                           // unlocked mode
-                        ds34pad[pad].analog_btn = !ds34pad[pad].analog_btn;
-
-                    ds34pad[pad].oldled[0] = led_patterns[pad][(ds34pad[pad].analog_btn & 1)];
-                    ds34pad[pad].btn_delay = 1;
+                    pad->oldled[0] = led_patterns[pad_idx][(pad->analog_btn & 1)];
+                    pad->btn_delay = 1;
                 } else {
-                    if (report->Power != 0xEE)
-                        ds34pad[pad].oldled[0] = power_level[report->Power];
+                    if (report->Power <= 0x05)
+                        pad->oldled[0] = power_level[report->Power];
 
-                    if (ds34pad[pad].btn_delay < MAX_DELAY)
-                        ds34pad[pad].btn_delay++;
+                    if (pad->btn_delay < MAX_DELAY)
+                        pad->btn_delay++;
                 }
             } else {
-                ds34pad[pad].oldled[0] = led_patterns[pad][(ds34pad[pad].analog_btn & 1)];
+                pad->oldled[0] = led_patterns[pad_idx][(pad->analog_btn & 1)];
 
-                if (ds34pad[pad].btn_delay > 0)
-                    ds34pad[pad].btn_delay--;
+                if (pad->btn_delay > 0)
+                    pad->btn_delay--;
             }
 
             if (report->Power == 0xEE) // charging
-                ds34pad[pad].oldled[3] = 1;
+                pad->oldled[3] = 1;
             else
-                ds34pad[pad].oldled[3] = 0;
+                pad->oldled[3] = 0;
 
-        } else if (ds34pad[pad].type == DS4) {
+        } else if (pad->type == DS4) {
             struct ds4report *report;
-            u8 up = 0, down = 0, left = 0, right = 0;
-
             report = (struct ds4report *)data;
+            translate_pad_ds4(report, &pad->ds2, 1);
+            padMacroPerform(&pad->ds2, report->PSButton);
 
-            switch (report->Dpad) {
-                case 0:
-                    up = 1;
-                    break;
-                case 1:
-                    up = 1;
-                    right = 1;
-                    break;
-                case 2:
-                    right = 1;
-                    break;
-                case 3:
-                    down = 1;
-                    right = 1;
-                    break;
-                case 4:
-                    down = 1;
-                    break;
-                case 5:
-                    down = 1;
-                    left = 1;
-                    break;
-                case 6:
-                    left = 1;
-                    break;
-                case 7:
-                    up = 1;
-                    left = 1;
-                    break;
-                case 8:
-                    up = 0;
-                    down = 0;
-                    left = 0;
-                    right = 0;
-                    break;
-            }
+            if (report->PSButton) {                                   // display battery level
+                if (report->Share && (pad->btn_delay == MAX_DELAY)) { // PS + Share
+                    if (pad->analog_btn < 2)                          // unlocked mode
+                        pad->analog_btn = !pad->analog_btn;
 
-            if (report->TPad) {
-                if (!report->Finger1Active) {
-                    if (report->Finger1X < 960)
-                        report->Share = 1;
-                    else
-                        report->Option = 1;
-                }
-
-                if (!report->Finger2Active) {
-                    if (report->Finger2X < 960)
-                        report->Share = 1;
-                    else
-                        report->Option = 1;
-                }
-            }
-
-            ds34pad[pad].data[0] = ~(report->Share | report->L3 << 1 | report->R3 << 2 | report->Option << 3 | up << 4 | right << 5 | down << 6 | left << 7);
-            ds34pad[pad].data[1] = ~(report->L2 | report->R2 << 1 | report->L1 << 2 | report->R1 << 3 | report->Triangle << 4 | report->Circle << 5 | report->Cross << 6 | report->Square << 7);
-
-            ds34pad[pad].data[2] = report->RightStickX; // rx
-            ds34pad[pad].data[3] = report->RightStickY; // ry
-            ds34pad[pad].data[4] = report->LeftStickX;  // lx
-            ds34pad[pad].data[5] = report->LeftStickY;  // ly
-
-            ds34pad[pad].data[6] = right * 255; // right
-            ds34pad[pad].data[7] = left * 255;  // left
-            ds34pad[pad].data[8] = up * 255;    // up
-            ds34pad[pad].data[9] = down * 255;  // down
-
-            ds34pad[pad].data[10] = report->Triangle * 255; // triangle
-            ds34pad[pad].data[11] = report->Circle * 255;   // circle
-            ds34pad[pad].data[12] = report->Cross * 255;    // cross
-            ds34pad[pad].data[13] = report->Square * 255;   // square
-
-            ds34pad[pad].data[14] = report->L1 * 255;   // L1
-            ds34pad[pad].data[15] = report->R1 * 255;   // R1
-            ds34pad[pad].data[16] = report->PressureL2; // L2
-            ds34pad[pad].data[17] = report->PressureR2; // R2
-
-            if (report->PSButton) {                                           // display battery level
-                if (report->Share && (ds34pad[pad].btn_delay == MAX_DELAY)) { // PS + Share
-                    if (ds34pad[pad].analog_btn < 2)                          // unlocked mode
-                        ds34pad[pad].analog_btn = !ds34pad[pad].analog_btn;
-
-                    ds34pad[pad].oldled[0] = rgbled_patterns[pad][(ds34pad[pad].analog_btn & 1)][0];
-                    ds34pad[pad].oldled[1] = rgbled_patterns[pad][(ds34pad[pad].analog_btn & 1)][1];
-                    ds34pad[pad].oldled[2] = rgbled_patterns[pad][(ds34pad[pad].analog_btn & 1)][2];
-                    ds34pad[pad].btn_delay = 1;
+                    pad->oldled[0] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][0];
+                    pad->oldled[1] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][1];
+                    pad->oldled[2] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][2];
+                    pad->btn_delay = 1;
                 } else {
-                    ds34pad[pad].oldled[0] = report->Battery;
-                    ds34pad[pad].oldled[1] = 0;
-                    ds34pad[pad].oldled[2] = 0;
+                    pad->oldled[0] = report->Battery;
+                    pad->oldled[1] = 0;
+                    pad->oldled[2] = 0;
 
-                    if (ds34pad[pad].btn_delay < MAX_DELAY)
-                        ds34pad[pad].btn_delay++;
+                    if (pad->btn_delay < MAX_DELAY)
+                        pad->btn_delay++;
                 }
             } else {
-                ds34pad[pad].oldled[0] = rgbled_patterns[pad][(ds34pad[pad].analog_btn & 1)][0];
-                ds34pad[pad].oldled[1] = rgbled_patterns[pad][(ds34pad[pad].analog_btn & 1)][1];
-                ds34pad[pad].oldled[2] = rgbled_patterns[pad][(ds34pad[pad].analog_btn & 1)][2];
+                pad->oldled[0] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][0];
+                pad->oldled[1] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][1];
+                pad->oldled[2] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][2];
 
-                if (ds34pad[pad].btn_delay > 0)
-                    ds34pad[pad].btn_delay--;
+                if (pad->btn_delay > 0)
+                    pad->btn_delay--;
             }
 
             if (report->Power != 0xB && report->Usb_plugged) // charging
-                ds34pad[pad].oldled[3] = 1;
+                pad->oldled[3] = 1;
             else
-                ds34pad[pad].oldled[3] = 0;
+                pad->oldled[3] = 0;
         }
-        if (ds34pad[pad].btn_delay > 0) {
-            ds34pad[pad].update_rum = 1;
+        if (pad->btn_delay > 0) {
+            pad->update_rum = 1;
         }
     }
 }

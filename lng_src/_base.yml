@@ -606,3 +606,29 @@ gui_strings:
   string: iLink Games
 - label: MX4SIO_GAMES
   string: MX4SIO Games
+- label: PADMACROCONFIG
+  string: Configure PADMACRO
+- label: PADMACRO_SETTINGS
+  string: Pad macro Settings
+- label: PADMACRO_ENABLE
+  string: Pad macros
+- label: PADMACRO_SLOWDOWN
+  string: 'Analog slow-down:'
+- label: HINT_PADMACRO_SLOWDOWN_AXIS
+  string: Reduce range of analog stick when button is pressed
+- label: LEFT_ANALOG
+  string: Left stick
+- label: RIGHT_ANALOG
+  string: Right stick
+- label: PADMACRO_INVERT_AXIS
+  string: 'Analog axis invert:'
+- label: HINT_PADMACRO_INVERT_AXIS
+  string: Invert analog stick axis
+- label: TURBO_SPEED
+  string: Turbo button speed
+- label: HINT_TURBO_SPEED
+  string: How fast to press the button when turbo is active
+- label: ACT_WHILE_PRESSED
+  string: While button pressed
+- label: ACT_TOGGLED
+  string: Toggled by button

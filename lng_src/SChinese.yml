@@ -362,3 +362,42 @@ translations:
   MX4SIO_GAMES:
   - untranslated
   - original: MX4SIO Games
+  PADMACROCONFIG:
+  - untranslated
+  - original: Configure PADMACRO
+  PADMACRO_SETTINGS:
+  - untranslated
+  - original: Pad macro Settings
+  PADMACRO_ENABLE:
+  - untranslated
+  - original: Pad macros
+  PADMACRO_SLOWDOWN:
+  - untranslated
+  - original: 'Analog slow-down:'
+  HINT_PADMACRO_SLOWDOWN_AXIS:
+  - untranslated
+  - original: Reduce range of analog stick when button is pressed
+  LEFT_ANALOG:
+  - untranslated
+  - original: Left stick
+  RIGHT_ANALOG:
+  - untranslated
+  - original: Right stick
+  PADMACRO_INVERT_AXIS:
+  - untranslated
+  - original: 'Analog axis invert:'
+  HINT_PADMACRO_INVERT_AXIS:
+  - untranslated
+  - original: Invert analog stick axis
+  TURBO_SPEED:
+  - untranslated
+  - original: Turbo button speed
+  HINT_TURBO_SPEED:
+  - untranslated
+  - original: How fast to press the button when turbo is active
+  ACT_WHILE_PRESSED:
+  - untranslated
+  - original: While button pressed
+  ACT_TOGGLED:
+  - untranslated
+  - original: Toggled by button

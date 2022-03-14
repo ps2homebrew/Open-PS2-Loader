@@ -36,6 +36,7 @@ int EnableCheatOp;
 #ifdef PADEMU
 int EnablePadEmuOp;
 int PadEmuSettings;
+int PadMacroSettings;
 #endif
 int EnableDebug;
 int *gCheatList; // Store hooks/codes addr+val pairs
@@ -98,6 +99,8 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("PADEMU = %s\n", EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
 
     PadEmuSettings = _strtoi(_strtok(NULL, " "));
+
+    PadMacroSettings = _strtoi(_strtok(NULL, " "));
 #endif
 
     i++;

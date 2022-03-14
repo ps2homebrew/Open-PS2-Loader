@@ -324,3 +324,16 @@ translations:
   USB_GAMES: Gry USB
   ILINK_GAMES: Gry iLink
   MX4SIO_GAMES: Gry MX4SIO
+  PADMACROCONFIG: Konfiguracja makr pada
+  PADMACRO_SETTINGS: Ustawienia makr pada
+  PADMACRO_ENABLE: Makra pada
+  PADMACRO_SLOWDOWN: 'Spowolnienie analoga:'
+  HINT_PADMACRO_SLOWDOWN_AXIS: Zmniejsz zakres drążka kiedy przycisk jest wciśnięty
+  LEFT_ANALOG: Lewy analog
+  RIGHT_ANALOG: Prawy analog
+  PADMACRO_INVERT_AXIS: 'Odwróć oś analoga:'
+  HINT_PADMACRO_INVERT_AXIS: Odwróć oś drążka analogowego
+  TURBO_SPEED: Szybkość turbo
+  HINT_TURBO_SPEED: Jak szybko naciskać przycisk kiedy turbo jest aktywne
+  ACT_WHILE_PRESSED: Kiedy wciśnięty
+  ACT_TOGGLED: Wciśnięcie przełącza

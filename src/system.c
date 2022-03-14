@@ -791,8 +791,8 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);
 
 #ifdef PADEMU
-#define PADEMU_SPECIFIER " %d, %u"
-#define PADEMU_ARGUMENT  , gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8)
+#define PADEMU_SPECIFIER " %d %u %u"
+#define PADEMU_ARGUMENT  , gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8), (unsigned int)(gPadMacroSettings)
 #else
 #define PADEMU_SPECIFIER
 #define PADEMU_ARGUMENT

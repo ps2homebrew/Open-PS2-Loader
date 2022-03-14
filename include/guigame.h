@@ -16,7 +16,10 @@ void guiGameShowCheatConfig(void);
 
 #ifdef PADEMU
 void guiGameShowPadEmuConfig(int forceGlobal);
+void guiGameShowPadMacroConfig(int forceGlobal);
 void guiGameSavePadEmuGlobalConfig(config_set_t *configGame);
+void guiGameSavePadMacroGlobalConfig(config_set_t *configGame);
+
 #endif
 
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet);

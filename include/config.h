@@ -51,9 +51,11 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_ENABLECHEAT  "$EnableCheat"
 #define CONFIG_ITEM_CHEATMODE    "$CheatMode"
 
-#define CONFIG_ITEM_PADEMUSOURCE   "$PADEMUSource"
-#define CONFIG_ITEM_ENABLEPADEMU   "$EnablePadEmu"
-#define CONFIG_ITEM_PADEMUSETTINGS "$PadEmuSettings"
+#define CONFIG_ITEM_PADEMUSOURCE     "$PADEMUSource"
+#define CONFIG_ITEM_ENABLEPADEMU     "$EnablePadEmu"
+#define CONFIG_ITEM_PADEMUSETTINGS   "$PadEmuSettings"
+#define CONFIG_ITEM_PADMACROSETTINGS "$PadMacroSettings"
+#define CONFIG_ITEM_PADMACROSOURCE   "$PadMacroSource"
 
 // OPL config keys
 #define CONFIG_OPL_THEME                "theme"

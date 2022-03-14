@@ -355,7 +355,7 @@ static u8 hci_cmd_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 static u8 l2cap_cmd_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
 
 static u8 identifier;
-static u8 press_emu;
+static u8 g_press_emu;
 static u8 disable_fake = 0;
 
 static ds34bt_pad_t ds34pad[MAX_PADS];
@@ -817,7 +817,7 @@ static void ds34pad_init()
         ds34pad_clear(i);
     }
 
-    press_emu = 0;
+    g_press_emu = 0;
     identifier = 0;
 }
 
@@ -1292,10 +1292,10 @@ static void hid_readReport(u8 *data, int bytes, int pad)
             ds34pad[pad].data[4] = report->LeftStickX;  // lx
             ds34pad[pad].data[5] = report->LeftStickY;  // ly
 
-            if (bytes == 21 && !press_emu)
-                press_emu = 1;
+            if (bytes == 21 && !g_press_emu)
+                g_press_emu = 1;
 
-            if (press_emu) {                                // needs emulating pressure buttons
+            if (g_press_emu) {                              // needs emulating pressure buttons
                 ds34pad[pad].data[6] = report->Right * 255; // right
                 ds34pad[pad].data[7] = report->Left * 255;  // left
                 ds34pad[pad].data[8] = report->Up * 255;    // up
@@ -1329,7 +1329,7 @@ static void hid_readReport(u8 *data, int bytes, int pad)
                 ds34pad[pad].data[17] = report->PressureR2; // R2
             }
 
-            if (report->PSButtonState && report->Power != 0xEE) // display battery level
+            if (report->PSButton && report->Power != 0xEE) // display battery level
                 ds34pad[pad].oldled[0] = power_level[report->Power];
             else
                 ds34pad[pad].oldled[0] = led_patterns[pad][1];
@@ -1383,14 +1383,14 @@ static void hid_readReport(u8 *data, int bytes, int pad)
             }
 
             if (bytes > 63 && report->TPad) {
-                if (!report->Finger1Active) {
+                if (!report->nFinger1Active) {
                     if (report->Finger1X < 960)
                         report->Share = 1;
                     else
                         report->Option = 1;
                 }
 
-                if (!report->Finger2Active) {
+                if (!report->nFinger2Active) {
                     if (report->Finger2X < 960)
                         report->Share = 1;
                     else

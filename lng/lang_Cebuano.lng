@@ -282,3 +282,16 @@ Itu-turn on/off ang Block Devices (e.g. USB).
 Dula sa USB
 Dula sa iLink
 Dula sa MX4SIO
+Configure PADMACRO
+Pad macro Settings
+Pad macros
+Analog slow-down:
+Reduce range of analog stick when button is pressed
+Left stick
+Right stick
+Analog axis invert:
+Invert analog stick axis
+Turbo button speed
+How fast to press the button when turbo is active
+While button pressed
+Toggled by button

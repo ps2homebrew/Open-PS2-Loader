@@ -282,7 +282,6 @@ static int parse_buf(const char *buf)
     gCheatList[i] = 0;
     i++;
     gCheatList[i] = 0;
-    i++;
 
     return 0;
 }

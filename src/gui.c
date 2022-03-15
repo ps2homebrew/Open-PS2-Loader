@@ -424,7 +424,7 @@ void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t *co
     if (guiMsgBox(_l(_STR_CONFIRMATION_SETTINGS_UPDATE), 1, NULL)) {
         guiRenderTextScreen(_l(_STR_PLEASE_WAIT));
 
-        if ((result = ethLoadInitModules()) == 0) {
+        if ((ethLoadInitModules()) == 0) {
             if ((result = oplUpdateGameCompatSingle(id, support, configSet)) == OPL_COMPAT_UPDATE_STAT_DONE) {
                 configSetInt(configSet, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_DLOAD);
             }

@@ -528,11 +528,13 @@ void submenuSort(submenu_list_t **submenu)
 {
     // a simple bubblesort
     // *submenu = mergeSort(*submenu);
-    submenu_list_t *head = *submenu;
+    submenu_list_t *head;
     int sorted = 0;
 
     if ((submenu == NULL) || (*submenu == NULL) || ((*submenu)->next == NULL))
         return;
+
+    head = *submenu;
 
     while (!sorted) {
         sorted = 1;

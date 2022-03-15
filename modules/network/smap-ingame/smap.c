@@ -563,7 +563,7 @@ int smap_init(int argc, char *argv[])
 
     SmapDriverData.smap_regbase = smap_regbase;
     SmapDriverData.emac3_regbase = emac3_regbase;
-    if (!SPD_REG16(SPD_R_REV_3) & SPD_CAPS_SMAP)
+    if ((SPD_REG16(SPD_R_REV_3) & SPD_CAPS_SMAP) == 0)
         return -1;
     if (SPD_REG16(SPD_R_REV_1) < 0x11)
         return -6; // Minimum: revision 17, ES2.

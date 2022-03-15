@@ -475,6 +475,8 @@ static int texPngLoadAll(GSTEXTURE *texture, const char *filePath, int texId)
 
         readFunction = NULL; // Use default reading function.
     } else {
+        if (texId == -1)
+            return ERR_BAD_FILE;
         if (!internalDefault[texId].texture)
             return ERR_BAD_FILE;
 

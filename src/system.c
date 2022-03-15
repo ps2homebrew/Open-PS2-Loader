@@ -746,7 +746,11 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 
     // Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
     // Start wiping from 0x00084000 instead (as the HDD Browser does), as the alarm patch is installed at 0x00082000.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
     memset((void *)0x00084000, 0, 0x00100000 - 0x00084000);
+#pragma GCC diagnostic pop
 
     modules = 0;
     ModuleStorage = GetModStorageLocation(filename, compatflags);

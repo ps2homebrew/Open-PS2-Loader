@@ -431,7 +431,6 @@ static int cdvdman_writeSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16
 {
     int i;
     u8 *p;
-    u8 rdbuf[64];
 
     WaitSema(cdvdman_scmdsema);
 
@@ -463,16 +462,20 @@ static int cdvdman_writeSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16
     i = 0;
     if (!(CDVDreg_SDATAIN & 0x40)) {
         do {
-            p = (void *)(rdbuf + i);
+            if (i >= out_size) {
+                break;
+            }
+            p = (void *)(out + i);
             *p = CDVDreg_SDATAOUT;
             i++;
         } while (!(CDVDreg_SDATAIN & 0x40));
     }
 
-    if (out_size > i)
-        out_size = i;
-
-    memcpy((void *)out, (void *)rdbuf, out_size);
+    if (!(CDVDreg_SDATAIN & 0x40)) {
+        do {
+            (void)CDVDreg_SDATAOUT;
+        } while (!(CDVDreg_SDATAIN & 0x40));
+    }
 
     SignalSema(cdvdman_scmdsema);
 

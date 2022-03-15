@@ -557,7 +557,7 @@ int main(int argc, char **argv, char **env)
 
 #ifdef DEBUG
     printf("ISO filesize: 0x%llx\n", filesize);
-    printf("Number of parts: %d\n", num_parts);
+    printf("Number of parts: %lld\n", num_parts);
 // return 0;
 #endif
 

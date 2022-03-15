@@ -824,7 +824,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argc++;
 
     char cmask[10];
-    snprintf(cmask, 10, "%d", compatflags);
+    snprintf(cmask, 10, "%u", compatflags);
     argv[argc] = cmask;
     argc++;
 

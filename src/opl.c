@@ -368,7 +368,7 @@ static void initSupport(item_list_t *itemList, int startMode, int mode, int forc
             initMenuForListSupport(mode);
         }
 
-        if (((force_reinit) && (startMode && mod->support->enabled)) || (startMode == START_MODE_AUTO && !mod->support->enabled)) {
+        if (((force_reinit) && (mod->support->enabled)) || (startMode == START_MODE_AUTO && !mod->support->enabled)) {
             mod->support->itemInit();
             moduleUpdateMenu(mode, 0, 0);
 

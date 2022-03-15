@@ -68,6 +68,7 @@ void StartNow(void *param)
 
     /* configuring the virtual memory cards */
     if (!(r = mc_configure(memcards))) {
+        (void)r;
         DPRINTF("mc_configure return %d.\n", r);
         readyToGo = MODULE_NO_RESIDENT_END;
         return;

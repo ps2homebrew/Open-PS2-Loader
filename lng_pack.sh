@@ -13,11 +13,11 @@ then
 	export OPL_VERSION=$(make oplversion)
 else
 	echo "Falling back to old OPL Lang Pack"
-	VERSION=$(cat "${CURRENT_DIR}/Makefile" | grep "VERSION =" | head -1 | cut -d " " -f 3)
-	SUBVERSION=$(cat "${CURRENT_DIR}/Makefile" | grep "SUBVERSION =" | head -1 | cut -d " " -f 3)
-	PATCHLEVEL=$(cat "${CURRENT_DIR}/Makefile" | grep "PATCHLEVEL =" | head -1 | cut -d " " -f 3)
-	REVISION=$(($(cat "${CURRENT_DIR}/DETAILED_CHANGELOG" | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
-	EXTRAVERSION=$(cat "${CURRENT_DIR}/Makefile" | grep "EXTRAVERSION =" | head -1 | cut -d " " -f 3)
+	VERSION=$(grep "VERSION =" < "${CURRENT_DIR}/Makefile" | head -1 | cut -d " " -f 3)
+	SUBVERSION=$(grep "SUBVERSION =" < "${CURRENT_DIR}/Makefile" | head -1 | cut -d " " -f 3)
+	PATCHLEVEL=$(grep "PATCHLEVEL =" < "${CURRENT_DIR}/Makefile" | head -1 | cut -d " " -f 3)
+	REVISION=$(($(grep "rev" < "${CURRENT_DIR}/DETAILED_CHANGELOG" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
+	EXTRAVERSION=$(grep "EXTRAVERSION =" < "${CURRENT_DIR}/Makefile" | head -1 | cut -d " " -f 3)
 	if [ "${EXTRAVERSION}" != "" ]; then EXTRAVERSION=-${EXTRAVERSION}; fi
 	GIT_HASH=$(git -C "${CURRENT_DIR}/" rev-parse --short=7 HEAD 2>/dev/null)
 	if [ "${GIT_HASH}" != "" ]; then GIT_HASH=-${GIT_HASH}; fi

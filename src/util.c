@@ -402,7 +402,6 @@ void closeFileBuffer(file_buffer_t *fileBuffer)
     }
     free(fileBuffer->buffer);
     free(fileBuffer);
-    fileBuffer = NULL;
 }
 
 // a simple maximum of two

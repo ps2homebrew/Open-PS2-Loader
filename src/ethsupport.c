@@ -787,9 +787,9 @@ static int ethReadNetConfig(void)
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
-        lastIP = *(struct ip4_addr *)&ip_info.ipaddr;
-        lastNM = *(struct ip4_addr *)&ip_info.netmask;
-        lastGW = *(struct ip4_addr *)&ip_info.gw;
+        memcpy(&lastIP, &ip_info.ipaddr, sizeof(lastIP));
+        memcpy(&lastNM, &ip_info.netmask, sizeof(lastNM));
+        memcpy(&lastGW, &ip_info.gw, sizeof(lastGW));
     } else {
         ip4_addr_set_zero(&lastIP);
         ip4_addr_set_zero(&lastNM);
@@ -863,10 +863,15 @@ static int ethApplyIPConfig(void)
 {
     t_ip_info ip_info;
     struct ip4_addr ipaddr, netmask, gw, dns;
+    struct ip4_addr ipaddr_ip_info, netmask_ip_info, gw_ip_info;
     const struct ip4_addr *dns_curr;
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
+        memcpy(&ipaddr_ip_info, (struct ip4_addr *)&ip_info.ipaddr, sizeof(ipaddr_ip_info));
+        memcpy(&netmask_ip_info, (struct ip4_addr *)&ip_info.netmask, sizeof(netmask_ip_info));
+        memcpy(&gw_ip_info, (struct ip4_addr *)&ip_info.gw, sizeof(gw_ip_info));
+
         IP4_ADDR(&ipaddr, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
         IP4_ADDR(&netmask, ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
         IP4_ADDR(&gw, ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
@@ -875,21 +880,24 @@ static int ethApplyIPConfig(void)
 
         // Check if it's the same. Otherwise, apply the new configuration.
         if ((ps2_ip_use_dhcp != ip_info.dhcp_enabled) || (!ps2_ip_use_dhcp &&
-                                                          (!ip_addr_cmp(&ipaddr, (struct ip4_addr *)&ip_info.ipaddr) ||
-                                                           !ip_addr_cmp(&netmask, (struct ip4_addr *)&ip_info.netmask) ||
-                                                           !ip_addr_cmp(&gw, (struct ip4_addr *)&ip_info.gw) ||
+                                                          (!ip_addr_cmp(&ipaddr, &ipaddr_ip_info) ||
+                                                           !ip_addr_cmp(&netmask, &netmask_ip_info) ||
+                                                           !ip_addr_cmp(&gw, &gw_ip_info) ||
                                                            !ip_addr_cmp(&dns, dns_curr)))) {
             if (ps2_ip_use_dhcp) {
-                ip4_addr_set_zero((struct ip4_addr *)&ip_info.ipaddr);
-                ip4_addr_set_zero((struct ip4_addr *)&ip_info.netmask);
-                ip4_addr_set_zero((struct ip4_addr *)&ip_info.gw);
+                ip4_addr_set_zero(&ipaddr_ip_info);
+                memcpy((struct ip4_addr *)&ip_info.ipaddr, &ipaddr_ip_info, sizeof(ipaddr_ip_info));
+                ip4_addr_set_zero(&netmask_ip_info);
+                memcpy((struct ip4_addr *)&ip_info.netmask, &netmask_ip_info, sizeof(netmask_ip_info));
+                ip4_addr_set_zero(&gw_ip_info);
+                memcpy((struct ip4_addr *)&ip_info.gw, &gw_ip_info, sizeof(gw_ip_info));
                 ip4_addr_set_zero(&dns);
 
                 ip_info.dhcp_enabled = 1;
             } else {
-                ip_addr_set((struct ip4_addr *)&ip_info.ipaddr, &ipaddr);
-                ip_addr_set((struct ip4_addr *)&ip_info.netmask, &netmask);
-                ip_addr_set((struct ip4_addr *)&ip_info.gw, &gw);
+                ip_addr_set(&ipaddr_ip_info, &ipaddr);
+                ip_addr_set(&netmask_ip_info, &netmask);
+                ip_addr_set(&gw_ip_info, &gw);
 
                 ip_info.dhcp_enabled = 0;
             }

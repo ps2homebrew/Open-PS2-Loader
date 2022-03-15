@@ -322,7 +322,9 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
             *pBDMDriver = fileXioIoctl(fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
             LOG("bdmDriver=%s\n", bdmDriver);
 
-            settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, "");
+            if (settings != NULL)
+                settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, "");
+
             if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") != 1) {
                 close(fd);
                 // Game is fragmented. Do not continue.

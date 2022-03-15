@@ -1052,7 +1052,6 @@ static void thmFree(theme_t *theme)
             fntRelease(theme->fonts[id]);
 
         free(theme);
-        theme = NULL;
     }
 }
 

@@ -423,7 +423,6 @@ static int IsofsRead(iop_file_t *f, void *buf, int size)
         if ((nbytes = size) > 0) {
             cdEmuRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf);
 
-            size -= nbytes;
             fh->position += nbytes;
             rpos += nbytes;
 

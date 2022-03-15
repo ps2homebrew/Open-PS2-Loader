@@ -296,7 +296,6 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
             while (sceCdRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf, NULL) == 0)
                 DelayThread(10000);
 
-            size -= nbytes;
             fh->position += nbytes;
             rpos += nbytes;
 

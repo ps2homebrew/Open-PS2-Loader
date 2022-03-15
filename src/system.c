@@ -541,7 +541,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     // For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
     // total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
     irxptr = (void *)0x00033000;
-    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr + GET_OPL_MOD_SIZE(irxptr_tab[0].info));
+    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, (void *)((u8 *)irxptr + GET_OPL_MOD_SIZE(irxptr_tab[0].info)));
     DI();
     ee_kmode_enter();
     memcpy((void *)(0x80000000 | (unsigned int)irxptr), irxptr_tab[0].ptr, GET_OPL_MOD_SIZE(irxptr_tab[0].info));
@@ -562,11 +562,11 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         curIrxSize = GET_OPL_MOD_SIZE(irxptr_tab[i].info);
 
         if (curIrxSize > 0) {
-            LOG("SYSTEM IRX %u address start: %p end: %p\n", GET_OPL_MOD_ID(irxptr_tab[i].info), irxptr, irxptr + curIrxSize);
+            LOG("SYSTEM IRX %u address start: %p end: %p\n", GET_OPL_MOD_ID(irxptr_tab[i].info), irxptr, (void *)((u8 *)irxptr + curIrxSize));
             memcpy(irxptr, irxptr_tab[i].ptr, curIrxSize);
 
             irxptr_tab[i].ptr = irxptr;
-            irxptr += ((curIrxSize + 0xF) & ~0xF);
+            irxptr = (void *)((u8 *)irxptr + ((curIrxSize + 0xF) & ~0xF));
             total_size += ((curIrxSize + 0xF) & ~0xF);
         } else {
             irxptr_tab[i].ptr = NULL;
@@ -780,7 +780,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         if (eph[i].type != ELF_PT_LOAD)
             continue;
 
-        pdata = (void *)(boot_elf + eph[i].offset);
+        pdata = (void *)((u8 *)boot_elf + eph[i].offset);
         memcpy(eph[i].vaddr, pdata, eph[i].filesz);
 
         if (eph[i].memsz > eph[i].filesz)

@@ -510,7 +510,7 @@ int CheckPS2Logo(int fd, u32 lba)
             w = !(hddReadSectors(lba + k, 1, buffer));
             if (!w)
                 break;
-            buffer += 512;
+            buffer = (void *)((u8 *)buffer + 512);
         }
     }
 

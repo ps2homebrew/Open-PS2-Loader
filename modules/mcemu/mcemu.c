@@ -682,7 +682,7 @@ restart:
         u32 csize = (size < 16) ? size : 16;
         mips_memcpy(buf, mcd->cbufp, csize);
         mcd->rcoff = (csize > 12) ? 0 : (mcd->rcoff - csize);
-        buf += csize;
+        buf = (void *)((u8 *)buf + csize);
         size -= csize;
         if (size <= 0)
             return 1;
@@ -700,7 +700,7 @@ restart:
         mcd->rcoff += 3;
     }
     if (mcd->rdoff == mcd->cspec.PageSize) {
-        buf += size;
+        buf = (void *)((u8 *)buf + size);
         size = tot_size - size;
         mcd->rpage++;
         mcd->rdoff = 0;

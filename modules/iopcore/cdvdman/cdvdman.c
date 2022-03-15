@@ -189,7 +189,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
             }
         }
 
-        ptr += SectorsToRead * 2048;
+        ptr = (void *)((u8 *)ptr + (SectorsToRead * 2048));
         remaining -= SectorsToRead;
         lsn += SectorsToRead;
         ReadPos += SectorsToRead * 2048;
@@ -229,7 +229,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 
             memcpy(buf, cdvdman_buf, nbytes);
 
-            buf = (void *)(buf + nbytes);
+            buf = (void *)((u8 *)buf + nbytes);
         }
 
         SignalSema(cdvdman_searchfilesema);
@@ -447,7 +447,7 @@ static int cdvdman_writeSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16
 
     if (in_size > 0) {
         for (i = 0; i < in_size; i++) {
-            p = (void *)(in + i);
+            p = (void *)((const u8 *)in + i);
             CDVDreg_SDATAIN = *p;
         }
     }
@@ -465,7 +465,7 @@ static int cdvdman_writeSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16
             if (i >= out_size) {
                 break;
             }
-            p = (void *)(out + i);
+            p = (void *)((u8 *)out + i);
             *p = CDVDreg_SDATAOUT;
             i++;
         } while (!(CDVDreg_SDATAIN & 0x40));

@@ -65,7 +65,7 @@ EOF
 
 # Lets pack it!
 cd ${BUILD_DIR}/
-zip -r "${CURRENT_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip" *
+zip -r "${CURRENT_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip" ./*
 if [ -f "${CURRENT_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip" ]
 	then echo "OPL Lang Package Complete: OPNPS2LD_LANGS-${OPL_VERSION}.zip"
 	else echo "OPL Lang Package not found!"

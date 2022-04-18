@@ -18,7 +18,9 @@ jobs:
     - name: git checkout
       uses: actions/checkout@v2
 
-    - run: git fetch --prune --unshallow
+    - run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        git fetch --prune --unshallow
 
     - name: Compile -> make clean release
       run: make --trace clean release
@@ -62,7 +64,9 @@ jobs:
     - name: git checkout
       uses: actions/checkout@v2
 
-    - run: git fetch --prune --unshallow
+    - run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        git fetch --prune --unshallow
 
     - name: Get version
       id: version
@@ -96,7 +100,9 @@ jobs:
     - name: git checkout
       uses: actions/checkout@v2
 
-    - run: git fetch --prune --unshallow
+    - run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        git fetch --prune --unshallow
 
     - name: Get version
       id: version

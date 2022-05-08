@@ -171,7 +171,7 @@ int read_raw_data(u8* addr, u32 size, u32 offset){
         DeviceReadSectors(lba, addr, n_blocks-1);
     	size -= r;
     	addr += r;
-    	lba += n_blocks;
+    	lba += n_blocks-1;
     }
     
     // read remaining data

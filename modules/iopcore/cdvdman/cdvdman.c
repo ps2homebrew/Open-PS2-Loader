@@ -150,10 +150,8 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
 */
 int read_raw_data(u8* addr, u32 size, u32 offset){
     u32 o_size = size;
-    u32 n_blocks = size/2048;
     u32 lba = offset/2048;
     u32 pos = offset & (2048 - 1);
-    if (size%2048) n_blocks++;
     
     // read first block if not aligned to sector size
     if (pos){
@@ -162,11 +160,12 @@ int read_raw_data(u8* addr, u32 size, u32 offset){
     	memcpy(addr, ciso_dec_buf+pos, r);
     	size -= r;
     	lba++;
-    	n_blocks--;
     	addr += r;
     }
     
     // read intermediate blocks if more than one block is left
+    u32 n_blocks = size/2048;
+    if (size%2048) n_blocks++;
     if (n_blocks>1){
     	int r = 2048*(n_blocks-1);
         DeviceReadSectors(lba, addr, n_blocks-1);

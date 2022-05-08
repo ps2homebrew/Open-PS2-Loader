@@ -166,6 +166,12 @@ int DeviceReadSectorsUncached(u32 lsn, void *buffer, unsigned int sectors)
     return rv;
 }
 
+/*
+  This small improvement will mostly benefit ZSO files.
+  For the same size of an ISO sector, we can have more than one ZSO blocks.
+  If we do a consecutive read of many ISO sectors we will have a huge amount of ZSO sectors ready.
+  Therefore reducing IO access for ZSO files.
+*/
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     if (sectors <= MAX_SECTOR_CACHE){

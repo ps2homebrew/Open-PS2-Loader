@@ -29,7 +29,7 @@ void ciso_decompressor(void* src, int src_len, void* dst, int dst_len, u32 topbi
   The meat of the compressed sector reader.
   Taken from ARK-4's Inferno 2 ISO Driver.
   Tailored for OPL.
-  While it should let you read pretty much any format, ZSO with 2K blocks is recommended for a lightweight implementation.
+  While it should let you read pretty much any format, it's made to work with 2K blocks ZSO for a lightweight implementation.
 */
 int ciso_read_sector(void* addr, u32 lsn, unsigned int count){
     u32 size = count*2048;

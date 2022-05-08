@@ -8,6 +8,8 @@
 
 #include <irx.h>
 
+#include "zso.h"
+
 #define DPRINTF(args...) // printf(args)
 
 struct dirTocEntry
@@ -148,12 +150,32 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 }
 
 //-------------------------------------------------------------------------
-static int cdEmuRead(u32 lsn, unsigned int count, void *buffer)
+void *ziso_alloc(u32 size)
+{
+    return AllocSysMemory(0, size, NULL);
+}
+
+int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
+{
+    u32 lba = offset / (2048 >> shift);  // avoid overflow by shifting sector size instead of offset
+    u32 pos = (offset << shift) & 2047;  // doesn't matter if it overflows since we only care about the 11 LSB anyways
+    longLseek(MountPoint.fd, lba);       // seek to sector
+    lseek(MountPoint.fd, pos, SEEK_CUR); // seek within sector
+    return read(MountPoint.fd, addr, size);
+}
+
+static int cdEmuReadRaw(u32 lsn, unsigned int count, void *buffer)
 {
     longLseek(MountPoint.fd, lsn);
-
     return (read(MountPoint.fd, buffer, count * 2048) == count * 2048 ? 0 : -EIO);
 }
+
+static int cdEmuReadCompressed(u32 lsn, unsigned int count, void *addr)
+{
+    return (ziso_read_sector(addr, lsn, count) == count) ? 0 : -EIO;
+}
+
+static int (*cdEmuRead)(u32 lsn, unsigned int count, void *buffer) = &cdEmuReadRaw;
 
 //-------------------------------------------------------------------------
 static void cdvdman_trimspaces(char *str)
@@ -479,12 +501,36 @@ ssema:
     return r;
 }
 
-static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
+static int ProbeZISO(int fd)
+{
+    struct
+    {
+        ZISO_header header;
+        u32 first_block;
+    } ziso_data;
+    longLseek(fd, 0);
+    if (read(fd, &ziso_data, sizeof(ziso_data)) == sizeof(ziso_data) && ziso_data.header.magic == ZSO_MAGIC) {
+        // initialize ZSO
+        ziso_init(&ziso_data.header, ziso_data.first_block);
+        // redirect cdEmuRead function
+        cdEmuRead = &cdEmuReadCompressed;
+        return 1;
+    } else {
+        cdEmuRead = &cdEmuReadRaw;
+        return 0;
+    }
+}
+
+int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
 {
     int result;
 
-    longLseek(fd, sector);
-    if (read(fd, cdvdman_buf, 2048) == 2048) {
+    int prev_fd = MountPoint.fd;
+    MountPoint.fd = fd; // for cdEmuRead
+
+    ProbeZISO(fd);
+
+    if (cdEmuRead(sector, 1, cdvdman_buf) == 0) {
         if ((cdvdman_buf[0x00] == 1) && (!memcmp(&cdvdman_buf[0x01], "CD001", 5))) {
             struct dirTocEntry *tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
 
@@ -500,6 +546,8 @@ static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
         result = EIO;
     }
 
+    MountPoint.fd = prev_fd;
+
     return result;
 }
 
@@ -510,10 +558,13 @@ static int IsofsMount(iop_file_t *f, const char *fsname, const char *devname, in
     if (MountPoint.fd >= 0)
         return -EBUSY;
 
-    WaitSema(MountPoint.sema);
+    int sema = MountPoint.sema;
+
+    WaitSema(sema);
 
     memset(&MountPoint, 0, sizeof(struct MountData));
     MountPoint.fd = -1;
+    MountPoint.sema = sema;
 
     if ((fd = open(devname, O_RDONLY)) >= 0) {
         if ((result = ProbeISO9660(fd, 16, &MountPoint.layer_info[0])) == 0)
@@ -524,7 +575,7 @@ static int IsofsMount(iop_file_t *f, const char *fsname, const char *devname, in
         result = fd;
     }
 
-    SignalSema(MountPoint.sema);
+    SignalSema(sema);
 
     return result;
 }

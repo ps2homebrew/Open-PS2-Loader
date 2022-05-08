@@ -8,5 +8,6 @@
 #include <stdio.h>
 #include <sysclib.h>
 #include <thsemap.h>
+#include <sysmem.h>
 
 #endif /* IOP_IRX_IMPORTS_H */

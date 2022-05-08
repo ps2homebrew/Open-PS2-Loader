@@ -115,6 +115,9 @@ extern int gBDMStartMode;
 extern int gHDDStartMode;
 extern int gETHStartMode;
 extern int gAPPStartMode;
+extern int bdmCacheSize;
+extern int hddCacheSize;
+extern int smbCacheSize;
 
 extern int gEnableILK;
 extern int gEnableMX4SIO;

@@ -8,6 +8,8 @@
 
 #include "device.h"
 
+#include "../../isofs/zso.h"
+
 extern struct cdvdman_settings_hdd cdvdman_settings;
 
 extern struct irx_export_table _exp_atad;
@@ -58,9 +60,9 @@ void DeviceInit(void)
     DPRINTF("DeviceInit: apa header LBA = %lu\n", cdvdman_settings.lba_start);
 
 #ifdef HD_PRO
-    //For HDPro, as its custom ATAD module does not export ata_io_start() and ata_io_finish(). And it also resets the ATA bus.
+    // For HDPro, as its custom ATAD module does not export ata_io_start() and ata_io_finish(). And it also resets the ATA bus.
     if (cdvdman_settings.common.flags & IOPCORE_ENABLE_POFF) {
-        //If IGR is enabled (the poweroff function here is disabled), we can tell when to flush the cache. Hence if IGR is disabled, then we should disable the write cache.
+        // If IGR is enabled (the poweroff function here is disabled), we can tell when to flush the cache. Hence if IGR is disabled, then we should disable the write cache.
         ata_device_set_write_cache(0, 0);
     }
 #endif
@@ -75,6 +77,19 @@ void DeviceInit(void)
     cdvdman_settings.common.media = apaHeader.discType;
     cdvdman_settings.common.layer1_start = apaHeader.layer1_start;
     NumParts = apaHeader.num_partitions;
+}
+
+void DeviceSetupZSO(u8 *buffer)
+{
+    ziso_read_sector(buffer, 16, 1);
+    u32 maxLBA = *(u32 *)(buffer + 80);
+    if (maxLBA > 0 && maxLBA < ziso_total_block) { // dual layer check
+        if (ziso_read_sector(buffer, maxLBA, 1) == 1) {
+            if ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5))) {
+                cdvdman_settings.common.layer1_start = maxLBA - 16; // adjust second layer start
+            }
+        }
+    }
 }
 
 void DeviceDeinit(void)
@@ -102,7 +117,12 @@ void DeviceUnmount(void)
 
 void DeviceStop(void)
 {
-    //This will be handled by ATAD.
+    // This will be handled by ATAD.
+}
+
+u8 DeviceGetCacheSize()
+{
+    return cdvdman_settings.common.hdd_cache;
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)

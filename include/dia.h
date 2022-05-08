@@ -49,7 +49,7 @@ struct UIItem
         struct
         {
             const char *text;
-            int stringId; // if zero, the text is used
+            int stringId; // if negative, the text is used
         } label;
 
         struct

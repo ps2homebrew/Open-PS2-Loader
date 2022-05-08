@@ -24,3 +24,7 @@ I_strncpy
 I_strchr
 I_strrchr
 sysclib_IMPORTS_end
+
+sysmem_IMPORTS_start
+I_AllocSysMemory
+sysmem_IMPORTS_end

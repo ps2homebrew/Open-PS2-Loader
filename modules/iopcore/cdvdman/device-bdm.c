@@ -70,7 +70,7 @@ void DeviceDeinit(void)
 
 int DeviceReady(void)
 {
-    //DPRINTF("%s\n", __func__);
+    // DPRINTF("%s\n", __func__);
 
     return (g_bd == NULL) ? SCECdNotReady : SCECdComplete;
 }
@@ -108,6 +108,15 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
+u8 DeviceGetCacheSize()
+{
+    return cdvdman_settings.common.bdm_cache;
+}
+
+void DeviceSetupZSO(u8 *buffer)
+{
+}
+
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 sector;
@@ -117,7 +126,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     u8 *p = (u8 *)buffer;
     int rv = SCECdErNO;
 
-    //DPRINTF("%s(%u, 0x%p, %u)\n", __func__, (unsigned int)lsn, buffer, sectors);
+    // DPRINTF("%s(%u, 0x%p, %u)\n", __func__, (unsigned int)lsn, buffer, sectors);
 
     if (g_bd == NULL)
         return SCECdErTRMOPN;

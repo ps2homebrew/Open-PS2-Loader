@@ -30,7 +30,7 @@ typedef struct // size = 1024
 #define HDL_GAME_DATA_OFFSET 0x100000 // Sector 0x800 in the extended attribute area.
 #define HDL_FS_MAGIC         0x1337
 
-static unsigned char IOBuffer[1024] ALIGNED(64);
+u8 IOBuffer[2048] ALIGNED(64); // one sector
 
 //-------------------------------------------------------------------------
 int hddCheck(void)

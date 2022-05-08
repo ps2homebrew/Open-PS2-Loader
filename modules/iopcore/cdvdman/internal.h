@@ -39,9 +39,9 @@
 #define iDPRINTF(args...)
 #endif
 
-#define CDVDMAN_SETTINGS_DEFAULT_COMMON         \
-    {                                           \
-        0x69, 0x69, 0x1234, 0x39393939, "B00BS" \
+#define CDVDMAN_SETTINGS_DEFAULT_COMMON                    \
+    {                                                      \
+        0x69, 0x69, 0x1234, 0x39393939, "B00BS", 16, 8, 12 \
     }
 #define CDVDMAN_SETTINGS_DEFAULT_HDD 0x12345678
 #define CDVDMAN_SETTINGS_DEFAULT_SMB                          \
@@ -108,7 +108,7 @@ struct dirTocEntry
 
 typedef void (*StmCallback_t)(void);
 
-//Internal (common) function prototypes
+// Internal (common) function prototypes
 extern void SetStm0Callback(StmCallback_t callback);
 extern int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf);
 extern int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf);

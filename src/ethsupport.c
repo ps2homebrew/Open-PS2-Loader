@@ -686,7 +686,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
             layer1_offset = layer1_start;
     }
 
-    if (sbProbeISO9660_64(partname, game, layer1_offset) != 0) {
+    if (sbProbeISO9660(partname, game, layer1_offset) != 0) {
         layer1_start = 0;
         LOG("DVD detected.\n");
     } else {

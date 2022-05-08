@@ -144,6 +144,9 @@ int gBDMStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
+int bdmCacheSize;
+int hddCacheSize;
+int smbCacheSize;
 int gEnableILK;
 int gEnableMX4SIO;
 int gAutosort;
@@ -840,6 +843,10 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_YOFF, &gYOff);
             configGetInt(configOPL, CONFIG_OPL_OVERSCAN, &gOverscan);
 
+            configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &bdmCacheSize);
+            configGetInt(configOPL, CONFIG_OPL_HDD_CACHE, &hddCacheSize);
+            configGetInt(configOPL, CONFIG_OPL_SMB_CACHE, &smbCacheSize);
+
             if (configGetStr(configOPL, CONFIG_OPL_THEME, &temp))
                 themeID = thmFindGuiID(temp);
 
@@ -1019,6 +1026,9 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
+        configSetInt(configOPL, CONFIG_OPL_BDM_CACHE, bdmCacheSize);
+        configSetInt(configOPL, CONFIG_OPL_HDD_CACHE, hddCacheSize);
+        configSetInt(configOPL, CONFIG_OPL_SMB_CACHE, smbCacheSize);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, gEnableILK);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
@@ -1555,6 +1565,10 @@ static void setDefaults(void)
     gHDDPrefix = "pfs0:";
     gBaseMCDir = "mc?:OPL";
 
+    bdmCacheSize = 16;
+    hddCacheSize = 8;
+    smbCacheSize = 12;
+
     ps2_ip_use_dhcp = 1;
     gETHOpMode = ETH_OP_MODE_AUTO;
     gPCShareAddressIsNetBIOS = 1;
@@ -1728,6 +1742,7 @@ static void autoLaunchHDDGame(char *argv[])
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
             configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
+            configGetInt(configOPL, CONFIG_OPL_HDD_CACHE, &hddCacheSize);
         }
     }
 

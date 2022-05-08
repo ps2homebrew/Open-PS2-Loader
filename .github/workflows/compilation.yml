@@ -132,6 +132,9 @@ jobs:
     needs: [build, build-variants]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
+    env:
+      USERNAME: ${{ secrets.USERNAME }}
+      PASSWORD: ${{ secrets.PASSWORD }}
     steps:
     - name: git checkout
       uses: actions/checkout@v2
@@ -194,19 +197,13 @@ jobs:
           OPNPS2LD-VARIANTS.7z
 
     - name: Upload pre-release to Mega
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master' && env.USERNAME != null
       uses: Difegue/action-megacmd@master
       with:
         args: put -c OPNPS2LD.7z /OPL/Pre-Release/${{ steps.version.outputs.version }}/
-      env:
-        USERNAME: ${{ secrets.USERNAME }}
-        PASSWORD: ${{ secrets.PASSWORD }}
 
     - name: Upload release to Mega
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: startsWith(github.ref, 'refs/tags/v') && env.USERNAME != null
       uses: Difegue/action-megacmd@master
       with:
         args: put -c OPNPS2LD.7z /OPL/Release/${{ steps.version.outputs.version }}/
-      env:
-        USERNAME: ${{ secrets.USERNAME }}
-        PASSWORD: ${{ secrets.PASSWORD }}

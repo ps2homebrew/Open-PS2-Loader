@@ -18,7 +18,6 @@ static int bdm_io_sema;
 extern struct irx_export_table _exp_bdm;
 
 #define MAX_SECTOR_CACHE 32
-#define MIN(x,y) ((x<y)?x:y)
 static u8 sector_cache[MAX_SECTOR_CACHE][2048];
 static int cur_sector = -1;
 
@@ -180,8 +179,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
             cur_sector = lsn;
         }
         int pos = lsn-cur_sector;
-        int n = MIN(MAX_SECTOR_CACHE-pos, sectors);
-        memcpy(buffer, &(sector_cache[pos]), 2048*n);
+        memcpy(buffer, &(sector_cache[pos]), 2048*sectors);
         return SCECdErNO;
     }
     return DeviceReadSectorsUncached(lsn, buffer, sectors);

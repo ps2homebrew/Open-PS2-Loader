@@ -505,6 +505,7 @@ static int ProbeZISO(int fd){
         ciso_uncompressed_size = header.total_bytes;
         ciso_align = header.align;
         ciso_block_header = 0;
+        ciso_idx_start_block = -1;
         // calculate number of blocks without using uncompressed_size (avoid 64bit division)
         read(fd, &ciso_total_block, 4); // grab offset of first block
         ciso_total_block = ((((ciso_total_block&0x7FFFFFFF)<<ciso_align) - ciso_header_size)/4)-1;

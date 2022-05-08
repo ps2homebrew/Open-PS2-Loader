@@ -53,7 +53,7 @@ int ciso_read_sector(void* addr, u32 lsn, unsigned int count){
         u32 o_end = (ciso_idx_cache[ending_block-ciso_idx_start_block]&0x7FFFFFFF)<<ciso_align;
         u32 compressed_size = o_end - o_start;
         if (size >= compressed_size){
-            c_buf = addr + size - compressed_size;
+            c_buf = (void*)((u32)addr + size - compressed_size);
             read_raw_data(c_buf, compressed_size, o_start);
         }
     }

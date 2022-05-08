@@ -17,6 +17,11 @@ static int bdm_io_sema;
 
 extern struct irx_export_table _exp_bdm;
 
+#define MAX_SECTOR_CACHE 16
+#define MIN(x,y) ((x<y)?x:y)
+static u8 sector_cache[MAX_SECTOR_CACHE][2048];
+static int cur_sector = -1;
+
 //
 // BDM exported functions
 //
@@ -108,8 +113,9 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
-int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
+int DeviceReadSectorsUncached(u32 lsn, void *buffer, unsigned int sectors)
 {
+
     u32 sector;
     u16 count;
     register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
@@ -158,6 +164,22 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     SignalSema(bdm_io_sema);
 
     return rv;
+}
+
+int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
+{
+
+    if (sectors <= MAX_SECTOR_CACHE){
+        if (cur_sector < 0 || lsn<cur_sector || (lsn+sectors)-cur_sector >= MAX_SECTOR_CACHE){
+            DeviceReadSectorsUncached(lsn, sector_cache, MAX_SECTOR_CACHE);
+            cur_sector = lsn;
+        }
+        int pos = lsn-cur_sector;
+        int n = MIN(MAX_SECTOR_CACHE-pos, sectors);
+        memcpy(buffer, &(sector_cache[pos]), 2048*n);
+        return SCECdErNO;
+    }
+    return DeviceReadSectorsUncached(lsn, buffer, sectors);
 }
 
 //

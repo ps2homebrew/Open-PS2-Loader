@@ -63,19 +63,6 @@ struct MountData
 static struct MountData MountPoint;
 static unsigned char cdvdman_buf[2048];
 
-static int logfile(const char* log){
-    int wfd = open("mass:/opl_log.txt", O_CREAT | O_WRONLY | O_APPEND);
-    write(wfd, log, strlen(log));
-    write(wfd, "\n", 1);
-    close(wfd);
-}
-
-static void dumpBuffer(const char* path, void* buf, u32 size){
-    int wfd = open(path, O_CREAT | O_WRONLY | O_TRUNC);
-    write(wfd, buf, size);
-    close(wfd);
-}
-
 static int IsofsUnsupported(void)
 {
     return -1;

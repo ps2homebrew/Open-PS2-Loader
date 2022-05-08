@@ -5,6 +5,7 @@
 */
 
 #include "internal.h"
+#include "../../isofs/zso.h"
 
 #define MODNAME "cdvd_driver"
 IRX_ID(MODNAME, 1, 1);
@@ -22,6 +23,9 @@ extern struct irx_export_table _exp_oplutils;
 #ifdef __USE_DEV9
 extern struct irx_export_table _exp_dev9;
 #endif
+
+// reader function interface, raw reader impementation by default
+int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectors;
 
 // internal functions prototypes
 static void oplShutdown(int poff);
@@ -139,12 +143,82 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
     return 0;
 }
 
+/*
+  For ZSO we need to be able to read at arbitrary offsets with arbitrary sizes.
+  Since we can only do sector-based reads, this funtions acts as a wrapper.
+  It will do at most 3 IO reads, most of the time only 1.
+*/
+int read_raw_data(u8* addr, u32 size, u32 offset){
+    u32 o_size = size;
+    u32 n_blocks = size/2048;
+    u32 lba = offset/2048;
+    u32 pos = offset & (2048 - 1);
+    if (size%2048) n_blocks++;
+    
+    // read first block if not aligned to sector size
+    if (pos){
+    	int r = MIN(size, (2048 - pos));
+        DeviceReadSectors(lba, ciso_dec_buf, 1);
+    	memcpy(addr, ciso_dec_buf+pos, r);
+    	size -= r;
+    	lba++;
+    	n_blocks--;
+    	addr += r;
+    }
+    
+    // read intermediate blocks if more than one block is left
+    if (n_blocks>1){
+    	int r = 2048*(n_blocks-1);
+        DeviceReadSectors(lba, addr, n_blocks-1);
+    	size -= r;
+    	addr += r;
+    	lba += n_blocks;
+    }
+    
+    // read remaining data
+    if (size){
+        DeviceReadSectors(lba, ciso_dec_buf, 1);
+    	memcpy(addr, ciso_dec_buf, size);
+    	size = 0;
+    }
+
+    // return remaining size
+    return o_size-size;
+}
+
+int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
+{
+    return (ciso_read_sector(addr, lsn, count) == count)? SCECdErNO : SCECdErEOM;
+}
+
+static int probed = 0;
+static int ProbeZSO(){
+    if (DeviceReadSectors(0, ciso_dec_buf, 1) != SCECdErNO)
+        return 0;
+    probed = 1;
+    if (*(u32*)ciso_dec_buf == ZSO_MAGIC){
+        CISO_header* header = (CISO_header*)ciso_dec_buf;
+        DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
+        ciso_header_size = header->header_size;
+        ciso_block_size = header->block_size;
+        ciso_uncompressed_size = header->total_bytes;
+        ciso_align = header->align;
+        ciso_block_header = 0;
+        // calculate number of blocks without using uncompressed_size (avoid 64bit division)
+        ciso_total_block = ((((*(u32*)(ciso_dec_buf+sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - ciso_header_size) / 4) - 1;
+    }
+    return 1;
+}
+
 static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 {
     unsigned int SectorsToRead, remaining;
     void *ptr;
 
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
+
+    if (probed == 0) // Probe for ZSO before first read
+        if (!ProbeZSO()) return 1;
 
     cdvdman_stat.err = SCECdErNO;
     for (ptr = buf, remaining = sectors; remaining > 0;) {
@@ -163,7 +237,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
             SetAlarm(&TargetTime, &cdvdemu_read_end_cb, NULL);
         }
 
-        cdvdman_stat.err = DeviceReadSectors(lsn, ptr, SectorsToRead);
+        cdvdman_stat.err = DeviceReadSectorsPtr(lsn, ptr, SectorsToRead);
         if (cdvdman_stat.err != SCECdErNO) {
             if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS)
                 CancelAlarm(&cdvdemu_read_end_cb, NULL);

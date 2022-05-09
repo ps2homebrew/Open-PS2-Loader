@@ -150,8 +150,8 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 }
 
 //-------------------------------------------------------------------------
-
-int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift){
+int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
+{
     u32 lba = offset/(2048>>shift);
     u32 pos = (offset<<shift)&2047;
     longLseek(MountPoint.fd, lba);
@@ -168,7 +168,7 @@ static int cdEmuReadRaw(u32 lsn, unsigned int count, void *buffer)
 
 static int cdEmuReadCompressed(u32 lsn, unsigned int count, void *addr)
 {
-    return (ciso_read_sector(addr, lsn, count)==count)? 0 : -EIO;
+    return (ciso_read_sector(addr, lsn, count) == count) ? 0 : -EIO;
 }
 
 static int (*cdEmuRead)(u32 lsn, unsigned int count, void *buffer) = &cdEmuReadRaw;
@@ -498,17 +498,18 @@ ssema:
     return r;
 }
 
-static int ProbeZISO(int fd){
+static int ProbeZISO(int fd)
+{
     CISO_header header;
     longLseek(fd, 0);
-    if (read(fd, &header, sizeof(header)) == sizeof(header) && header.magic == ZSO_MAGIC){
+    if (read(fd, &header, sizeof(header)) == sizeof(header) && header.magic == ZSO_MAGIC) {
         // read header information
         ciso_uncompressed_size = header.total_bytes;
         ciso_align = header.align;
         ciso_idx_start_block = -1;
         // calculate number of blocks without using uncompressed_size (avoid 64bit division)
         read(fd, &ciso_total_block, 4); // grab offset of first block
-        ciso_total_block = ((((ciso_total_block&0x7FFFFFFF)<<ciso_align) - sizeof(CISO_header))/4)-1;
+        ciso_total_block = ((((ciso_total_block & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
         // redirect cdEmuRead function
         cdEmuRead = &cdEmuReadCompressed;
         return 1;

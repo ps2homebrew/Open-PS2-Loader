@@ -17,6 +17,9 @@ static int bdm_io_sema;
 
 extern struct irx_export_table _exp_bdm;
 
+const u32 MAX_SECTOR_CACHE = 32;
+u8 sector_cache[32][2048];
+
 //
 // BDM exported functions
 //

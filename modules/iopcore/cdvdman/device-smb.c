@@ -15,6 +15,9 @@ extern struct irx_export_table _exp_oplsmb;
 
 extern int smb_io_sema;
 
+const u32 MAX_SECTOR_CACHE = 16;
+u8 sector_cache[16][2048];
+
 static void ps2ip_init(void);
 
 // !!! ps2ip exports functions pointers !!!

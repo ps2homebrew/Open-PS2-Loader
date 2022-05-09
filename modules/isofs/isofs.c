@@ -514,6 +514,9 @@ static int ProbeZISO(int fd)
         cdEmuRead = &cdEmuReadCompressed;
         return 1;
     }
+    else{
+        cdEmuRead = &cdEmuReadRaw;
+    }
     return 0;
 }
 

@@ -10,17 +10,18 @@
 
 #define CISO_IDX_MAX_ENTRIES 4096
 
-#define MIN(x,y) ((x<y)?x:y)
+#define MIN(x, y) ((x < y) ? x : y)
 
 // CSO Header (same for ZSO)
-typedef struct {
-    u32 magic;  // 0
-    u32 header_size;  // 4
+typedef struct
+{
+    u32 magic;       // 0
+    u32 header_size; // 4
     u64 total_bytes; // 8
-    u32 block_size; // 16
-    u8 ver; // 20
-    u8 align;  // 21
-    u8 rsv_06[2];  // 22
+    u32 block_size;  // 16
+    u8 ver;          // 20
+    u8 align;        // 21
+    u8 rsv_06[2];    // 22
 } CISO_header;
 
 
@@ -37,10 +38,10 @@ extern u32 ciso_total_block;
 extern u8 ciso_dec_buf[2048];
 extern u8 ciso_com_buf[3072];
 
-void ciso_decompressor(void* src, int src_len, void* dst, int dst_len, u32 topbit);
-int ciso_read_sector(void* buf, u32 sector, unsigned int count);
+void ciso_decompressor(void *src, int src_len, void *dst, int dst_len, u32 topbit);
+int ciso_read_sector(void *buf, u32 sector, unsigned int count);
 
 // This must be implemented by isofs/cdvdman
-extern int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift);
+extern int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift);
 
 #endif

@@ -110,7 +110,6 @@ void DeviceUnmount(void)
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
-
     u32 sector;
     u16 count;
     register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;

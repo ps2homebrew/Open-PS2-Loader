@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 # Copyright (c) 2011 by Virtuous Flame
 # Based BOOSTER 1.01 CSO Compressor
@@ -30,6 +30,13 @@ from struct import pack, unpack
 from multiprocessing import Pool
 from getopt import *
 
+try:
+    # Python 2
+    xrange
+except NameError:
+    # Python 3, xrange is now named range
+    xrange = range
+
 CISO_MAGIC = 0x4F53495A
 DEFAULT_ALIGN = 0
 COMPRESS_THREHOLD = 100
@@ -38,10 +45,6 @@ DEFAULT_PADDING = br'X'
 MP = False
 MP_NR = 1024 * 16
 
-try:
-    for i in xrange(1): pass
-except:
-    xrange = range
 
 def hexdump(data):
     for i in data:
@@ -126,7 +129,7 @@ def decompress_cso(fname_in, fname_out, level):
         print("ciso file format error")
         return -1
 
-    total_block = total_bytes / block_size
+    total_block = total_bytes // block_size
     index_buf = []
 
     for i in xrange(total_block + 1):
@@ -143,8 +146,8 @@ def decompress_cso(fname_in, fname_out, level):
         percent_cnt += 1
         if percent_cnt >= percent_period and percent_period != 0:
             percent_cnt = 0
-            print >> sys.stderr, ("decompress %d%%\r" %
-                                  (block / percent_period)),
+            print("decompress %d%%\r" %
+                  (block / percent_period), file=sys.stderr),
 
         index = index_buf[block]
         plain = index & 0x80000000
@@ -217,7 +220,7 @@ def compress_cso(fname_in, fname_out, level):
         magic, header_size, total_bytes, block_size, ver, align)
     fout.write(header)
 
-    total_block = int(total_bytes / block_size)
+    total_block = total_bytes // block_size
     index_buf = [0 for i in xrange(total_block + 1)]
 
     fout.write(b"\x00\x00\x00\x00" * len(index_buf))
@@ -241,9 +244,11 @@ def compress_cso(fname_in, fname_out, level):
             percent_cnt = 0
 
             if block == 0:
-                print(("compress %3d%% avarage rate %3d%%\r" % (block / percent_period, 0)))
+                print("compress %3d%% avarage rate %3d%%\r" % (
+                    block / percent_period, 0), file=sys.stderr, end='\r'),
             else:
-                print(("compress %3d%% avarage rate %3d%%\r" % (block / percent_period, 100*write_pos/(block*0x800))))
+                print("compress %3d%% avarage rate %3d%%\r" % (
+                    block / percent_period, 100*write_pos/(block*0x800)), file=sys.stderr, end='\r'),
 
         if MP:
             iso_data = [(fin.read(block_size), level)

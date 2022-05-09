@@ -157,13 +157,13 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
 */
 int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
 {
-    if (sectors <= MAX_SECTOR_CACHE){
-        if (cur_sector < 0 || lsn<cur_sector || (lsn+sectors)-cur_sector >= MAX_SECTOR_CACHE){
+    if (sectors <= MAX_SECTOR_CACHE) {
+        if (cur_sector < 0 || lsn < cur_sector || (lsn + sectors) - cur_sector >= MAX_SECTOR_CACHE) {
             DeviceReadSectors(lsn, sector_cache, MAX_SECTOR_CACHE);
             cur_sector = lsn;
         }
-        int pos = lsn-cur_sector;
-        memcpy(buffer, &(sector_cache[pos]), 2048*sectors);
+        int pos = lsn - cur_sector;
+        memcpy(buffer, &(sector_cache[pos]), 2048 * sectors);
         return SCECdErNO;
     }
     return DeviceReadSectors(lsn, buffer, sectors);
@@ -174,60 +174,63 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
   Since we can only do sector-based reads, this funtions acts as a wrapper.
   It will do at most 3 IO reads, most of the time only 1.
 */
-int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift){
+int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
+{
     u32 o_size = size;
-    u32 lba = offset/(2048>>shift);
-    u32 pos = ((offset&2047)<<shift)&2047;
-    
+    u32 lba = offset / (2048 >> shift);
+    u32 pos = ((offset & 2047) << shift) & 2047;
+
     // read first block if not aligned to sector size
-    if (pos){
-    	int r = MIN(size, (2048 - pos));
+    if (pos) {
+        int r = MIN(size, (2048 - pos));
         DeviceReadSectorsCached(lba, ciso_dec_buf, 1);
-    	memcpy(addr, ciso_dec_buf+pos, r);
-    	size -= r;
-    	lba++;
-    	addr += r;
+        memcpy(addr, ciso_dec_buf + pos, r);
+        size -= r;
+        lba++;
+        addr += r;
     }
-    
+
     // read intermediate blocks if more than one block is left
-    u32 n_blocks = size/2048;
-    if (size%2048) n_blocks++;
-    if (n_blocks>1){
-    	int r = 2048*(n_blocks-1);
-        DeviceReadSectorsCached(lba, addr, n_blocks-1);
-    	size -= r;
-    	addr += r;
-    	lba += n_blocks-1;
+    u32 n_blocks = size / 2048;
+    if (size % 2048)
+        n_blocks++;
+    if (n_blocks > 1) {
+        int r = 2048 * (n_blocks - 1);
+        DeviceReadSectorsCached(lba, addr, n_blocks - 1);
+        size -= r;
+        addr += r;
+        lba += n_blocks - 1;
     }
-    
+
     // read remaining data
-    if (size){
+    if (size) {
         DeviceReadSectorsCached(lba, ciso_dec_buf, 1);
-    	memcpy(addr, ciso_dec_buf, size);
-    	size = 0;
+        memcpy(addr, ciso_dec_buf, size);
+        size = 0;
     }
 
     // return remaining size
-    return o_size-size;
+    return o_size - size;
 }
 
 int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 {
-    return (ciso_read_sector(addr, lsn, count) == count)? SCECdErNO : SCECdErEOM;
+    return (ciso_read_sector(addr, lsn, count) == count) ? SCECdErNO : SCECdErEOM;
 }
 
 static int probed = 0;
-static int ProbeZSO(){
+static int ProbeZSO()
+{
     if (DeviceReadSectorsCached(0, ciso_dec_buf, 1) != SCECdErNO)
         return 0;
     probed = 1;
-    if (*(u32*)ciso_dec_buf == ZSO_MAGIC){
-        CISO_header* header = (CISO_header*)ciso_dec_buf;
+    if (*(u32 *)ciso_dec_buf == ZSO_MAGIC) {
+        CISO_header *header = (CISO_header *)ciso_dec_buf;
         DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
         ciso_uncompressed_size = header->total_bytes;
         ciso_align = header->align;
         // calculate number of blocks without using uncompressed_size (avoid 64bit division)
-        ciso_total_block = ((((*(u32*)(ciso_dec_buf+sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
+        ciso_total_block = ((((*(u32 *)(ciso_dec_buf + sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
     }
     return 1;
 }
@@ -240,14 +243,15 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
     if (probed == 0) // Probe for ZSO before first read
-        if (!ProbeZSO()) return 1;
+        if (!ProbeZSO())
+            return 1;
 
     cdvdman_stat.err = SCECdErNO;
     for (ptr = buf, remaining = sectors; remaining > 0;) {
         SectorsToRead = remaining;
 
         if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS) {
-            //Limit transfers to a maximum length of 8, with a restricted transfer rate.
+            // Limit transfers to a maximum length of 8, with a restricted transfer rate.
             iop_sys_clock_t TargetTime;
 
             if (SectorsToRead > 8)
@@ -275,7 +279,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
             u32 j;
             u8 *logo = (u8 *)ptr;
             static u8 key = 0;
-            if (lsn == 0) //First sector? Copy the first byte as the value for unscrambling the logo.
+            if (lsn == 0) // First sector? Copy the first byte as the value for unscrambling the logo.
                 key = logo[0];
             if (key != 0) {
                 for (j = 0; j < (SectorsToRead * 2048); j++) {
@@ -291,7 +295,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
         ReadPos += SectorsToRead * 2048;
 
         if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS) {
-            //Sleep until the required amount of time has been spent.
+            // Sleep until the required amount of time has been spent.
             WaitEventFlag(cdvdman_stat.intr_ef, 0x1000, WEF_AND, NULL);
         }
     }
@@ -304,9 +308,9 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
     cdvdman_stat.status = SCECdStatRead;
 
     buf = (void *)PHYSADDR(buf);
-#ifdef HDD_DRIVER //As of now, only the ATA interface requires this. We do this here to share cdvdman_buf.
+#ifdef HDD_DRIVER // As of now, only the ATA interface requires this. We do this here to share cdvdman_buf.
     if ((u32)(buf)&3) {
-        //For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.
+        // For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.
         WaitSema(cdvdman_searchfilesema);
 
         u32 nsectors, nbytes;
@@ -351,7 +355,7 @@ u32 sceCdGetReadPos(void)
     return ReadPos;
 }
 
-//Must be called from a thread context, with interrupts disabled.
+// Must be called from a thread context, with interrupts disabled.
 static int cdvdman_common_lock(int IntrContext)
 {
     if (sync_flag)
@@ -499,7 +503,7 @@ int sceCdSC(int code, int *param)
             } else
                 SignalSema(cdrom_io_sema);
 
-            result = *param; //EE N-command code.
+            result = *param; // EE N-command code.
             break;
         case CDSC_GET_VERSION:
             result = CDVDMAN_MODULE_VERSION;
@@ -616,7 +620,7 @@ static unsigned int event_alarm_cb(void *args)
     struct cdvdman_cb_data *cb_data = args;
 
     cdvdman_signal_read_end_intr();
-    if (cb_data->user_cb != NULL) //This interrupt does not occur immediately, hence check for the callback again here.
+    if (cb_data->user_cb != NULL) // This interrupt does not occur immediately, hence check for the callback again here.
         cb_data->user_cb(cb_data->reason);
     return 0;
 }
@@ -648,8 +652,8 @@ static void cdvdman_cdread_Thread(void *args)
         cdvdman_read(cdvdman_stat.cdread_lba, cdvdman_stat.cdread_sectors, cdvdman_stat.cdread_buf);
 
         /* This streaming callback is not compatible with the original SONY stream channel 0 (IOP) callback's design.
-	   The original is run from the interrupt handler, but we want it to run
-	   from a threaded environment because our interrupt is emulated. */
+       The original is run from the interrupt handler, but we want it to run
+       from a threaded environment because our interrupt is emulated. */
         if (Stm0Callback != NULL) {
             cdvdman_signal_read_end();
 
@@ -658,7 +662,7 @@ static void cdvdman_cdread_Thread(void *args)
             if (Stm0Callback != NULL)
                 Stm0Callback();
         } else
-            cdvdman_cb_event(SCECdFuncRead); //Only runs if streaming is not in action.
+            cdvdman_cb_event(SCECdFuncRead); // Only runs if streaming is not in action.
     }
 }
 
@@ -702,21 +706,21 @@ static int intrh_cdrom(void *common)
         CDVDreg_PWOFF = CDL_DATA_RDY;
 
     if (CDVDreg_PWOFF & CDL_DATA_END) {
-        //If IGR is enabled: Do not acknowledge the interrupt here. The EE-side IGR code will monitor and acknowledge it.
+        // If IGR is enabled: Do not acknowledge the interrupt here. The EE-side IGR code will monitor and acknowledge it.
         if (cdvdman_settings.common.flags & IOPCORE_ENABLE_POFF) {
-            CDVDreg_PWOFF = CDL_DATA_END; //Acknowldge power-off request.
+            CDVDreg_PWOFF = CDL_DATA_END; // Acknowldge power-off request.
         }
-        iSetEventFlag(cdvdman_stat.intr_ef, 0x14); //Notify FILEIO and CDVDFSV of the power-off event.
+        iSetEventFlag(cdvdman_stat.intr_ef, 0x14); // Notify FILEIO and CDVDFSV of the power-off event.
 
-//Call power-off callback here. OPL doesn't handle one, so do nothing.
+// Call power-off callback here. OPL doesn't handle one, so do nothing.
 #ifdef __USE_DEV9
         if (cdvdman_settings.common.flags & IOPCORE_ENABLE_POFF) {
-            //If IGR is disabled, switch off the console.
+            // If IGR is disabled, switch off the console.
             iWakeupThread(POFFThreadID);
         }
 #endif
     } else
-        CDVDreg_PWOFF = CDL_DATA_COMPLETE; //Acknowledge interrupt
+        CDVDreg_PWOFF = CDL_DATA_COMPLETE; // Acknowledge interrupt
 
     return 1;
 }
@@ -726,7 +730,7 @@ static inline void InstallIntrHandler(void)
     RegisterIntrHandler(IOP_IRQ_CDVD, 1, &intrh_cdrom, NULL);
     EnableIntr(IOP_IRQ_CDVD);
 
-    //Acknowledge hardware events (e.g. poweroff)
+    // Acknowledge hardware events (e.g. poweroff)
     if (CDVDreg_PWOFF & CDL_DATA_END)
         CDVDreg_PWOFF = CDL_DATA_END;
     if (CDVDreg_PWOFF & CDL_DATA_RDY)

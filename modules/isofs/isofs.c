@@ -516,8 +516,8 @@ static int ProbeZISO(int fd)
     }
     else{
         cdEmuRead = &cdEmuReadRaw;
+        return 0;
     }
-    return 0;
 }
 
 static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)

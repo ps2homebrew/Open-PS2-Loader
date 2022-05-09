@@ -174,10 +174,10 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
   Since we can only do sector-based reads, this funtions acts as a wrapper.
   It will do at most 3 IO reads, most of the time only 1.
 */
-int read_raw_data(u8* addr, u32 size, u32 offset){
+int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift){
     u32 o_size = size;
-    u32 lba = offset/2048;
-    u32 pos = offset & (2048 - 1);
+    u32 lba = offset/(2048>>shift);
+    u32 pos = ((offset&2047)<<shift)&2047;
     
     // read first block if not aligned to sector size
     if (pos){
@@ -230,7 +230,7 @@ static int ProbeZSO(){
         ciso_align = header->align;
         ciso_block_header = 0;
         // calculate number of blocks without using uncompressed_size (avoid 64bit division)
-        ciso_total_block = ((((*(u32*)(ciso_dec_buf+sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - ciso_header_size) / 4) - 1;
+        ciso_total_block = ((((*(u32*)(ciso_dec_buf+ciso_header_size) & 0x7FFFFFFF) << ciso_align) - ciso_header_size) / 4) - 1;
     }
     return 1;
 }

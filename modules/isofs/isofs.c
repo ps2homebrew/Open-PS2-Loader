@@ -151,8 +151,11 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 
 //-------------------------------------------------------------------------
 
-int read_raw_data(u8* addr, u32 size, u32 offset){
-    lseek(MountPoint.fd, offset, SEEK_SET);
+int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift){
+    u32 lba = offset/(2048>>shift);
+    u32 pos = ((offset&2047)<<shift)&2047;
+    longLseek(MountPoint.fd, lba);
+    lseek(MountPoint.fd, pos, SEEK_CUR);
     return read(MountPoint.fd, addr, size);
 }
 

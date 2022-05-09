@@ -44,6 +44,6 @@ void ciso_decompressor(void* src, int src_len, void* dst, int dst_len, u32 topbi
 int ciso_read_sector(void* buf, u32 sector, unsigned int count);
 
 // This must be implemented by isofs/cdvdman
-extern int read_raw_data(u8* addr, u32 size, u32 offset);
+extern int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift);
 
 #endif

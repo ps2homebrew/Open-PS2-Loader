@@ -29,10 +29,7 @@ extern u32 ciso_idx_cache[CISO_IDX_MAX_ENTRIES];
 extern int ciso_idx_start_block;
 
 // header data that we need for the reader
-extern u32 ciso_header_size;
-extern u32 ciso_block_size;
 extern u64 ciso_uncompressed_size;
-extern u32 ciso_block_header;
 extern u32 ciso_align;
 extern u32 ciso_total_block;
 

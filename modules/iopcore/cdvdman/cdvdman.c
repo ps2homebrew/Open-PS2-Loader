@@ -39,7 +39,7 @@ static void cdvdman_create_semaphores(void);
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
 
 // Sector cache to improve IO
-#define MAX_SECTOR_CACHE 32
+#define MAX_SECTOR_CACHE 16
 static u8 sector_cache[MAX_SECTOR_CACHE][2048];
 static int cur_sector = -1;
 
@@ -224,13 +224,10 @@ static int ProbeZSO(){
     if (*(u32*)ciso_dec_buf == ZSO_MAGIC){
         CISO_header* header = (CISO_header*)ciso_dec_buf;
         DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
-        ciso_header_size = header->header_size;
-        ciso_block_size = header->block_size;
         ciso_uncompressed_size = header->total_bytes;
         ciso_align = header->align;
-        ciso_block_header = 0;
         // calculate number of blocks without using uncompressed_size (avoid 64bit division)
-        ciso_total_block = ((((*(u32*)(ciso_dec_buf+ciso_header_size) & 0x7FFFFFFF) << ciso_align) - ciso_header_size) / 4) - 1;
+        ciso_total_block = ((((*(u32*)(ciso_dec_buf+sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
     }
     return 1;
 }

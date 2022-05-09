@@ -25,7 +25,8 @@ extern struct irx_export_table _exp_dev9;
 #endif
 
 // reader function interface, raw reader impementation by default
-int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectors;
+int DeviceReadSectorsCached(u32 sector, void *buffer, unsigned int count);
+int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectorsCached;
 
 // internal functions prototypes
 static void oplShutdown(int poff);
@@ -36,6 +37,11 @@ static void cdvdman_signal_read_end_intr(void);
 static void cdvdman_startThreads(void);
 static void cdvdman_create_semaphores(void);
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
+
+// Sector cache to improve IO
+#define MAX_SECTOR_CACHE 32
+static u8 sector_cache[MAX_SECTOR_CACHE][2048];
+static int cur_sector = -1;
 
 struct cdvdman_cb_data
 {
@@ -144,6 +150,26 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
 }
 
 /*
+  This small improvement will mostly benefit ZSO files.
+  For the same size of an ISO sector, we can have more than one ZSO blocks.
+  If we do a consecutive read of many ISO sectors we will have a huge amount of ZSO sectors ready.
+  Therefore reducing IO access for ZSO files.
+*/
+int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
+{
+    if (sectors <= MAX_SECTOR_CACHE){
+        if (cur_sector < 0 || lsn<cur_sector || (lsn+sectors)-cur_sector >= MAX_SECTOR_CACHE){
+            DeviceReadSectors(lsn, sector_cache, MAX_SECTOR_CACHE);
+            cur_sector = lsn;
+        }
+        int pos = lsn-cur_sector;
+        memcpy(buffer, &(sector_cache[pos]), 2048*sectors);
+        return SCECdErNO;
+    }
+    return DeviceReadSectors(lsn, buffer, sectors);
+}
+
+/*
   For ZSO we need to be able to read at arbitrary offsets with arbitrary sizes.
   Since we can only do sector-based reads, this funtions acts as a wrapper.
   It will do at most 3 IO reads, most of the time only 1.
@@ -156,7 +182,7 @@ int read_raw_data(u8* addr, u32 size, u32 offset){
     // read first block if not aligned to sector size
     if (pos){
     	int r = MIN(size, (2048 - pos));
-        DeviceReadSectors(lba, ciso_dec_buf, 1);
+        DeviceReadSectorsCached(lba, ciso_dec_buf, 1);
     	memcpy(addr, ciso_dec_buf+pos, r);
     	size -= r;
     	lba++;
@@ -168,7 +194,7 @@ int read_raw_data(u8* addr, u32 size, u32 offset){
     if (size%2048) n_blocks++;
     if (n_blocks>1){
     	int r = 2048*(n_blocks-1);
-        DeviceReadSectors(lba, addr, n_blocks-1);
+        DeviceReadSectorsCached(lba, addr, n_blocks-1);
     	size -= r;
     	addr += r;
     	lba += n_blocks-1;
@@ -176,7 +202,7 @@ int read_raw_data(u8* addr, u32 size, u32 offset){
     
     // read remaining data
     if (size){
-        DeviceReadSectors(lba, ciso_dec_buf, 1);
+        DeviceReadSectorsCached(lba, ciso_dec_buf, 1);
     	memcpy(addr, ciso_dec_buf, size);
     	size = 0;
     }
@@ -192,7 +218,7 @@ int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 
 static int probed = 0;
 static int ProbeZSO(){
-    if (DeviceReadSectors(0, ciso_dec_buf, 1) != SCECdErNO)
+    if (DeviceReadSectorsCached(0, ciso_dec_buf, 1) != SCECdErNO)
         return 0;
     probed = 1;
     if (*(u32*)ciso_dec_buf == ZSO_MAGIC){

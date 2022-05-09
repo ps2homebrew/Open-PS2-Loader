@@ -17,10 +17,6 @@ static int bdm_io_sema;
 
 extern struct irx_export_table _exp_bdm;
 
-#define MAX_SECTOR_CACHE 32
-static u8 sector_cache[MAX_SECTOR_CACHE][2048];
-static int cur_sector = -1;
-
 //
 // BDM exported functions
 //
@@ -112,7 +108,7 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
-int DeviceReadSectorsUncached(u32 lsn, void *buffer, unsigned int sectors)
+int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
 
     u32 sector;
@@ -163,26 +159,6 @@ int DeviceReadSectorsUncached(u32 lsn, void *buffer, unsigned int sectors)
     SignalSema(bdm_io_sema);
 
     return rv;
-}
-
-/*
-  This small improvement will mostly benefit ZSO files.
-  For the same size of an ISO sector, we can have more than one ZSO blocks.
-  If we do a consecutive read of many ISO sectors we will have a huge amount of ZSO sectors ready.
-  Therefore reducing IO access for ZSO files.
-*/
-int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
-{
-    if (sectors <= MAX_SECTOR_CACHE){
-        if (cur_sector < 0 || lsn<cur_sector || (lsn+sectors)-cur_sector >= MAX_SECTOR_CACHE){
-            DeviceReadSectorsUncached(lsn, sector_cache, MAX_SECTOR_CACHE);
-            cur_sector = lsn;
-        }
-        int pos = lsn-cur_sector;
-        memcpy(buffer, &(sector_cache[pos]), 2048*sectors);
-        return SCECdErNO;
-    }
-    return DeviceReadSectorsUncached(lsn, buffer, sectors);
 }
 
 //

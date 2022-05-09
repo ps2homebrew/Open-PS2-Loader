@@ -12,9 +12,6 @@ extern struct cdvdman_settings_hdd cdvdman_settings;
 
 extern struct irx_export_table _exp_atad;
 
-const u32 MAX_SECTOR_CACHE = 8;
-u8 sector_cache[8][2048];
-
 char lba_48bit = 0;
 char atad_inited = 0;
 static unsigned char CurrentPart = 0;

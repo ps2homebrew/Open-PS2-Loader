@@ -12,7 +12,7 @@ u32 ciso_total_block;
 
 // block buffers
 u8 ciso_dec_buf[2048] __attribute__((aligned(64)));
-u8 ciso_com_buf[3072] __attribute__((aligned(64)));
+u8 ciso_com_buf[2048] __attribute__((aligned(64)));
 
 /*
   Decompressor wrapper function.
@@ -80,6 +80,8 @@ int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
         b_offset = (b_offset & 0x7FFFFFFF);
         b_size = (b_size & 0x7FFFFFFF);
         b_size = (b_size - b_offset) << ciso_align;
+
+        if (b_size > 2048) b_size = 2048;
 
         // read block, skipping header if needed
         if (c_buf > addr) {

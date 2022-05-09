@@ -39,10 +39,8 @@ static void cdvdman_create_semaphores(void);
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
 
 // Sector cache to improve IO
-//#define MAX_SECTOR_CACHE 16
-//static u8 sector_cache[MAX_SECTOR_CACHE][2048];
-extern const u32 MAX_SECTOR_CACHE;
-extern u8 sector_cache[][2048];
+#define MAX_SECTOR_CACHE 8
+static u8 sector_cache[MAX_SECTOR_CACHE][2048];
 static int cur_sector = -1;
 
 struct cdvdman_cb_data

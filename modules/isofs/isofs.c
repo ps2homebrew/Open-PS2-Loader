@@ -503,6 +503,8 @@ static int ProbeZISO(int fd)
     CISO_header header;
     longLseek(fd, 0);
     if (read(fd, &header, sizeof(header)) == sizeof(header) && header.magic == ZSO_MAGIC) {
+        // initialize ZSO
+        initZSO();
         // read header information
         ciso_uncompressed_size = header.total_bytes;
         ciso_align = header.align;
@@ -520,10 +522,11 @@ static int ProbeZISO(int fd)
     }
 }
 
-static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
+int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
 {
     int result;
 
+    int prev_fd = MountPoint.fd;
     MountPoint.fd = fd; // for cdEmuRead
 
     ProbeZISO(fd);
@@ -544,7 +547,7 @@ static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
         result = EIO;
     }
 
-    MountPoint.fd = -1;
+    MountPoint.fd = prev_fd;
 
     return result;
 }

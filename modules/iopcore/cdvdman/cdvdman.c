@@ -227,18 +227,23 @@ int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 }
 
 static int probed = 0;
-static int ProbeZSO()
+static int ProbeZSO(u8* buffer)
 {
-    if (DeviceReadSectorsCached(0, ciso_dec_buf, 1) != SCECdErNO)
+    if (DeviceReadSectors(0, buffer, 1) != SCECdErNO)
         return 0;
     probed = 1;
-    if (*(u32 *)ciso_dec_buf == ZSO_MAGIC) {
-        CISO_header *header = (CISO_header *)ciso_dec_buf;
+    if (*(u32 *)buffer == ZSO_MAGIC) {
+        // initialize ZSO
+        initZSO();
+        // initialize cache
+        initCache();
+        // read header information
+        CISO_header *header = (CISO_header *)buffer;
         DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
         ciso_uncompressed_size = header->total_bytes;
         ciso_align = header->align;
         // calculate number of blocks without using uncompressed_size (avoid 64bit division)
-        ciso_total_block = ((((*(u32 *)(ciso_dec_buf + sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
+        ciso_total_block = ((((*(u32 *)(buffer + sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
     }
     return 1;
 }
@@ -251,7 +256,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
     if (probed == 0) // Probe for ZSO before first read
-        if (!ProbeZSO())
+        if (!ProbeZSO(buf))
             return 1;
 
     cdvdman_stat.err = SCECdErNO;
@@ -779,9 +784,6 @@ int _start(int argc, char **argv)
 
     // init disk type stuff
     cdvdman_initDiskType();
-
-    // initialize cache
-    initCache();
 
     return MODULE_RESIDENT_END;
 }

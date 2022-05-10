@@ -2,7 +2,7 @@
 #include "zso.h"
 
 // block offset cache, reduces IO access
-u32 ciso_idx_cache[CISO_IDX_MAX_ENTRIES];
+u32* ciso_idx_cache = NULL; //[CISO_IDX_MAX_ENTRIES];
 int ciso_idx_start_block = -1;
 
 // header data that we need for the reader
@@ -11,8 +11,20 @@ u32 ciso_align;
 u32 ciso_total_block;
 
 // block buffers
-u8 ciso_dec_buf[2048] __attribute__((aligned(64)));
-u8 ciso_com_buf[2048] __attribute__((aligned(64)));
+u8* ciso_dec_buf = NULL; //[2048] __attribute__((aligned(64)));
+u8* ciso_com_buf = NULL; //[2048] __attribute__((aligned(64)));
+
+void initZSO(){
+    if (ciso_dec_buf == NULL){
+        ciso_dec_buf = AllocSysMemory(0, 2*2048 + sizeof(u32)*CISO_IDX_MAX_ENTRIES + 64, NULL);
+        if((u32)ciso_dec_buf & 63) // align 64
+            ciso_dec_buf = (void*)(((u32)ciso_dec_buf & (~63)) + 64);
+        if (ciso_dec_buf){
+            ciso_com_buf = ciso_dec_buf + 2048;
+            ciso_idx_cache = ciso_com_buf + 2048;
+        }
+    }
+}
 
 /*
   Decompressor wrapper function.

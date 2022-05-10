@@ -499,14 +499,14 @@ ssema:
 
 static int ProbeZISO(int fd)
 {
-    CISO_header header;
-    u32 first_block;
+    struct {
+        CISO_header header;
+        u32 first_block;
+    } ziso_data;
     longLseek(fd, 0);
-    if (read(fd, &header, sizeof(header)) == sizeof(header) && header.magic == ZSO_MAGIC) {
-        // grab offset of first block
-        read(fd, &first_block, 4);
+    if (read(fd, &ziso_data, sizeof(ziso_data)) == sizeof(ziso_data) && ziso_data.header.magic == ZSO_MAGIC) {
         // initialize ZSO
-        initZSO(&header, first_block);
+        initZSO(&ziso_data.header, ziso_data.first_block);
         // redirect cdEmuRead function
         cdEmuRead = &cdEmuReadCompressed;
         return 1;

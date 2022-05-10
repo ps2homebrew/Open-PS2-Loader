@@ -541,7 +541,9 @@ static const struct cdvdman_settings_common cdvdman_settings_common_sample = {
     0x69, 0x69,
     0x1234,
     0x39393939,
-    "B00BS"};
+    "B00BS",
+    8, 0, 4 // default cache sizes
+};
 
 int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman, void **cdvdman_irx, int *patchindex)
 {
@@ -590,6 +592,14 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     if (compatmask & COMPAT_MODE_6) {
         settings->flags |= IOPCORE_ENABLE_POFF;
     }
+
+    config_set_t *configOPL = configGetByType(CONFIG_OPL);
+    configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &bdmCacheSize);
+    configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &hddCacheSize);
+    configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &smbCacheSize);
+    settings->bdm_cache = bdmCacheSize;
+    settings->hdd_cache = hddCacheSize;
+    settings->smb_cache = smbCacheSize;
 
     InitGSMConfig(configSet);
 

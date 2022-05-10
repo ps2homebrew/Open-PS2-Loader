@@ -476,6 +476,10 @@ void guiShowConfig()
     diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
+    diaSetInt(diaConfig, CFG_BDMCACHE, bdmCacheSize);
+    diaSetInt(diaConfig, CFG_HDDCACHE, hddCacheSize);
+    diaSetInt(diaConfig, CFG_SMBCACHE, smbCacheSize);
+
     diaSetInt(diaConfig, CFG_DEBUG, gEnableDebug);
     diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
     diaSetInt(diaConfig, CFG_HDDGAMELISTCACHE, gHDDGameListCache);
@@ -513,6 +517,9 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
+        diaGetInt(diaConfig, CFG_BDMCACHE, &bdmCacheSize);
+        diaGetInt(diaConfig, CFG_HDDCACHE, &hddCacheSize);
+        diaGetInt(diaConfig, CFG_SMBCACHE, &smbCacheSize);
 
         if (ret == BLOCKDEVICE_BUTTON)
             guiShowBlockDeviceConfig();

@@ -108,6 +108,10 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
+u8 DeviceGetCacheSize(){
+    return cdvdman_settings.common.bdm_cache;
+}
+
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 sector;

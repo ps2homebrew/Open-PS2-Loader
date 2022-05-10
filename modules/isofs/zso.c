@@ -81,11 +81,9 @@ int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
         b_size = (b_size & 0x7FFFFFFF);
         b_size = (b_size - b_offset) << ciso_align;
 
-        if (b_size > 2048) b_size = 2048;
-
         // read block, skipping header if needed
         if (c_buf > addr) {
-            memcpy(com_buf, c_buf, b_size); // fast read
+            memcpy(com_buf, c_buf, MIN(b_size, 2048)); // fast read
             c_buf += b_size;
         } else { // slow read
             b_size = read_raw_data(com_buf, b_size, b_offset, ciso_align);

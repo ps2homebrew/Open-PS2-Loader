@@ -15,6 +15,9 @@ extern struct irx_export_table _exp_oplsmb;
 
 extern int smb_io_sema;
 
+const u32 MAX_SECTOR_CACHE = SMB_CACHE_SIZE;
+u8 sector_cache[SMB_CACHE_SIZE][2048];
+
 static void ps2ip_init(void);
 
 // !!! ps2ip exports functions pointers !!!
@@ -65,6 +68,10 @@ void DeviceDeinit(void)
 int DeviceReady(void)
 {
     return SCECdComplete;
+}
+
+u8 DeviceGetCacheSize(){
+    return cdvdman_settings.common.smb_cache;
 }
 
 void DeviceFSInit(void)

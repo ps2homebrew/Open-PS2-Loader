@@ -39,8 +39,8 @@ static void cdvdman_create_semaphores(void);
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
 
 // Sector cache to improve IO
-#define MAX_SECTOR_CACHE 8
-static u8 sector_cache[MAX_SECTOR_CACHE][2048];
+static u8 MAX_SECTOR_CACHE = 0;
+static u8* sector_cache = NULL;
 static int cur_sector = -1;
 
 struct cdvdman_cb_data
@@ -77,6 +77,14 @@ static int POFFThreadID;
 
 typedef void (*oplShutdownCb_t)(void);
 static oplShutdownCb_t vmcShutdownCb = NULL;
+
+void initCache(){
+    u8 cache_size = DeviceGetCacheSize();
+    if (cache_size){
+        sector_cache = AllocSysMemory(ALLOC_FIRST, cache_size*2048, NULL);
+        if (sector_cache) MAX_SECTOR_CACHE = cache_size;
+    }
+}
 
 void oplRegisterShutdownCallback(oplShutdownCb_t cb)
 {
@@ -163,7 +171,7 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
             cur_sector = lsn;
         }
         int pos = lsn - cur_sector;
-        memcpy(buffer, &(sector_cache[pos]), 2048 * sectors);
+        memcpy(buffer, &(sector_cache[pos*2048]), 2048 * sectors);
         return SCECdErNO;
     }
     return DeviceReadSectors(lsn, buffer, sectors);
@@ -771,6 +779,9 @@ int _start(int argc, char **argv)
 
     // init disk type stuff
     cdvdman_initDiskType();
+
+    // initialize cache
+    initCache();
 
     return MODULE_RESIDENT_END;
 }

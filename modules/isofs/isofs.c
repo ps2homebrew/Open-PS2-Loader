@@ -500,17 +500,13 @@ ssema:
 static int ProbeZISO(int fd)
 {
     CISO_header header;
+    u32 first_block;
     longLseek(fd, 0);
     if (read(fd, &header, sizeof(header)) == sizeof(header) && header.magic == ZSO_MAGIC) {
+        // grab offset of first block
+        read(fd, &first_block, 4);
         // initialize ZSO
-        initZSO();
-        // read header information
-        ciso_uncompressed_size = header.total_bytes;
-        ciso_align = header.align;
-        ciso_idx_start_block = -1;
-        // calculate number of blocks without using uncompressed_size (avoid 64bit division)
-        read(fd, &ciso_total_block, 4); // grab offset of first block
-        ciso_total_block = ((((ciso_total_block & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
+        initZSO(&header, first_block);
         // redirect cdEmuRead function
         cdEmuRead = &cdEmuReadCompressed;
         return 1;

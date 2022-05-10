@@ -2,19 +2,24 @@
 #include "zso.h"
 
 // block offset cache, reduces IO access
-u32* ciso_idx_cache = NULL; //[CISO_IDX_MAX_ENTRIES];
+u32* ciso_idx_cache = NULL;
 int ciso_idx_start_block = -1;
 
 // header data that we need for the reader
-u64 ciso_uncompressed_size;
 u32 ciso_align;
 u32 ciso_total_block;
 
 // block buffers
-u8* ciso_dec_buf = NULL; //[2048] __attribute__((aligned(64)));
-u8* ciso_com_buf = NULL; //[2048] __attribute__((aligned(64)));
+u8* ciso_dec_buf = NULL;
+u8* ciso_com_buf = NULL;
 
-void initZSO(){
+void initZSO(CISO_header* header, u32 first_block){
+    // read header information
+    ciso_align = header->align;
+    ciso_idx_start_block = -1;
+    // calculate number of blocks without using uncompressed_size (avoid 64bit division)
+    ciso_total_block = ((((first_block & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
+    // allocate memory
     if (ciso_dec_buf == NULL){
         ciso_dec_buf = AllocSysMemory(0, 2*2048 + sizeof(u32)*CISO_IDX_MAX_ENTRIES + 64, NULL);
         if((u32)ciso_dec_buf & 63) // align 64

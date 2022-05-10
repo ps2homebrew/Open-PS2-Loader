@@ -234,16 +234,11 @@ static int ProbeZSO(u8* buffer)
     probed = 1;
     if (*(u32 *)buffer == ZSO_MAGIC) {
         // initialize ZSO
-        initZSO();
+        initZSO((CISO_header*)buffer, *(u32 *)(buffer + sizeof(CISO_header)));
         // initialize cache
         initCache(); // only makes sense to have a cache on ZSO
-        // read header information
-        CISO_header *header = (CISO_header *)buffer;
+        // redirect sector reader
         DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
-        ciso_uncompressed_size = header->total_bytes;
-        ciso_align = header->align;
-        // calculate number of blocks without using uncompressed_size (avoid 64bit division)
-        ciso_total_block = ((((*(u32 *)(buffer + sizeof(CISO_header)) & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
     }
     return 1;
 }

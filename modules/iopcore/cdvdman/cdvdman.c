@@ -26,7 +26,7 @@ extern struct irx_export_table _exp_dev9;
 
 // reader function interface, raw reader impementation by default
 int DeviceReadSectorsCached(u32 sector, void *buffer, unsigned int count);
-int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectorsCached;
+int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectors;
 
 // internal functions prototypes
 static void oplShutdown(int poff);
@@ -165,7 +165,7 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
 */
 int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
 {
-    if (sectors <= MAX_SECTOR_CACHE) {
+    if (sectors <= MAX_SECTOR_CACHE) { // if MAX_SECTOR_CACHE is 0 then it will act as disabled and passthrough
         if (cur_sector < 0 || lsn < cur_sector || (lsn + sectors) - cur_sector >= MAX_SECTOR_CACHE) {
             DeviceReadSectors(lsn, sector_cache, MAX_SECTOR_CACHE);
             cur_sector = lsn;
@@ -185,8 +185,8 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
 int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 {
     u32 o_size = size;
-    u32 lba = offset / (2048 >> shift);
-    u32 pos = (offset << shift) & 2047;
+    u32 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
+    u32 pos = (offset << shift) & 2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
 
     // read first block if not aligned to sector size
     if (pos) {
@@ -236,7 +236,7 @@ static int ProbeZSO(u8* buffer)
         // initialize ZSO
         initZSO();
         // initialize cache
-        initCache();
+        initCache(); // only makes sense to have a cache on ZSO
         // read header information
         CISO_header *header = (CISO_header *)buffer;
         DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
@@ -256,7 +256,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
     if (probed == 0) // Probe for ZSO before first read
-        if (!ProbeZSO(buf))
+        if (!ProbeZSO(buf)) // we need to pass the buffer so we have somewhere to read the first sector to identify ZSO before allocating any extra RAM
             return 1;
 
     cdvdman_stat.err = SCECdErNO;

@@ -152,17 +152,16 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 //-------------------------------------------------------------------------
 int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
 {
-    u32 lba = offset/(2048>>shift);
-    u32 pos = (offset<<shift)&2047;
-    longLseek(MountPoint.fd, lba);
-    lseek(MountPoint.fd, pos, SEEK_CUR);
+    u32 lba = offset/(2048>>shift); // avoid overflow by shifting sector size instead of offset
+    u32 pos = (offset<<shift)&2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
+    longLseek(MountPoint.fd, lba); // seek to sector
+    lseek(MountPoint.fd, pos, SEEK_CUR); // seek within sector
     return read(MountPoint.fd, addr, size);
 }
 
 static int cdEmuReadRaw(u32 lsn, unsigned int count, void *buffer)
 {
     longLseek(MountPoint.fd, lsn);
-
     return (read(MountPoint.fd, buffer, count * 2048) == count * 2048 ? 0 : -EIO);
 }
 

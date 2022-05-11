@@ -10,7 +10,6 @@ u32 ciso_align;
 u32 ciso_total_block;
 
 // block buffers
-u8* ciso_dec_buf = NULL;
 u8* ciso_com_buf = NULL;
 
 void initZSO(CISO_header* header, u32 first_block){
@@ -20,26 +19,14 @@ void initZSO(CISO_header* header, u32 first_block){
     // calculate number of blocks without using uncompressed_size (avoid 64bit division)
     ciso_total_block = ((((first_block & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
     // allocate memory
-    if (ciso_dec_buf == NULL){
-        ciso_dec_buf = AllocSysMemory(0, 2*2048 + sizeof(u32)*CISO_IDX_MAX_ENTRIES + 64, NULL);
-        if((u32)ciso_dec_buf & 63) // align 64
-            ciso_dec_buf = (void*)(((u32)ciso_dec_buf & (~63)) + 64);
-        if (ciso_dec_buf){
-            ciso_com_buf = ciso_dec_buf + 2048;
+    if (ciso_com_buf == NULL){
+        ciso_com_buf = AllocSysMemory(0, 2048 + sizeof(u32)*CISO_IDX_MAX_ENTRIES + 64, NULL);
+        if((u32)ciso_com_buf & 63) // align 64
+            ciso_com_buf = (void*)(((u32)ciso_com_buf & (~63)) + 64);
+        if (ciso_com_buf){
             ciso_idx_cache = ciso_com_buf + 2048;
         }
     }
-}
-
-/*
-  Decompressor wrapper function.
-*/
-void ciso_decompressor(void *src, int src_len, void *dst, int dst_len, u32 topbit)
-{
-    if (topbit)
-        memcpy(dst, src, dst_len); // check for NC area
-    else
-        LZ4_decompress_fast(src, dst, dst_len);
 }
 
 /*
@@ -53,8 +40,6 @@ int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
     u32 size = count * 2048;
     u32 cur_block;
     u32 o_lsn = lsn;
-    u8 *com_buf = ciso_com_buf;
-    u8 *dec_buf = ciso_dec_buf;
     u8 *c_buf = NULL;
     u32 i = 0;
 
@@ -98,19 +83,22 @@ int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
         b_size = (b_size & 0x7FFFFFFF);
         b_size = (b_size - b_offset) << ciso_align;
 
-        // read block, skipping header if needed
-        if (c_buf > addr) {
-            memcpy(com_buf, c_buf, MIN(b_size, 2048)); // fast read
+        int r = MIN(b_size, 2048);
+
+        // read block
+        if (c_buf > addr) { // fast read
+            memcpy(addr, c_buf, r);
             c_buf += b_size;
         } else { // slow read
-            b_size = read_raw_data(com_buf, b_size, b_offset, ciso_align);
+            r = read_raw_data(addr, r, b_offset, ciso_align);
         }
 
         // decompress block
-        ciso_decompressor(com_buf, b_size, dec_buf, 2048, topbit);
+        if (topbit == 0){
+            memcpy(ciso_com_buf, addr, r); // read compressed block into temp buffer
+            LZ4_decompress_fast(ciso_com_buf, addr, 2048);
+        }
 
-        // read data from block into buffer
-        memcpy(addr, dec_buf, 2048);
         size -= 2048;
         addr += 2048;
         lsn++;

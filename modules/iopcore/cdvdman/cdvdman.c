@@ -40,7 +40,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
 
 // Sector cache to improve IO
 static u8 MAX_SECTOR_CACHE = 0;
-static u8* sector_cache = NULL;
+static u8 *sector_cache = NULL;
 static int cur_sector = -1;
 
 struct cdvdman_cb_data
@@ -78,11 +78,13 @@ static int POFFThreadID;
 typedef void (*oplShutdownCb_t)(void);
 static oplShutdownCb_t vmcShutdownCb = NULL;
 
-void initCache(){
+void initCache()
+{
     u8 cache_size = DeviceGetCacheSize();
-    if (cache_size){
-        sector_cache = AllocSysMemory(ALLOC_FIRST, cache_size*2048, NULL);
-        if (sector_cache) MAX_SECTOR_CACHE = cache_size;
+    if (cache_size) {
+        sector_cache = AllocSysMemory(ALLOC_FIRST, cache_size * 2048, NULL);
+        if (sector_cache)
+            MAX_SECTOR_CACHE = cache_size;
     }
 }
 
@@ -159,7 +161,8 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
 
 /*
 static int read_ahead_lsn = -1;
-static void readAheadThread(){
+static void readAheadThread()
+{
     if (read_ahead_lsn >= 0){
         DeviceReadSectors(read_ahead_lsn, sector_cache, MAX_SECTOR_CACHE);
         read_ahead_lsn = -1;
@@ -199,7 +202,7 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
             cur_sector = lsn;
         }
         int pos = lsn - cur_sector;
-        memcpy(buffer, &(sector_cache[pos*2048]), 2048 * sectors);
+        memcpy(buffer, &(sector_cache[pos * 2048]), 2048 * sectors);
         return SCECdErNO;
     }
     /*
@@ -214,7 +217,7 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
     }
     */
     int res = DeviceReadSectors(lsn, buffer, sectors);
-    //startReadAheadThread(lsn+sectors);
+    // startReadAheadThread(lsn+sectors);
     return res;
 }
 
@@ -232,8 +235,8 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
     // read first block if not aligned to sector size
     if (pos) {
         int r = MIN(size, (2048 - pos));
-        DeviceReadSectorsCached(lba, ciso_dec_buf, 1);
-        memcpy(addr, ciso_dec_buf + pos, r);
+        DeviceReadSectorsCached(lba, ciso_com_buf, 1);
+        memcpy(addr, ciso_com_buf + pos, r);
         size -= r;
         lba++;
         addr += r;
@@ -253,8 +256,8 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
     // read remaining data
     if (size) {
-        DeviceReadSectorsCached(lba, ciso_dec_buf, 1);
-        memcpy(addr, ciso_dec_buf, size);
+        DeviceReadSectorsCached(lba, ciso_com_buf, 1);
+        memcpy(addr, ciso_com_buf, size);
         size = 0;
     }
 
@@ -268,14 +271,14 @@ int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 }
 
 static int probed = 0;
-static int ProbeZSO(u8* buffer)
+static int ProbeZSO(u8 *buffer)
 {
     if (DeviceReadSectors(0, buffer, 1) != SCECdErNO)
         return 0;
     probed = 1;
     if (*(u32 *)buffer == ZSO_MAGIC) {
         // initialize ZSO
-        initZSO((CISO_header*)buffer, *(u32 *)(buffer + sizeof(CISO_header)));
+        initZSO((CISO_header *)buffer, *(u32 *)(buffer + sizeof(CISO_header)));
         // initialize cache
         initCache(); // only makes sense to have a cache on ZSO
         // redirect sector reader
@@ -291,7 +294,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
-    if (probed == 0) // Probe for ZSO before first read
+    if (probed == 0)        // Probe for ZSO before first read
         if (!ProbeZSO(buf)) // we need to pass the buffer so we have somewhere to read the first sector to identify ZSO before allocating any extra RAM
             return 1;
 

@@ -34,11 +34,9 @@ extern u32 ciso_align;
 extern u32 ciso_total_block;
 
 // block buffers
-extern u8* ciso_dec_buf;
 extern u8* ciso_com_buf;
 
 void initZSO(CISO_header* header, u32 first_block);
-void ciso_decompressor(void *src, int src_len, void *dst, int dst_len, u32 topbit);
 int ciso_read_sector(void *buf, u32 sector, unsigned int count);
 
 // This must be implemented by isofs/cdvdman

@@ -158,6 +158,34 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
 }
 
 /*
+static int read_ahead_lsn = -1;
+static void readAheadThread(){
+    if (read_ahead_lsn >= 0){
+        DeviceReadSectors(read_ahead_lsn, sector_cache, MAX_SECTOR_CACHE);
+        read_ahead_lsn = -1;
+    }
+}
+
+static void startReadAheadThread(int lsn)
+{
+    read_ahead_lsn = lsn;
+    iop_thread_t thread_param;
+
+    cdvdman_stat.status = SCECdStatPause;
+    cdvdman_stat.err = SCECdErNO;
+
+    thread_param.thread = &readAheadThread;
+    thread_param.stacksize = 0x1000;
+    thread_param.priority = 0x0E;
+    thread_param.attr = TH_C;
+    thread_param.option = 0xABCD0000;
+
+    int tid = CreateThread(&thread_param);
+    StartThread(tid, NULL);
+}
+*/
+
+/*
   This small improvement will mostly benefit ZSO files.
   For the same size of an ISO sector, we can have more than one ZSO blocks.
   If we do a consecutive read of many ISO sectors we will have a huge amount of ZSO sectors ready.
@@ -174,7 +202,20 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
         memcpy(buffer, &(sector_cache[pos*2048]), 2048 * sectors);
         return SCECdErNO;
     }
-    return DeviceReadSectors(lsn, buffer, sectors);
+    /*
+    // check if we have some of the data already in the cache
+    if (MAX_SECTOR_CACHE && cur_sector >= 0 && lsn >= cur_sector){
+        int pos = lsn - cur_sector;
+        int r = MAX_SECTOR_CACHE - pos;
+        memcpy(buffer, &(sector_cache[pos*2048]), 2048 * r);
+        buffer += 2048 * r;
+        lsn += r;
+        sectors -= r;
+    }
+    */
+    int res = DeviceReadSectors(lsn, buffer, sectors);
+    //startReadAheadThread(lsn+sectors);
+    return res;
 }
 
 /*

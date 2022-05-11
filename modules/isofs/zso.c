@@ -38,10 +38,8 @@ void initZSO(CISO_header* header, u32 first_block){
 int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
 {
     u32 size = count * 2048;
-    u32 cur_block;
     u32 o_lsn = lsn;
     u8 *c_buf = NULL;
-    u32 i = 0;
 
     // refresh index table if needed
     u32 starting_block = lsn;
@@ -50,34 +48,40 @@ int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
         read_raw_data(ciso_idx_cache, CISO_IDX_MAX_ENTRIES * sizeof(u32), starting_block * 4 + sizeof(CISO_header), 0);
         ciso_idx_start_block = starting_block;
     }
+    
+    // reduce IO by doing one read of all compressed data into the end of the provided buffer
+    u32 o_start = (ciso_idx_cache[starting_block - ciso_idx_start_block] & 0x7FFFFFFF);
+    u32 o_end;
     if (ending_block < ciso_idx_start_block + CISO_IDX_MAX_ENTRIES) {
-        // reduce IO by doing one read of all compressed data into the end of the provided buffer
-        u32 o_start = (ciso_idx_cache[starting_block - ciso_idx_start_block] & 0x7FFFFFFF);
-        u32 o_end = (ciso_idx_cache[ending_block - ciso_idx_start_block] & 0x7FFFFFFF);
-        u32 compressed_size = (o_end - o_start) << ciso_align;
-        if (size >= compressed_size) {
-            c_buf = (void *)((u32)addr + size - compressed_size);
-            read_raw_data(c_buf, compressed_size, o_start, ciso_align);
-        }
+        o_end = ciso_idx_cache[ending_block - ciso_idx_start_block];
     }
+    else{
+        read_raw_data(&o_end, sizeof(u32), starting_block * 4 + sizeof(CISO_header), 0);
+    }
+    o_end &= 0x7FFFFFFF;
+    u32 compressed_size = (o_end - o_start) << ciso_align;
+    if (size >= compressed_size) {
+        c_buf = (void *)((u32)addr + size - compressed_size);
+        read_raw_data(c_buf, compressed_size, o_start, ciso_align);
+    }
+    
     while (size > 0) {
         // calculate block number and offset within block
-        cur_block = lsn;
 
-        if (cur_block >= ciso_total_block) {
+        if (lsn >= ciso_total_block) {
             // EOF reached
             break;
         }
 
-        if (cur_block >= ciso_idx_start_block + CISO_IDX_MAX_ENTRIES) {
+        if (lsn >= ciso_idx_start_block + CISO_IDX_MAX_ENTRIES) {
             // refresh index cache
-            read_raw_data(ciso_idx_cache, CISO_IDX_MAX_ENTRIES * sizeof(u32), cur_block * 4 + sizeof(CISO_header), 0);
-            ciso_idx_start_block = cur_block;
+            read_raw_data(ciso_idx_cache, CISO_IDX_MAX_ENTRIES * sizeof(u32), lsn * 4 + sizeof(CISO_header), 0);
+            ciso_idx_start_block = lsn;
         }
 
         // read compressed block offset and size
-        u32 b_offset = ciso_idx_cache[cur_block - ciso_idx_start_block];
-        u32 b_size = ciso_idx_cache[cur_block - ciso_idx_start_block + 1];
+        u32 b_offset = ciso_idx_cache[lsn - ciso_idx_start_block];
+        u32 b_size = ciso_idx_cache[lsn - ciso_idx_start_block + 1];
         u32 topbit = b_offset & 0x80000000; // extract top bit for decompressor
         b_offset = (b_offset & 0x7FFFFFFF);
         b_size = (b_size & 0x7FFFFFFF);
@@ -102,7 +106,6 @@ int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
         size -= 2048;
         addr += 2048;
         lsn++;
-        i++;
     }
-    return i;
+    return lsn-o_lsn;
 }

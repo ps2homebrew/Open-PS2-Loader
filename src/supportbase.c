@@ -595,8 +595,8 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
 
     config_set_t *configOPL = configGetByType(CONFIG_OPL);
     configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &bdmCacheSize);
-    configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &hddCacheSize);
-    configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &smbCacheSize);
+    configGetInt(configOPL, CONFIG_OPL_HDD_CACHE, &hddCacheSize);
+    configGetInt(configOPL, CONFIG_OPL_SMB_CACHE, &smbCacheSize);
     settings->bdm_cache = bdmCacheSize;
     settings->hdd_cache = hddCacheSize;
     settings->smb_cache = smbCacheSize;

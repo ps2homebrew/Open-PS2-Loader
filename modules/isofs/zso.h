@@ -8,7 +8,7 @@
 
 #define ZSO_MAGIC 0x4F53495A // ZISO
 
-#define CISO_IDX_MAX_ENTRIES 512
+#define CISO_IDX_MAX_ENTRIES 256
 
 #define MIN(x, y) ((x < y) ? x : y)
 

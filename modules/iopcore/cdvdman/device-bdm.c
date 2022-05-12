@@ -112,6 +112,10 @@ u8 DeviceGetCacheSize(){
     return cdvdman_settings.common.bdm_cache;
 }
 
+void DeviceSetupZSO(u8* buffer){
+    
+}
+
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 sector;

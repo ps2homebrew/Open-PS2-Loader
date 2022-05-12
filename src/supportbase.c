@@ -479,14 +479,14 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
 }
 
 static int probed_fd = -1;
-static u8 initial_sector[2048];
-
-int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
+extern u8 IOBuffer[2048];
+static int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
 {
     u64 pos = (u64)offset<<shift;
     lseek64(probed_fd, pos, SEEK_SET);
     return read(probed_fd, addr, size);
 }
+int (*read_cso_data)(u8* addr, u32 size, u32 offset, u32 shift) = &read_raw_data;
 
 void* ciso_alloc(u32 size){
     return malloc(size);
@@ -504,6 +504,7 @@ static int ProbeZISO(int fd)
         initZSO(&ziso_data.header, ziso_data.first_block);
         // redirect cdEmuRead function
         probed_fd = fd;
+        read_cso_data = &read_raw_data;
         return 1;
     }
     else{
@@ -518,8 +519,8 @@ u32 sbGetISO9660MaxLBA(const char *path)
 
     if ((file = open(path, O_RDONLY, 0666)) >= 0) {
         if (ProbeZISO(file)){
-            if (ciso_read_sector(initial_sector, 16, 1) == 1){
-                maxLBA = *(u32*)(initial_sector+80);
+            if (ciso_read_sector(IOBuffer, 16, 1) == 1){
+                maxLBA = *(u32*)(IOBuffer+80);
             }
             else{
                 maxLBA = 0;
@@ -547,8 +548,8 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
     if (game->media == SCECdPS2DVD) { // Only DVDs can have multiple layers.
         if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
             if (ProbeZISO(fd)){
-                if (ciso_read_sector(initial_sector, layer1_offset, 1) == 1 &&
-                    ((initial_sector[0x00] == 1) && (!strncmp(&initial_sector[0x01], "CD001", 5)))){
+                if (ciso_read_sector(IOBuffer, layer1_offset, 1) == 1 &&
+                    ((IOBuffer[0x00] == 1) && (!strncmp(&IOBuffer[0x01], "CD001", 5)))){
                     result = 0;
                 }
             }

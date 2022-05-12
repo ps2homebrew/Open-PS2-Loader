@@ -200,7 +200,7 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
   Since we can only do sector-based reads, this funtions acts as a wrapper.
   It will do at most 3 IO reads, most of the time only 1.
 */
-int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
+static int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 {
     u32 o_size = size;
     u32 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
@@ -238,6 +238,7 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
     // return remaining size
     return o_size - size;
 }
+int (*read_cso_data)(u8* addr, u32 size, u32 offset, u32 shift) = &read_raw_data;
 
 int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 {
@@ -255,6 +256,8 @@ static int ProbeZSO(u8 *buffer)
         initZSO((CISO_header *)buffer, *(u32 *)(buffer + sizeof(CISO_header)));
         // initialize cache
         initCache(); // only makes sense to have a cache on ZSO
+        // Device ZSO Setup
+        DeviceSetupZSO(buffer);
         // redirect sector reader
         DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
     }

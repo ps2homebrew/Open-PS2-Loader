@@ -74,6 +74,10 @@ u8 DeviceGetCacheSize(){
     return cdvdman_settings.common.smb_cache;
 }
 
+void DeviceSetupZSO(u8* buffer){
+    
+}
+
 void DeviceFSInit(void)
 {
     int i = 0;

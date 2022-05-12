@@ -154,7 +154,7 @@ void* ciso_alloc(u32 size){
     return AllocSysMemory(0, size, NULL);
 }
 
-int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
+static int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
 {
     u32 lba = offset/(2048>>shift); // avoid overflow by shifting sector size instead of offset
     u32 pos = (offset<<shift)&2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
@@ -162,6 +162,7 @@ int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
     lseek(MountPoint.fd, pos, SEEK_CUR); // seek within sector
     return read(MountPoint.fd, addr, size);
 }
+int (*read_cso_data)(u8* addr, u32 size, u32 offset, u32 shift) = &read_raw_data;
 
 static int cdEmuReadRaw(u32 lsn, unsigned int count, void *buffer)
 {

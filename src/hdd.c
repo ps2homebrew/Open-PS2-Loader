@@ -6,8 +6,6 @@
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h>
 
-#include "../modules/isofs/zso.h"
-
 typedef struct // size = 1024
 {
     u32 checksum; // HDL uses 0xdeadfeed magic here
@@ -141,30 +139,6 @@ struct GameDataEntry
     struct GameDataEntry *next;
     char id[APA_IDMAX + 1];
 };
-
-static struct GameDataEntry *cur_game;
-
-/*
-static int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
-{
-    // TODO
-}
-
-static int ProbeZISO(struct GameDataEntry *game)
-{
-    if (hddReadSectors(game->lba, 2, IOBuffer) && *(u32*)IOBuffer == ZSO_MAGIC) {
-        // initialize ZSO
-        initZSO(IOBuffer, *(u32*)(IOBuffer+sizeof(CISO_header)));
-        // redirect cdEmuRead function
-        read_cso_data = &read_raw_data;
-        cur_game = game;
-        return 1;
-    }
-    else{
-        return 0;
-    }
-}
-*/
 
 static int hddGetHDLGameInfo(struct GameDataEntry *game, hdl_game_info_t *ginfo)
 {

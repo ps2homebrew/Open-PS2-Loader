@@ -82,7 +82,6 @@ void DeviceInit(void)
 void DeviceSetupZSO(u8* buffer){
     ciso_read_sector(buffer, 16, 1);
     u32 maxLBA = *(u32*)(buffer+80);
-
     if (maxLBA < ciso_total_block){
         ciso_read_sector(buffer, maxLBA, 1);
         if ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5))){

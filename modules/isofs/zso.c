@@ -20,7 +20,7 @@ void initZSO(CISO_header* header, u32 first_block){
     ciso_total_block = ((((first_block & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
     // allocate memory
     if (ciso_com_buf == NULL){
-        ciso_com_buf = AllocSysMemory(0, 2048 + sizeof(u32)*CISO_IDX_MAX_ENTRIES + 64, NULL);
+        ciso_com_buf = ciso_alloc(2048 + sizeof(u32)*CISO_IDX_MAX_ENTRIES + 64);
         if((u32)ciso_com_buf & 63) // align 64
             ciso_com_buf = (void*)(((u32)ciso_com_buf & (~63)) + 64);
         if (ciso_com_buf){
@@ -35,7 +35,7 @@ void initZSO(CISO_header* header, u32 first_block){
   Tailored for OPL.
   While it should let you read pretty much any format, it's made to work with 2K blocks ZSO for a lightweight implementation.
 */
-int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
+int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
 {
     u32 size = count * 2048;
     u32 o_lsn = lsn;
@@ -62,13 +62,12 @@ int ciso_read_sector(void *addr, u32 lsn, unsigned int count)
         o_end &= 0x7FFFFFFF;
         u32 compressed_size = (o_end - o_start) << ciso_align;
         if (size >= compressed_size) {
-            c_buf = (void *)((u32)addr + size - compressed_size);
+            c_buf = addr + size - compressed_size;
             read_raw_data(c_buf, compressed_size, o_start, ciso_align);
         }
     }
     
     while (size > 0) {
-        // calculate block number and offset within block
 
         if (lsn >= ciso_total_block) {
             // EOF reached

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2011 by Virtuous Flame
-# Based BOOSTER 1.01 CSO Compressor
+# Based BOOSTER 1.01 ZSO Compressor
 #
 # GNU General Public Licence (GPL)
 #
@@ -24,11 +24,12 @@ __version__ = "1.0"
 
 import sys
 import os
+# import getopt
 
 import lz4.block
 from struct import pack, unpack
 from multiprocessing import Pool
-from getopt import *
+from getopt import gnu_getopt, GetoptError
 
 try:
     # Python 2
@@ -52,23 +53,34 @@ def hexdump(data):
     print("")
 
 
-def zip_compress(plain, level=9):
+def lz4_compress(plain, level=9):
     return lz4.block.compress(plain, store_size=False)
 
 
-def zip_compress_mp(i):
+def lz4_compress_mp(i):
     return lz4.block.compress(i[0], store_size=False)
 
 
-def zip_decompress(compressed):
-    #   hexdump(data)
-    return lz4.block.decompress(compressed)
+def lz4_decompress(compressed):
+    # hexdump(compressed)
+    usize = 2048
+    max_size = 4177920
+    while True:
+        try:
+            decompressed = lz4.block.decompress(compressed, uncompressed_size=usize)
+            break
+        except lz4.block.LZ4BlockError:
+            usize *= 2
+            if usize > max_size:
+                print('Error: data too large or corrupt')
+                break
+    return decompressed
 
 
 def usage():
     print("Usage: ziso [-c level] [-m] [-t percent] [-h] infile outfile")
-    print("  -c level: 1-9 compress ISO to ZSO (1=fast/large - 16=small/slow")
-    print("         0   decompress CSO to ISO")
+    print("  -c level: 1-9 compress ISO to ZSO, use any non-zero number it has no effect")
+    print("              0 decompress ZSO to ISO")
     print("  -m Use multiprocessing acceleration for compressing")
     print("  -t percent Compression Threshold (1-100)")
     print("  -a align Padding alignment 0=small/slow 6=fast/large")
@@ -97,36 +109,38 @@ def seek_and_read(fin, offset, size):
     return fin.read(size)
 
 
-def read_cso_header(fin):
-    """CSO header has 0x18 bytes"""
+def read_zso_header(fin):
+    """
+    ZSO header has 0x18 bytes
+    """
     data = seek_and_read(fin, 0, 0x18)
     magic, header_size, total_bytes, block_size, ver, align = unpack(
         'IIQIbbxx', data)
     return magic, header_size, total_bytes, block_size, ver, align
 
 
-def generate_cso_header(magic, header_size, total_bytes, block_size, ver, align):
+def generate_zso_header(magic, header_size, total_bytes, block_size, ver, align):
     data = pack('IIQIbbxx', magic, header_size,
                 total_bytes, block_size, ver, align)
 #    assert(len(data) == 0x18)
     return data
 
 
-def show_cso_info(fname_in, fname_out, total_bytes, block_size, total_block, align):
+def show_zso_info(fname_in, fname_out, total_bytes, block_size, total_block, align):
     print("Decompress '%s' to '%s'" % (fname_in, fname_out))
     print("Total File Size %ld bytes" % (total_bytes))
     print("block size      %d  bytes" % (block_size))
     print("total blocks    %d  blocks" % (total_block))
-    print("index align     %d" % (1 << align))
+    print("index align     %d" % (align))
 
 
-def decompress_cso(fname_in, fname_out, level):
+def decompress_zso(fname_in, fname_out, level):
     fin, fout = open_input_output(fname_in, fname_out)
-    magic, header_size, total_bytes, block_size, ver, align = read_cso_header(
+    magic, header_size, total_bytes, block_size, ver, align = read_zso_header(
         fin)
 
     if magic != CISO_MAGIC or block_size == 0 or total_bytes == 0:
-        print("ciso file format error")
+        print("ziso file format error")
         return -1
 
     total_block = total_bytes // block_size
@@ -135,7 +149,7 @@ def decompress_cso(fname_in, fname_out, level):
     for i in xrange(total_block + 1):
         index_buf.append(unpack('I', fin.read(4))[0])
 
-    show_cso_info(fname_in, fname_out, total_bytes,
+    show_zso_info(fname_in, fname_out, total_bytes,
                   block_size, total_block, align)
 
     block = 0
@@ -147,7 +161,7 @@ def decompress_cso(fname_in, fname_out, level):
         if percent_cnt >= percent_period and percent_period != 0:
             percent_cnt = 0
             print("decompress %d%%\r" %
-                  (block / percent_period), file=sys.stderr),
+                  (block / percent_period), file=sys.stderr, end='\r'),
 
         index = index_buf[block]
         plain = index & 0x80000000
@@ -158,19 +172,21 @@ def decompress_cso(fname_in, fname_out, level):
             read_size = block_size
         else:
             index2 = index_buf[block+1] & 0x7fffffff
-            """ Have to read more bytes if align was set"""
+            """
+            Have to read more bytes if align was set
+            """
             if align:
                 read_size = (index2-index+1) << (align)
             else:
                 read_size = (index2-index) << (align)
 
-        cso_data = seek_and_read(fin, read_pos, read_size)
+        zso_data = seek_and_read(fin, read_pos, read_size)
 
         if plain:
-            dec_data = cso_data
+            dec_data = zso_data
         else:
             try:
-                dec_data = zip_decompress(cso_data)
+                dec_data = lz4_decompress(zso_data)
             except Exception as e:
                 print("%d block: 0x%08X %d %s" %
                       (block, read_pos, read_size, e))
@@ -181,7 +197,7 @@ def decompress_cso(fname_in, fname_out, level):
 
     fin.close()
     fout.close()
-    print("ciso decompress completed")
+    print("ziso decompress completed")
 
 
 def show_comp_info(fname_in, fname_out, total_bytes, block_size, align, level):
@@ -203,7 +219,7 @@ def set_align(fout, write_pos, align):
     return write_pos
 
 
-def compress_cso(fname_in, fname_out, level):
+def compress_zso(fname_in, fname_out, level):
     fin, fout = open_input_output(fname_in, fname_out)
     fin.seek(0, os.SEEK_END)
     total_bytes = fin.tell()
@@ -211,12 +227,12 @@ def compress_cso(fname_in, fname_out, level):
 
     magic, header_size, block_size, ver, align = CISO_MAGIC, 0x18, 0x800, 1, DEFAULT_ALIGN
 
-    # We have to use alignment on any CSO files which > 2GB, for MSB bit of index as the plain indicator
+    # We have to use alignment on any ZSO files which > 2GB, for MSB bit of index as the plain indicator
     # If we don't then the index can be larger than 2GB, which its plain indicator was improperly set
     if total_bytes >= 2 ** 31 and align == 0:
         align = 1
 
-    header = generate_cso_header(
+    header = generate_zso_header(
         magic, header_size, total_bytes, block_size, ver, align)
     fout.write(header)
 
@@ -253,30 +269,30 @@ def compress_cso(fname_in, fname_out, level):
         if MP:
             iso_data = [(fin.read(block_size), level)
                         for i in xrange(min(total_block - block, MP_NR))]
-            cso_data_all = pool.map_async(
-                zip_compress_mp, iso_data).get(9999999)
+            zso_data_all = pool.map_async(
+                lz4_compress_mp, iso_data).get(9999999)
 
-            for i in xrange(len(cso_data_all)):
+            for i in xrange(len(zso_data_all)):
                 write_pos = set_align(fout, write_pos, align)
                 index_buf[block] = write_pos >> align
-                cso_data = cso_data_all[i]
+                zso_data = zso_data_all[i]
 
-                if 100 * len(cso_data) / len(iso_data[i][0]) >= min(COMPRESS_THREHOLD, 100):
-                    cso_data = iso_data[i][0]
+                if 100 * len(zso_data) / len(iso_data[i][0]) >= min(COMPRESS_THREHOLD, 100):
+                    zso_data = iso_data[i][0]
                     index_buf[block] |= 0x80000000  # Mark as plain
                 elif index_buf[block] & 0x80000000:
                     print(
-                        "Align error, you have to increase align by 1 or CFW won't be able to read offset above 2 ** 31 bytes")
+                        "Align error, you have to increase align by 1 or OPL won't be able to read offset above 2 ** 31 bytes")
                     sys.exit(1)
 
-                fout.write(cso_data)
-                write_pos += len(cso_data)
+                fout.write(zso_data)
+                write_pos += len(zso_data)
                 block += 1
         else:
             iso_data = fin.read(block_size)
 
             try:
-                cso_data = zip_compress(iso_data, level)
+                zso_data = lz4_compress(iso_data, level)
             except Exception as e:
                 print("%d block: %s" % (block, e))
                 sys.exit(-1)
@@ -284,16 +300,16 @@ def compress_cso(fname_in, fname_out, level):
             write_pos = set_align(fout, write_pos, align)
             index_buf[block] = write_pos >> align
 
-            if 100 * len(cso_data) / len(iso_data) >= COMPRESS_THREHOLD:
-                cso_data = iso_data
+            if 100 * len(zso_data) / len(iso_data) >= COMPRESS_THREHOLD:
+                zso_data = iso_data
                 index_buf[block] |= 0x80000000  # Mark as plain
             elif index_buf[block] & 0x80000000:
                 print(
                     "Align error, you have to increase align by 1 or CFW won't be able to read offset above 2 ** 31 bytes")
                 sys.exit(1)
 
-            fout.write(cso_data)
-            write_pos += len(cso_data)
+            fout.write(zso_data)
+            write_pos += len(zso_data)
             block += 1
 
     # Last position (total size)
@@ -306,7 +322,7 @@ def compress_cso(fname_in, fname_out, level):
 #        assert(len(idx) == 4)
         fout.write(idx)
 
-    print("ciso compress completed , total size = %8d bytes , rate %d%%" %
+    print("ziso compress completed , total size = %8d bytes , rate %d%%" %
           (write_pos, (write_pos*100/total_bytes)))
 
     fin.close()
@@ -339,26 +355,28 @@ def parse_args():
         elif o == '-a':
             DEFAULT_ALIGN = int(a)
         elif o == '-p':
-            DEFAULT_PADDING = bytes(a[0])
+            DEFAULT_PADDING = bytes(a[0], encoding='utf8')
         elif o == '-h':
             usage()
             sys.exit(0)
 
-    if level == None:
-        print("You have to specify compress level")
-        sys.exit(-1)
+    # if level == None:
+    #     print("You have to specify compress level")
+    #     sys.exit(-1)
 
     try:
         fname_in, fname_out = args[1:3]
-    except ValueError as e:
-        print("You have to specify input/output filename")
+    except ValueError as err:
+        print("You have to specify input/output filename: %s", err)
         sys.exit(-1)
 
     return level, fname_in, fname_out
 
 
 def load_sector_table(sector_table_fn, total_block, default_level=9):
-    """ In future we will support NC """
+    """
+    In future we will support NC
+    """
     sectors = [default_level for i in range(total_block)]
 
     with open(sector_table_fn) as f:
@@ -396,9 +414,9 @@ def main():
     level, fname_in, fname_out = parse_args()
 
     if level == 0:
-        decompress_cso(fname_in, fname_out, level)
+        decompress_zso(fname_in, fname_out, level)
     else:
-        compress_cso(fname_in, fname_out, level)
+        compress_zso(fname_in, fname_out, level)
 
 
 PROFILE = False

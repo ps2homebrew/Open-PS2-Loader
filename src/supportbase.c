@@ -16,6 +16,8 @@
 #include <io_common.h>   // FIO_MT_RDONLY
 #include <ps2sdkapi.h>   // lseek64
 
+#include "../modules/isofs/zso.h"
+
 /// internal linked list used to populate the list from directory listing
 struct game_list_t
 {
@@ -476,16 +478,59 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
     return count;
 }
 
+static int probed_fd = -1;
+static u8 initial_sector[2048];
+
+int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
+{
+    u64 pos = (u64)offset<<shift;
+    lseek64(probed_fd, pos, SEEK_SET);
+    return read(probed_fd, addr, size);
+}
+
+void* ciso_alloc(u32 size){
+    return malloc(size);
+}
+
+static int ProbeZISO(int fd)
+{
+    struct {
+        CISO_header header;
+        u32 first_block;
+    } ziso_data;
+    lseek(fd, 0, SEEK_SET);
+    if (read(fd, &ziso_data, sizeof(ziso_data)) == sizeof(ziso_data) && ziso_data.header.magic == ZSO_MAGIC) {
+        // initialize ZSO
+        initZSO(&ziso_data.header, ziso_data.first_block);
+        // redirect cdEmuRead function
+        probed_fd = fd;
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
 u32 sbGetISO9660MaxLBA(const char *path)
 {
     u32 maxLBA;
-    FILE *file;
+    int file;
 
-    if ((file = fopen(path, "rb")) != NULL) {
-        fseek(file, 16 * 2048 + 80, SEEK_SET);
-        if (fread(&maxLBA, sizeof(maxLBA), 1, file) != 1)
-            maxLBA = 0;
-        fclose(file);
+    if ((file = open(path, O_RDONLY, 0666)) >= 0) {
+        if (ProbeZISO(file)){
+            if (ciso_read_sector(initial_sector, 16, 1) == 1){
+                maxLBA = *(u32*)(initial_sector+80);
+            }
+            else{
+                maxLBA = 0;
+            }
+        }
+        else{
+            lseek(file, 16 * 2048 + 80, SEEK_SET);
+            if (read(file, &maxLBA, sizeof(maxLBA)) != sizeof(maxLBA))
+                maxLBA = 0;
+        }
+        close(file);
     } else {
         maxLBA = 0;
     }
@@ -495,38 +540,24 @@ u32 sbGetISO9660MaxLBA(const char *path)
 
 int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
 {
-    int result;
-    FILE *file;
-    char buffer[6];
-
-    result = -1;
-    if (game->media == SCECdPS2DVD) { // Only DVDs can have multiple layers.
-        if ((file = fopen(path, "rb")) != NULL) {
-            if (fseek(file, layer1_offset * 2048, SEEK_SET) == 0) {
-                if ((fread(buffer, 1, sizeof(buffer), file) == sizeof(buffer)) &&
-                    ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
-                    result = 0;
-                }
-            }
-            fclose(file);
-        }
-    }
-
-    return result;
-}
-
-int sbProbeISO9660_64(const char *path, base_game_info_t *game, u32 layer1_offset)
-{
-    int result, fd;
+    int result = -1, fd;
     char buffer[6];
 
     result = -1;
     if (game->media == SCECdPS2DVD) { // Only DVDs can have multiple layers.
         if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
-            if (lseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
-                if ((read(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
-                    ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
+            if (ProbeZISO(fd)){
+                if (ciso_read_sector(initial_sector, layer1_offset, 1) == 1 &&
+                    ((initial_sector[0x00] == 1) && (!strncmp(&initial_sector[0x01], "CD001", 5)))){
                     result = 0;
+                }
+            }
+            else{
+                if (lseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
+                    if ((read(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
+                        ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
+                        result = 0;
+                    }
                 }
             }
             close(fd);

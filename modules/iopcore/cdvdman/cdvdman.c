@@ -159,34 +159,9 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
     return 0;
 }
 
-/*
-static int read_ahead_lsn = -1;
-static void readAheadThread()
-{
-    if (read_ahead_lsn >= 0){
-        DeviceReadSectors(read_ahead_lsn, sector_cache, MAX_SECTOR_CACHE);
-        read_ahead_lsn = -1;
-    }
+void* ciso_alloc(u32 size){
+    return AllocSysMemory(0, size, NULL);
 }
-
-static void startReadAheadThread(int lsn)
-{
-    read_ahead_lsn = lsn;
-    iop_thread_t thread_param;
-
-    cdvdman_stat.status = SCECdStatPause;
-    cdvdman_stat.err = SCECdErNO;
-
-    thread_param.thread = &readAheadThread;
-    thread_param.stacksize = 0x1000;
-    thread_param.priority = 0x0E;
-    thread_param.attr = TH_C;
-    thread_param.option = 0xABCD0000;
-
-    int tid = CreateThread(&thread_param);
-    StartThread(tid, NULL);
-}
-*/
 
 /*
   This small improvement will mostly benefit ZSO files.
@@ -217,7 +192,6 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
     }
     */
     int res = DeviceReadSectors(lsn, buffer, sectors);
-    // startReadAheadThread(lsn+sectors);
     return res;
 }
 

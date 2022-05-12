@@ -150,6 +150,10 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 }
 
 //-------------------------------------------------------------------------
+void* ciso_alloc(u32 size){
+    return AllocSysMemory(0, size, NULL);
+}
+
 int read_raw_data(u8* addr, u32 size, u32 offset, u32 shift)
 {
     u32 lba = offset/(2048>>shift); // avoid overflow by shifting sector size instead of offset

@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
-#include <sysclib.h>
+#include <tamtypes.h>
 
 #define ZSO_MAGIC 0x4F53495A // ZISO
 
@@ -37,7 +37,7 @@ extern u32 ciso_total_block;
 extern u8* ciso_com_buf;
 
 void initZSO(CISO_header* header, u32 first_block);
-int ciso_read_sector(void *buf, u32 sector, unsigned int count);
+int ciso_read_sector(u8* buf, u32 sector, unsigned int count);
 
 // This must be implemented by isofs/cdvdman
 extern int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift);

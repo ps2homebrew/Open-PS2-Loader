@@ -273,7 +273,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
 
             sceCdSync(0);
             memcpy(buf, &cdvdman_fs_buf[offset], nbytes);
-            buf += nbytes;
+            buf = (void *)((u8 *)buf + nbytes);
         }
 
         //Phase 2: read the data to the middle of the buffer, in units of 2048.
@@ -296,7 +296,6 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
             while (sceCdRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf, NULL) == 0)
                 DelayThread(10000);
 
-            size -= nbytes;
             fh->position += nbytes;
             rpos += nbytes;
 

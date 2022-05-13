@@ -637,7 +637,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
     if (ret != 2)
         BlinkColour(5, 0x0000FF, 1); // Red
     //(...then, write the remaining info!)
-    bh = buffer + image_size;
+    bh = (void *)((u8 *)buffer + image_size);
     bh->filesize = (u32)file_size;
     bh->reserved = (u32)0;
     bh->headersize = (u32)54;
@@ -663,7 +663,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
     if (intffmd == 3) // Interlace Mode, FRAME Mode (Read every line)
         height >>= 1;
     for (i = 1; i <= height; i++) {
-        addr = buffer + ((height - i) * lenght);
+        addr = (void *)((u8 *)buffer + ((height - i) * lenght));
 
         // Ensure that all the data has indeed been written back to main memory
         FlushCache(GS_WRITEBACK_DCACHE);

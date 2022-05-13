@@ -29,7 +29,7 @@
 static int gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
 static int gCheatMode;   // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
 
-static int gCheatList[MAX_CHEATLIST]; // Store hooks/codes addr+val pairs
+static u32 gCheatList[MAX_CHEATLIST]; // Store hooks/codes addr+val pairs
 
 void InitCheatsConfig(config_set_t *configSet)
 {
@@ -58,7 +58,7 @@ int GetCheatsEnabled(void)
     return gEnableCheat;
 }
 
-const int *GetCheatsList(void)
+const u32 *GetCheatsList(void)
 {
     return gCheatList;
 }
@@ -69,8 +69,8 @@ const int *GetCheatsList(void)
 static code_t make_code(const char *s)
 {
     code_t code;
-    int address;
-    int value;
+    u32 address;
+    u32 value;
     char digits[CODE_DIGITS];
     int i = 0;
 
@@ -282,7 +282,6 @@ static int parse_buf(const char *buf)
     gCheatList[i] = 0;
     i++;
     gCheatList[i] = 0;
-    i++;
 
     return 0;
 }

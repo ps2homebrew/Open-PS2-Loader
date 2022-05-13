@@ -716,16 +716,16 @@ void *rpc_sf(int cmd, void *data, int size)
             *(u8 *)data = ds34usb_get_status(*(u8 *)data);
             break;
         case DS34USB_GET_BDADDR:
-            *(u8 *)data = ds34usb_get_bdaddr((u8 *)(data + 1), *(u8 *)data);
+            *(u8 *)data = ds34usb_get_bdaddr(((u8 *)data + 1), *(u8 *)data);
             break;
         case DS34USB_SET_BDADDR:
-            ds34usb_set_bdaddr((u8 *)(data + 1), *(u8 *)data);
+            ds34usb_set_bdaddr(((u8 *)data + 1), *(u8 *)data);
             break;
         case DS34USB_SET_RUMBLE:
-            ds34usb_set_rumble(*(u8 *)(data + 1), *(u8 *)(data + 2), *(u8 *)data);
+            ds34usb_set_rumble(*((u8 *)data + 1), *((u8 *)data + 2), *(u8 *)data);
             break;
         case DS34USB_SET_LED:
-            ds34usb_set_led((u8 *)(data + 1), *(u8 *)data);
+            ds34usb_set_led(((u8 *)data + 1), *(u8 *)data);
             break;
         case DS34USB_GET_DATA:
             ds34usb_get_data((char *)data, 18, *(u8 *)data);

@@ -1645,13 +1645,13 @@ void *rpc_sf(int cmd, void *data, int size)
             *(u8 *)data = ds34bt_get_status(*(u8 *)data);
             break;
         case DS34BT_GET_BDADDR:
-            *(u8 *)(data + 6) = ds34bt_get_bdaddr((u8 *)data);
+            *((u8 *)data + 6) = ds34bt_get_bdaddr((u8 *)data);
             break;
         case DS34BT_SET_RUMBLE:
-            ds34bt_set_rumble(*(u8 *)(data + 1), *(u8 *)(data + 2), *(u8 *)data);
+            ds34bt_set_rumble(*((u8 *)data + 1), *((u8 *)data + 2), *(u8 *)data);
             break;
         case DS34BT_SET_LED:
-            ds34bt_set_led((u8 *)(data + 1), *(u8 *)data);
+            ds34bt_set_led(((u8 *)data + 1), *(u8 *)data);
             break;
         case DS34BT_GET_DATA:
             ds34bt_get_data((char *)data, 18, *(u8 *)data);
@@ -1660,10 +1660,10 @@ void *rpc_sf(int cmd, void *data, int size)
             ds34bt_reset();
             break;
         case DS34BT_GET_VERSION:
-            *(u8 *)(data + sizeof(hci_information_t)) = ds34bt_get_ver((u8 *)data);
+            *((u8 *)data + sizeof(hci_information_t)) = ds34bt_get_ver((u8 *)data);
             break;
         case DS34BT_GET_FEATURES:
-            *(u8 *)(data + 8) = ds34bt_get_feat((u8 *)data);
+            *((u8 *)data + 8) = ds34bt_get_feat((u8 *)data);
             break;
         default:
             break;

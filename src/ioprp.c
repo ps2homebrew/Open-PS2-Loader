@@ -44,14 +44,14 @@ unsigned int patch_IOPRP_image(void *ioprp_image, void *cdvdman_module, unsigned
         memset(romdir_out, 0, sizeof(struct romdir_entry));
 
         if (!strcmp(romdir_in->fileName, "CDVDMAN"))
-            patch_CDVDMAN((void *)(ioprp_image + offset_out), romdir_out, cdvdman_module, size_cdvdman);
+            patch_CDVDMAN((void *)((u8 *)ioprp_image + offset_out), romdir_out, cdvdman_module, size_cdvdman);
         else if (!strcmp(romdir_in->fileName, "CDVDFSV"))
-            patch_CDVDFSV((void *)(ioprp_image + offset_out), romdir_out);
+            patch_CDVDFSV((void *)((u8 *)ioprp_image + offset_out), romdir_out);
         else if (!strcmp(romdir_in->fileName, "EESYNC"))
-            patch_EESYNC((void *)(ioprp_image + offset_out), romdir_out);
-        else {                                                                                                /* Other modules that should not be tampered with */
-            memcpy((void *)(ioprp_image + offset_out), (void *)(IOPRP_img + offset_in), romdir_in->fileSize); /* Copy the file/entry's contents. */
-            romdir_out->fileSize = romdir_in->fileSize;                                                       /* Copy the file size. */
+            patch_EESYNC((void *)((u8 *)ioprp_image + offset_out), romdir_out);
+        else {                                                                                                      /* Other modules that should not be tampered with */
+            memcpy((void *)((u8 *)ioprp_image + offset_out), (void *)(IOPRP_img + offset_in), romdir_in->fileSize); /* Copy the file/entry's contents. */
+            romdir_out->fileSize = romdir_in->fileSize;                                                             /* Copy the file size. */
         }
 
         /* For ALL modules */

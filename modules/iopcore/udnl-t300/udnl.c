@@ -166,7 +166,7 @@ static struct RomdirFileStat *GetFileStatFromImage(const struct RomImgData *Imag
             if (((unsigned int *)filename_temp)[0] == ((unsigned int *)RomdirEntry->name)[0] && ((unsigned int *)filename_temp)[1] == ((unsigned int *)RomdirEntry->name)[1] && (*(unsigned short int *)&((unsigned int *)filename_temp)[2] == *(unsigned short int *)&((unsigned int *)RomdirEntry->name)[2])) {
 
                 stat->romdirent = RomdirEntry;
-                stat->data = ImageStat->ImageStart + offset;
+                stat->data = (void *)((u8 *)(ImageStat->ImageStart) + offset);
                 stat->extinfo = NULL;
 
                 if (RomdirEntry->ExtInfoEntrySize > 0) {
@@ -502,7 +502,7 @@ static void LoadIRXModule(const void *module, struct ModuleInfo *ModuleInfo)
 
     /* 0x00000fec */
     if (ELF_phdr[1].filesz < ELF_phdr[1].memsz) {
-        ZeroSection((unsigned int *)(ModuleInfo->text_start + ELF_phdr[1].filesz), (ELF_phdr[1].memsz - ELF_phdr[1].filesz) >> 2);
+        ZeroSection((unsigned int *)((u8 *)(ModuleInfo->text_start) + ELF_phdr[1].filesz), (ELF_phdr[1].memsz - ELF_phdr[1].filesz) >> 2);
     }
 
     /* 0x00001048 */
@@ -512,31 +512,31 @@ static void LoadIRXModule(const void *module, struct ModuleInfo *ModuleInfo)
 
             /* 0x0000107c - Warning: beware of sign extension! The code here depends on sign extension. */
             for (i = 0, ELF_relocation = (elf_rel *)((unsigned int)module + CurrentELF_shdr->offset); i < NumRelocs; i++, ELF_relocation++) {
-                //            DEBUG_PRINTF("Reloc %d: %p\n", (unsigned char)ELF_relocation->info&0xFF, ModuleInfo->text_start+ELF_relocation->offset);    //Code for debugging only: Not originally present.
+                //            DEBUG_PRINTF("Reloc %d: %p\n", (unsigned char)ELF_relocation->info&0xFF, (u8 *)(ModuleInfo->text_start)+ELF_relocation->offset);    //Code for debugging only: Not originally present.
 
                 switch (ELF_relocation->info & 0xFF) {
                     case R_MIPS_NONE:
                         break;
                     case R_MIPS_16:
-                        WordPatchLocation = (unsigned int *)(ModuleInfo->text_start + ELF_relocation->offset);
-                        *WordPatchLocation = (*WordPatchLocation & 0xFFFF0000) | (((unsigned int)ModuleInfo->text_start + *(short int *)(ModuleInfo->text_start + ELF_relocation->offset)) & 0xFFFF);
+                        WordPatchLocation = (unsigned int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation->offset);
+                        *WordPatchLocation = (*WordPatchLocation & 0xFFFF0000) | (((unsigned int)ModuleInfo->text_start + *(short int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation->offset)) & 0xFFFF);
                         break;
                     case R_MIPS_32:
-                        WordPatchLocation = (unsigned int *)(ModuleInfo->text_start + ELF_relocation->offset);
+                        WordPatchLocation = (unsigned int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation->offset);
                         *WordPatchLocation += (unsigned int)ModuleInfo->text_start;
                         break;
                     case R_MIPS_REL32:
                         break;
                     case R_MIPS_26:
-                        WordPatchLocation = (unsigned int *)(ModuleInfo->text_start + ELF_relocation->offset);
+                        WordPatchLocation = (unsigned int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation->offset);
                         *WordPatchLocation = (((unsigned int)ModuleInfo->text_start + ((*WordPatchLocation & 0x03FFFFFF) << 2 | ((unsigned int)WordPatchLocation & 0xF0000000))) << 4 >> 6) | (*WordPatchLocation & 0xFC000000);
                         break;
                     case R_MIPS_HI16: // 0x00001120    - Ouch. D:
-                        temp = (((unsigned int)*(unsigned short int *)(ModuleInfo->text_start + ELF_relocation->offset)) << 16) + *(short int *)(ModuleInfo->text_start + ELF_relocation[1].offset);
+                        temp = (((unsigned int)*(unsigned short int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation->offset)) << 16) + *(short int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation[1].offset);
                         temp += (unsigned int)ModuleInfo->text_start;
-                        WordPatchLocation = (unsigned int *)(ModuleInfo->text_start + ELF_relocation->offset);
+                        WordPatchLocation = (unsigned int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation->offset);
                         *WordPatchLocation = (((temp >> 15) + 1) >> 1 & 0xFFFF) | (*WordPatchLocation & 0xFFFF0000);
-                        WordPatchLocation = (unsigned int *)(ModuleInfo->text_start + ELF_relocation[1].offset);
+                        WordPatchLocation = (unsigned int *)((u8 *)(ModuleInfo->text_start) + ELF_relocation[1].offset);
                         *WordPatchLocation = (*WordPatchLocation & 0xFFFF0000) | (temp & 0xFFFF);
                         ELF_relocation++;
                         i++;
@@ -607,7 +607,7 @@ static int LoadModule(const void *module, struct ModuleInfo *ModuleInfo)
     }
 
     /* 0x00000dd4 */
-    InitLoadedModInfo(ModuleInfo, ModuleInfo->text_start - 0x30);
+    InitLoadedModInfo(ModuleInfo, (void *)((u8 *)(ModuleInfo->text_start) - 0x30));
 
     return 0;
 }
@@ -1035,7 +1035,7 @@ int _start(int argc, char *argv[])
 
     ResetData = buffer;
     memset(ResetData, 0, sizeof(struct ResetData));
-    ResetData->ModData = (void *)buffer + sizeof(struct ResetData);
+    ResetData->ModData = (void *)((u8 *)buffer + sizeof(struct ResetData));
     IoprpBuffer = (void *)((unsigned int)buffer + MAX_MODULES * sizeof(void *) + sizeof(struct ResetData));
     ResetData->IOPRPBuffer = (void *)((unsigned int)IoprpBuffer & 0x1FFFFF00);
     ResetData->MemSize = QueryMemSize() >> 20;
@@ -1051,7 +1051,7 @@ int _start(int argc, char *argv[])
         ImageDataBuffer[0].filename = "ROM";
     }
     if (BootMode3 & 0x00000100) {
-        if (GetFileStatFromImage(&ImageDataBuffer[0].stat, "OLDROM", &ROMStat) != 0 && GetIOPRPStat(ROMStat.data, ROMStat.data + 0x40000, &ImageDataBuffer[1].stat)) {
+        if (GetFileStatFromImage(&ImageDataBuffer[0].stat, "OLDROM", &ROMStat) != 0 && GetIOPRPStat(ROMStat.data, (const void *)((const u8 *)(ROMStat.data) + 0x40000), &ImageDataBuffer[1].stat)) {
             memcpy(&ImageDataBuffer[0].stat, &ImageDataBuffer[1].stat, sizeof(ImageDataBuffer[0].stat));
             printf("  use alternate ROM image\n");
         }
@@ -1067,7 +1067,7 @@ int _start(int argc, char *argv[])
         memcpy(IoprpBuffer, IOPRP_img, size_IOPRP_img);
         if (GetIOPRPStat(IoprpBuffer, (void *)((unsigned int)IoprpBuffer + size_IOPRP_img), &ImageDataBuffer[1].stat) != NULL) {
             ImageDataBuffer[1].filename = "DATA";
-            IoprpBuffer += (size_IOPRP_img + 0xF) & ~0xF;
+            IoprpBuffer = (void *)((u8 *)IoprpBuffer + ((size_IOPRP_img + 0xF) & ~0xF));
         }
     }
 
@@ -1079,9 +1079,9 @@ int _start(int argc, char *argv[])
 
         do {
             if (read(ImageData->fd, IoprpBuffer, ImageData->size) == ImageData->size) {
-                if (GetIOPRPStat(IoprpBuffer, IoprpBuffer + 0x4000, &ImageData->stat) != NULL) {
+                if (GetIOPRPStat(IoprpBuffer, (void *)((u8 *)IoprpBuffer + 0x4000), &ImageData->stat) != NULL) {
                     /* 0x00000420 */
-                    IoprpBuffer += (ImageData->size + 0xF) & ~0xF;
+                    IoprpBuffer = (void *)((u8 *)IoprpBuffer + ((ImageData->size + 0xF) & ~0xF));
                 }
             }
 

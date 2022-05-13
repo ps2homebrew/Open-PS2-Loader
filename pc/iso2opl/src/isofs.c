@@ -160,7 +160,7 @@ int isofs_ReadISO(s64 offset, u32 nbytes, void *buf)
     int r;
 
 #ifdef DEBUG
-    printf("isofs_ReadISO: offset = %lld nbytes = %d\n", offset, nbytes);
+    printf("isofs_ReadISO: offset = %lld nbytes = %u\n", offset, nbytes);
 #endif
 
     // lseek64(g_fh_iso, offset, SEEK_SET);
@@ -189,7 +189,7 @@ int isofs_ReadSect(u32 lsn, u32 nsectors, void *buf)
     s64 offset;
 
 #ifdef DEBUG
-    printf("isofs_ReadSect: LBA = %d nsectors = %d\n", lsn, nsectors);
+    printf("isofs_ReadSect: LBA = %u nsectors = %u\n", lsn, nsectors);
 #endif
 
     offset = lsn * 2048;
@@ -410,7 +410,7 @@ int FindPath(char *pathname)
                         strcat(CachedDirInfo.pathname, "/");
 
 #ifdef DEBUG
-                        printf("Adding '%s' to cached pathname - path depth = %d\n", dirname, CachedDirInfo.path_depth);
+                        printf("Adding '%s' to cached pathname - path depth = %u\n", dirname, CachedDirInfo.path_depth);
 #endif
 
                         strcat(CachedDirInfo.pathname, dirname);
@@ -456,7 +456,7 @@ int FindPath(char *pathname)
 
         if (isofs_ReadSect(CachedDirInfo.sector_start + CachedDirInfo.cache_offset, CachedDirInfo.cache_size, CachedDirInfo.cache) != 1) {
 #ifdef DEBUG
-            printf("Couldn't Read from CD, trying to read %d sectors, starting at sector %d !\n",
+            printf("Couldn't Read from CD, trying to read %u sectors, starting at sector %u !\n",
                    CachedDirInfo.cache_size, CachedDirInfo.sector_start + CachedDirInfo.cache_offset);
 #endif
 
@@ -669,7 +669,7 @@ int isofs_Cache_Dir(const char *pathname, enum Cache_getMode getMode)
     }
 
 #ifdef DEBUG
-    printf("Read the CD root TOC - LBA = %d size = %d\n",
+    printf("Read the CD root TOC - LBA = %u size = %u\n",
            (gIsBigEnd ? CDVolDesc.rootToc.tocLBA_bigend : CDVolDesc.rootToc.tocLBA),
            (gIsBigEnd ? CDVolDesc.rootToc.tocSize_bigend : CDVolDesc.rootToc.tocSize));
 #endif
@@ -833,7 +833,7 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 // If we've got here, then we have a block of the directory cached, and want to check
 // from this point, to the end of the dir
 #ifdef DEBUG
-    printf("cache_size = %d\n", CachedDirInfo.cache_size);
+    printf("cache_size = %u\n", CachedDirInfo.cache_size);
 #endif
 
     while (CachedDirInfo.cache_size > 0) {
@@ -959,7 +959,7 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
     s64 offset;
 
 #ifdef DEBUG
-    printf("isofs_Read: fd = %d nbytes = %d\n", fd, nbytes);
+    printf("isofs_Read: fd = %d nbytes = %u\n", fd, nbytes);
 #endif
 
     if (!isofs_inited)
@@ -981,7 +981,7 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
     offset = (((s64)fh->lsn) * 2048) + fh->position;
 
 #ifdef DEBUG
-    printf("isofs_Read: offset =%lld nbytes = %d\n", offset, nbytes);
+    printf("isofs_Read: offset =%lld nbytes = %u\n", offset, nbytes);
 #endif
 
     r = isofs_ReadISO(offset, nbytes, buf);
@@ -1001,7 +1001,7 @@ int isofs_Seek(int fd, u32 offset, int origin)
     FHANDLE *fh;
 
 #ifdef DEBUG
-    printf("isofs_Seek: fd = %d offset = %d origin = %d\n", fd, offset, origin);
+    printf("isofs_Seek: fd = %d offset = %u origin = %d\n", fd, offset, origin);
 #endif
 
     if (!isofs_inited)

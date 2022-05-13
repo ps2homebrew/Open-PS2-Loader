@@ -55,13 +55,13 @@
  */
 typedef struct
 {
-    int addr;
-    int val;
+    u32 addr;
+    u32 val;
 } code_t;
 
 void InitCheatsConfig(config_set_t *configSet);
 int GetCheatsEnabled(void);
-const int *GetCheatsList(void);
+const u32 *GetCheatsList(void);
 int load_cheats(const char *cheatfile);
 
 #endif /* _CHEATMAN_H_ */

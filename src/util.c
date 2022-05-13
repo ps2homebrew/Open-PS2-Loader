@@ -402,7 +402,6 @@ void closeFileBuffer(file_buffer_t *fileBuffer)
     }
     free(fileBuffer->buffer);
     free(fileBuffer);
-    fileBuffer = NULL;
 }
 
 // a simple maximum of two
@@ -511,7 +510,7 @@ int CheckPS2Logo(int fd, u32 lba)
             w = !(hddReadSectors(lba + k, 1, buffer));
             if (!w)
                 break;
-            buffer += 512;
+            buffer = (void *)((u8 *)buffer + 512);
         }
     }
 

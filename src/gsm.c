@@ -138,7 +138,7 @@ void PrepareGSM(char *cmdline)
 
     FIELD_fix = gGSMFIELDFix != 0 ? 1 : 0;
 
-    sprintf(cmdline, "%d %d %d %llu %llu %u %u %u %d %d %d", predef_vmode[gGSMVMode].interlace,
+    sprintf(cmdline, "%hhu %hhu %hhu %llu %llu %hu %d %d %d %d %d", predef_vmode[gGSMVMode].interlace,
             predef_vmode[gGSMVMode].mode,
             predef_vmode[gGSMVMode].ffmd,
             predef_vmode[gGSMVMode].display,

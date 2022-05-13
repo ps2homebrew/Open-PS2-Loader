@@ -240,16 +240,13 @@ pkoWriteMem(char *buf, int len)
 static void
 cmdListener(int sock)
 {
-    int done;
     int len;
     int addrlen;
     unsigned int cmd;
     pko_pkt_hdr *header;
     struct sockaddr_in remote_addr;
 
-    done = 0;
-
-    while (!done) {
+    while (1) {
 
         addrlen = sizeof(remote_addr);
         len = recvfrom(sock, &recvbuf[0], BUF_SIZE, 0,

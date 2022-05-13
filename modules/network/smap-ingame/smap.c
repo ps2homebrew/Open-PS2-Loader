@@ -104,7 +104,7 @@ static u16 _smap_read_phy(volatile u8 *emac3_regbase, unsigned int address)
     } while (i < 100);
 
     if (i >= 100)
-        printf("smap: %s: > %d ms\n", "_smap_read_phy", i);
+        printf("smap: %s: > %u ms\n", "_smap_read_phy", i);
 
     return result;
 }
@@ -563,7 +563,7 @@ int smap_init(int argc, char *argv[])
 
     SmapDriverData.smap_regbase = smap_regbase;
     SmapDriverData.emac3_regbase = emac3_regbase;
-    if (!SPD_REG16(SPD_R_REV_3) & SPD_CAPS_SMAP)
+    if ((SPD_REG16(SPD_R_REV_3) & SPD_CAPS_SMAP) == 0)
         return -1;
     if (SPD_REG16(SPD_R_REV_1) < 0x11)
         return -6; // Minimum: revision 17, ES2.

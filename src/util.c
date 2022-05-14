@@ -508,38 +508,23 @@ int CheckPS2Logo(int fd, u32 lba)
     u32 ps2logochecksum = 0;
     char text[1024];
 
-    struct {
-        CISO_header header;
-        u32 first_block;
-    } ziso_data;
-
     w = 0;
     if ((fd > 0) && (lba == 0)){ // BDM_MODE & ETH_MODE
-        // read file header
         lseek(fd, 0, SEEK_SET);
-        read(fd, &ziso_data, sizeof(ziso_data));
-        if (ziso_data.header.magic != ZSO_MAGIC){ // plain ISO
-            lseek(fd, 0, SEEK_SET);
-            w = read(fd, logo, sizeof(logo)) == sizeof(logo);
-        }
+        w = read(fd, logo, sizeof(logo)) == sizeof(logo);
     }
     if ((lba > 0) && (fd == 0)) {       // HDD_MODE
-        // read file header
-        hddReadSectors(lba, 1, buffer);
-        memcpy(&ziso_data, buffer, sizeof(ziso_data));
-        if (ziso_data.header.magic != ZSO_MAGIC){ // plain ISO
-            for (k = 0; k <= 12 * 4; k++) { // NB: Disc sector size (2048 bytes) and HDD sector size (512 bytes) differ, hence why we multiplied the number of sectors (12) by 4.
-                w = !(hddReadSectors(lba + k, 1, buffer));
-                if (!w)
-                    break;
-                buffer += 512;
-            }
+        for (k = 0; k <= 12 * 4; k++) { // NB: Disc sector size (2048 bytes) and HDD sector size (512 bytes) differ, hence why we multiplied the number of sectors (12) by 4.
+            w = !(hddReadSectors(lba + k, 1, buffer));
+            if (!w)
+                break;
+            buffer += 512;
         }
     }
 
-    if (ziso_data.header.magic == ZSO_MAGIC){
+    if (*(u32*)buffer == ZSO_MAGIC){
         // initialize ZSO
-        initZSO(&ziso_data.header, ziso_data.first_block);
+        initZSO(buffer, *(u32*)((u8*)buffer + sizeof(CISO_header)));
         probed_fd = fd;
         probed_lba = lba;
         // read ZISO data

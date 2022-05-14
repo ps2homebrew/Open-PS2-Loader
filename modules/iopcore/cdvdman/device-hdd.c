@@ -82,10 +82,10 @@ void DeviceInit(void)
 void DeviceSetupZSO(u8* buffer){
     ciso_read_sector(buffer, 16, 1);
     u32 maxLBA = *(u32*)(buffer+80);
-    if (maxLBA < ciso_total_block){
+    if (maxLBA < ciso_total_block){ // dual layer check
         ciso_read_sector(buffer, maxLBA, 1);
         if ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5))){
-            cdvdman_settings.common.layer1_start = maxLBA-16;
+            cdvdman_settings.common.layer1_start = maxLBA-16; // adjust second layer start
         }
     }
 }

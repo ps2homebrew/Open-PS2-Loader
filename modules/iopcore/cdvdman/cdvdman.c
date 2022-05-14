@@ -209,8 +209,8 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
     // read first block if not aligned to sector size
     if (pos) {
         int r = MIN(size, (2048 - pos));
-        DeviceReadSectorsCached(lba, ciso_com_buf, 1);
-        memcpy(addr, ciso_com_buf + pos, r);
+        DeviceReadSectorsCached(lba, ciso_tmp_buf, 1);
+        memcpy(addr, ciso_tmp_buf + pos, r);
         size -= r;
         lba++;
         addr += r;
@@ -230,8 +230,8 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
     // read remaining data
     if (size) {
-        DeviceReadSectorsCached(lba, ciso_com_buf, 1);
-        memcpy(addr, ciso_com_buf, size);
+        DeviceReadSectorsCached(lba, ciso_tmp_buf, 1);
+        memcpy(addr, ciso_tmp_buf, size);
         size = 0;
     }
 

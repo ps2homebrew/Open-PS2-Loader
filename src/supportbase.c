@@ -478,18 +478,9 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
     return count;
 }
 
-static int probed_fd = -1;
+extern int probed_fd;
+extern u32 probed_lba;
 extern u8 IOBuffer[2048];
-int read_cso_data(u8* addr, u32 size, u32 offset, u32 shift)
-{
-    u64 pos = (u64)offset<<shift;
-    lseek64(probed_fd, pos, SEEK_SET);
-    return read(probed_fd, addr, size);
-}
-
-void* ciso_alloc(u32 size){
-    return malloc(size);
-}
 
 static int ProbeZISO(int fd)
 {
@@ -503,6 +494,7 @@ static int ProbeZISO(int fd)
         initZSO(&ziso_data.header, ziso_data.first_block);
         // redirect cdEmuRead function
         probed_fd = fd;
+        probed_lba = 0;
         return 1;
     }
     else{

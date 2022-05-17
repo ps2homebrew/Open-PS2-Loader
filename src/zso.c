@@ -3,13 +3,10 @@
 int probed_fd = 0;
 u32 probed_lba = 0;
 
-static void ReadHDDSectors(u32 lba, u8* buffer, u32 nsectors){
-    int k, w;
-    int lsn = probed_lba + (lba*4);
-    for (k = 0; k <= nsectors * 4; k++) { // NB: Disc sector size (2048 bytes) and HDD sector size (512 bytes) differ, hence why we multiplied the number of sectors by 4.
-        hddReadSectors(lsn + k, 1, buffer);
-        buffer += 512;
-    }
+static void ReadHDDSectors(u32 lba, u8* buffer, u32 nsectors)
+{
+    u32 lsn = probed_lba + (lba*4);
+    hddReadSectors(lsn, nsectors*4, buffer);
 }
 
 static void longLseek(int fd, unsigned int lba)

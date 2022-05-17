@@ -492,7 +492,7 @@ static int ProbeZISO(int fd)
     if (read(fd, &ziso_data, sizeof(ziso_data)) == sizeof(ziso_data) && ziso_data.header.magic == ZSO_MAGIC) {
         // initialize ZSO
         initZSO(&ziso_data.header, ziso_data.first_block);
-        // redirect cdEmuRead function
+        // set ISO file descriptor for ZSO reader
         probed_fd = fd;
         probed_lba = 0;
         return 1;

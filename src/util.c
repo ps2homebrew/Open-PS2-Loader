@@ -548,6 +548,10 @@ int CheckPS2Logo(int fd, u32 lba)
         probed_lba = lba;
         logfile("read logo sectors\n");
         // read ZISO data
+        if (probed_lba > 0){
+            hddReadSectors(lba + 1*4, 1, logo);
+            logbuffer("mass:/logo_lba1.bin", logo, 512);
+        }
         w = (ciso_read_sector(logo, 0, 12) == 12);
     }
 

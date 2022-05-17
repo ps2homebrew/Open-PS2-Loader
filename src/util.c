@@ -499,6 +499,18 @@ int GetSystemRegion(void)
     return ConsoleRegion;
 }
 
+void logfile(char* text){
+    int fd = open("mass:/opl_log.txt", O_APPEND | O_CREAT | O_WRONLY);
+    write(fd, text, strlen(text));
+    close(fd);
+}
+
+void logbuffer(char* path, void* buf, size_t size){
+    int fd = open(path, O_CREAT | O_TRUNC | O_WRONLY);
+    write(fd, buf, size);
+    close(fd);
+}
+
 int CheckPS2Logo(int fd, u32 lba)
 {
     u8 logo[12 * 2048] ALIGNED(64);
@@ -507,6 +519,8 @@ int CheckPS2Logo(int fd, u32 lba)
     u8 ValidPS2Logo = 0;
     u32 ps2logochecksum = 0;
     char text[1024];
+
+    logfile("checking ps2 logo\n");
 
     w = 0;
     if ((fd > 0) && (lba == 0)){ // BDM_MODE & ETH_MODE
@@ -522,15 +536,22 @@ int CheckPS2Logo(int fd, u32 lba)
         }
     }
 
-    if (*(u32*)buffer == ZSO_MAGIC){
+    logfile("checking for ZSO\n");
+
+    logbuffer("mass:/logo_com.bin", logo, 12*2048);
+
+    if (*(u32*)logo == ZSO_MAGIC){
+        logfile("init ZSO\n");
         // initialize ZSO
-        initZSO(buffer, *(u32*)((u8*)buffer + sizeof(CISO_header)));
+        initZSO(logo, *(u32*)((u8*)logo + sizeof(CISO_header)));
         probed_fd = fd;
         probed_lba = lba;
+        logfile("read logo sectors\n");
         // read ZISO data
-        ciso_read_sector(buffer, 0, 12);
-        w = 1;
+        w = (ciso_read_sector(logo, 0, 12) == 12);
     }
+
+    logbuffer("mass:/logo_dec.bin", logo, 12*2048);
 
     if (w) {
 

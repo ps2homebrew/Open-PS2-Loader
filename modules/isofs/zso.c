@@ -45,7 +45,7 @@ int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
         // refresh index table if needed
         u32 starting_block = lsn;
         u32 ending_block = lsn + count + 1;
-        if (ciso_idx_start_block < 0 || starting_block < ciso_idx_start_block || ending_block >= ciso_idx_start_block + CISO_IDX_MAX_ENTRIES) {
+        if (ciso_idx_start_block < 0 || starting_block < ciso_idx_start_block || starting_block >= ciso_idx_start_block + CISO_IDX_MAX_ENTRIES) {
             read_cso_data(ciso_idx_cache, CISO_IDX_MAX_ENTRIES * sizeof(u32), starting_block * 4 + sizeof(CISO_header), 0);
             ciso_idx_start_block = starting_block;
         }

@@ -26,7 +26,7 @@ typedef struct
 
 
 // block offset cache, reduces IO access
-extern u32* ciso_idx_cache;
+extern u32 *ciso_idx_cache;
 extern int ciso_idx_start_block;
 
 // header data that we need for the reader
@@ -34,13 +34,13 @@ extern u32 ciso_align;
 extern u32 ciso_total_block;
 
 // temp block buffer (2048 bytes)
-extern u8* ciso_tmp_buf;
+extern u8 *ciso_tmp_buf;
 
-void initZSO(CISO_header* header, u32 first_block);
-int ciso_read_sector(u8* buf, u32 sector, unsigned int count);
+void initZSO(CISO_header *header, u32 first_block);
+int ciso_read_sector(u8 *buf, u32 sector, unsigned int count);
 
 // This must be implemented by isofs/cdvdman/frontend
-extern void* ciso_alloc(u32 size);
+extern void *ciso_alloc(u32 size);
 extern int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift);
 
 #endif

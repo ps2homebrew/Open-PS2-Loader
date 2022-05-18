@@ -2,7 +2,7 @@
 #include "zso.h"
 
 // block offset cache, reduces IO access
-u32* ciso_idx_cache = NULL;
+u32 *ciso_idx_cache = NULL;
 int ciso_idx_start_block = -1;
 
 // header data that we need for the reader
@@ -10,20 +10,21 @@ u32 ciso_align;
 u32 ciso_total_block;
 
 // block buffers
-u8* ciso_tmp_buf = NULL;
+u8 *ciso_tmp_buf = NULL;
 
-void initZSO(CISO_header* header, u32 first_block){
+void initZSO(CISO_header *header, u32 first_block)
+{
     // read header information
     ciso_align = header->align;
     ciso_idx_start_block = -1;
     // calculate number of blocks without using uncompressed_size (avoid 64bit division)
     ciso_total_block = ((((first_block & 0x7FFFFFFF) << ciso_align) - sizeof(CISO_header)) / 4) - 1;
     // allocate memory
-    if (ciso_tmp_buf == NULL){
-        ciso_tmp_buf = ciso_alloc(2048 + sizeof(u32)*CISO_IDX_MAX_ENTRIES + 64);
-        if((u32)ciso_tmp_buf & 63) // align 64
-            ciso_tmp_buf = (void*)(((u32)ciso_tmp_buf & (~63)) + 64);
-        if (ciso_tmp_buf){
+    if (ciso_tmp_buf == NULL) {
+        ciso_tmp_buf = ciso_alloc(2048 + sizeof(u32) * CISO_IDX_MAX_ENTRIES + 64);
+        if ((u32)ciso_tmp_buf & 63) // align 64
+            ciso_tmp_buf = (void *)(((u32)ciso_tmp_buf & (~63)) + 64);
+        if (ciso_tmp_buf) {
             ciso_idx_cache = ciso_tmp_buf + 2048;
         }
     }
@@ -35,10 +36,10 @@ void initZSO(CISO_header* header, u32 first_block){
   Tailored for OPL.
   While it should let you read pretty much any format, it's made to work with 2K blocks ZSO for a lightweight implementation.
 */
-int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
+int ciso_read_sector(u8 *addr, u32 lsn, unsigned int count)
 {
 
-    if (lsn >= ciso_total_block){
+    if (lsn >= ciso_total_block) {
         return 0;
     }
 
@@ -54,14 +55,13 @@ int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
             read_cso_data(ciso_idx_cache, CISO_IDX_MAX_ENTRIES * sizeof(u32), starting_block * 4 + sizeof(CISO_header), 0);
             ciso_idx_start_block = starting_block;
         }
-        
+
         // reduce IO by doing one read of all compressed data into the end of the provided buffer
         u32 o_start = (ciso_idx_cache[starting_block - ciso_idx_start_block] & 0x7FFFFFFF);
         u32 o_end;
         if (ending_block < ciso_idx_start_block + CISO_IDX_MAX_ENTRIES) {
             o_end = ciso_idx_cache[ending_block - ciso_idx_start_block];
-        }
-        else{
+        } else {
             read_cso_data(&o_end, sizeof(u32), starting_block * 4 + sizeof(CISO_header), 0);
         }
         o_end &= 0x7FFFFFFF;
@@ -71,7 +71,7 @@ int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
             read_cso_data(c_buf, compressed_size, o_start, ciso_align);
         }
     }
-    
+
     while (size > 0) {
 
         if (lsn >= ciso_total_block) {
@@ -104,7 +104,7 @@ int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
         }
 
         // decompress block
-        if (topbit == 0){
+        if (topbit == 0) {
             memcpy(ciso_tmp_buf, addr, r); // read compressed block into temp buffer
             LZ4_decompress_fast(ciso_tmp_buf, addr, 2048);
         }
@@ -113,5 +113,5 @@ int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
         addr += 2048;
         lsn++;
     }
-    return lsn-o_lsn;
+    return lsn - o_lsn;
 }

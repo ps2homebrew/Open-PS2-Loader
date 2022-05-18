@@ -159,7 +159,8 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
     return 0;
 }
 
-void* ciso_alloc(u32 size){
+void *ciso_alloc(u32 size)
+{
     return AllocSysMemory(0, size, NULL);
 }
 

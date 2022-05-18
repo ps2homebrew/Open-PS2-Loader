@@ -150,15 +150,16 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 }
 
 //-------------------------------------------------------------------------
-void* ciso_alloc(u32 size){
+void *ciso_alloc(u32 size)
+{
     return AllocSysMemory(0, size, NULL);
 }
 
-int read_cso_data(u8* addr, u32 size, u32 offset, u32 shift)
+int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
 {
-    u32 lba = offset/(2048>>shift); // avoid overflow by shifting sector size instead of offset
-    u32 pos = (offset<<shift)&2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
-    longLseek(MountPoint.fd, lba); // seek to sector
+    u32 lba = offset / (2048 >> shift);  // avoid overflow by shifting sector size instead of offset
+    u32 pos = (offset << shift) & 2047;  // doesn't matter if it overflows since we only care about the 11 LSB anyways
+    longLseek(MountPoint.fd, lba);       // seek to sector
     lseek(MountPoint.fd, pos, SEEK_CUR); // seek within sector
     return read(MountPoint.fd, addr, size);
 }
@@ -503,7 +504,8 @@ ssema:
 
 static int ProbeZISO(int fd)
 {
-    struct {
+    struct
+    {
         CISO_header header;
         u32 first_block;
     } ziso_data;
@@ -514,8 +516,7 @@ static int ProbeZISO(int fd)
         // redirect cdEmuRead function
         cdEmuRead = &cdEmuReadCompressed;
         return 1;
-    }
-    else{
+    } else {
         cdEmuRead = &cdEmuReadRaw;
         return 0;
     }

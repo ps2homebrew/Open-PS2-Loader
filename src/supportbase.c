@@ -484,7 +484,8 @@ extern u8 IOBuffer[2048];
 
 static int ProbeZISO(int fd)
 {
-    struct {
+    struct
+    {
         CISO_header header;
         u32 first_block;
     } ziso_data;
@@ -496,8 +497,7 @@ static int ProbeZISO(int fd)
         probed_fd = fd;
         probed_lba = 0;
         return 1;
-    }
-    else{
+    } else {
         return 0;
     }
 }
@@ -508,15 +508,13 @@ u32 sbGetISO9660MaxLBA(const char *path)
     int file;
 
     if ((file = open(path, O_RDONLY, 0666)) >= 0) {
-        if (ProbeZISO(file)){
-            if (ciso_read_sector(IOBuffer, 16, 1) == 1){
-                maxLBA = *(u32*)(IOBuffer+80);
-            }
-            else{
+        if (ProbeZISO(file)) {
+            if (ciso_read_sector(IOBuffer, 16, 1) == 1) {
+                maxLBA = *(u32 *)(IOBuffer + 80);
+            } else {
                 maxLBA = 0;
             }
-        }
-        else{
+        } else {
             lseek(file, 16 * 2048 + 80, SEEK_SET);
             if (read(file, &maxLBA, sizeof(maxLBA)) != sizeof(maxLBA))
                 maxLBA = 0;
@@ -537,13 +535,12 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
     result = -1;
     if (game->media == SCECdPS2DVD) { // Only DVDs can have multiple layers.
         if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
-            if (ProbeZISO(fd)){
+            if (ProbeZISO(fd)) {
                 if (ciso_read_sector(IOBuffer, layer1_offset, 1) == 1 &&
-                    ((IOBuffer[0x00] == 1) && (!strncmp(&IOBuffer[0x01], "CD001", 5)))){
+                    ((IOBuffer[0x00] == 1) && (!strncmp(&IOBuffer[0x01], "CD001", 5)))) {
                     result = 0;
                 }
-            }
-            else{
+            } else {
                 if (lseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
                     if ((read(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
                         ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {

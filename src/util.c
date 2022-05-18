@@ -499,13 +499,15 @@ int GetSystemRegion(void)
     return ConsoleRegion;
 }
 
-void logfile(char* text){
+void logfile(char *text)
+{
     int fd = open("mass:/opl_log.txt", O_APPEND | O_CREAT | O_WRONLY);
     write(fd, text, strlen(text));
     close(fd);
 }
 
-void logbuffer(char* path, void* buf, size_t size){
+void logbuffer(char *path, void *buf, size_t size)
+{
     int fd = open(path, O_CREAT | O_TRUNC | O_WRONLY);
     write(fd, buf, size);
     close(fd);
@@ -521,7 +523,7 @@ int CheckPS2Logo(int fd, u32 lba)
     char text[1024];
 
     w = 0;
-    if ((fd > 0) && (lba == 0)){ // BDM_MODE & ETH_MODE
+    if ((fd > 0) && (lba == 0)) { // BDM_MODE & ETH_MODE
         lseek(fd, 0, SEEK_SET);
         w = read(fd, logo, sizeof(logo)) == sizeof(logo);
     }
@@ -534,9 +536,9 @@ int CheckPS2Logo(int fd, u32 lba)
         }
     }
 
-    if (*(u32*)logo == ZSO_MAGIC){
+    if (*(u32 *)logo == ZSO_MAGIC) {
         // initialize ZSO
-        initZSO(logo, *(u32*)((u8*)logo + sizeof(CISO_header)));
+        initZSO(logo, *(u32 *)((u8 *)logo + sizeof(CISO_header)));
         probed_fd = fd;
         probed_lba = lba;
         // read ZISO data

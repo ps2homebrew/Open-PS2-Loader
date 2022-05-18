@@ -1566,8 +1566,8 @@ static void setDefaults(void)
     gBaseMCDir = "mc?:OPL";
 
     bdmCacheSize = 16;
-    hddCacheSize = 4;
-    smbCacheSize = 8;
+    hddCacheSize = 8;
+    smbCacheSize = 12;
 
     ps2_ip_use_dhcp = 1;
     gETHOpMode = ETH_OP_MODE_AUTO;

@@ -172,8 +172,8 @@ void *ciso_alloc(u32 size)
 */
 int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
 {
-    if (sectors <= MAX_SECTOR_CACHE) { // if MAX_SECTOR_CACHE is 0 then it will act as disabled and passthrough
-        if (cur_sector < 0 || lsn < cur_sector || (lsn + sectors) - cur_sector >= MAX_SECTOR_CACHE) {
+    if (sectors < MAX_SECTOR_CACHE) { // if MAX_SECTOR_CACHE is 0 then it will act as disabled and passthrough
+        if (cur_sector < 0 || lsn < cur_sector || (lsn + sectors) - cur_sector > MAX_SECTOR_CACHE) {
             DeviceReadSectors(lsn, sector_cache, MAX_SECTOR_CACHE);
             cur_sector = lsn;
         }

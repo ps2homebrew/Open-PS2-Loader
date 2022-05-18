@@ -86,7 +86,7 @@ static inline void CopyFromFIFO(volatile u8 *smap_regbase, void *buffer, unsigne
 
     if ((result = CopyFromFIFOWithDMA(smap_regbase, buffer, length)) > 0) {
         length -= result;
-        buffer = buffer + result;
+        buffer = (void *)((u8 *)buffer + result);
     }
 
     __asm__ __volatile__(

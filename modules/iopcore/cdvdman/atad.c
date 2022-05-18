@@ -260,8 +260,8 @@ static int ata_device_select(int device)
 
     /* Select the device.  */
     ata_hwport->r_select = (device & 1) << 4;
-    res = ata_hwport->r_control;
-    res = ata_hwport->r_control; //Only done once in v1.04.
+    (void)(ata_hwport->r_control);
+    (void)(ata_hwport->r_control); //Only done once in v1.04.
 
     return ata_wait_bus_busy();
 }

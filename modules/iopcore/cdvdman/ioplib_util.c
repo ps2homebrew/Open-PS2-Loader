@@ -185,9 +185,9 @@ static int Hook_LoadModuleBuffer(void *ptr)
 {
     const struct FakeModule *mod;
 
-    DPRINTF("Hook_LoadModuleBuffer() modname = %s\n", (char *)(ptr + 0x8e));
+    DPRINTF("Hook_LoadModuleBuffer() modname = %s\n", ((char *)ptr + 0x8e));
 
-    mod = checkFakemodByName((char *)(ptr + 0x8e), modulefake_list);
+    mod = checkFakemodByName(((char *)ptr + 0x8e), modulefake_list);
     if (mod != NULL)
         return mod->id;
 

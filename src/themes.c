@@ -114,7 +114,7 @@ static mutable_text_t *initMutableText(const char *themePath, config_set_t *them
     snprintf(elemProp, sizeof(elemProp), "%s_wrap", name);
     if (configGetInt(themeConfig, elemProp, &sizingMode)) {
         if (sizingMode > 0)
-            mutableText->sizingMode = SIZING_WRAP;
+            sizingMode = SIZING_WRAP;
     }
 
     if ((elem->width != DIM_UNDEF) || (elem->height != DIM_UNDEF)) {
@@ -1052,7 +1052,6 @@ static void thmFree(theme_t *theme)
             fntRelease(theme->fonts[id]);
 
         free(theme);
-        theme = NULL;
     }
 }
 

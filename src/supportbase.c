@@ -788,7 +788,7 @@ void sbCreateFolders(const char *path, int createDiscImgFolders)
 int sbLoadCheats(const char *path, const char *file)
 {
     char cheatfile[64];
-    const int *cheatList;
+    const u32 *cheatList;
     int result;
 
     if (GetCheatsEnabled()) {

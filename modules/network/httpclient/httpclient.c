@@ -61,7 +61,6 @@ static int GetData(int socket, char *buffer, int length)
         FD_ZERO(&readfds);
         FD_SET(socket, &readfds);
         if (select(socket + 1, &readfds, NULL, NULL, &timeout) <= 0) {
-            result = -EPIPE;
             break;
         }
 

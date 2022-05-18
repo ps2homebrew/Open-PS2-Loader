@@ -30,7 +30,6 @@ static void lngFreeFromFile(char **lang_strs)
         lang_strs[strId] = NULL;
     }
     free(lang_strs);
-    lang_strs = NULL;
 }
 
 static int lngLoadFont(const char *dir, const char *name)

@@ -38,9 +38,9 @@ fi
 printf '\n' >> /tmp/commit_summary
 
 # Store number of commits
-old_number_commits=$(($(cat OLD_DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-)))
-number_commits=$(cat /tmp/commit_summary | wc -l)
-new_number_commits=$((${number_commits} - ${old_number_commits} + 2))
+old_number_commits=$(($(grep "rev" < OLD_DETAILED_CHANGELOG | head -1 | cut -d " " -f 1 | cut -c 4-)))
+number_commits=$(wc -l < /tmp/commit_summary)
+new_number_commits=$((number_commits - old_number_commits + 2))
 
 # Echo it!
 echo "Current Revision ${number_commits} (Of BitBucket r${old_number_commits} + Of GIT r${new_number_commits})"
@@ -62,7 +62,7 @@ gawk '{ L[n++] = $0 } END { while(n--) print L[n] }' /tmp/commit_summary > /tmp/
 # Store each commit in one variable[list]
 while read line_commit_summary
 do
- old_number_commits=$((${old_number_commits} + 1))
+ old_number_commits=$((old_number_commits + 1))
  echo "rev${old_number_commits} - ${line_commit_summary}" >> /tmp/commit_summary_new
 done < /tmp/commit_summary_reverse
 

@@ -112,7 +112,7 @@ uint32_t nbd_recv(int s, void *mem, size_t len, int flags)
     //        LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE("nbd_recv(-, 0x%X, %d)\n", (int)mem, size);
     // dbgLOG("left = %u\n", left);
     do {
-        bytesRead = recv(s, mem + totalRead, left, flags);
+        bytesRead = recv(s, (void *)((uint8_t *)mem + totalRead), left, flags);
         // dbgLOG("bytesRead = %u\n", bytesRead);
         if (bytesRead <= 0) // if (bytesRead == -1) failed for nbdfuse, seems it not send NBD_CMD_DISC
             break;

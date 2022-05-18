@@ -61,18 +61,19 @@ def lz4_compress_mp(i):
     return lz4.block.compress(i[0], store_size=False)
 
 
-def lz4_decompress(compressed):
+def lz4_decompress(compressed, block_size, align):
     # hexdump(compressed)
-    usize = 2048
-    max_size = 4177920
+    padding = 0
     while True:
         try:
-            decompressed = lz4.block.decompress(compressed, uncompressed_size=usize)
+            decompressed = lz4.block.decompress(
+                compressed, uncompressed_size=block_size)
             break
         except lz4.block.LZ4BlockError:
-            usize *= 2
-            if usize > max_size:
-                print('Error: data too large or corrupt')
+            padding += 1
+            compressed = compressed[:-1]
+            if padding > align:
+                print('Error: align too large or corrupt')
                 break
     return decompressed
 
@@ -175,10 +176,9 @@ def decompress_zso(fname_in, fname_out, level):
             """
             Have to read more bytes if align was set
             """
-            if align:
-                read_size = (index2-index+1) << (align)
-            else:
-                read_size = (index2-index) << (align)
+            read_size = (index2-index) << (align)
+            if block == total_block - 1:
+                read_size = total_bytes - read_pos
 
         zso_data = seek_and_read(fin, read_pos, read_size)
 
@@ -186,7 +186,8 @@ def decompress_zso(fname_in, fname_out, level):
             dec_data = zso_data
         else:
             try:
-                dec_data = lz4_decompress(zso_data)
+                dec_data = lz4_decompress(zso_data, block_size, align)
+
             except Exception as e:
                 print("%d block: 0x%08X %d %s" %
                       (block, read_pos, read_size, e))
@@ -229,8 +230,14 @@ def compress_zso(fname_in, fname_out, level):
 
     # We have to use alignment on any ZSO files which > 2GB, for MSB bit of index as the plain indicator
     # If we don't then the index can be larger than 2GB, which its plain indicator was improperly set
-    if total_bytes >= 2 ** 31 and align == 0:
+    if total_bytes >= 2 ** 31 and align < 1:
         align = 1
+    elif total_bytes >= 4 ** 31 and align < 2:
+        align = 2
+    elif total_bytes >= 6 ** 31 and align < 3:
+        align = 3
+    elif total_bytes >= 8 ** 31 and align < 4:
+        align = 4
 
     header = generate_zso_header(
         magic, header_size, total_bytes, block_size, ver, align)

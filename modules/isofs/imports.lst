@@ -9,7 +9,6 @@ ioman_IMPORTS_start
 I_open
 I_close
 I_read
-I_write
 I_lseek
 I_AddDrv
 ioman_IMPORTS_end

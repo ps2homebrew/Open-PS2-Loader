@@ -81,7 +81,7 @@ static oplShutdownCb_t vmcShutdownCb = NULL;
 void initCache()
 {
     u8 cache_size = DeviceGetCacheSize();
-    if (cache_size) {
+    if (cache_size && sector_cache == NULL) {
         sector_cache = AllocSysMemory(ALLOC_FIRST, cache_size * 2048, NULL);
         if (sector_cache)
             MAX_SECTOR_CACHE = cache_size;
@@ -254,8 +254,6 @@ static int ProbeZSO(u8 *buffer)
     if (*(u32 *)buffer == ZSO_MAGIC) {
         // initialize ZSO
         initZSO((CISO_header *)buffer, *(u32 *)(buffer + sizeof(CISO_header)));
-        // initialize cache
-        initCache(); // only makes sense to have a cache on ZSO
         // Device ZSO Setup
         DeviceSetupZSO(buffer);
         // redirect sector reader
@@ -271,9 +269,13 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
-    if (probed == 0)        // Probe for ZSO before first read
+    if (probed == 0){        // Probe for ZSO before first read
+        // initialize cache
+        initCache();
+        // check for ZSO
         if (!ProbeZSO(buf)) // we need to pass the buffer so we have somewhere to read the first sector to identify ZSO before allocating any extra RAM
             return 1;
+    }
 
     cdvdman_stat.err = SCECdErNO;
     for (ptr = buf, remaining = sectors; remaining > 0;) {

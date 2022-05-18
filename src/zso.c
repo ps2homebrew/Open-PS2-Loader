@@ -6,7 +6,10 @@ u32 probed_lba = 0;
 static void ReadHDDSectors(u32 lba, u8* buffer, u32 nsectors)
 {
     u32 lsn = probed_lba + (lba*4);
-    hddReadSectors(lsn, nsectors*4, buffer);
+    for (int k=0; k<nsectors*4; k++){
+        hddReadSectors(lsn + k, 1, buffer);
+        buffer += 512;
+    }
 }
 
 static void longLseek(int fd, unsigned int lba)
@@ -32,13 +35,11 @@ int read_cso_data(u8* addr, u32 size, u32 offset, u32 shift)
     u32 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
     u32 pos = (offset << shift) & 2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
     if (probed_fd > 0){ // USB/ETH
-        logfile("read from USB/ETH sectors\n");
         longLseek(probed_fd, lba);
         lseek(probed_fd, pos, SEEK_CUR);
         return read(probed_fd, addr, size);
     }
     else{ // HDD
-        logfile("read from HDD\n");
         u32 o_size = size;
 
         // read first block if not aligned to sector size

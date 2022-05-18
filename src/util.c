@@ -520,8 +520,6 @@ int CheckPS2Logo(int fd, u32 lba)
     u32 ps2logochecksum = 0;
     char text[1024];
 
-    logfile("checking ps2 logo\n");
-
     w = 0;
     if ((fd > 0) && (lba == 0)){ // BDM_MODE & ETH_MODE
         lseek(fd, 0, SEEK_SET);
@@ -536,29 +534,16 @@ int CheckPS2Logo(int fd, u32 lba)
         }
     }
 
-    logfile("checking for ZSO\n");
-
-    logbuffer("mass:/logo_com.bin", logo, 12*2048);
-
     if (*(u32*)logo == ZSO_MAGIC){
-        logfile("init ZSO\n");
         // initialize ZSO
         initZSO(logo, *(u32*)((u8*)logo + sizeof(CISO_header)));
         probed_fd = fd;
         probed_lba = lba;
-        logfile("read logo sectors\n");
         // read ZISO data
-        if (probed_lba > 0){
-            hddReadSectors(lba + 1*4, 1, logo);
-            logbuffer("mass:/logo_lba1.bin", logo, 512);
-        }
         w = (ciso_read_sector(logo, 0, 12) == 12);
     }
 
-    logbuffer("mass:/logo_dec.bin", logo, 12*2048);
-
     if (w) {
-
         u8 key = logo[0];
         if (logo[0] != 0) {
             for (j = 0; j < (12 * 2048); j++) {

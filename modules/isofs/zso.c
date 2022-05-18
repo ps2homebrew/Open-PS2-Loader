@@ -37,6 +37,11 @@ void initZSO(CISO_header* header, u32 first_block){
 */
 int ciso_read_sector(u8* addr, u32 lsn, unsigned int count)
 {
+
+    if (lsn >= ciso_total_block){
+        return 0;
+    }
+
     u32 size = count * 2048;
     u32 o_lsn = lsn;
     u8 *c_buf = NULL;

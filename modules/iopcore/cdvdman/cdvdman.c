@@ -26,7 +26,7 @@ extern struct irx_export_table _exp_dev9;
 
 // reader function interface, raw reader impementation by default
 int DeviceReadSectorsCached(u32 sector, void *buffer, unsigned int count);
-int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectors;
+int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectorsCached;
 
 // internal functions prototypes
 static void oplShutdown(int poff);

@@ -486,13 +486,13 @@ static int ProbeZISO(int fd)
 {
     struct
     {
-        CISO_header header;
+        ZISO_header header;
         u32 first_block;
     } ziso_data;
     lseek(fd, 0, SEEK_SET);
     if (read(fd, &ziso_data, sizeof(ziso_data)) == sizeof(ziso_data) && ziso_data.header.magic == ZSO_MAGIC) {
         // initialize ZSO
-        initZSO(&ziso_data.header, ziso_data.first_block);
+        ziso_init(&ziso_data.header, ziso_data.first_block);
         // set ISO file descriptor for ZSO reader
         probed_fd = fd;
         probed_lba = 0;
@@ -509,7 +509,7 @@ u32 sbGetISO9660MaxLBA(const char *path)
 
     if ((file = open(path, O_RDONLY, 0666)) >= 0) {
         if (ProbeZISO(file)) {
-            if (ciso_read_sector(IOBuffer, 16, 1) == 1) {
+            if (ziso_read_sector(IOBuffer, 16, 1) == 1) {
                 maxLBA = *(u32 *)(IOBuffer + 80);
             } else {
                 maxLBA = 0;
@@ -536,7 +536,7 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
     if (game->media == SCECdPS2DVD) { // Only DVDs can have multiple layers.
         if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
             if (ProbeZISO(fd)) {
-                if (ciso_read_sector(IOBuffer, layer1_offset, 1) == 1 &&
+                if (ziso_read_sector(IOBuffer, layer1_offset, 1) == 1 &&
                     ((IOBuffer[0x00] == 1) && (!strncmp(&IOBuffer[0x01], "CD001", 5)))) {
                     result = 0;
                 }

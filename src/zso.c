@@ -30,7 +30,7 @@ static void longLseek(int fd, unsigned int lba)
     }
 }
 
-int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
+int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 {
     u32 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
     u32 pos = (offset << shift) & 2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
@@ -44,8 +44,8 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
         // read first block if not aligned to sector size
         if (pos) {
             int r = MIN(size, (2048 - pos));
-            ReadHDDSectors(lba, ciso_tmp_buf, 1);
-            memcpy(addr, ciso_tmp_buf + pos, r);
+            ReadHDDSectors(lba, ziso_tmp_buf, 1);
+            memcpy(addr, ziso_tmp_buf + pos, r);
             size -= r;
             lba++;
             addr += r;
@@ -65,8 +65,8 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
         // read remaining data
         if (size) {
-            ReadHDDSectors(lba, ciso_tmp_buf, 1);
-            memcpy(addr, ciso_tmp_buf, size);
+            ReadHDDSectors(lba, ziso_tmp_buf, 1);
+            memcpy(addr, ziso_tmp_buf, size);
             size = 0;
         }
 
@@ -75,7 +75,7 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
     }
 }
 
-void *ciso_alloc(u32 size)
+void *ziso_alloc(u32 size)
 {
     return malloc(size);
 }

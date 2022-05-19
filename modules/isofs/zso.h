@@ -8,7 +8,7 @@
 
 #define ZSO_MAGIC 0x4F53495A // ZISO
 
-#define CISO_IDX_MAX_ENTRIES 256
+#define ZISO_IDX_MAX_ENTRIES 256
 
 #define MIN(x, y) ((x < y) ? x : y)
 
@@ -22,25 +22,25 @@ typedef struct
     u8 ver;          // 20
     u8 align;        // 21
     u8 rsv_06[2];    // 22
-} CISO_header;
+} ZISO_header;
 
 
 // block offset cache, reduces IO access
-extern u32 *ciso_idx_cache;
-extern int ciso_idx_start_block;
+extern u32 *ziso_idx_cache;
+extern int ziso_idx_start_block;
 
 // header data that we need for the reader
-extern u32 ciso_align;
-extern u32 ciso_total_block;
+extern u32 ziso_align;
+extern u32 ziso_total_block;
 
 // temp block buffer (2048 bytes)
-extern u8 *ciso_tmp_buf;
+extern u8 *ziso_tmp_buf;
 
-void initZSO(CISO_header *header, u32 first_block);
-int ciso_read_sector(u8 *buf, u32 sector, unsigned int count);
+void ziso_init(ZISO_header *header, u32 first_block);
+int ziso_read_sector(u8 *buf, u32 sector, unsigned int count);
 
 // This must be implemented by isofs/cdvdman/frontend
-extern void *ciso_alloc(u32 size);
-extern int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift);
+extern void *ziso_alloc(u32 size);
+extern int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift);
 
 #endif

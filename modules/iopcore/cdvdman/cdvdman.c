@@ -159,7 +159,7 @@ static unsigned int cdvdemu_read_end_cb(void *arg)
     return 0;
 }
 
-void *ciso_alloc(u32 size)
+void *ziso_alloc(u32 size)
 {
     return AllocSysMemory(0, size, NULL);
 }
@@ -203,7 +203,7 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
   Since we can only do sector-based reads, this funtions acts as a wrapper.
   It will do at most 3 IO reads, most of the time only 1.
 */
-int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
+int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 {
     u32 o_size = size;
     u32 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
@@ -212,8 +212,8 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
     // read first block if not aligned to sector size
     if (pos) {
         int r = MIN(size, (2048 - pos));
-        DeviceReadSectorsCached(lba, ciso_tmp_buf, 1);
-        memcpy(addr, ciso_tmp_buf + pos, r);
+        DeviceReadSectorsCached(lba, ziso_tmp_buf, 1);
+        memcpy(addr, ziso_tmp_buf + pos, r);
         size -= r;
         lba++;
         addr += r;
@@ -233,8 +233,8 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
     // read remaining data
     if (size) {
-        DeviceReadSectorsCached(lba, ciso_tmp_buf, 1);
-        memcpy(addr, ciso_tmp_buf, size);
+        DeviceReadSectorsCached(lba, ziso_tmp_buf, 1);
+        memcpy(addr, ziso_tmp_buf, size);
         size = 0;
     }
 
@@ -253,7 +253,7 @@ int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
     }
     return SCECdErNO;
     */
-    return (ciso_read_sector(addr, lsn, count) == count) ? SCECdErNO : SCECdErEOM;
+    return (ziso_read_sector(addr, lsn, count) == count) ? SCECdErNO : SCECdErEOM;
 }
 
 static int probed = 0;
@@ -264,7 +264,7 @@ static int ProbeZSO(u8 *buffer)
     probed = 1;
     if (*(u32 *)buffer == ZSO_MAGIC) {
         // initialize ZSO
-        initZSO((CISO_header *)buffer, *(u32 *)(buffer + sizeof(CISO_header)));
+        ziso_init((ZISO_header *)buffer, *(u32 *)(buffer + sizeof(ZISO_header)));
         // Device ZSO Setup
         DeviceSetupZSO(buffer);
         // redirect sector reader

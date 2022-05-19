@@ -150,12 +150,12 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 }
 
 //-------------------------------------------------------------------------
-void *ciso_alloc(u32 size)
+void *ziso_alloc(u32 size)
 {
     return AllocSysMemory(0, size, NULL);
 }
 
-int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
+int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 {
     u32 lba = offset / (2048 >> shift);  // avoid overflow by shifting sector size instead of offset
     u32 pos = (offset << shift) & 2047;  // doesn't matter if it overflows since we only care about the 11 LSB anyways
@@ -172,7 +172,7 @@ static int cdEmuReadRaw(u32 lsn, unsigned int count, void *buffer)
 
 static int cdEmuReadCompressed(u32 lsn, unsigned int count, void *addr)
 {
-    return (ciso_read_sector(addr, lsn, count) == count) ? 0 : -EIO;
+    return (ziso_read_sector(addr, lsn, count) == count) ? 0 : -EIO;
 }
 
 static int (*cdEmuRead)(u32 lsn, unsigned int count, void *buffer) = &cdEmuReadRaw;
@@ -505,13 +505,13 @@ static int ProbeZISO(int fd)
 {
     struct
     {
-        CISO_header header;
+        ZISO_header header;
         u32 first_block;
     } ziso_data;
     longLseek(fd, 0);
     if (read(fd, &ziso_data, sizeof(ziso_data)) == sizeof(ziso_data) && ziso_data.header.magic == ZSO_MAGIC) {
         // initialize ZSO
-        initZSO(&ziso_data.header, ziso_data.first_block);
+        ziso_init(&ziso_data.header, ziso_data.first_block);
         // redirect cdEmuRead function
         cdEmuRead = &cdEmuReadCompressed;
         return 1;

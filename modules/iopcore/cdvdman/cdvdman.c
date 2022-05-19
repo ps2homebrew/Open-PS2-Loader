@@ -265,6 +265,8 @@ static int ProbeZSO(u8 *buffer)
     if (*(u32 *)buffer == ZSO_MAGIC) {
         // initialize ZSO
         ziso_init((ZISO_header *)buffer, *(u32 *)(buffer + sizeof(ZISO_header)));
+        // initialize cache
+        initCache();
         // Device ZSO Setup
         DeviceSetupZSO(buffer);
         // redirect sector reader
@@ -281,8 +283,6 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
     if (probed == 0) { // Probe for ZSO before first read
-        // initialize cache
-        initCache();
         // check for ZSO
         if (!ProbeZSO(buf)) // we need to pass the buffer so we have somewhere to read the first sector to identify ZSO before allocating any extra RAM
             return 1;

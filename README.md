@@ -15,7 +15,7 @@ Open PS2 Loader (OPL) is a 100% Open source game and application loader for
 the PS2 and PS3 units. It supports three categories of devices: USB mass
 storage devices, SMB shares and the PlayStation 2 HDD unit. USB devices and
 SMB shares support USBExtreme and \*.ISO formats while PS2 HDD supports HDLoader
-format. It's now the most compatible homebrew loader.
+format, all devices also support ZSO format (compressed ISO). It's now the most compatible homebrew loader.
 
 OPL developed continuously - anyone can contribute improvements to
 the project due to its open-source nature.

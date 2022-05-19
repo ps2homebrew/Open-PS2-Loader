@@ -63,18 +63,16 @@ def lz4_compress_mp(i):
 
 def lz4_decompress(compressed, block_size, align):
     # hexdump(compressed)
-    padding = 0
+    decompressed = None
     while True:
         try:
             decompressed = lz4.block.decompress(
                 compressed, uncompressed_size=block_size)
             break
         except lz4.block.LZ4BlockError:
-            padding += 1
-            compressed = compressed[:-1]
-            if padding > align:
-                print('Error: align too large or corrupt')
-                break
+            padding = compressed[-1]
+            while compressed[-1] == padding:
+            	compressed = compressed[:-1]
     return decompressed
 
 

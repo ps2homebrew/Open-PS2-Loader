@@ -220,6 +220,37 @@ Not supported.
 </details>
 
 <details>
+  <summary> <b> ZSO Format </b> </summary>
+<p>
+
+As of version 1.2.0, compressed ISO files in ZSO format is supported by OPL.
+
+To handle ZSO files, a python script (ziso.py) is included in the pc folder of this repository.
+It requires Python 3 and the LZ4 library:
+  
+  ```sh
+pip install lz4
+```
+  
+To compress an ISO file to ZSO:
+  
+  ```sh
+python ziso.py -c 2 "input.iso" "output.zso"
+```
+  
+To decompress a ZSO back to the original ISO:
+  
+```sh
+python ziso.py -c 0 "input.zso" "output.iso"
+```
+  
+You can copy ZSO files to the same folder as your ISOs and they will be detected by OPL.
+To install onto internal HDD, you can use the latest version of HDL-Dump.
+  
+</p>
+</details>
+
+<details>
   <summary> <b> PS3 BC </b> </summary>
 <p>
 

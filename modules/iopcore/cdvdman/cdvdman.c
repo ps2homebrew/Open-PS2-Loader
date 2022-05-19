@@ -185,11 +185,13 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
     // check if we have some of the data already in the cache
     if (MAX_SECTOR_CACHE && cur_sector >= 0 && lsn >= cur_sector){
         int pos = lsn - cur_sector;
-        int r = MAX_SECTOR_CACHE - pos;
-        memcpy(buffer, &(sector_cache[pos*2048]), 2048 * r);
-        buffer += 2048 * r;
-        lsn += r;
-        sectors -= r;
+        if (pos < MAX_SECTOR_CACHE){
+            int r = MAX_SECTOR_CACHE - pos;
+            memcpy(buffer, &(sector_cache[pos*2048]), 2048 * r);
+            buffer += 2048 * r;
+            lsn += r;
+            sectors -= r;
+        }
     }
     */
     int res = DeviceReadSectors(lsn, buffer, sectors);
@@ -242,6 +244,15 @@ int read_cso_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
 int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 {
+    /*
+    u8 *buf = (u8 *)addr;
+    for (u32 i=0; i<count; i++){
+        if (ciso_read_sector(buf, lsn+i, 1)!=1)
+            return SCECdErEOM;
+        buf += 2048;
+    }
+    return SCECdErNO;
+    */
     return (ciso_read_sector(addr, lsn, count) == count) ? SCECdErNO : SCECdErEOM;
 }
 
@@ -269,7 +280,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
-    if (probed == 0){        // Probe for ZSO before first read
+    if (probed == 0) { // Probe for ZSO before first read
         // initialize cache
         initCache();
         // check for ZSO

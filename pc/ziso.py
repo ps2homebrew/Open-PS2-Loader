@@ -70,9 +70,7 @@ def lz4_decompress(compressed, block_size, align):
                 compressed, uncompressed_size=block_size)
             break
         except lz4.block.LZ4BlockError:
-            padding = compressed[-1]
-            while compressed[-1] == padding:
-            	compressed = compressed[:-1]
+            compressed = compressed[:-1]
     return decompressed
 
 
@@ -190,6 +188,11 @@ def decompress_zso(fname_in, fname_out, level):
                 print("%d block: 0x%08X %d %s" %
                       (block, read_pos, read_size, e))
                 sys.exit(-1)
+
+        if (len(dec_data) != block_size):
+            print("%d block: 0x%08X %d" %
+                      (block, read_pos, read_size))
+            sys.exit(-1)
 
         fout.write(dec_data)
         block += 1

@@ -68,7 +68,7 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
         // calculate size of compressed data and if we can copy it entirely into the provided buffer
         u32 compressed_size = (o_end - o_start) << ziso_align;
         if (size >= compressed_size) {
-            c_buf = addr + size - compressed_size; // copy at the end to avoid overlap
+            c_buf = addr + size - compressed_size;                      // copy at the end to avoid overlap
             read_raw_data(c_buf, compressed_size, o_start, ziso_align); // read all compressed data at once
         }
     }
@@ -92,14 +92,14 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
         u32 b_size = ziso_idx_cache[lsn - ziso_idx_start_block + 1];
         u32 topbit = b_offset & 0x80000000; // extract top bit for decompressor
         b_offset = (b_offset & 0x7FFFFFFF); // remove top bit
-        b_size = (b_size & 0x7FFFFFFF); // remove top bit
+        b_size = (b_size & 0x7FFFFFFF);     // remove top bit
         b_size = (b_size - b_offset) << ziso_align;
 
         // prevent reading more than a sector (eliminates padding if any)
         int r = MIN(b_size, 2048);
 
         // read block
-        if (c_buf > addr) { // fast read
+        if (c_buf > addr) {         // fast read
             memcpy(addr, c_buf, r); // move compressed block to its correct position in the buffer
             c_buf += b_size;
         } else { // slow read, happens on rare cases where decompressed data overlaps compressed data
@@ -107,8 +107,8 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
         }
 
         // if the block is not compressed, it will already be in its correct place
-        if (topbit == 0) { // block is compressed
-            memcpy(ziso_tmp_buf, addr, r); // read compressed block into temp buffer
+        if (topbit == 0) {                                 // block is compressed
+            memcpy(ziso_tmp_buf, addr, r);                 // read compressed block into temp buffer
             LZ4_decompress_fast(ziso_tmp_buf, addr, 2048); // decompress block
         }
 

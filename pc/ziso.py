@@ -169,7 +169,7 @@ def decompress_zso(fname_in, fname_out):
             dec_data = zso_data
         else:
             try:
-                dec_data = lz4_decompress(zso_data, block_size, align)
+                dec_data = lz4_decompress(zso_data, block_size)
 
             except Exception as e:
                 print("%d block: 0x%08X %d %s" %

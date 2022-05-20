@@ -229,14 +229,7 @@ def compress_zso(fname_in, fname_out, level):
 
     # We have to use alignment on any ZSO files which > 2GB, for MSB bit of index as the plain indicator
     # If we don't then the index can be larger than 2GB, which its plain indicator was improperly set
-    if total_bytes >= 2 ** 31 and align < 1:
-        align = 1
-    elif total_bytes >= 4 ** 31 and align < 2:
-        align = 2
-    elif total_bytes >= 6 ** 31 and align < 3:
-        align = 3
-    elif total_bytes >= 8 ** 31 and align < 4:
-        align = 4
+    align = total_bytes // 2 ** 31
 
     header = generate_zso_header(
         magic, header_size, total_bytes, block_size, ver, align)

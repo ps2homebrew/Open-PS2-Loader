@@ -49,7 +49,7 @@ MP_NR = 1024 * 16
 
 def hexdump(data):
     for i in data:
-        print("0x%02X" % ((ord(i)))),
+        print("0x%02X" % ((ord(i))))
     print("")
 
 
@@ -136,14 +136,14 @@ def decompress_zso(fname_in, fname_out, level):
     magic, header_size, total_bytes, block_size, ver, align = read_zso_header(
         fin)
 
-    if magic != CISO_MAGIC or block_size == 0 or total_bytes == 0:
+    if magic != CISO_MAGIC or block_size == 0 or total_bytes == 0 or header_size != 24:
         print("ziso file format error")
         return -1
 
     total_block = total_bytes // block_size
     index_buf = []
 
-    for i in xrange(total_block + 1):
+    for _ in xrange(total_block + 1):
         index_buf.append(unpack('I', fin.read(4))[0])
 
     show_zso_info(fname_in, fname_out, total_bytes,
@@ -158,7 +158,7 @@ def decompress_zso(fname_in, fname_out, level):
         if percent_cnt >= percent_period and percent_period != 0:
             percent_cnt = 0
             print("decompress %d%%\r" %
-                  (block / percent_period), file=sys.stderr, end='\r'),
+                  (block / percent_period), file=sys.stderr, end='\r')
 
         index = index_buf[block]
         plain = index & 0x80000000
@@ -169,9 +169,7 @@ def decompress_zso(fname_in, fname_out, level):
             read_size = block_size
         else:
             index2 = index_buf[block+1] & 0x7fffffff
-            """
-            Have to read more bytes if align was set
-            """
+            # Have to read more bytes if align was set
             read_size = (index2-index) << (align)
             if block == total_block - 1:
                 read_size = total_bytes - read_pos
@@ -269,10 +267,10 @@ def compress_zso(fname_in, fname_out, level):
 
             if block == 0:
                 print("compress %3d%% avarage rate %3d%%\r" % (
-                    block / percent_period, 0), file=sys.stderr, end='\r'),
+                    block / percent_period, 0), file=sys.stderr, end='\r')
             else:
                 print("compress %3d%% avarage rate %3d%%\r" % (
-                    block / percent_period, 100*write_pos/(block*0x800)), file=sys.stderr, end='\r'),
+                    block / percent_period, 100*write_pos/(block*0x800)), file=sys.stderr, end='\r')
 
         if MP:
             iso_data = [(fin.read(block_size), level)

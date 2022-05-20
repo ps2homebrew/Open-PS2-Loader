@@ -54,8 +54,7 @@ def lz4_compress_mp(i):
     return lz4.block.compress(i[0], store_size=False)
 
 
-def lz4_decompress(compressed, block_size, align):
-    # hexdump(compressed)
+def lz4_decompress(compressed, block_size):
     decompressed = None
     while True:
         try:
@@ -100,9 +99,7 @@ def seek_and_read(fin, offset, size):
 
 
 def read_zso_header(fin):
-    """
-    ZSO header has 0x18 bytes
-    """
+    # ZSO header has 0x18 bytes
     data = seek_and_read(fin, 0, 0x18)
     magic, header_size, total_bytes, block_size, ver, align = unpack(
         'IIQIbbxx', data)
@@ -112,7 +109,6 @@ def read_zso_header(fin):
 def generate_zso_header(magic, header_size, total_bytes, block_size, ver, align):
     data = pack('IIQIbbxx', magic, header_size,
                 total_bytes, block_size, ver, align)
-#    assert(len(data) == 0x18)
     return data
 
 
@@ -124,7 +120,7 @@ def show_zso_info(fname_in, fname_out, total_bytes, block_size, total_block, ali
     print("index align     %d" % (align))
 
 
-def decompress_zso(fname_in, fname_out, level):
+def decompress_zso(fname_in, fname_out):
     fin, fout = open_input_output(fname_in, fname_out)
     magic, header_size, total_bytes, block_size, ver, align = read_zso_header(
         fin)
@@ -311,7 +307,6 @@ def compress_zso(fname_in, fname_out, level):
     fout.seek(len(header))
     for i in index_buf:
         idx = pack('I', i)
-#        assert(len(idx) == 4)
         fout.write(idx)
 
     print("ziso compress completed , total size = %8d bytes , rate %d%%" %
@@ -352,10 +347,6 @@ def parse_args():
             usage()
             sys.exit(0)
 
-    # if level == None:
-    #     print("You have to specify compress level")
-    #     sys.exit(-1)
-
     try:
         fname_in, fname_out = args[1:3]
     except ValueError as err:
@@ -366,9 +357,7 @@ def parse_args():
 
 
 def load_sector_table(sector_table_fn, total_block, default_level=9):
-    """
-    In future we will support NC
-    """
+    # In future we will support NC
     sectors = [default_level for i in range(total_block)]
 
     with open(sector_table_fn) as f:
@@ -406,7 +395,7 @@ def main():
     level, fname_in, fname_out = parse_args()
 
     if level == 0:
-        decompress_zso(fname_in, fname_out, level)
+        decompress_zso(fname_in, fname_out)
     else:
         compress_zso(fname_in, fname_out, level)
 

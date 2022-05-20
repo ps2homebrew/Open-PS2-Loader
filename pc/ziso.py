@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright (c) 2011 by Virtuous Flame
-# Based BOOSTER 1.01 ZSO Compressor
+# Based BOOSTER 1.01 CSO Compressor
+# Adapted for codestation's ZSO format
 #
 # GNU General Public Licence (GPL)
 #
@@ -20,25 +21,17 @@
 
 __author__ = "Virtuous Flame"
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "2.0"
 
 import sys
 import os
-# import getopt
 
 import lz4.block
 from struct import pack, unpack
 from multiprocessing import Pool
 from getopt import gnu_getopt, GetoptError
 
-try:
-    # Python 2
-    xrange
-except NameError:
-    # Python 3, xrange is now named range
-    xrange = range
-
-CISO_MAGIC = 0x4F53495A
+ZISO_MAGIC = 0x4F53495A
 DEFAULT_ALIGN = 0
 COMPRESS_THREHOLD = 100
 DEFAULT_PADDING = br'X'
@@ -136,14 +129,14 @@ def decompress_zso(fname_in, fname_out, level):
     magic, header_size, total_bytes, block_size, ver, align = read_zso_header(
         fin)
 
-    if magic != CISO_MAGIC or block_size == 0 or total_bytes == 0 or header_size != 24 or ver > 1:
+    if magic != ZISO_MAGIC or block_size == 0 or total_bytes == 0 or header_size != 24 or ver > 1:
         print("ziso file format error")
         return -1
 
     total_block = total_bytes // block_size
     index_buf = []
 
-    for _ in xrange(total_block + 1):
+    for _ in range(total_block + 1):
         index_buf.append(unpack('I', fin.read(4))[0])
 
     show_zso_info(fname_in, fname_out, total_bytes,
@@ -189,7 +182,7 @@ def decompress_zso(fname_in, fname_out, level):
 
         if (len(dec_data) != block_size):
             print("%d block: 0x%08X %d" %
-                      (block, read_pos, read_size))
+                  (block, read_pos, read_size))
             sys.exit(-1)
 
         fout.write(dec_data)
@@ -225,7 +218,7 @@ def compress_zso(fname_in, fname_out, level):
     total_bytes = fin.tell()
     fin.seek(0)
 
-    magic, header_size, block_size, ver, align = CISO_MAGIC, 0x18, 0x800, 1, DEFAULT_ALIGN
+    magic, header_size, block_size, ver, align = ZISO_MAGIC, 0x18, 0x800, 1, DEFAULT_ALIGN
 
     # We have to use alignment on any ZSO files which > 2GB, for MSB bit of index as the plain indicator
     # If we don't then the index can be larger than 2GB, which its plain indicator was improperly set
@@ -236,7 +229,7 @@ def compress_zso(fname_in, fname_out, level):
     fout.write(header)
 
     total_block = total_bytes // block_size
-    index_buf = [0 for i in xrange(total_block + 1)]
+    index_buf = [0 for i in range(total_block + 1)]
 
     fout.write(b"\x00\x00\x00\x00" * len(index_buf))
     show_comp_info(fname_in, fname_out, total_bytes, block_size, align, level)
@@ -267,11 +260,11 @@ def compress_zso(fname_in, fname_out, level):
 
         if MP:
             iso_data = [(fin.read(block_size), level)
-                        for i in xrange(min(total_block - block, MP_NR))]
+                        for i in range(min(total_block - block, MP_NR))]
             zso_data_all = pool.map_async(
                 lz4_compress_mp, iso_data).get(9999999)
 
-            for i in xrange(len(zso_data_all)):
+            for i in range(len(zso_data_all)):
                 write_pos = set_align(fout, write_pos, align)
                 index_buf[block] = write_pos >> align
                 zso_data = zso_data_all[i]

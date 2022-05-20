@@ -136,7 +136,7 @@ def decompress_zso(fname_in, fname_out, level):
     magic, header_size, total_bytes, block_size, ver, align = read_zso_header(
         fin)
 
-    if magic != CISO_MAGIC or block_size == 0 or total_bytes == 0 or header_size != 24:
+    if magic != CISO_MAGIC or block_size == 0 or total_bytes == 0 or header_size != 24 or ver > 1:
         print("ziso file format error")
         return -1
 

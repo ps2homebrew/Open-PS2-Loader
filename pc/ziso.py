@@ -260,10 +260,9 @@ def compress_zso(fname_in, fname_out, level):
             zso_data_all = pool.map_async(
                 lz4_compress_mp, iso_data).get(9999999)
 
-            for i in range(len(zso_data_all)):
+            for i, zso_data in enumerate(zso_data_all):
                 write_pos = set_align(fout, write_pos, align)
                 index_buf[block] = write_pos >> align
-                zso_data = zso_data_all[i]
 
                 if 100 * len(zso_data) / len(iso_data[i][0]) >= min(COMPRESS_THREHOLD, 100):
                     zso_data = iso_data[i][0]

@@ -13,10 +13,10 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        apk add build-base git zip gawk python3 py3-pip
+        apk add build-base git zip gawk python3 py3-pip bash
 
     - name: git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -33,7 +33,7 @@ jobs:
 
     - name: Upload release artifact ELF
       if: ${{ success() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: OPNPS2LD
         path: |
@@ -41,7 +41,7 @@ jobs:
 
     - name: Upload release artifact info
       if: ${{ success() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: INFO
         path: |
@@ -62,10 +62,10 @@ jobs:
     container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip
+      run: apk add build-base git zip gawk python3 py3-pip bash
 
     - name: git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -87,10 +87,42 @@ jobs:
       run: sh ./make_changelog.sh
 
     - name: Upload variants artifact ELF
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: OPNPS2LD-VARIANTS
         path: OPNPS2LD*.ELF
+
+  build-lang:
+    runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
+    steps:
+    - name: Install dependencies
+      run: |
+        apk add build-base git zip gawk python3 py3-pip bash
+
+    - name: git checkout
+      uses: actions/checkout@v3
+
+    - run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        git fetch --prune --unshallow
+
+    - name: Install Python packages
+      run: pip3 install -r requirements.txt
+
+    - name: Compile -> make download_lng languages
+      run: make --trace download_lng languages
+
+    - name: Create artifact
+      run: sh ./lng_pack.sh
+
+    - name: Upload release artifact
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: OPNPS2LD-LANGS
+        path: |
+          OPNPS2LD-LANGS-*.zip
 
   build-debug:
     strategy:
@@ -101,10 +133,10 @@ jobs:
     container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip
+      run: apk add build-base git zip gawk python3 py3-pip bash
 
     - name: git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -123,13 +155,13 @@ jobs:
         mv opl.elf opl-${{ matrix.debug }}.elf
 
     - name: Upload variants artifact ELF
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: opl-debug-${{ steps.version.outputs.version }}-${{ matrix.docker }}
         path: opl-*.elf
 
   release:
-    needs: [build, build-variants]
+    needs: [build, build-variants, build-lang]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     env:
@@ -137,7 +169,7 @@ jobs:
       PASSWORD: ${{ secrets.PASSWORD }}
     steps:
     - name: git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - run: git fetch --prune --unshallow
 
@@ -146,17 +178,22 @@ jobs:
       run: echo "::set-output name=version::$(make oplversion)"
 
     - name: Download release artifact
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v3
       with:
         name: OPNPS2LD
 
     - name: Download variants artifact
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v3
       with:
         name: OPNPS2LD-VARIANTS
 
+    - name: Download languages artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: OPNPS2LD-LANGS
+
     - name: Download info artifact
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v3
       with:
         name: INFO
 
@@ -166,8 +203,10 @@ jobs:
         cp INFO/* OPNPS2LD-VARIANTS/
         7z a -t7z OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD/*
         7z a -t7z OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS/*
+        7z a -t7z OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z OPNPS2LD-LANGS/*
         cp -f OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD.7z
         cp -f OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS.7z
+        cp -f OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z OPNPS2LD-LANGS.7z
 
     - name: Create prerelease
       if: github.ref == 'refs/heads/master'
@@ -180,8 +219,10 @@ jobs:
         files: |
           OPNPS2LD-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
+          OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z
+          OPNPS2LD-LANGS.7z
 
     - name: Create release
       if: startsWith(github.ref, 'refs/tags/v')
@@ -193,8 +234,10 @@ jobs:
         files: |
           OPNPS2LD-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
+          OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z
+          OPNPS2LD-LANGS.7z
 
     - name: Upload pre-release to Mega
       if: github.ref == 'refs/heads/master' && env.USERNAME != null

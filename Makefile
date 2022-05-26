@@ -109,6 +109,7 @@ EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 LNG_SRC_DIR = lng_src/
+LNG_TMPL_DIR = lng_tmpl/
 LNG_DIR = lng/
 PNG_ASSETS_DIR = gfx/
 
@@ -206,11 +207,11 @@ EE_DEPS = $($(filter %.o,$(EE_OBJS)):%.o=%.d)
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup languages
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng languages
 
 ifdef PS2SDK
 
-all: languages
+all: download_lng languages
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
 ifneq ($(NOT_PACKED),1)
@@ -219,7 +220,7 @@ else
 	$(MAKE) $(EE_BIN)
 endif
 
-release: $(EE_VPKD).ZIP
+release: download_lng languages $(EE_VPKD).ZIP
 
 debug:
 	$(MAKE) DEBUG=1 all
@@ -240,6 +241,8 @@ clean:
 	echo "Cleaning..."
 	echo "-Interface"
 	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PACKED) $(EE_BIN_STRIPPED) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
+	echo "-Language"
+	rm -fr $(LNG_SRC_DIR) $(LNG_DIR)lang_*.lng $(INTERNAL_LANGUAGE_C) $(INTERNAL_LANGUAGE_H)
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-IOP core"
@@ -747,12 +750,16 @@ endif
 TRANSLATIONS_LNG = $(TRANSLATIONS:%=$(LNG_DIR)lang_%.lng)
 TRANSLATIONS_YML = $(TRANSLATIONS:%=$(LNG_SRC_DIR)%.yml)
 ENGLISH_TEMPLATE_YML = $(LNG_SRC_DIR)English.yml
-BASE_LANGUAGE = $(LNG_SRC_DIR)_base.yml
+ENGLISH_LNG = $(LNG_SRC_DIR)lang_English.lng
+BASE_LANGUAGE = $(LNG_TMPL_DIR)_base.yml
 INTERNAL_LANGUAGE_C = src/lang_internal.c
 INTERNAL_LANGUAGE_H = include/lang_autogen.h
 LANG_COMPILER = lang_compiler.py
 
-languages: $(TRANSLATIONS_LNG) $(TRANSLATIONS_YML) $(INTERNAL_LANGUAGE_C) $(INTERNAL_LANGUAGE_H)
+languages: $(ENGLISH_TEMPLATE_YML) $(TRANSLATIONS_YML) $(ENGLISH_LNG) $(TRANSLATIONS_LNG) $(INTERNAL_LANGUAGE_C) $(INTERNAL_LANGUAGE_H)
+
+download_lng:
+	./download_lng.sh
 
 $(TRANSLATIONS_LNG): $(LNG_DIR)lang_%.lng: $(LNG_SRC_DIR)%.yml $(BASE_LANGUAGE) $(LANG_COMPILER)
 	python3 $(LANG_COMPILER) --make_lng --base $(BASE_LANGUAGE) --translation $< $@
@@ -762,6 +769,9 @@ $(TRANSLATIONS_YML): %.yml: $(BASE_LANGUAGE) $(LANG_COMPILER)
 
 $(ENGLISH_TEMPLATE_YML): $(BASE_LANGUAGE) $(LANG_COMPILER)
 	python3 $(LANG_COMPILER) --make_template_yml --base $< $@
+
+$(ENGLISH_LNG): $(ENGLISH_TEMPLATE_YML) $(BASE_LANGUAGE) $(LANG_COMPILER)
+	python3 $(LANG_COMPILER) --make_lng --base $(BASE_LANGUAGE) --translation $< $@
 
 $(INTERNAL_LANGUAGE_C): $(BASE_LANGUAGE) $(LANG_COMPILER)
 	python3 $(LANG_COMPILER) --make_source --base $< $@

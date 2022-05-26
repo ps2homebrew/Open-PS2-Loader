@@ -13,11 +13,14 @@ def represent_str(self, data):
 
 yaml.add_representer(str, represent_str)
 
-with open('lng_src/_base.yml', encoding='utf-8') as f:
+with open('lng_tmpl/_base.yml', encoding='utf-8') as f:
     base = yaml.safe_load(f)
 
 for file in os.listdir('lng'):
-    assert file.endswith('.lng') and file.startswith("lang_")
+    try:
+        assert file.endswith('.lng') and file.startswith("lang_")
+    except AssertionError:
+        continue
     base_name = file[5:-4]
     output = {
         "comments": [],

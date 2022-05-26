@@ -21,6 +21,7 @@
 *.zip
 *.ZIP
 *.a
+*.d
 DETAILED_CHANGELOG
 
 #
@@ -39,3 +40,10 @@ DETAILED_CHANGELOG
 #
 pc/iso2usbld/bin/iso2usbld
 IOPRP_img.c
+
+# language
+lng/lang_*.lng
+*lng_src
+src/lang_internal.c
+include/lang_autogen.h
+tmp/

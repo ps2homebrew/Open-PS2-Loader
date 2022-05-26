@@ -46,3 +46,4 @@ lng/lang_*.lng
 *lng_src
 src/lang_internal.c
 include/lang_autogen.h
+tmp/

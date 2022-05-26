@@ -2,9 +2,9 @@
 
 ## For translators
 
-All translation files moved to the separate repository: <https://github.com/ps2homebrew/Open-PS2-Loader-lang>\
-Provide your submissions there.\
-Languages were moved there for reducing commit stress for the main repository.\
+All translation files moved to the separate repository: <https://github.com/ps2homebrew/Open-PS2-Loader-lang>\\
+Provide your submissions there.\\
+Languages were moved there for reducing commit stress for the main repository.\\
 Check if your `.yml` file has untranslated strings. Example:
 
 ```yml
@@ -20,6 +20,7 @@ You should change this into:
 ```
 
 If you want to test your changes:
+
 - run `make download_lng`
 - make your changes int `lng_src/*.yml`
 - run `make languages`
@@ -27,9 +28,9 @@ If you want to test your changes:
 
 ## For developers
 
-If you add the language string into the code,\
-propose your changes into `lng_tmpl/_base.yml` with the necessary comments.\
-For example, if you add the string `_STR_NETWORK_STARTUP_ERROR`,\
+If you add the language string into the code,\\
+propose your changes into `lng_tmpl/_base.yml` with the necessary comments.\\
+For example, if you add the string `_STR_NETWORK_STARTUP_ERROR`,\\
 then you should update the base file like:
 
 ```yml
@@ -38,8 +39,8 @@ then you should update the base file like:
   string: '%d: Network startup error.'
 ```
 
-After running `make languages` propose your changes into [the language repo](https://github.com/ps2homebrew/Open-PS2-Loader-lang).\
+After running `make languages` propose your changes into [the language repo](https://github.com/ps2homebrew/Open-PS2-Loader-lang).\\
 Folder `lng_src` will contain updated files.
 
-It is not recommended to rename or remove already existing strings.\
+It is not recommended to rename or remove already existing strings.\\
 In such a case, you will need to edit all language yml files manually.

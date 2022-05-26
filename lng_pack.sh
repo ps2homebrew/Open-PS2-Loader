@@ -28,7 +28,7 @@ fi
 # Print a list
 mkdir -p "${BUILD_DIR}"
 cd "${CURRENT_DIR}/lng/"
-printf "$(ls ./*.lng | cut -c 6- | rev | cut -c 5- | rev)" > "${LANG_LIST}"
+printf "$(ls lang_*.lng | cut -c 6- | rev | cut -c 5- | rev)" > "${LANG_LIST}"
 cd "${CURRENT_DIR}"
 
 # Copy format

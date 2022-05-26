@@ -177,25 +177,8 @@ jobs:
       id: version
       run: echo "::set-output name=version::$(make oplversion)"
 
-    - name: Download release artifact
+    - name: Download all artifacts
       uses: actions/download-artifact@v3
-      with:
-        name: OPNPS2LD
-
-    - name: Download variants artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: OPNPS2LD-VARIANTS
-
-    - name: Download languages artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: OPNPS2LD-LANGS
-
-    - name: Download info artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: INFO
 
     - name: Prepare artifacts for release
       run: |

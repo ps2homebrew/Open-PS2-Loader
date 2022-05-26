@@ -13,10 +13,10 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        apk add build-base git zip gawk python3 py3-pip
+        apk add build-base git zip gawk python3 py3-pip bash
 
     - name: git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -62,7 +62,7 @@ jobs:
     container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip
+      run: apk add build-base git zip gawk python3 py3-pip bash
 
     - name: git checkout
       uses: actions/checkout@v2
@@ -101,7 +101,7 @@ jobs:
     container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip
+      run: apk add build-base git zip gawk python3 py3-pip bash
 
     - name: git checkout
       uses: actions/checkout@v2

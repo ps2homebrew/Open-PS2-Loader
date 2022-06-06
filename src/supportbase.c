@@ -591,6 +591,10 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         settings->flags |= IOPCORE_ENABLE_POFF;
     }
 
+    settings->fakemodule_flags = 0;
+    settings->fakemodule_flags |= FAKE_MODULE_FLAG_CDVDFSV;
+    settings->fakemodule_flags |= FAKE_MODULE_FLAG_CDVDSTM;
+
     InitGSMConfig(configSet);
 
     InitCheatsConfig(configSet);
@@ -608,6 +612,10 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     } else {
         configGetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
         configGetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, &gPadEmuSettings);
+    }
+
+    if (gEnablePadEmu) {
+        settings->fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
     }
 #endif
 

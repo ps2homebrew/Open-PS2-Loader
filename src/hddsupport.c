@@ -506,6 +506,8 @@ void hddLaunchGame(int id, config_set_t *configSet)
         configEnd();
     }
 
+    settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_DEV9;
+    settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_ATAD;
     sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }
 

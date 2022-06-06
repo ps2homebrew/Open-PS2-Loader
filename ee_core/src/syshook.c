@@ -180,8 +180,8 @@ void Install_Kernel_Hooks(void)
         SetSyscall(__NR__ExecPS2, &Hook_ExecPS2);
     }
 
-    Old_Exit = GetSyscallHandler(__NR__Exit);
-    SetSyscall(__NR__Exit, &Hook_Exit);
+    Old_Exit = GetSyscallHandler(__NR_KExit);
+    SetSyscall(__NR_KExit, &Hook_Exit);
 }
 
 /*----------------------------------------------------------------------------------------------*/
@@ -192,7 +192,7 @@ void Remove_Kernel_Hooks(void)
 {
     SetSyscall(__NR_SifSetDma, Old_SifSetDma);
     SetSyscall(__NR_SifSetReg, Old_SifSetReg);
-    SetSyscall(__NR__Exit, Old_Exit);
+    SetSyscall(__NR_KExit, Old_Exit);
 
     DI();
     ee_kmode_enter();

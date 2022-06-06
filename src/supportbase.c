@@ -616,6 +616,10 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     settings->hdd_cache = hddCacheSize;
     settings->smb_cache = smbCacheSize;
 
+    settings->fakemodule_flags = 0;
+    settings->fakemodule_flags |= FAKE_MODULE_FLAG_CDVDFSV;
+    settings->fakemodule_flags |= FAKE_MODULE_FLAG_CDVDSTM;
+
     InitGSMConfig(configSet);
 
     InitCheatsConfig(configSet);
@@ -641,6 +645,10 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         configGetInt(configSet, CONFIG_ITEM_PADMACROSETTINGS, &gPadMacroSettings);
     } else {
         configGetInt(configGame, CONFIG_ITEM_PADMACROSETTINGS, &gPadMacroSettings);
+    }
+
+    if (gEnablePadEmu) {
+        settings->fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
     }
 #endif
 

@@ -1,12 +1,22 @@
 
 #ifndef __CDVD_CONFIG__
 #define __CDVD_CONFIG__
+
+// flags
 #define IOPCORE_COMPAT_ALT_READ      0x0001
 #define IOPCORE_COMPAT_0_SKIP_VIDEOS 0x0002
 #define IOPCORE_COMPAT_EMU_DVDDL     0x0004
 #define IOPCORE_COMPAT_ACCU_READS    0x0008
 #define IOPCORE_ENABLE_POFF          0x0100
 #define IOPCORE_SMB_FORMAT_USBLD     0x0200
+
+// fakemodule_flags
+#define FAKE_MODULE_FLAG_DEV9    (1 << 0) // not used, compiled in
+#define FAKE_MODULE_FLAG_USBD    (1 << 1) // Used with BDM-USB or PADEMU
+#define FAKE_MODULE_FLAG_SMAP    (1 << 2) // not used, compiled in
+#define FAKE_MODULE_FLAG_ATAD    (1 << 3) // not used, compiled in
+#define FAKE_MODULE_FLAG_CDVDSTM (1 << 4) // not used, compiled in
+#define FAKE_MODULE_FLAG_CDVDFSV (1 << 5) // not used, compiled in
 
 #define ISO_MAX_PARTS 10
 
@@ -20,6 +30,7 @@ struct cdvdman_settings_common
     u8 bdm_cache;
     u8 hdd_cache;
     u8 smb_cache;
+    u8 fakemodule_flags;
 } __attribute__((packed));
 
 struct cdvdman_settings_hdd

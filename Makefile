@@ -241,8 +241,6 @@ clean:
 	echo "Cleaning..."
 	echo "-Interface"
 	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PACKED) $(EE_BIN_STRIPPED) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
-	echo "-Language"
-	rm -fr $(LNG_SRC_DIR) $(LNG_DIR)lang_*.lng $(INTERNAL_LANGUAGE_C) $(INTERNAL_LANGUAGE_H)
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-IOP core"
@@ -313,6 +311,10 @@ clean:
 	$(MAKE) -C modules/pademu USE_USB=1 clean
 	echo "-pc tools"
 	$(MAKE) -C pc clean
+
+realclean: clean
+	echo "-Language"
+	rm -fr $(LNG_SRC_DIR) $(LNG_DIR)lang_*.lng $(INTERNAL_LANGUAGE_C) $(INTERNAL_LANGUAGE_H)
 
 rebuild: clean all
 

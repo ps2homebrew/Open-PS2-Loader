@@ -699,6 +699,8 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         strcpy(filename, game->startup);
     deinit(NO_EXCEPTION, ETH_MODE); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
+    settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_DEV9;
+    settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_SMAP;
     sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
 

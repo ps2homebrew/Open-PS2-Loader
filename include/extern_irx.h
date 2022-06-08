@@ -22,8 +22,8 @@ extern int size_bdm_mcemu_irx;
 extern void *bdmevent_irx;
 extern int size_bdmevent_irx;
 
-extern void *bdmfs_vfat_irx;
-extern int size_bdmfs_vfat_irx;
+extern void *bdmfs_fatfs_irx;
+extern int size_bdmfs_fatfs_irx;
 
 extern void *bt_pademu_irx;
 extern int size_bt_pademu_irx;

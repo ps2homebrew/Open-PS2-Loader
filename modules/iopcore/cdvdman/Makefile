@@ -33,6 +33,7 @@ IOP_BIN  = bdm_cdvdman.irx
 IOP_OBJS_DIR = obj.bdm/
 IOP_OBJS += device-bdm.o
 IOP_CFLAGS += -DBDM_DRIVER
+IOP_LIBS += -L$(PS2SDK)/iop/lib -lbdm
 ifeq ($(IOPCORE_DEBUG),1)
 USE_DEV9 = 1
 endif

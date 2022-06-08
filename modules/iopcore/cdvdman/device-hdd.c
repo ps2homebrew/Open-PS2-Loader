@@ -120,11 +120,6 @@ void DeviceStop(void)
     // This will be handled by ATAD.
 }
 
-u8 DeviceGetCacheSize()
-{
-    return cdvdman_settings.common.hdd_cache;
-}
-
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 offset = 0;

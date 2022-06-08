@@ -27,10 +27,9 @@ struct cdvdman_settings_common
     u16 flags;
     u32 layer1_start;
     u8 DiscID[5];
-    u8 bdm_cache;
-    u8 hdd_cache;
-    u8 smb_cache;
+    u8 zso_cache;
     u8 fakemodule_flags;
+    u8 padding;
 } __attribute__((packed));
 
 struct cdvdman_settings_hdd

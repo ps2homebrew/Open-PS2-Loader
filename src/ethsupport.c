@@ -701,6 +701,10 @@ static void ethLaunchGame(int id, config_set_t *configSet)
 
     settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_DEV9;
     settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_SMAP;
+
+    // adjust ZSO cache
+    settings->common.zso_cache = smbCacheSize;
+
     sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
 

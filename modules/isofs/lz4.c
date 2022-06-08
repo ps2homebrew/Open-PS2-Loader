@@ -497,27 +497,6 @@ _output_error:
     return (int)(-(((char *)ip) - source)) - 1;
 }
 
-
-int LZ4_decompress_safe(const char *source, char *dest, int inputSize, int maxOutputSize)
-{
-    return LZ4_decompress_generic(source, dest, inputSize, maxOutputSize, endOnInputSize, noPrefix, full, 0);
-}
-
-int LZ4_decompress_safe_withPrefix64k(const char *source, char *dest, int inputSize, int maxOutputSize)
-{
-    return LZ4_decompress_generic(source, dest, inputSize, maxOutputSize, endOnInputSize, withPrefix, full, 0);
-}
-
-int LZ4_decompress_safe_partial(const char *source, char *dest, int inputSize, int targetOutputSize, int maxOutputSize)
-{
-    return LZ4_decompress_generic(source, dest, inputSize, maxOutputSize, endOnInputSize, noPrefix, partial, targetOutputSize);
-}
-
-int LZ4_decompress_fast_withPrefix64k(const char *source, char *dest, int outputSize)
-{
-    return LZ4_decompress_generic(source, dest, 0, outputSize, endOnOutputSize, withPrefix, full, 0);
-}
-
 int LZ4_decompress_fast(const char *source, char *dest, int outputSize)
 {
 #ifdef _MSC_VER /* This version is faster with Visual */
@@ -526,6 +505,3 @@ int LZ4_decompress_fast(const char *source, char *dest, int outputSize)
     return LZ4_decompress_generic(source, dest, 0, outputSize, endOnOutputSize, withPrefix, full, 0);
 #endif
 }
-
-int LZ4_uncompress(const char *source, char *dest, int outputSize) { return LZ4_decompress_fast(source, dest, outputSize); }
-int LZ4_uncompress_unknownOutputSize(const char *source, char *dest, int isize, int maxOutputSize) { return LZ4_decompress_safe(source, dest, isize, maxOutputSize); }

@@ -108,11 +108,6 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
-u8 DeviceGetCacheSize()
-{
-    return cdvdman_settings.common.bdm_cache;
-}
-
 void DeviceSetupZSO(u8 *buffer)
 {
 }

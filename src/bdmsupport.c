@@ -372,6 +372,9 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     }
     settings->common.layer1_start = layer1_start;
 
+    // adjust ZSO cache
+    settings->common.zso_cache = bdmCacheSize;
+
     if ((result = sbLoadCheats(bdmPrefix, game->startup)) < 0) {
         switch (result) {
             case -ENOENT:

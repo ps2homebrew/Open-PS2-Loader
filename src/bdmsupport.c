@@ -95,8 +95,8 @@ void bdmLoadModules(void)
     // Load Block Device Manager (BDM)
     sysLoadModuleBuffer(&bdm_irx, size_bdm_irx, 0, NULL);
 
-    // Load VFAT (mass:) driver
-    sysLoadModuleBuffer(&bdmfs_vfat_irx, size_bdmfs_vfat_irx, 0, NULL);
+    // Load FATFS (mass:) driver
+    sysLoadModuleBuffer(&bdmfs_fatfs_irx, size_bdmfs_fatfs_irx, 0, NULL);
 
     // Load USB Block Device drivers
     sysLoadModuleBuffer(&usbd_irx, size_usbd_irx, 0, NULL);

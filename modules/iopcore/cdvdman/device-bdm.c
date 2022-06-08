@@ -7,6 +7,7 @@
 #include "internal.h"
 
 #include <bdm.h>
+#include <bd_defrag.h>
 
 #include "device.h"
 
@@ -85,11 +86,6 @@ void DeviceStop(void)
 
 void DeviceFSInit(void)
 {
-    int i;
-    DPRINTF("USB: NumParts = %d\n", cdvdman_settings.common.NumParts);
-    for (i = 0; i < cdvdman_settings.common.NumParts; i++)
-        DPRINTF("USB: LBAs[%d] = %lu\n", i, cdvdman_settings.LBAs[i]);
-
     DPRINTF("Waiting for device...\n");
     WaitSema(bdm_io_sema);
     DPRINTF("Waiting for device...done!\n");
@@ -110,11 +106,6 @@ void DeviceUnmount(void)
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
-    u32 sector;
-    u16 count;
-    register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
-    register int i, esc_flag = 0;
-    u8 *p = (u8 *)buffer;
     int rv = SCECdErNO;
 
     // DPRINTF("%s(%u, 0x%p, %u)\n", __func__, (unsigned int)lsn, buffer, sectors);
@@ -122,39 +113,9 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     if (g_bd == NULL)
         return SCECdErTRMOPN;
 
-    lbound = 0;
-    ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
-    offslsn = lsn;
-    r = nlsn = 0;
-    sectors_to_read = sectors;
-
     WaitSema(bdm_io_sema);
-    for (i = 0; i < cdvdman_settings.common.NumParts; i++, lbound = ubound, ubound += 0x80000, offslsn -= 0x80000) {
-
-        if (lsn >= lbound && lsn < ubound) {
-            if ((lsn + sectors) > (ubound - 1)) {
-                sectors_to_read = ubound - lsn;
-                sectors -= sectors_to_read;
-                nlsn = ubound;
-            } else
-                esc_flag = 1;
-
-            sector = cdvdman_settings.LBAs[i] + (offslsn * g_bd_sectors_per_sector);
-            count = sectors_to_read * g_bd_sectors_per_sector;
-            if (g_bd->read(g_bd, sector, &p[r], count) != count) {
-                rv = SCECdErREAD;
-                break;
-            }
-
-            r += sectors_to_read * 2048;
-            offslsn += sectors_to_read;
-            sectors_to_read = sectors;
-            lsn = nlsn;
-        }
-
-        if (esc_flag)
-            break;
-    }
+    if (bd_defrag(g_bd, &cdvdman_settings.frags, lsn * 4, buffer, sectors * 4) != (sectors * 4))
+        rv = SCECdErREAD;
     SignalSema(bdm_io_sema);
 
     return rv;

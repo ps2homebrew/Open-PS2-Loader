@@ -2,6 +2,9 @@
 #ifndef __CDVD_CONFIG__
 #define __CDVD_CONFIG__
 
+#include <tamtypes.h>
+#include <usbhdfsd-common.h>
+
 // flags
 #define IOPCORE_COMPAT_ALT_READ      0x0001
 #define IOPCORE_COMPAT_0_SKIP_VIDEOS 0x0002
@@ -13,7 +16,7 @@
 // fakemodule_flags
 #define FAKE_MODULE_FLAG_DEV9    (1 << 0) // not used, compiled in
 #define FAKE_MODULE_FLAG_USBD    (1 << 1) // Used with BDM-USB or PADEMU
-#define FAKE_MODULE_FLAG_SMAP    (1 << 2) // not used, compiled in
+#define FAKE_MODULE_FLAG_SMAP    (1 << 2) // Used with SMB or BDM-UDPBD
 #define FAKE_MODULE_FLAG_ATAD    (1 << 3) // not used, compiled in
 #define FAKE_MODULE_FLAG_CDVDSTM (1 << 4) // not used, compiled in
 #define FAKE_MODULE_FLAG_CDVDFSV (1 << 5) // not used, compiled in
@@ -61,7 +64,7 @@ struct cdvdman_settings_smb
 struct cdvdman_settings_bdm
 {
     struct cdvdman_settings_common common;
-    u32 LBAs[ISO_MAX_PARTS];
+    bd_fraglist_t frags;
 } __attribute__((packed));
 
 #endif

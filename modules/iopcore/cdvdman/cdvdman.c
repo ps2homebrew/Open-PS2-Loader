@@ -80,7 +80,7 @@ static oplShutdownCb_t vmcShutdownCb = NULL;
 
 void initCache()
 {
-    u8 cache_size = DeviceGetCacheSize();
+    u8 cache_size = cdvdman_settings.common.zso_cache;
     if (cache_size && sector_cache == NULL) {
         sector_cache = AllocSysMemory(ALLOC_FIRST, cache_size * 2048, NULL);
         if (sector_cache)

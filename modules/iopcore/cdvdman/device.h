@@ -8,5 +8,4 @@ void DeviceUnmount(void); // Called when OPL is shutting down.
 void DeviceStop(void);    // Called before the PS2 is to be shut down.
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors);
-u8 DeviceGetCacheSize();
 void DeviceSetupZSO(u8 *buffer);

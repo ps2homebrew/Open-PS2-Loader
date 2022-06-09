@@ -612,10 +612,6 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         settings->flags |= IOPCORE_ENABLE_POFF;
     }
 
-    settings->bdm_cache = bdmCacheSize;
-    settings->hdd_cache = hddCacheSize;
-    settings->smb_cache = smbCacheSize;
-
     settings->fakemodule_flags = 0;
     settings->fakemodule_flags |= FAKE_MODULE_FLAG_CDVDFSV;
     settings->fakemodule_flags |= FAKE_MODULE_FLAG_CDVDSTM;

@@ -75,21 +75,9 @@ void DeviceInit(void)
     memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
 
     cdvdman_settings.common.media = apaHeader.discType;
-    cdvdman_settings.common.layer1_start = apaHeader.layer1_start;
+    if (cdvdman_settings.common.layer1_start == 0) // layer1 start not set, read it from APA header
+        cdvdman_settings.common.layer1_start = apaHeader.layer1_start;
     NumParts = apaHeader.num_partitions;
-}
-
-void DeviceSetupZSO(u8 *buffer)
-{
-    ziso_read_sector(buffer, 16, 1);
-    u32 maxLBA = *(u32 *)(buffer + 80);
-    if (maxLBA > 0 && maxLBA < ziso_total_block) { // dual layer check
-        if (ziso_read_sector(buffer, maxLBA, 1) == 1) {
-            if ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5))) {
-                cdvdman_settings.common.layer1_start = maxLBA - 16; // adjust second layer start
-            }
-        }
-    }
 }
 
 void DeviceDeinit(void)

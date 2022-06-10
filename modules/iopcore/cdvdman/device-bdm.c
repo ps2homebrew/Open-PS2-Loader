@@ -108,10 +108,6 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
-void DeviceSetupZSO(u8 *buffer)
-{
-}
-
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 sector;

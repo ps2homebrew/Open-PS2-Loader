@@ -501,7 +501,7 @@ void hddLaunchGame(int id, config_set_t *configSet)
         ziso_init(IOBuffer, *(u32 *)((u8 *)IOBuffer + sizeof(ZISO_header)));
         ziso_read_sector(IOBuffer, 16, 1);
         u32 maxLBA = *(u32 *)(IOBuffer + 80);
-        if (maxLBA > 0 && maxLBA < ziso_total_block) { // dual layer check
+        if (maxLBA > 0 && maxLBA < ziso_total_block) {   // dual layer check
             settings->common.layer1_start = maxLBA - 16; // adjust second layer start
         }
     }

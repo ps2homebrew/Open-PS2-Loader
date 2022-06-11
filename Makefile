@@ -171,7 +171,7 @@ ifeq ($(DEBUG),1)
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
     SMSTCPIP_INGAME_CFLAGS =
-    IOP_OBJS += udptty-ingame.o
+    IOP_OBJS += udptty.o
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
     EECORE_EXTRA_FLAGS += EESIO_DEBUG=1
@@ -187,7 +187,7 @@ ifeq ($(DEBUG),1)
       DECI2_DEBUG=1
       CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #(clear IOPCORE_DEBUG) dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
     else
-      IOP_OBJS += udptty-ingame.o
+      IOP_OBJS += udptty.o
     endif
   endif
 else
@@ -298,12 +298,6 @@ clean:
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo " -lwnbdsvr"
 	$(MAKE) -C modules/network/lwnbdsvr clean
-	echo " -udptty-ingame"
-	$(MAKE) -C modules/debug/udptty-ingame clean
-	echo " -ioptrap"
-	$(MAKE) -C modules/debug/ioptrap clean
-	echo " -ps2link"
-	$(MAKE) -C modules/debug/ps2link clean
 	echo " -ds34usb"
 	$(MAKE) -C modules/ds34usb clean
 	echo " -ds34bt"
@@ -631,22 +625,13 @@ $(EE_ASM_DIR)lwnbdsvr.s: modules/network/lwnbdsvr/lwnbdsvr.irx | $(EE_ASM_DIR)
 $(EE_ASM_DIR)udptty.s: $(PS2SDK)/iop/irx/udptty.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ udptty_irx
 
-modules/debug/udptty-ingame/udptty.irx: modules/debug/udptty-ingame
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)udptty-ingame.s: modules/debug/udptty-ingame/udptty.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ udptty_ingame_irx
-
-modules/debug/ioptrap/ioptrap.irx: modules/debug/ioptrap
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)ioptrap.s: modules/debug/ioptrap/ioptrap.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)ioptrap.s: $(PS2SDK)/iop/irx/ioptrap.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ioptrap_irx
 
-modules/debug/ps2link/ps2link.irx: modules/debug/ps2link
-	$(MAKE) -C $<
+#modules/debug/ps2link/ps2link.irx: modules/debug/ps2link
+#	$(MAKE) -C $<
 
-$(EE_ASM_DIR)ps2link.s: modules/debug/ps2link/ps2link.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)ps2link.s: modules/debug/ps2link.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2link_irx
 
 modules/network/nbns/nbns.irx: modules/network/nbns

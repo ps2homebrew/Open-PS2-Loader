@@ -171,7 +171,7 @@ ifeq ($(DEBUG),1)
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
     SMSTCPIP_INGAME_CFLAGS =
-    IOP_OBJS += udptty.o
+    IOP_OBJS += 
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
     EECORE_EXTRA_FLAGS += EESIO_DEBUG=1
@@ -187,7 +187,7 @@ ifeq ($(DEBUG),1)
       DECI2_DEBUG=1
       CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #(clear IOPCORE_DEBUG) dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
     else
-      IOP_OBJS += udptty.o
+      IOP_OBJS +=
     endif
   endif
 else

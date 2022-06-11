@@ -181,9 +181,6 @@ extern int size_tifinet_ingame_irx;
 extern void *udptty_irx;
 extern int size_udptty_irx;
 
-extern void *udptty_ingame_irx;
-extern int size_udptty_ingame_irx;
-
 extern void *udnl_irx;
 extern int size_udnl_irx;
 

@@ -524,8 +524,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     }
 #else
     if (modules & CORE_IRX_DEBUG) {
-        irxptr_tab[modcount].info = size_udptty_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDPTTY);
-        irxptr_tab[modcount++].ptr = (void *)&udptty_ingame_irx;
+        irxptr_tab[modcount].info = size_udptty_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDPTTY);
+        irxptr_tab[modcount++].ptr = (void *)&udptty_irx;
         irxptr_tab[modcount].info = size_ioptrap_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPTRAP);
         irxptr_tab[modcount++].ptr = (void *)&ioptrap_irx;
     }

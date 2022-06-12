@@ -41,6 +41,13 @@ int PadMacroSettings;
 int EnableDebug;
 int *gCheatList; // Store hooks/codes addr+val pairs
 
+// This function is defined as weak in ps2sdkc, so how
+// we are not using time zone, so we can safe some KB
+void _ps2sdk_timezone_update() {}
+
+DISABLE_PATCHED_FUNCTIONS();      // Disable the patched functionalities
+DISABLE_EXTRA_TIMERS_FUNCTIONS(); // Disable the extra functionalities for timers
+
 static int eecoreInit(int argc, char **argv)
 {
     int i = 0;

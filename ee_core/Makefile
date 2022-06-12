@@ -53,7 +53,7 @@ ifeq ($(PADEMU),1)
 EE_CFLAGS += -DPADEMU
 endif
 
-EE_LIBS += -lkernel-nopatch -lgcc
+EE_LIBS += -lkernel -lgcc
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	@mkdir -p $(EE_OBJS_DIR)

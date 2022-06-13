@@ -67,10 +67,6 @@ int DeviceReady(void)
     return SCECdComplete;
 }
 
-void DeviceSetupZSO(u8 *buffer)
-{
-}
-
 void DeviceFSInit(void)
 {
     int i = 0;

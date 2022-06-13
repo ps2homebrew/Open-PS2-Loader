@@ -267,8 +267,6 @@ static int ProbeZSO(u8 *buffer)
         ziso_init((ZISO_header *)buffer, *(u32 *)(buffer + sizeof(ZISO_header)));
         // initialize cache
         initCache();
-        // Device ZSO Setup
-        DeviceSetupZSO(buffer);
         // redirect sector reader
         DeviceReadSectorsPtr = &DeviceReadSectorsCompressed;
     }

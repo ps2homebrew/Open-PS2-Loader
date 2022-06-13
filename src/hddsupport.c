@@ -26,6 +26,12 @@
 
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
 
+#include "../modules/isofs/zso.h"
+
+extern int probed_fd;
+extern u32 probed_lba;
+extern u8 IOBuffer[2048];
+
 static unsigned char hddForceUpdate = 0;
 static unsigned char hddHDProKitDetected = 0;
 static unsigned char hddModulesLoaded = 0;
@@ -485,6 +491,20 @@ void hddLaunchGame(int id, config_set_t *configSet)
 
     if (gPS2Logo)
         EnablePS2Logo = CheckPS2Logo(0, game->start_sector + OPL_HDD_MODE_PS2LOGO_OFFSET);
+
+    // Check for ZSO to correctly adjust layer1 start
+    settings->common.layer1_start = 0; // cdvdman will read it from APA header
+    hddReadSectors(game->start_sector + OPL_HDD_MODE_PS2LOGO_OFFSET, 1, IOBuffer);
+    if (*(u32 *)IOBuffer == ZSO_MAGIC) {
+        probed_fd = 0;
+        probed_lba = game->start_sector + OPL_HDD_MODE_PS2LOGO_OFFSET;
+        ziso_init(IOBuffer, *(u32 *)((u8 *)IOBuffer + sizeof(ZISO_header)));
+        ziso_read_sector(IOBuffer, 16, 1);
+        u32 maxLBA = *(u32 *)(IOBuffer + 80);
+        if (maxLBA > 0 && maxLBA < ziso_total_block) {   // dual layer check
+            settings->common.layer1_start = maxLBA - 16; // adjust second layer start
+        }
+    }
 
     if (gAutoLaunchGame == NULL) {
         deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed

@@ -318,10 +318,16 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     settings = (struct cdvdman_settings_bdm *)((u8 *)irx + index);
     if (settings == NULL)
         return;
-    memset(&settings->frags, 0, sizeof(bd_fraglist_t));
+    memset(&settings->frags[0], 0, sizeof(bd_fragment_t) * BDM_MAX_FRAGS);
+    u8 iTotalFragCount = 0;
 
+    //
+    // Add ISO as fragfile[0] to fragment list
+    //
+    struct cdvdman_fragfile *iso_frag = &settings->fragfile[0];
+    iso_frag->frag_start = 0;
+    iso_frag->frag_count = 0;
     for (i = 0; i < game->parts; i++) {
-        bd_fraglist_t part_frags;
         int fidx;
 
         // Open file
@@ -338,20 +344,16 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
         *pBDMDriver = fileXioIoctl(fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
 
         // Get fragment list
-        fileXioIoctl2(fd, USBMASS_IOCTL_GET_FRAGLIST, NULL, 0, (void *)&part_frags, sizeof(bd_fraglist_t));
-        if ((settings->frags.count + part_frags.count) > 10) {
+        int iFragCount = fileXioIoctl2(fd, USBMASS_IOCTL_GET_FRAGLIST, NULL, 0, (void *)&settings->frags[iTotalFragCount], sizeof(bd_fragment_t) * (BDM_MAX_FRAGS - iTotalFragCount));
+        if (iFragCount > BDM_MAX_FRAGS) {
             // Too many fragments
             close(fd);
             sbUnprepare(&settings->common);
             guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
             return;
         }
-
-        // Add part fragments to iopcore fragment list
-        for (fidx = 0; fidx < part_frags.count; fidx++) {
-            settings->frags.list[settings->frags.count] = part_frags.list[fidx];
-            settings->frags.count++;
-        }
+        iso_frag->frag_count += iFragCount;
+        iTotalFragCount += iFragCount;
 
         if ((gPS2Logo) && (i == 0))
             EnablePS2Logo = CheckPS2Logo(fd, 0);

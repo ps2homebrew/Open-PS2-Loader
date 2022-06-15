@@ -61,10 +61,25 @@ struct cdvdman_settings_smb
     };
 } __attribute__((packed));
 
+#define BDM_MAX_FILES 1  // ISO
+#define BDM_MAX_FRAGS 64 // 64 * 8bytes = 512bytes
+
+struct cdvdman_fragfile
+{
+    u8 frag_start; /// First fragment in the fragment table
+    u8 frag_count; /// Munber of fragments in the fragment table
+} __attribute__((packed));
+
 struct cdvdman_settings_bdm
 {
     struct cdvdman_settings_common common;
-    bd_fraglist_t frags;
+
+    // Fragmented files:
+    // 0 = ISO
+    struct cdvdman_fragfile fragfile[BDM_MAX_FILES];
+
+    // Fragment table, containing the fragments of all files
+    bd_fragment_t frags[BDM_MAX_FRAGS];
 } __attribute__((packed));
 
 #endif

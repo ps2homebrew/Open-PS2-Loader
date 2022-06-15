@@ -122,7 +122,13 @@ extern void cdvdman_initdev(void);
 
 extern struct CDVDMAN_SETTINGS_TYPE cdvdman_settings;
 
+#ifdef HDD_DRIVER
+// HDD driver also uses this buffer, for aligning unaligned reads.
 #define CDVDMAN_BUF_SECTORS 2
+#else
+// Normally this buffer is only used by 'searchfile', only 1 sector used
+#define CDVDMAN_BUF_SECTORS 1
+#endif
 extern u8 cdvdman_buf[CDVDMAN_BUF_SECTORS * 2048];
 
 extern int cdrom_io_sema;

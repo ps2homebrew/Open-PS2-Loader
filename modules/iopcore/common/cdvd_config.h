@@ -2,6 +2,9 @@
 #ifndef __CDVD_CONFIG__
 #define __CDVD_CONFIG__
 
+#include <tamtypes.h>
+#include <usbhdfsd-common.h>
+
 // flags
 #define IOPCORE_COMPAT_ALT_READ      0x0001
 #define IOPCORE_COMPAT_0_SKIP_VIDEOS 0x0002
@@ -13,7 +16,7 @@
 // fakemodule_flags
 #define FAKE_MODULE_FLAG_DEV9    (1 << 0) // not used, compiled in
 #define FAKE_MODULE_FLAG_USBD    (1 << 1) // Used with BDM-USB or PADEMU
-#define FAKE_MODULE_FLAG_SMAP    (1 << 2) // not used, compiled in
+#define FAKE_MODULE_FLAG_SMAP    (1 << 2) // Used with SMB or BDM-UDPBD
 #define FAKE_MODULE_FLAG_ATAD    (1 << 3) // not used, compiled in
 #define FAKE_MODULE_FLAG_CDVDSTM (1 << 4) // not used, compiled in
 #define FAKE_MODULE_FLAG_CDVDFSV (1 << 5) // not used, compiled in
@@ -58,10 +61,25 @@ struct cdvdman_settings_smb
     };
 } __attribute__((packed));
 
+#define BDM_MAX_FILES 1  // ISO
+#define BDM_MAX_FRAGS 64 // 64 * 8bytes = 512bytes
+
+struct cdvdman_fragfile
+{
+    u8 frag_start; /// First fragment in the fragment table
+    u8 frag_count; /// Munber of fragments in the fragment table
+} __attribute__((packed));
+
 struct cdvdman_settings_bdm
 {
     struct cdvdman_settings_common common;
-    u32 LBAs[ISO_MAX_PARTS];
+
+    // Fragmented files:
+    // 0 = ISO
+    struct cdvdman_fragfile fragfile[BDM_MAX_FILES];
+
+    // Fragment table, containing the fragments of all files
+    bd_fragment_t frags[BDM_MAX_FRAGS];
 } __attribute__((packed));
 
 #endif

@@ -157,7 +157,7 @@ jobs:
     - name: Upload variants artifact ELF
       uses: actions/upload-artifact@v3
       with:
-        name: opl-debug-${{ steps.version.outputs.version }}-${{ matrix.docker }}
+        name: OPNPS2LD-DEBUG
         path: opl-*.elf
 
   release:
@@ -190,6 +190,10 @@ jobs:
         cp -f OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD.7z
         cp -f OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS.7z
         cp -f OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z OPNPS2LD-LANGS.7z
+        
+    - name: Prepare artifacts only for tagged release
+      run: |
+        7z a -t7z OPNPS2LD-DEBUG-${{ steps.version.outputs.version }}.7z OPNPS2LD-DEBUG/*
 
     - name: Create prerelease
       if: github.ref == 'refs/heads/master'
@@ -217,6 +221,7 @@ jobs:
         files: |
           OPNPS2LD-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
+          OPNPS2LD-DEBUG-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z

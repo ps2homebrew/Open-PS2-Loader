@@ -12,14 +12,6 @@
 #include "ioplib_util.h"
 #include "smsutils.h"
 
-#ifdef __IOPCORE_DEBUG
-#define DPRINTF(args...) printf(args)
-#else
-#define DPRINTF(args...) \
-    do {                 \
-    } while (0)
-#endif
-
 typedef struct ModuleStatus
 {
     char name[56];

@@ -12,6 +12,8 @@
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
+#include <usbhdfsd-common.h>
+
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
 
@@ -314,38 +316,49 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     int irx_size = size_bdm_cdvdman_irx;
     compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
     settings = (struct cdvdman_settings_bdm *)((u8 *)irx + index);
+    if (settings == NULL)
+        return;
+    memset(&settings->frags[0], 0, sizeof(bd_fragment_t) * BDM_MAX_FRAGS);
+    u8 iTotalFragCount = 0;
+
+    //
+    // Add ISO as fragfile[0] to fragment list
+    //
+    struct cdvdman_fragfile *iso_frag = &settings->fragfile[0];
+    iso_frag->frag_start = 0;
+    iso_frag->frag_count = 0;
     for (i = 0; i < game->parts; i++) {
+        int fidx;
+
+        // Open file
         sbCreatePath(game, partname, bdmPrefix, "/", i);
         fd = open(partname, O_RDONLY);
-        if (fd >= 0) {
-            int *pBDMDriver = (int *)bdmDriver;
-            *pBDMDriver = fileXioIoctl(fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
-            LOG("bdmDriver=%s\n", bdmDriver);
-
-            if (settings != NULL)
-                settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, "");
-
-            if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") != 1) {
-                close(fd);
-                // Game is fragmented. Do not continue.
-                if (settings != NULL)
-                    sbUnprepare(&settings->common);
-
-                guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
-                return;
-            }
-
-            if ((gPS2Logo) && (i == 0))
-                EnablePS2Logo = CheckPS2Logo(fd, 0);
-
-            close(fd);
-        } else {
-            // Unable to open part of the game. Do not continue.
-            if (settings != NULL)
-                sbUnprepare(&settings->common);
+        if (fd < 0) {
+            sbUnprepare(&settings->common);
             guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
             return;
         }
+
+        // Get driver - we should only need to do this once
+        int *pBDMDriver = (int *)bdmDriver;
+        *pBDMDriver = fileXioIoctl(fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
+
+        // Get fragment list
+        int iFragCount = fileXioIoctl2(fd, USBMASS_IOCTL_GET_FRAGLIST, NULL, 0, (void *)&settings->frags[iTotalFragCount], sizeof(bd_fragment_t) * (BDM_MAX_FRAGS - iTotalFragCount));
+        if (iFragCount > BDM_MAX_FRAGS) {
+            // Too many fragments
+            close(fd);
+            sbUnprepare(&settings->common);
+            guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
+            return;
+        }
+        iso_frag->frag_count += iFragCount;
+        iTotalFragCount += iFragCount;
+
+        if ((gPS2Logo) && (i == 0))
+            EnablePS2Logo = CheckPS2Logo(fd, 0);
+
+        close(fd);
     }
 
     // Initialize layer 1 information.

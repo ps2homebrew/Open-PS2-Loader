@@ -75,12 +75,11 @@ static float appGetELFSize(char *path)
 static char *appGetBoot(char *device, int max, char *path)
 {
     char *pos, *filenamesep;
-    int len;
 
     // Looking for the boot device & filename from the path
     pos = strrchr(path, ':');
     if (pos != NULL) {
-        len = (int)(pos + 1 - path);
+        int len = (int)(pos + 1 - path);
         if (len + 1 > max)
             len = max - 1;
         strncpy(device, path, len);
@@ -242,7 +241,6 @@ static int appScanCallback(const char *path, config_set_t *appConfig, void *arg)
 static int appUpdateItemList(void)
 {
     struct app_info_linked *appsLinkedList, *appNext;
-    int i;
 
     appFreeList();
 
@@ -259,6 +257,7 @@ static int appUpdateItemList(void)
         appsList = malloc(appItemCount * sizeof(app_info_t));
 
         if (appsList != NULL) {
+            int i;
             for (i = 0; appsLinkedList != NULL; i++) { // appsLinkedList contains items in reverse order.
                 memcpy(&appsList[appItemCount - i - 1], &appsLinkedList->app, sizeof(app_info_t));
 
@@ -358,18 +357,18 @@ static void appRenameItem(int id, char *newName)
 
 static void appLaunchItem(int id, config_set_t *configSet)
 {
-    int mode, fd;
+    int fd;
     const char *filename;
     const char *argv1;
-    char partition[128];
-    char *argv[2];
 
     // Retrieve configuration set by appGetConfig()
     configGetStr(configSet, CONFIG_ITEM_STARTUP, &filename);
 
     fd = open(filename, O_RDONLY);
     if (fd >= 0) {
-        int argc = 1;
+        int mode, argc = 1;
+        char partition[128];
+        char *argv[2];
         close(fd);
 
         strcpy(partition, "");

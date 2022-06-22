@@ -198,7 +198,7 @@ static int appScanCallback(const char *path, config_set_t *appConfig, void *arg)
 {
     struct app_info_linked **appsLinkedList = (struct app_info_linked **)arg;
     struct app_info_linked *app;
-    const char *title, *boot;
+    const char *title, *boot, *argv1;
 
     if (configGetStr(appConfig, APP_CONFIG_TITLE, &title) != 0 && configGetStr(appConfig, APP_CONFIG_BOOT, &boot) != 0) {
         if (*appsLinkedList == NULL) {
@@ -224,6 +224,11 @@ static int appScanCallback(const char *path, config_set_t *appConfig, void *arg)
         app->app.boot[APP_BOOT_MAX] = '\0';
         strncpy(app->app.path, path, APP_PATH_MAX + 1);
         app->app.path[APP_PATH_MAX] = '\0';
+        if (configGetStr(appConfig, APP_CONFIG_ARGV1, &argv1) != 0) {
+            strncpy(app->app.argv1, argv1, APP_ARGV1_MAX + 1);
+            app->app.argv1[APP_ARGV1_MAX] = '\0';
+        } else
+            app->app.argv1[0] = '\0';
         app->app.legacy = 0;
         return 0;
     } else {
@@ -355,14 +360,16 @@ static void appLaunchItem(int id, config_set_t *configSet)
 {
     int mode, fd;
     const char *filename;
+    const char *argv1;
     char partition[128];
-    char *argv[1];
+    char *argv[2];
 
     // Retrieve configuration set by appGetConfig()
     configGetStr(configSet, CONFIG_ITEM_STARTUP, &filename);
 
     fd = open(filename, O_RDONLY);
     if (fd >= 0) {
+        int argc = 1;
         close(fd);
 
         strcpy(partition, "");
@@ -377,8 +384,13 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
         argv[0] = (char *)filename;
 
+        if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &argv1) != 0) {
+            argv[1] = (char *)argv1;
+            argc = 2;
+        }
+
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
-        LoadELFFromFileWithPartition(filename, partition, 1, argv);
+        LoadELFFromFileWithPartition(filename, partition, argc, argv);
     } else
         guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 }
@@ -408,6 +420,7 @@ static config_set_t *appGetConfig(int id)
 
         configSetStr(config, CONFIG_ITEM_NAME, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
+        configSetStr(config, CONFIG_ITEM_ALTSTARTUP, appsList[id].argv1); // reuse AltStartup for argument 1
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_STARTUP, path);
 

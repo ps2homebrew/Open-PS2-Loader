@@ -473,7 +473,7 @@ modules/isofs/isofs.irx: modules/isofs
 $(EE_ASM_DIR)isofs.s: modules/isofs/isofs.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ isofs_irx
 
-$(EE_ASM_DIR)usbd.s: $(PS2SDK)/iop/irx/usbd.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)usbd.s: $(PS2SDK)/iop/irx/usbd_mini.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbd_irx
 
 $(EE_ASM_DIR)libsd.s: $(PS2SDK)/iop/irx/libsd.irx | $(EE_ASM_DIR)

@@ -177,6 +177,11 @@ jobs:
       id: version
       run: echo "::set-output name=version::$(make oplversion)"
 
+    - name: Get parent trigger
+      if: ${{ github.event_name }} == 'repository_dispatch'
+      id: parent
+      run: echo "::set-output name=parent::$(echo -${{ github.event.client_payload.parent }}@${{ github.event.client_payload.parent_sha }} | sed 's/\//,/g')"
+
     - name: Download all artifacts
       uses: actions/download-artifact@v3
 
@@ -207,6 +212,17 @@ jobs:
           OPNPS2LD-VARIANTS.7z
           OPNPS2LD-LANGS.7z
 
+    - name: update release
+      if: github.ref == 'refs/heads/master' && '${{ github.event_name }}' == 'repository_dispatch'
+      id: update_release
+      uses: tubone24/update_release@v1.0
+      env:
+       GITHUB_TOKEN: ${{ github.token }}
+       TAG_NAME: "latest"
+      with:
+       body: "Package was released again because of a toolchain update: ${{ github.event.client_payload.parent }}@${{ github.event.client_payload.parent_sha }}"
+       is_append_body: true
+
     - name: Create release
       if: startsWith(github.ref, 'refs/tags/v')
       uses: marvinpinto/action-automatic-releases@latest
@@ -226,10 +242,10 @@ jobs:
       if: github.ref == 'refs/heads/master' && env.USERNAME != null
       uses: Difegue/action-megacmd@master
       with:
-        args: put -c OPNPS2LD.7z /OPL/Pre-Release/${{ steps.version.outputs.version }}/
+        args: put -c OPNPS2LD.7z /OPL/Pre-Release/${{ steps.version.outputs.version }}${{ steps.parent.outputs.parent }}/
 
     - name: Upload release to Mega
       if: startsWith(github.ref, 'refs/tags/v') && env.USERNAME != null
       uses: Difegue/action-megacmd@master
       with:
-        args: put -c OPNPS2LD.7z /OPL/Release/${{ steps.version.outputs.version }}/
+        args: put -c OPNPS2LD.7z /OPL/Release/${{ steps.version.outputs.version }}${{ steps.parent.outputs.parent }}/

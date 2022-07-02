@@ -8,9 +8,11 @@
 #define APP_TITLE_MAX 128
 #define APP_PATH_MAX  128
 #define APP_BOOT_MAX  64
+#define APP_ARGV1_MAX 128
 
 #define APP_CONFIG_TITLE "title"
 #define APP_CONFIG_BOOT  "boot"
+#define APP_CONFIG_ARGV1 "argv1"
 
 #define APP_TITLE_CONFIG_FILE "title.cfg"
 
@@ -19,6 +21,7 @@ typedef struct
     char title[APP_TITLE_MAX + 1];
     char path[APP_PATH_MAX + 1];
     char boot[APP_BOOT_MAX + 1];
+    char argv1[APP_ARGV1_MAX + 1];
     u8 legacy;
 } app_info_t;
 

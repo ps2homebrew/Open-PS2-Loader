@@ -26,11 +26,11 @@ You can visit the Open PS2 Loader forum at:
 
 You can report compatibility game problems at:
 
-<https://www.psx-place.com/threads/open-ps2-loader-game-bug-reports.19401/>
+<https://github.com/ps2homebrew/Open-PS2-Loader-Compatibility-list>
 
 For an updated compatibility list, you can visit the OPL-CL site at:
 
-<http://sx.sytes.net/oplcl/games.aspx>
+<https://ps2homebrew.github.io/Open-PS2-Loader-Compatibility-list/List/>
 
 <details>
   <summary> <b> Release types </b> </summary>
@@ -60,7 +60,7 @@ USB modes:
 | Folder | Description                                          | Modes       |
 | ------ | ---------------------------------------------------- | ----------- |
 | `CD`   | for games on CD media - i.e. blue-bottom discs       | USB and SMB |
-| `DVD`  | for DVD5 and DVD9 images if using the NTFS file system on USB or SMB; DVD9 images must be split and placed into the device root if using the FAT32 file system on USB or SMB | USB and SMB |
+| `DVD`  | for DVD5 and DVD9 images if using NTFS and EXFAT file system on USB or SMB; DVD9 images must be split and placed in device root if using FAT32 file system on USB or SMB | USB and SMB |
 | `VMC`  | for Virtual Memory Card images - from 8MB up to 64MB | all         |
 | `CFG`  | for saving per-game configuration files              | all         |
 | `ART`  | for game art images                                  | all         |
@@ -81,14 +81,26 @@ All partitions created by OPL will be 128Mb (it is not recommended to enlarge pa
   <summary> <b> USB </b> </summary>
 <p>
 
-Game files on USB must be perfectly defragmented either file by file or
-by whole drive, and Dual Layer DVD9 images must be split to avoid the 4GB
-limitations of the FAT32 file system. We do not recommend using any programs.
-The best way for defragmenting - copy all files to pc, format USB, copy all files back.
-Repeat it once you faced defragmenting problem again.
+Game files on USB should be perfectly defragged file if above 64 fragments per file or
+per entire drive, and dual layer DVD9 images must be split to avoid the 4GB
+limitations of the FAT32 file system, however if was on 1.2.0 exfat does not have this limitation. We do not recommend using any programs.
+Best way to defrag - copy all files to PC, format USB, copy all files back.
+Repeat it once you faced the defrag problem again.
 
-You also need a PC program to convert or split games into USB Advance/Extreme
-format, such as USBUtil 2.0.
+You also need a PC program to convert or split games to USB Advance/Extreme
+format, such as USBUtil 2.0 and OPLUtil: OPL Game Utility.
+
+</p>
+</details>
+
+<details>
+  <summary> <b> SMARTPHONE </b> </summary>
+<p>
+
+For android devices you can add USB games via OTG before formatting the device with applications or in the device settings in FAT32 or EXFAT. To split games larger than 4GB use the OPLUtil application: OPL Game Utility
+ 
+The application does not work on devices with android 11 only lower and THERE IS NO WAY TO DEFRAGMENT THE GAMES ON SMARTPHONE, Best way to defrag - copy all files to SMARTPHONE, USB format, copy all files back.
+Repeat it once you faced defrag problem again or defrag on PC.
 
 </p>
 </details>

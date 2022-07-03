@@ -81,11 +81,9 @@ All partitions created by OPL will be 128Mb (it is not recommended to enlarge pa
   <summary> <b> USB </b> </summary>
 <p>
 
-Game files on USB must be perfectly defragmented 
-if they are above or equal to 64 fragments per file or
+Game files on USB must be perfectly defragmented if they are above or equal to 64 fragments per file or
 per entire drive, and Dual Layer DVD9 images must be split to avoid the 4GB
-limitations of the FAT32 file system, 
-however if was on 1.2.0 exfat does not have this limitation.
+limitations of the FAT32 file system, however if was on 1.2.0 exfat does not have this limitation.
 We do not recommend using any programs.
 The best way to defrag - copy all files to PC, format USB, copy all files back.
 Repeat it once you faced the defrag problem again.
@@ -100,15 +98,11 @@ format, such as USBUtil 2.0 and OPLUtil: OPL Game Utility.
   <summary> <b> SMARTPHONE </b> </summary>
 <p>
 
-For android devices you can add USB games via OTG 
-before formatting the device with applications or in the device settings in FAT32 or EXFAT. 
-To split games larger than 4GB use the OPLUtil application: OPL Game Utility.
-
-The application does not work on devices with Android 11 only lower and 
-THERE IS NO WAY TO DEFRAGMENT THE GAMES ON SMARTPHONE, 
-The best way to defrag - copy all files to SMARTPHONE 
-USB format, copy all files back.
-Repeat it once you faced defrag problem again or defrag on PC.
+On Android devices you can add USB games via OTG, format the device with app or in device settings in FAT32 or EXFAT.
+Dual layer DVD9 images should be split along with 4GB ones, use OPLUtil application: OPL Game Utility.
+The app does not work on devices with Android 11 only lower and THERE IS NO WAY TO DEFRAGMENT GAMES ON SMARTPHONE,
+Best way to defrag - copy all files to SMARTPHONE, USB format and 
+copy all files back. If remains defragmentation fragment on PC.
 
 </p>
 </details>

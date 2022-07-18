@@ -561,7 +561,7 @@ static const struct cdvdman_settings_common cdvdman_settings_common_sample = {
     0x1234,
     0x39393939,
     "B00BS",
-    16, 8, 12 // default cache sizes
+    16, 8, 16 // default cache sizes
 };
 
 int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman, void **cdvdman_irx, int *patchindex)

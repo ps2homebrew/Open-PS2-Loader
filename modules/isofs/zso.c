@@ -71,7 +71,7 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
     read_raw_data(c_buff, compressed_size, o_start, ziso_align);
 
     // process each sector
-    for (int i = 0; i < count; i++) {
+    for (unsigned int i = 0; i < count; i++) {
 
         // refresh block index cache if needed
         if (cur_block >= ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES - 1) {

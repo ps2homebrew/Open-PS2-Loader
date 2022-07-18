@@ -90,13 +90,14 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
         // prevent reading more than a sector (eliminates padding if any)
         int r = MIN(b_size, 2048);
 
-        // move block to its correct position in the buffer
-        memcpy(addr, c_buff, r);
-
         // if the block is not compressed, it will already be in its correct place
         if (topbit == 0) {                                 // block is compressed
-            memcpy(ziso_tmp_buf, addr, r);                 // read compressed block into temp buffer
+            memcpy(ziso_tmp_buf, c_buff, r);                 // read compressed block into temp buffer
             LZ4_decompress_fast(ziso_tmp_buf, addr, 2048); // decompress block
+        }
+        else{
+            // move block to its correct position in the buffer
+            memcpy(addr, c_buff, r);
         }
 
         cur_block++;

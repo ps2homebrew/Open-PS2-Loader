@@ -34,7 +34,7 @@ void ziso_init(ZISO_header *header, u32 first_block)
   The meat of the compressed sector reader.
   Taken from ARK-4's Inferno 2 ISO Driver.
   Tailored for OPL.
-  While it should let you read pretty much any format, it's made to work with 2K blocks ZSO for a lightweight implementation.
+  It's meant to work with 2048 block sizes, matching DVD sector size, and LZ4 compression for ZSO.
 */
 int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
 {
@@ -59,14 +59,15 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
     // calculate start and size of all compressed data
     if (cur_block + count < ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES)
         last_block = ziso_idx_cache[cur_block + count - ziso_idx_start_block];
-    else
+    else // last block offset is not withing cache, must read it from disk, this should be rare
         read_raw_data(&last_block, sizeof(u32), (cur_block + count) * 4 + sizeof(ZISO_header), 0);
 
     u32 o_start = (ziso_idx_cache[cur_block - ziso_idx_start_block] & 0x7FFFFFFF);
     u32 o_end = (last_block & 0x7FFFFFFF);
     u32 compressed_size = (o_end - o_start) << ziso_align;
 
-    // read all compressed data to the end of provided buffer
+    // read all compressed data to the end of provided buffer to reduce IO
+    // there should be no overflow or overrun, as long as compressed data is smaller, and it should be
     u8 *c_buff = addr + (count * 2048) - compressed_size;
     read_raw_data(c_buff, compressed_size, o_start, ziso_align);
 
@@ -79,18 +80,18 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
             ziso_idx_start_block = cur_block;
         }
 
-        // read block offset and size
+        // read block offset and size from cache
         u32 b_offset = ziso_idx_cache[cur_block - ziso_idx_start_block];
         u32 b_size = ziso_idx_cache[cur_block - ziso_idx_start_block + 1];
-        u32 topbit = b_offset & 0x80000000;
-        b_offset = (b_offset & 0x7FFFFFFF);
-        b_size = (b_size & 0x7FFFFFFF);
-        b_size = (b_size - b_offset) << ziso_align;
+        u32 topbit = b_offset & 0x80000000;         // extract top bit
+        b_offset = (b_offset & 0x7FFFFFFF);         // remove top bit
+        b_size = (b_size & 0x7FFFFFFF);             // remove top bit
+        b_size = (b_size - b_offset) << ziso_align; // calculate size of compressed block
 
         // prevent reading more than a sector (eliminates padding if any)
         int r = MIN(b_size, 2048);
 
-        // if the block is not compressed, it will already be in its correct place
+        // check top bit to determine if block is compressed or raw
         if (topbit == 0) {                                 // block is compressed
             memcpy(ziso_tmp_buf, c_buff, r);               // read compressed block into temp buffer
             LZ4_decompress_fast(ziso_tmp_buf, addr, 2048); // decompress block

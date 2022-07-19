@@ -234,15 +234,6 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
 int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 {
-    /*
-    u8 *buf = (u8 *)addr;
-    for (u32 i=0; i<count; i++){
-        if (ciso_read_sector(buf, lsn+i, 1)!=1)
-            return SCECdErEOM;
-        buf += 2048;
-    }
-    return SCECdErNO;
-    */
     return (ziso_read_sector(addr, lsn, count) == count) ? SCECdErNO : SCECdErEOM;
 }
 

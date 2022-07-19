@@ -34,7 +34,7 @@ void ziso_init(ZISO_header *header, u32 first_block)
   The meat of the compressed sector reader.
   Taken from ARK-4's Inferno 2 ISO Driver.
   Tailored for OPL.
-  It's meant to work with 2048 block sizes, matching DVD sector size, and LZ4 compression for ZSO.
+  It's made to work with 2048 block size (matching DVD sector size) and LZ4 compression (ZSO).
 */
 int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
 {
@@ -59,7 +59,7 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
     // calculate start and size of all compressed data
     if (cur_block + count < ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES)
         last_block = ziso_idx_cache[cur_block + count - ziso_idx_start_block];
-    else // last block offset is not withing cache, must read it from disk, this should be rare
+    else // last block offset is not within cache, must read it from disk, this should be rare
         read_raw_data(&last_block, sizeof(u32), (cur_block + count) * 4 + sizeof(ZISO_header), 0);
 
     u32 o_start = (ziso_idx_cache[cur_block - ziso_idx_start_block] & 0x7FFFFFFF);

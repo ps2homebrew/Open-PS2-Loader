@@ -245,7 +245,7 @@ struct UIItem diaConfig[] = {
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"BDM Cache", -1}}},
     {UI_SPACER},
-    {UI_INT, CFG_BDMCACHE, 1, 1, -1, 0, 0, {.intvalue = {16, 16, 0, 32, NULL}}},
+    {UI_INT, CFG_BDMCACHE, 1, 1, -1, 0, 0, {.intvalue = {16, 8, 0, 32, NULL}}},
     {UI_BREAK},
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"HDD Cache", -1}}},
     {UI_SPACER},
@@ -253,7 +253,7 @@ struct UIItem diaConfig[] = {
     {UI_BREAK},
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"SMB Cache", -1}}},
     {UI_SPACER},
-    {UI_INT, CFG_SMBCACHE, 1, 1, -1, 0, 0, {.intvalue = {12, 4, 0, 32, NULL}}},
+    {UI_INT, CFG_SMBCACHE, 1, 1, -1, 0, 0, {.intvalue = {16, 4, 0, 32, NULL}}},
     {UI_BREAK},
 
     // buttons

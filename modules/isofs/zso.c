@@ -34,88 +34,75 @@ void ziso_init(ZISO_header *header, u32 first_block)
   The meat of the compressed sector reader.
   Taken from ARK-4's Inferno 2 ISO Driver.
   Tailored for OPL.
-  While it should let you read pretty much any format, it's made to work with 2K blocks ZSO for a lightweight implementation.
+  It's made to work with 2048 block size (matching DVD sector size) and LZ4 compression (ZSO).
 */
 int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
 {
+
+    u32 last_block;
+    u32 cur_block = lsn;
 
     if (lsn >= ziso_total_block) {
         return 0; // can't seek beyond file
     }
 
-    u32 size = count * 2048;
-    u32 o_lsn = lsn;
-    u8 *c_buf = NULL;
-
-    {
-        // refresh index table if needed
-        u32 starting_block = lsn;
-        u32 ending_block = lsn + count + 1;
-        if (ziso_idx_start_block < 0 || starting_block < ziso_idx_start_block || ending_block >= ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES) {
-            read_raw_data(ziso_idx_cache, ZISO_IDX_MAX_ENTRIES * sizeof(u32), starting_block * 4 + sizeof(ZISO_header), 0);
-            ziso_idx_start_block = starting_block;
-        }
-
-        // reduce IO by doing one read of all compressed data into the end of the provided buffer
-        u32 o_start = (ziso_idx_cache[starting_block - ziso_idx_start_block] & 0x7FFFFFFF);
-        u32 o_end;
-        if (ending_block < ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES) { // ending block offset within cache
-            o_end = ziso_idx_cache[ending_block - ziso_idx_start_block];
-        } else { // need to read ending block from file
-            read_raw_data(&o_end, sizeof(u32), starting_block * 4 + sizeof(ZISO_header), 0);
-        }
-        o_end &= 0x7FFFFFFF;
-        // calculate size of compressed data and if we can copy it entirely into the provided buffer
-        u32 compressed_size = (o_end - o_start) << ziso_align;
-        if (size >= compressed_size) {
-            c_buf = addr + size - compressed_size;                      // copy at the end to avoid overlap
-            read_raw_data(c_buf, compressed_size, o_start, ziso_align); // read all compressed data at once
-        }
+    if (lsn + count >= ziso_total_block) {
+        count = ziso_total_block - lsn; // adjust sector count if reading beyond file
     }
 
+    // refresh index table if needed
+    if (ziso_idx_start_block < 0 || lsn < ziso_idx_start_block || lsn >= ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES - 1) {
+        read_raw_data((u8 *)ziso_idx_cache, ZISO_IDX_MAX_ENTRIES * sizeof(u32), lsn * 4 + sizeof(ZISO_header), 0);
+        ziso_idx_start_block = lsn;
+    }
+
+    // calculate start and size of all compressed data
+    if (cur_block + count < ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES)
+        last_block = ziso_idx_cache[cur_block + count - ziso_idx_start_block];
+    else // last block offset is not within cache, must read it from disk, this should be rare
+        read_raw_data(&last_block, sizeof(u32), (cur_block + count) * 4 + sizeof(ZISO_header), 0);
+
+    u32 o_start = (ziso_idx_cache[cur_block - ziso_idx_start_block] & 0x7FFFFFFF);
+    u32 o_end = (last_block & 0x7FFFFFFF);
+    u32 compressed_size = (o_end - o_start) << ziso_align;
+
+    // read all compressed data to the end of provided buffer to reduce IO
+    // there should be no overflow or overrun, as long as compressed data is smaller, and it should be
+    u8 *c_buff = addr + (count * 2048) - compressed_size;
+    read_raw_data(c_buff, compressed_size, o_start, ziso_align);
+
     // process each sector
-    while (size > 0) {
+    for (unsigned int i = 0; i < count; i++) {
 
-        if (lsn >= ziso_total_block) {
-            // EOF reached
-            break;
+        // refresh block index cache if needed
+        if (cur_block >= ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES - 1) {
+            read_raw_data((u8 *)ziso_idx_cache, ZISO_IDX_MAX_ENTRIES * sizeof(u32), cur_block * 4 + sizeof(ZISO_header), 0);
+            ziso_idx_start_block = cur_block;
         }
 
-        if (lsn >= ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES) {
-            // refresh index cache
-            read_raw_data(ziso_idx_cache, ZISO_IDX_MAX_ENTRIES * sizeof(u32), lsn * 4 + sizeof(ZISO_header), 0);
-            ziso_idx_start_block = lsn;
-        }
-
-        // read compressed block offset and size
-        u32 b_offset = ziso_idx_cache[lsn - ziso_idx_start_block];
-        u32 b_size = ziso_idx_cache[lsn - ziso_idx_start_block + 1];
-        u32 topbit = b_offset & 0x80000000; // extract top bit for decompressor
-        b_offset = (b_offset & 0x7FFFFFFF); // remove top bit
-        b_size = (b_size & 0x7FFFFFFF);     // remove top bit
-        b_size = (b_size - b_offset) << ziso_align;
+        // read block offset and size from cache
+        u32 b_offset = ziso_idx_cache[cur_block - ziso_idx_start_block];
+        u32 b_size = ziso_idx_cache[cur_block - ziso_idx_start_block + 1];
+        u32 topbit = b_offset & 0x80000000;         // extract top bit
+        b_offset = (b_offset & 0x7FFFFFFF);         // remove top bit
+        b_size = (b_size & 0x7FFFFFFF);             // remove top bit
+        b_size = (b_size - b_offset) << ziso_align; // calculate size of compressed block
 
         // prevent reading more than a sector (eliminates padding if any)
         int r = MIN(b_size, 2048);
 
-        // read block
-        if (c_buf > addr) {         // fast read
-            memcpy(addr, c_buf, r); // move compressed block to its correct position in the buffer
-            c_buf += b_size;
-        } else { // slow read, happens on rare cases where decompressed data overlaps compressed data
-            r = read_raw_data(addr, r, b_offset, ziso_align);
-        }
-
-        // if the block is not compressed, it will already be in its correct place
+        // check top bit to determine if block is compressed or raw
         if (topbit == 0) {                                 // block is compressed
-            memcpy(ziso_tmp_buf, addr, r);                 // read compressed block into temp buffer
+            memcpy(ziso_tmp_buf, c_buff, r);               // read compressed block into temp buffer
             LZ4_decompress_fast(ziso_tmp_buf, addr, 2048); // decompress block
+        } else {
+            // move block to its correct position in the buffer
+            memcpy(addr, c_buff, r);
         }
 
-        size -= 2048;
+        cur_block++;
         addr += 2048;
-        lsn++;
+        c_buff += b_size;
     }
-    // calculate number of sectors read
-    return lsn - o_lsn;
+    return cur_block - lsn;
 }

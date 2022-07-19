@@ -41,7 +41,7 @@
 
 #define CDVDMAN_SETTINGS_DEFAULT_COMMON                    \
     {                                                      \
-        0x69, 0x69, 0x1234, 0x39393939, "B00BS", 16, 8, 12 \
+        0x69, 0x69, 0x1234, 0x39393939, "B00BS", 16, 8, 16 \
     }
 #define CDVDMAN_SETTINGS_DEFAULT_HDD 0x12345678
 #define CDVDMAN_SETTINGS_DEFAULT_SMB                          \

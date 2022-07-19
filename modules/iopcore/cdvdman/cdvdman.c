@@ -181,19 +181,6 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
         memcpy(buffer, &(sector_cache[pos * 2048]), 2048 * sectors);
         return SCECdErNO;
     }
-    /*
-    // check if we have some of the data already in the cache
-    if (MAX_SECTOR_CACHE && cur_sector >= 0 && lsn >= cur_sector){
-        int pos = lsn - cur_sector;
-        if (pos < MAX_SECTOR_CACHE){
-            int r = MAX_SECTOR_CACHE - pos;
-            memcpy(buffer, &(sector_cache[pos*2048]), 2048 * r);
-            buffer += 2048 * r;
-            lsn += r;
-            sectors -= r;
-        }
-    }
-    */
     int res = DeviceReadSectors(lsn, buffer, sectors);
     return res;
 }
@@ -209,10 +196,13 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
     u32 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
     u32 pos = (offset << shift) & 2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
 
+    // prevent caching if already reading into ZSO index cache
+    int (*ReadSectors)(u32 lsn, void *buffer, unsigned int sectors) = (addr == ziso_idx_cache) ? &DeviceReadSectors : &DeviceReadSectorsCached;
+
     // read first block if not aligned to sector size
     if (pos) {
         int r = MIN(size, (2048 - pos));
-        DeviceReadSectorsCached(lba, ziso_tmp_buf, 1);
+        ReadSectors(lba, ziso_tmp_buf, 1);
         memcpy(addr, ziso_tmp_buf + pos, r);
         size -= r;
         lba++;
@@ -225,7 +215,7 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
         n_blocks++;
     if (n_blocks > 1) {
         int r = 2048 * (n_blocks - 1);
-        DeviceReadSectorsCached(lba, addr, n_blocks - 1);
+        ReadSectors(lba, addr, n_blocks - 1);
         size -= r;
         addr += r;
         lba += n_blocks - 1;
@@ -233,7 +223,7 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
     // read remaining data
     if (size) {
-        DeviceReadSectorsCached(lba, ziso_tmp_buf, 1);
+        ReadSectors(lba, ziso_tmp_buf, 1);
         memcpy(addr, ziso_tmp_buf, size);
         size = 0;
     }
@@ -244,15 +234,6 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 
 int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
 {
-    /*
-    u8 *buf = (u8 *)addr;
-    for (u32 i=0; i<count; i++){
-        if (ciso_read_sector(buf, lsn+i, 1)!=1)
-            return SCECdErEOM;
-        buf += 2048;
-    }
-    return SCECdErNO;
-    */
     return (ziso_read_sector(addr, lsn, count) == count) ? SCECdErNO : SCECdErEOM;
 }
 

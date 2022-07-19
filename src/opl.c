@@ -1567,7 +1567,7 @@ static void setDefaults(void)
 
     bdmCacheSize = 16;
     hddCacheSize = 8;
-    smbCacheSize = 12;
+    smbCacheSize = 16;
 
     ps2_ip_use_dhcp = 1;
     gETHOpMode = ETH_OP_MODE_AUTO;

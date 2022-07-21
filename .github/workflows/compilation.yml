@@ -161,7 +161,7 @@ jobs:
         path: opl-*.elf
 
   release:
-    needs: [build, build-variants, build-lang]
+    needs: [build, build-variants, build-lang, build-debug]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     env:

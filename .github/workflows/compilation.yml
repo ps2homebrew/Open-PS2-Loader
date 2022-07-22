@@ -157,7 +157,7 @@ jobs:
     - name: Upload variants artifact ELF
       uses: actions/upload-artifact@v3
       with:
-        name: OPNPS2LD-DEBUG
+        name: OPNPS2LD-DEBUG-${{ matrix.docker }}
         path: opl-*.elf
 
   release:

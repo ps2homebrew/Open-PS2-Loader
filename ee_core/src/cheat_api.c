@@ -60,7 +60,7 @@ void SetupCheats()
             k++;
         }
         // Discard any false positives from being possible hooks
-        if ((code.addr & 0xf0000000) == 0x40000000 || 0x30000000) {
+        if ((code.addr & 0xf0000000) == 0x40000000 || (code.addr & 0xf0000000) == 0x30000000) {
             nextCodeCanBeHook = 0;
         } else {
             nextCodeCanBeHook = 1;

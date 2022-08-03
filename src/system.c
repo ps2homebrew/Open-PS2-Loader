@@ -34,6 +34,8 @@
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioInit, fileXioExit, fileXioDevctl
 
+#include <elf-loader.h>
+
 typedef struct
 {
     char VMC_filename[1024];
@@ -341,11 +343,119 @@ int sysGetDiscID(char *hexDiscID)
     return 1;
 }
 
+int file_exists(char *filepath)
+{
+	int filenum;
+	
+	filenum = open(filepath, O_RDONLY);
+	if (filenum < 0) return 0;
+	close(filenum);
+	
+	return 1;
+}
+
 void sysExecExit(void)
 {
-    // Deinitialize without shutting down active devices.
-    deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
-    Exit(0);
+	bool ExitToELF = false;
+	bool FoundSystemUpdate = false;
+	int fdn = 0;
+	int j;
+	char *PathToCheck;
+	u8 romver[16];
+	
+	// List the possible paths for system updates
+	char osdsys_updates_paths[20][256] = { 
+		"mc0:/BADATA-SYSTEM/osdmain.elf",
+		"mc0:/BADATA-SYSTEM/osd120.elf",
+		"mc0:/BADATA-SYSTEM/osd130.elf",
+		"mc0:/BIDATA-SYSTEM/osdmain.elf",
+		"mc0:/BIDATA-SYSTEM/osd110.elf",
+		"mc0:/BIDATA-SYSTEM/osd130.elf",
+		"mc0:/BIDATA-SYSTEM/osdsys.elf",
+		"mc0:/BEDATA-SYSTEM/osdmain.elf",
+		"mc0:/BEDATA-SYSTEM/osd130.elf",
+		"mc0:/BCDATA-SYSTEM/osdmain.elf",
+		"mc1:/BADATA-SYSTEM/osdmain.elf",
+		"mc1:/BADATA-SYSTEM/osd120.elf",
+		"mc1:/BADATA-SYSTEM/osd130.elf",
+		"mc1:/BIDATA-SYSTEM/osdmain.elf",
+		"mc1:/BIDATA-SYSTEM/osd110.elf",
+		"mc1:/BIDATA-SYSTEM/osd130.elf",
+		"mc1:/BIDATA-SYSTEM/osdsys.elf",
+		"mc1:/BEDATA-SYSTEM/osdmain.elf",
+		"mc1:/BEDATA-SYSTEM/osd130.elf",
+		"mc1:/BCDATA-SYSTEM/osdmain.elf"
+	};
+	
+	// Possible exit paths (DEV1, DEV1 in mc1, DEV3, AltDEV3)
+	char exit_paths[4][256] = { 
+		"mc0:/BOOT/BOOT.ELF",
+		"mc1:/BOOT/BOOT.ELF",
+		"mass:/BOOT/BOOT.ELF",
+		"mass:/BOOT.ELF"
+	};
+	
+	// Checks the ROMVER.
+	// In case of 2.30 or 2.50, we assume that exit to an ELF
+	// is the better option since these versions does not launches
+	// system updates.
+	if((fdn = open("rom0:ROMVER", O_RDONLY)) > 0)
+    {
+        read(fdn, romver, sizeof romver);
+        close(fdn);
+
+        if (romver[1] == '2'){
+            if (romver[2] == '3'){ // ROMVER 2.30 SCPH-900XX 8C+
+				ExitToELF = true;
+			}else if (romver[2] == '5'){ // ROMVER 2.50 PX300 Bravia TVs (aka PS2 TVs)
+				ExitToELF = true;
+			}
+		}
+    }
+	
+	// Checks for OSDSYS updates
+	for (j=0; j<20; j++) {
+		PathToCheck = osdsys_updates_paths[j];
+  		if (file_exists(PathToCheck)) FoundSystemUpdate = true;
+		PathToCheck = NULL;
+	}
+	
+	// If there are no OSDSYS updates, we should try to exit to an ELF
+	if (FoundSystemUpdate == false) ExitToELF = true;
+	
+	if (ExitToELF == false){ // Normal exit behavior
+		
+		// Deinitialize without shutting down active devices.
+		deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
+		
+		Exit(0);
+		
+	}else{
+		for (j=0; j<4; j++) { // Checks if the ELFs exists, and if one of them exists, we launch it.
+			PathToCheck = exit_paths[j];
+			if (file_exists(PathToCheck)){
+    			char *argv[2];
+				argv[0] = PathToCheck;
+    			argv[1] = NULL;
+				
+				// Deinitialize without shutting down active devices.
+				deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
+				
+				LoadELFFromFile(PathToCheck, 1, argv);
+				
+				Exit(0);
+			}
+			PathToCheck = NULL;
+		}
+		
+		// No ELFs were found, so we exit the usual way which should
+		// lead to the browser since no updates were found before.
+		
+		// Deinitialize without shutting down active devices.
+		deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
+		
+		Exit(0);
+	}
 }
 
 // Module bits

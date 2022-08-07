@@ -238,7 +238,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install dependencies
-      run: apk add build-base git zip cdrkit
+      run:  sudo apt install build-base git zip cdrkit
 
     - name: git checkout
       uses: actions/checkout@v3

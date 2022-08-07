@@ -236,9 +236,10 @@ jobs:
 
   OPLTestISO:
     runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run:  sudo apt install build-base git zip cdrkit
+      run:  apk add build-base git zip genisoimage
 
     - name: git checkout
       uses: actions/checkout@v3

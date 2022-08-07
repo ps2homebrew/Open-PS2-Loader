@@ -3,6 +3,7 @@ name: CI-compile
 on:
   push:
   pull_request:
+  workflow_dispatch:
   repository_dispatch:
     types: [run_build]
 

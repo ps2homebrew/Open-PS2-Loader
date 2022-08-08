@@ -97,7 +97,7 @@ struct HistoryEntry
 
 // Functions
 int LoadHistoryFile(const char *path, struct HistoryEntry *HistoryEntries);
-int SaveHistoryFile(const char *path, const struct HistoryEntry *HistoryEntries);
-int AddOldHistoryFileRecord(const char *path, const struct HistoryEntry *OldHistoryEntry);
+int SaveHistoryFile(const char *path, const struct HistoryEntry *HistoryEntries, int mcType);
+int AddOldHistoryFileRecord(const char *path, const struct HistoryEntry *OldHistoryEntry, int mcType);
 int AddHistoryRecord(const char *name);
 int AddHistoryRecordUsingFullPath(const char *path);

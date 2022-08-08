@@ -86,8 +86,11 @@ int LoadHistoryFile(const char *path, struct HistoryEntry *HistoryEntries)
     return result;
 }
 
-int SaveHistoryFile(const char *path, const struct HistoryEntry *HistoryEntries)
+int SaveHistoryFile(const char *path, const struct HistoryEntry *HistoryEntries, int mcType)
 {
+    if (mcType != sceMcTypePS2) //don't write if there is no PS2 MC's 
+        return -1;
+
     char fullpath[64];
     int fd, result;
 
@@ -101,8 +104,11 @@ int SaveHistoryFile(const char *path, const struct HistoryEntry *HistoryEntries)
     return result;
 }
 
-int AddOldHistoryFileRecord(const char *path, const struct HistoryEntry *OldHistoryEntry)
+int AddOldHistoryFileRecord(const char *path, const struct HistoryEntry *OldHistoryEntry, int mcType)
 {
+    if (mcType != sceMcTypePS2) //don't write if there is no PS2 MC's 
+        return -1;
+
     char fullpath[64];
     int fd, result;
 
@@ -249,7 +255,7 @@ int AddHistoryRecord(const char *name)
                 memcpy(&OldHistoryEntry, NewEntry, sizeof(OldHistoryEntry));
 
                 // Unlike the original, add the old history record here.
-                AddOldHistoryFileRecord(path, &OldHistoryEntry);
+                AddOldHistoryFileRecord(path, &OldHistoryEntry, (path[2] == '0') ? mcType : mcType1);
             }
 
             // Initialize the new entry.
@@ -262,14 +268,7 @@ int AddHistoryRecord(const char *name)
     }
 
     // Unlike the original, save here.
-    if (path[2] == '0') {    
-       if(mcType != sceMcTypePS2)
-          return -1;
-    } else {
-       if(mcType1 != sceMcTypePS2)
-          return -1;
-    }
-     return SaveHistoryFile(path, HistoryEntries);
+    return SaveHistoryFile(path, HistoryEntries, (path[2] == '0') ? mcType : mcType1);
 }
 
 static void GetBootFilename(const char *bootpath, char *filename)

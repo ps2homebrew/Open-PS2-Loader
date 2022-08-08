@@ -32,8 +32,11 @@ extern unsigned char icon_sys_C[];
 
 #define DEBUG_PRINTF(args...)
 
-int CreateSystemDataFolder(const char *path, char FolderRegionLetter)
+int CreateSystemDataFolder(const char *path, char FolderRegionLetter, int mcType)
 {
+    if (mcType != sceMcTypePS2) //don't write if there is no PS2 MC's 
+        return -1;
+
     char fullpath[64];
     int fd, result, size;
     void *icon;
@@ -126,7 +129,7 @@ static u16 GetTimestamp(void)
 int AddHistoryRecord(const char *name)
 {
     struct HistoryEntry HistoryEntries[MAX_HISTORY_ENTRIES], *NewEntry, OldHistoryEntry;
-    int i, value, LeastUsedRecord, LeastUsedRecordLaunchCount, LeastUsedRecordTimestamp, NewLaunchCount, result, mcType;
+    int i, value, LeastUsedRecord, LeastUsedRecordLaunchCount, LeastUsedRecordTimestamp, NewLaunchCount, result, mcType, mcType1;
     u8 BlankSlotList[MAX_HISTORY_ENTRIES];
     int NumBlankSlots, NumSlotsUsed, IsNewRecord;
     char SystemRegionLetter;
@@ -137,7 +140,9 @@ int AddHistoryRecord(const char *name)
     // Don't write history for ps1 cards
     mcGetInfo(0, 0, &mcType, 0, 0);
     mcSync(0, NULL, &result);
-    if (mcType == sceMcTypePS1)
+    mcGetInfo(1, 0, &mcType1, 0, 0);
+    mcSync(0, NULL, &result);
+    if (mcType != sceMcTypePS2 && mcType1 != sceMcTypePS2) //don't even waste time, if there are no PS2 MC's 
         return -1;
 
     // For simplicity, create the data folder immediately if the history file does not exist (unlike the original).
@@ -150,9 +155,9 @@ int AddHistoryRecord(const char *name)
             SystemRegionLetter = GetSystemFolderLetter();
 
             path[2] = '0';
-            if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
+            if ((result = CreateSystemDataFolder(path, SystemRegionLetter, mcType)) != 0) {
                 path[2] = '1';
-                if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
+                if ((result = CreateSystemDataFolder(path, SystemRegionLetter, mcType1)) != 0) {
                     DEBUG_PRINTF("Error: Can't create system data folder: %d\n", result);
                     return result;
                 }
@@ -257,7 +262,14 @@ int AddHistoryRecord(const char *name)
     }
 
     // Unlike the original, save here.
-    return SaveHistoryFile(path, HistoryEntries);
+    if (path[2] == '0') {    
+       if(mcType != sceMcTypePS2)
+          return -1;
+    } else {
+       if(mcType1 != sceMcTypePS2)
+          return -1;
+    }
+     return SaveHistoryFile(path, HistoryEntries);
 }
 
 static void GetBootFilename(const char *bootpath, char *filename)

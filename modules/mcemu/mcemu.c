@@ -122,6 +122,9 @@ void InstallSecrmanHook(void *exp)
 /* Installs handlers for SIO2MAN's routine for enabled virtual memory cards */
 void InstallSio2manHook(void *exp, int ver)
 {
+    psio2_mc_transfer_init = GetExportEntry(exp, 24);
+    psio2_transfer_reset = GetExportEntry(exp, 26);
+
     /* hooking SIO2MAN entry #25 (used by MCMAN and old PADMAN) */
     pSio2man25 = HookExportEntry(exp, 25, hookSio2man25);
     /* hooking SIO2MAN entry #51 (used by MC2_* modules and PADMAN) */
@@ -459,6 +462,12 @@ u32 *hookSio2man67()
 /* SIO2 Command handler */
 void Sio2McEmu(Sio2Packet *sd)
 {
+    /*
+     * Unlock SIO2 access for MX4SIO
+     * NOTE: we are assuming MC's are only accessed when LOCKED
+     */
+    psio2_transfer_reset();
+
     if ((sd->ctrl[0] & 0xF0) == 0x70) {
         register u32 ddi, *pctl, result, length;
         register u8 *wdma, *rdma;
@@ -591,6 +600,12 @@ void Sio2McEmu(Sio2Packet *sd)
     }
 
     /* DPRINTF("SIO2 status 0x%X\n", sd->iostatus); */
+
+    /*
+     * Lock SIO2 access again as the user expects it
+     * NOTE: we are assuming MC's are only accessed when LOCKED
+     */
+    psio2_mc_transfer_init();
 }
 //------------------------------
 // endfunc

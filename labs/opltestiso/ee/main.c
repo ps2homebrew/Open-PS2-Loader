@@ -49,7 +49,7 @@ IRX_DEFINE(freeram);
 void print_speed(clock_t clk_start, clock_t clk_end, u32 fd_size, u32 buf_size)
 {
     unsigned int msec = (int)((clk_end - clk_start) / (CLOCKS_PER_SEC / 1000));
-    PRINTF("\t\t- Read %dKiB in %dms, blocksize=%d, speed=%dKB/s\n", fd_size / 1024, msec, buf_size, fd_size / msec);
+    PRINTF("\t\t- Read %04dKiB in %04dms, blocksize=%06d, speed=%04dKB/s\n", fd_size / 1024, msec, buf_size, fd_size / msec);
 }
 
 //--------------------------------------------------------------

@@ -34,7 +34,7 @@ extern unsigned char icon_sys_C[];
 
 int CreateSystemDataFolder(const char *path, char FolderRegionLetter, int mcType)
 {
-    if (mcType != sceMcTypePS2) //don't write if there is no PS2 MC's 
+    if (mcType != sceMcTypePS2) //don't write if there is no PS2 MC's
         return -1;
 
     char fullpath[64];
@@ -88,7 +88,7 @@ int LoadHistoryFile(const char *path, struct HistoryEntry *HistoryEntries)
 
 int SaveHistoryFile(const char *path, const struct HistoryEntry *HistoryEntries, int mcType)
 {
-    if (mcType != sceMcTypePS2) //don't write if there is no PS2 MC's 
+    if (mcType != sceMcTypePS2) //don't write if there is no PS2 MC's
         return -1;
 
     char fullpath[64];

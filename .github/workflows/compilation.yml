@@ -235,7 +235,7 @@ jobs:
       with:
         args: put -c OPNPS2LD.7z /OPL/Release/${{ steps.version.outputs.version }}/
 
-  OPLTestISO:
+  build-opltestiso:
     runs-on: ubuntu-latest
     container: ps2dev/ps2dev:latest
     steps:

@@ -55,6 +55,7 @@ void *pFastBuf = NULL;                                                          
 
 PtrRegisterLibraryEntires pRegisterLibraryEntires; /* Pointer to RegisterLibraryEntires routine */
 Sio2McProc pSio2man25, pSio2man51;                 /* Pointers to SIO2MAN routines */
+Sio2McProc2 psio2_mc_transfer_init, psio2_transfer_reset;
 void (*pSio2man67)();
 
 u8 mceccbuf[MCEMU_PORTS][0x20]; /* ECC buffers */

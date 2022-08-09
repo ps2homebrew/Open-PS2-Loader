@@ -141,6 +141,7 @@ typedef struct _MemoryCard
 
 /* type for a pointer to SIO2MAN's entries */
 typedef void (*Sio2McProc)(Sio2Packet *arg);
+typedef void (*Sio2McProc2)();
 
 int DummySecrAuthCard(int port, int slot, int cnum);
 void Sio2McEmu(Sio2Packet *sd);
@@ -208,6 +209,7 @@ extern void *pFastBuf;
 
 extern PtrRegisterLibraryEntires pRegisterLibraryEntires;
 extern Sio2McProc pSio2man25, pSio2man51;
+extern Sio2McProc2 psio2_mc_transfer_init, psio2_transfer_reset;
 extern void (*pSio2man67)();
 
 extern u8 mceccbuf[MCEMU_PORTS][0x20];

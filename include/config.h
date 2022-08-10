@@ -38,6 +38,10 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_DNAS         "$DNAS"
 #define CONFIG_ITEM_CONFIGSOURCE "$ConfigSource"
 
+#define CONFIG_ITEM_OSDLNG        "$CustomLanguageValue"
+#define CONFIG_ITEM_OSDLNG_SOURCE "$CustomLanguageSource"
+#define CONFIG_ITEM_OSDLNG_ENABLE "$CustomLanguageEnable"
+
 // Per-Game GSM keys. -Bat-
 #define CONFIG_ITEM_GSMSOURCE   "$GSMSource"
 #define CONFIG_ITEM_ENABLEGSM   "$EnableGSM"

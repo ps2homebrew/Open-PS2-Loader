@@ -22,7 +22,7 @@
 #include "include/renderman.h"
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
-
+#include <osd_config.h>
 #include "include/pggsm.h"
 #include "include/cheatman.h"
 
@@ -802,15 +802,23 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 #define PADEMU_ARGUMENT
 #endif
 
+#define CONFIGPARAMDATA " %d %d %d %d %d %d %d %d %d"
+    ConfigParam PARAM;
+    GetOsdConfigParam(&PARAM);                                                  //get system configuration
+    PARAM.language = (gOSDLanguageEnable) ? gOSDLanguageValue : PARAM.language; //patch what we care about
+#define CONFIGPARAMDATA_ARGUMENT , PARAM.spdifMode, PARAM.screenType, PARAM.videoOutput, PARAM.japLanguage, PARAM.ps1drvConfig, PARAM.version, PARAM.language, PARAM.timezoneOffset, gOSDLanguageEnable
+
     argc = 0;
-    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER,
+    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER CONFIGPARAMDATA,
             mode_str, gEnableDebug, gExitPath, gHDDSpindown,
             local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
             local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
             local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],
             gETHOpMode,
             GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0,
-            GetGSMEnabled() PADEMU_ARGUMENT);
+            GetGSMEnabled() PADEMU_ARGUMENT
+                CONFIGPARAMDATA_ARGUMENT);
+
     argv[argc] = config_str;
     argc++;
 

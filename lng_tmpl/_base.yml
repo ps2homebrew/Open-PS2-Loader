@@ -632,3 +632,33 @@ gui_strings:
   string: While button pressed
 - label: ACT_TOGGLED
   string: Toggled by button
+- label: LANGUAGE_JAPANESE
+  string: JAPANESE
+- label: LANGUAGE_ENGLISH
+  string: ENGLISH
+- label: LANGUAGE_FRENCH
+  string: FRENCH
+- label: LANGUAGE_SPANISH
+  string: SPANISH
+- label: LANGUAGE_GERMAN
+  string: GERMAN
+- label: LANGUAGE_ITALIAN
+  string: ITALIAN
+- label: LANGUAGE_DUTCH
+  string: DUTCH
+- label: LANGUAGE_PORTUGUESE
+  string: PORTUGUESE
+- label: LANGUAGE_RUSSIAN
+  string: RUSSIAN
+- label: LANGUAGE_KOREAN
+  string: KOREAN
+- label: LANGUAGE_TRAD_CHINESE
+  string: TRADITIONAL CHINESE
+- label: LANGUAGE_SIMPL_CHINESE
+  string: SIMPLIFIED CHINESE
+- label: OSD_SETTINGS
+  string: OSD settings
+- label: OSD_SETTINGS_LNG
+  string: OSD Language
+- label: ENABLE_LNG
+  string: Change language

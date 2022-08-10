@@ -20,6 +20,8 @@
 #include <ee_regs.h>
 #include <ps2_reg_defs.h>
 
+ConfigParam CustomOSDConfigParam;
+
 int set_reg_hook;
 int set_reg_disabled;
 int iop_reboot_count = 0;
@@ -37,6 +39,8 @@ int (*Old_SifSetReg)(u32 register_num, int register_value);
 int (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
 int (*Old_CreateThread)(ee_thread_t *thread_param);
 void (*Old_Exit)(s32 exit_code);
+void (*Old_SetOsdConfigParam)(ConfigParam *config);
+void (*Old_GetOsdConfigParam)(ConfigParam *config);
 
 /*----------------------------------------------------------------------------------------*/
 /* This function is called when SifSetDma catches a reboot request.                       */
@@ -159,12 +163,45 @@ void sysExit(s32 exit_code)
     IGR_Exit(exit_code);
 }
 
+void hook_SetOsdConfigParam(ConfigParam *config)
+{
+    DPRINTF(__func__ ": called\n");
+    CustomOSDConfigParam.spdifMode = config->spdifMode;
+    CustomOSDConfigParam.screenType = config->screenType;
+    CustomOSDConfigParam.videoOutput = config->videoOutput;
+    CustomOSDConfigParam.japLanguage = config->japLanguage;
+    CustomOSDConfigParam.ps1drvConfig = config->ps1drvConfig;
+    CustomOSDConfigParam.version = config->version;
+    CustomOSDConfigParam.language = config->language;
+    CustomOSDConfigParam.timezoneOffset = config->timezoneOffset;
+}
+
+void hook_GetOsdConfigParam(ConfigParam *config)
+{
+    DPRINTF(__func__ ": called\n");
+    config->spdifMode = CustomOSDConfigParam.spdifMode;
+    config->screenType = CustomOSDConfigParam.screenType;
+    config->videoOutput = CustomOSDConfigParam.videoOutput;
+    config->japLanguage = CustomOSDConfigParam.japLanguage;
+    config->ps1drvConfig = CustomOSDConfigParam.ps1drvConfig;
+    config->version = CustomOSDConfigParam.version;
+    config->language = CustomOSDConfigParam.language;
+    config->timezoneOffset = CustomOSDConfigParam.timezoneOffset;
+}
+
 /*----------------------------------------------------------------------------------------*/
 /* Replace SifSetDma, SifSetReg, LoadExecPS2 syscalls in kernel. (Game Loader)            */
 /* Replace CreateThread and ExecPS2 syscalls in kernel. (In Game Reset)                   */
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
+    if (enforceLanguage) {
+        Old_SetOsdConfigParam = GetSyscallHandler(__NR_SetOsdConfigParam);
+        SetSyscall(__NR_SetOsdConfigParam, &hook_SetOsdConfigParam);
+        Old_GetOsdConfigParam = GetSyscallHandler(__NR_GetOsdConfigParam);
+        SetSyscall(__NR_GetOsdConfigParam, &hook_GetOsdConfigParam);
+    }
+
     Old_SifSetDma = GetSyscallHandler(__NR_SifSetDma);
     SetSyscall(__NR_SifSetDma, &Hook_SifSetDma);
 
@@ -190,6 +227,10 @@ void Install_Kernel_Hooks(void)
 /*----------------------------------------------------------------------------------------------*/
 void Remove_Kernel_Hooks(void)
 {
+    if (enforceLanguage) {
+        SetSyscall(__NR_SetOsdConfigParam, Old_SetOsdConfigParam);
+        SetSyscall(__NR_GetOsdConfigParam, Old_GetOsdConfigParam);
+    }
     SetSyscall(__NR_SifSetDma, Old_SifSetDma);
     SetSyscall(__NR_SifSetReg, Old_SifSetReg);
     SetSyscall(__NR_KExit, Old_Exit);

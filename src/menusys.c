@@ -24,6 +24,7 @@ enum MENU_IDs {
     MENU_GFX_SETTINGS,
     MENU_AUDIO_SETTINGS,
     MENU_CONTROLLER_SETTINGS,
+    MENU_OSD_LANGUAGE_SETTINGS,
     MENU_PARENTAL_LOCK,
     MENU_NET_CONFIG,
     MENU_NET_UPDATE,
@@ -43,6 +44,7 @@ enum GAME_MENU_IDs {
     GAME_PADEMU_SETTINGS,
     GAME_PADMACRO_SETTINGS,
 #endif
+    GAME_OSD_LANGUAGE_SETTINGS,
     GAME_SAVE_CHANGES,
     GAME_TEST_CHANGES,
     GAME_REMOVE_CHANGES,
@@ -208,6 +210,7 @@ static void menuInitMainMenu(void)
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_AUDIO_SETTINGS, _STR_AUDIO_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_CONTROLLER_SETTINGS, _STR_CONTROLLER_SETTINGS);
+    submenuAppendItem(&mainMenu, -1, NULL, MENU_OSD_LANGUAGE_SETTINGS, _STR_OSD_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
@@ -240,6 +243,7 @@ void menuInitGameMenu(void)
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADEMU_SETTINGS, _STR_PADEMUCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADMACRO_SETTINGS, _STR_PADMACROCONFIG);
 #endif
+    submenuAppendItem(&gameMenu, -1, NULL, GAME_OSD_LANGUAGE_SETTINGS, _STR_OSD_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_TEST_CHANGES, _STR_TEST);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_REMOVE_CHANGES, _STR_REMOVE_ALL_SETTINGS);
@@ -834,6 +838,9 @@ void menuHandleInputMenu()
         } else if (id == MENU_CONTROLLER_SETTINGS) {
             if (menuCheckParentalLock() == 0)
                 guiShowControllerConfig();
+        } else if (id == MENU_OSD_LANGUAGE_SETTINGS) {
+            if (menuCheckParentalLock() == 0)
+                guiGameShowOSDLanguageConfig(1);
         } else if (id == MENU_PARENTAL_LOCK) {
             if (menuCheckParentalLock() == 0)
                 guiShowParentalLockConfig();
@@ -850,13 +857,12 @@ void menuHandleInputMenu()
             guiShowAbout();
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
+                guiGameSaveOSDLanguageGlobalConfig(configGetByType(CONFIG_GAME));
 #ifdef PADEMU
                 guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
                 guiGameSavePadMacroGlobalConfig(configGetByType(CONFIG_GAME));
-                saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
-#else
-                saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
 #endif
+                saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
                 menuSetParentalLockCheckState(1); // Re-enable parental lock check.
             }
         } else if (id == MENU_EXIT) {
@@ -1071,6 +1077,8 @@ void menuHandleInputGameMenu()
         } else if (menuID == GAME_PADMACRO_SETTINGS) {
             guiGameShowPadMacroConfig(0);
 #endif
+        } else if (menuID == GAME_OSD_LANGUAGE_SETTINGS) {
+            guiGameShowOSDLanguageConfig(0);
         } else if (menuID == GAME_SAVE_CHANGES) {
             if (guiGameSaveConfig(itemConfig, selected_item->item->userdata))
                 configSetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_USER);

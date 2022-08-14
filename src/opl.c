@@ -198,6 +198,10 @@ char gOPLPart[128];
 char *gHDDPrefix;
 char gExportName[32];
 
+int gOSDLanguageValue;
+int gOSDLanguageEnable;
+int gOSDLanguageSource;
+
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
 {
     if (mode == -1)

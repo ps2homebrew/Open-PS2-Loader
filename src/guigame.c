@@ -36,6 +36,9 @@ static int GSMFIELDFix;
 
 static int EnableCheat;
 static int CheatMode;
+
+static int forceGlobalOSDLanguage;
+
 #ifdef PADEMU
 static int EnablePadEmu;
 static int PadEmuSettings;
@@ -73,6 +76,8 @@ static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *confi
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame);
 static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *configGame);
 #endif
+static int guiGameSaveOSDLanguageGameConfig(config_set_t *configSet, int result);
+static void guiGameLoadOSDLanguageConfig(config_set_t *configSet, config_set_t *configGame);
 
 int guiGameAltStartupNameHandler(char *text, int maxLen)
 {
@@ -1085,6 +1090,9 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
     configSetVMC(configSet, vmc1, 0);
     configSetVMC(configSet, vmc2, 1);
 
+    result = guiGameSaveOSDLanguageGameConfig(configSet, result);
+    guiGameSaveOSDLanguageGlobalConfig(configGame);
+
     return result;
 }
 
@@ -1101,6 +1109,9 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         configRemoveKey(configGame, CONFIG_ITEM_GSMXOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMFIELDFIX);
+        //OSD Language
+        configRemoveKey(configGame, CONFIG_ITEM_OSDLNG);
+        configRemoveKey(configGame, CONFIG_ITEM_OSDLNG_ENABLE);
 
 #ifdef PADEMU
         // PADEMU
@@ -1134,12 +1145,18 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 
+        //OSD Language
+        configRemoveKey(configSet, CONFIG_ITEM_OSDLNG);
+        configRemoveKey(configSet, CONFIG_ITEM_OSDLNG_SOURCE);
+        configRemoveKey(configSet, CONFIG_ITEM_OSDLNG_ENABLE);
+
 #ifdef PADEMU
         // PADEMU
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
         configRemoveKey(configSet, CONFIG_ITEM_PADMACROSETTINGS);
+        configRemoveKey(configSet, CONFIG_ITEM_PADMACROSOURCE);
 #endif
         // VMC
         configRemoveVMC(configSet, 0);
@@ -1295,6 +1312,99 @@ static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *con
 }
 #endif
 
+//OSD
+
+static int guiGameOSDLanguageUpdater(int modified)
+{
+    int previousSource = gOSDLanguageSource;
+    diaGetInt(diaOSDConfig, OSD_LANGUAGE_SOURCE, &gOSDLanguageSource);
+
+    // update GUI to display per-game or global settings if changed
+    if (previousSource != gOSDLanguageSource && gOSDLanguageSource == SETTINGS_GLOBAL) {
+        config_set_t *configSet = gameMenuLoadConfig(diaOSDConfig);
+        configRemoveKey(configSet, CONFIG_ITEM_OSDLNG_SOURCE);
+        guiGameLoadOSDLanguageConfig(configSet, configGetByType(CONFIG_GAME));
+    } else if (previousSource != gOSDLanguageSource && gOSDLanguageSource == SETTINGS_PERGAME) {
+        config_set_t *configSet = gameMenuLoadConfig(diaOSDConfig);
+        configSetInt(configSet, CONFIG_ITEM_OSDLNG_SOURCE, gOSDLanguageSource);
+        guiGameLoadOSDLanguageConfig(configSet, configGetByType(CONFIG_GAME));
+    }
+
+    diaGetInt(diaOSDConfig, OSD_LANGUAGE_ENABLE, &gOSDLanguageEnable);
+    diaGetInt(diaOSDConfig, OSD_LANGUAGE_VALUE, &gOSDLanguageValue);
+
+    return 0;
+}
+
+void guiGameShowOSDLanguageConfig(int forceGlobal)
+{
+    const char *Lngs[] = {_l(_STR_LANGUAGE_JAPANESE), _l(_STR_LANGUAGE_ENGLISH), _l(_STR_LANGUAGE_FRENCH), _l(_STR_LANGUAGE_SPANISH), _l(_STR_LANGUAGE_GERMAN), _l(_STR_LANGUAGE_ITALIAN), _l(_STR_LANGUAGE_DUTCH), _l(_STR_LANGUAGE_PORTUGUESE), _l(_STR_LANGUAGE_RUSSIAN), _l(_STR_LANGUAGE_KOREAN), _l(_STR_LANGUAGE_TRAD_CHINESE), _l(_STR_LANGUAGE_SIMPL_CHINESE), NULL};
+    const char *sources[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
+    diaSetEnum(diaOSDConfig, OSD_LANGUAGE_VALUE, Lngs);
+    diaSetEnum(diaOSDConfig, OSD_LANGUAGE_SOURCE, sources);
+    forceGlobalOSDLanguage = forceGlobal;
+    diaSetEnabled(diaOSDConfig, OSD_LANGUAGE_SOURCE, !forceGlobalOSDLanguage);
+
+    if (forceGlobalOSDLanguage) {
+        guiGameLoadOSDLanguageConfig(NULL, configGetByType(CONFIG_GAME));
+    }
+
+
+    int result = -1;
+    while (result != 0) {
+        result = diaExecuteDialog(diaOSDConfig, result, 1, &guiGameOSDLanguageUpdater);
+
+        if (result == UIID_BTN_OK)
+            break;
+    }
+}
+static int guiGameSaveOSDLanguageGameConfig(config_set_t *configSet, int result)
+{
+    if (gOSDLanguageSource == SETTINGS_PERGAME) {
+        if ((result = configSetInt(configSet, CONFIG_ITEM_OSDLNG_SOURCE, gOSDLanguageSource)))
+            if ((result = configSetInt(configSet, CONFIG_ITEM_OSDLNG_ENABLE, gOSDLanguageEnable)))
+                result = configSetInt(configSet, CONFIG_ITEM_OSDLNG, gOSDLanguageValue);
+    } else {
+        configRemoveKey(configSet, CONFIG_ITEM_OSDLNG);
+        configRemoveKey(configSet, CONFIG_ITEM_OSDLNG_ENABLE);
+    }
+
+    return result;
+}
+
+void guiGameSaveOSDLanguageGlobalConfig(config_set_t *configGame)
+{
+    if (gOSDLanguageSource == SETTINGS_GLOBAL) {
+        configSetInt(configGame, CONFIG_ITEM_OSDLNG_ENABLE, gOSDLanguageEnable);
+        configSetInt(configGame, CONFIG_ITEM_OSDLNG, gOSDLanguageValue);
+    }
+}
+
+static void guiGameLoadOSDLanguageConfig(config_set_t *configSet, config_set_t *configGame)
+{
+    gOSDLanguageValue = 0;
+    gOSDLanguageEnable = 0;
+    gOSDLanguageSource = 0;
+
+    configGetInt(configGame, CONFIG_ITEM_OSDLNG_ENABLE, &gOSDLanguageEnable);
+    configGetInt(configGame, CONFIG_ITEM_OSDLNG, &gOSDLanguageValue);
+    // override global with per-game settings if available and selected.
+    if (!forceGlobalOSDLanguage) {
+        configGetInt(configSet, CONFIG_ITEM_OSDLNG_SOURCE, &gOSDLanguageSource);
+        if (gOSDLanguageSource == SETTINGS_PERGAME) {
+            if (!configGetInt(configSet, CONFIG_ITEM_OSDLNG_ENABLE, &gOSDLanguageEnable))
+                gOSDLanguageEnable = 0;
+            if (!configGetInt(configSet, CONFIG_ITEM_OSDLNG, &gOSDLanguageValue))
+                gOSDLanguageValue = 0;
+        }
+    }
+
+    diaSetInt(diaOSDConfig, OSD_LANGUAGE_SOURCE, gOSDLanguageSource);
+    diaSetInt(diaOSDConfig, OSD_LANGUAGE_ENABLE, gOSDLanguageEnable);
+    diaSetInt(diaOSDConfig, OSD_LANGUAGE_VALUE, gOSDLanguageValue);
+}
+//OSD Language
+
 // loads defaults if no config found
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
 {
@@ -1328,6 +1438,9 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     guiGameLoadPadEmuConfig(configSet, configGame);
     guiGameLoadPadMacroConfig(configSet, configGame);
 #endif
+
+    guiGameLoadOSDLanguageConfig(configSet, configGame);
+
     /// Find out the current game ID ///
     hexid[0] = '\0';
     configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));

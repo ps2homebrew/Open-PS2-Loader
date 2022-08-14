@@ -1012,3 +1012,29 @@ struct UIItem diaControllerConfig[] = {
     {UI_BREAK},
     // end of dialog
     {UI_TERMINATOR}};
+
+struct UIItem diaOSDConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OSD_SETTINGS}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -50, 0, {.label = {NULL, _STR_SETTINGS_SOURCE}}},
+    {UI_SPACER},
+    {UI_ENUM, OSD_LANGUAGE_SOURCE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLE_LNG}}},
+    {UI_SPACER},
+    {UI_BOOL, OSD_LANGUAGE_ENABLE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_OSD_SETTINGS_LNG}}},
+    {UI_SPACER},
+    {UI_ENUM, OSD_LANGUAGE_VALUE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+    {UI_BREAK},
+    // end of dialog
+    {UI_TERMINATOR}};

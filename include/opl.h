@@ -143,6 +143,10 @@ extern int gCheatSource;
 extern int gGSMSource;
 extern int gPadEmuSource;
 
+extern int gOSDLanguageValue;
+extern int gOSDLanguageEnable;
+extern int gOSDLanguageSource;
+
 extern int showCfgPopup;
 
 #ifdef IGS

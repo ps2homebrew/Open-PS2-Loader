@@ -736,13 +736,8 @@ void menuRenderMenu()
         // render, advance
         fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
         y += spacing;
-        if (gHDDStartMode && gEnableWrite) {
-            if (cp == 7)
-                y += spacing / 2;
-        } else {
-            if (cp == 6)
-                y += spacing / 2;
-        }
+        if (cp == (MENU_ABOUT - 1))
+            y += spacing / 2;
     }
 
     // hints
@@ -1023,13 +1018,8 @@ void menuRenderGameMenu()
         // render, advance
         fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
         y += spacing;
-#ifdef PADEMU
-        if (cp == 5 || cp == 7)
-            y += spacing / 2; // leave a blank space before rendering Save & Remove Settings.
-#else
-        if (cp == 3 || cp == 5)
+        if (cp == (GAME_SAVE_CHANGES - 1) || cp == (GAME_REMOVE_CHANGES - 1))
             y += spacing / 2;
-#endif
     }
 
     // hints

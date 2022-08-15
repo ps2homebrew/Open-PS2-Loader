@@ -133,11 +133,9 @@ endif
 ifeq ($(DTL_T10000),1)
   EE_CFLAGS += -D_DTL_T10000
   EECORE_EXTRA_FLAGS += DTL_T10000=1
-  UDNL_SRC = modules/iopcore/udnl-t300
-  UDNL_OUT = modules/iopcore/udnl-t300/udnl.irx
+  UDNL_OUT = $(PS2SDK)/iop/irx/udnl-t300.irx
 else
-  UDNL_SRC = modules/iopcore/udnl
-  UDNL_OUT = modules/iopcore/udnl/udnl.irx
+  UDNL_OUT = $(PS2SDK)/iop/irx/udnl.irx
 endif
 
 ifeq ($(IGS),1)
@@ -244,14 +242,8 @@ clean:
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-IOP core"
-	echo " -udnl-t300"
-	$(MAKE) -C modules/iopcore/udnl-t300 clean
-	echo " -udnl"
-	$(MAKE) -C modules/iopcore/udnl clean
 	echo " -imgdrv"
 	$(MAKE) -C modules/iopcore/imgdrv clean
-	echo " -eesync"
-	$(MAKE) -C modules/iopcore/eesync clean
 	echo " -cdvdman"
 	$(MAKE) -C modules/iopcore/cdvdman USE_BDM=1 clean
 	$(MAKE) -C modules/iopcore/cdvdman USE_SMB=1 clean
@@ -298,8 +290,6 @@ clean:
 	$(MAKE) -C modules/network/lwnbdsvr clean
 	echo " -udptty-ingame"
 	$(MAKE) -C modules/debug/udptty-ingame clean
-	echo " -ioptrap"
-	$(MAKE) -C modules/debug/ioptrap clean
 	echo " -ps2link"
 	$(MAKE) -C modules/debug/ps2link clean
 	echo " -ds34usb"
@@ -370,10 +360,6 @@ ee_core/ee_core.elf: ee_core
 $(EE_ASM_DIR)ee_core.s: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eecore_elf
 
-$(UDNL_OUT): $(UDNL_SRC)
-	echo "-IOP core"
-	$(MAKE) -C $<
-
 $(EE_ASM_DIR)udnl.s: $(UDNL_OUT) | $(EE_ASM_DIR)
 	$(BIN2S) $(UDNL_OUT) $@ udnl_irx
 
@@ -383,10 +369,7 @@ modules/iopcore/imgdrv/imgdrv.irx: modules/iopcore/imgdrv
 $(EE_ASM_DIR)imgdrv.s: modules/iopcore/imgdrv/imgdrv.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ imgdrv_irx
 
-modules/iopcore/eesync/eesync.irx: modules/iopcore/eesync
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)eesync.s: modules/iopcore/eesync/eesync.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)eesync.s: $(PS2SDK)/iop/irx/eesync-nano.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eesync_irx
 
 modules/iopcore/cdvdman/bdm_cdvdman.irx: modules/iopcore/cdvdman
@@ -639,10 +622,7 @@ modules/debug/udptty-ingame/udptty.irx: modules/debug/udptty-ingame
 $(EE_ASM_DIR)udptty-ingame.s: modules/debug/udptty-ingame/udptty.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ udptty_ingame_irx
 
-modules/debug/ioptrap/ioptrap.irx: modules/debug/ioptrap
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)ioptrap.s: modules/debug/ioptrap/ioptrap.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)ioptrap.s: $(PS2SDK)/iop/irx/ioptrap.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ioptrap_irx
 
 modules/debug/ps2link/ps2link.irx: modules/debug/ps2link

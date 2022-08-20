@@ -649,8 +649,10 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
 #endif
 
     if (configGetInt(configSet, CONFIG_ITEM_OSDLNG_SOURCE, &gOSDLanguageSource)) {
+        configGetInt(configSet, CONFIG_ITEM_OSDLNG_ENABLE, &gOSDLanguageEnable);
         configGetInt(configSet, CONFIG_ITEM_OSDLNG, &gOSDLanguageValue);
     } else {
+        configGetInt(configGame, CONFIG_ITEM_OSDLNG_ENABLE, &gOSDLanguageEnable);
         configGetInt(configGame, CONFIG_ITEM_OSDLNG, &gOSDLanguageValue);
     }
 

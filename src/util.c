@@ -537,7 +537,7 @@ int CheckPS2Logo(int fd, u32 lba)
 
     if (*(u32 *)logo == ZSO_MAGIC) {
         // initialize ZSO
-        ziso_init(logo, *(u32 *)((u8 *)logo + sizeof(ZISO_header)));
+        ziso_init((ZISO_header *)logo, *(u32 *)((u8 *)logo + sizeof(ZISO_header)));
         probed_fd = fd;
         probed_lba = lba;
         // read ZISO data

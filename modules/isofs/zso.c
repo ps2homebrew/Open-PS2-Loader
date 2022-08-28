@@ -81,7 +81,7 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
         // check top bit to determine if block is compressed or raw
         if (topbit == 0) {                                 // block is compressed
             memcpy(ziso_tmp_buf, c_buff, r);               // read compressed block into temp buffer
-            LZ4_decompress_fast(ziso_tmp_buf, addr, 2048); // decompress block
+            LZ4_decompress_fast((char *)ziso_tmp_buf, (char *)addr, 2048); // decompress block
         } else {
             // move block to its correct position in the buffer
             memcpy(addr, c_buff, r);

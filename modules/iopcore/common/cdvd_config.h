@@ -82,4 +82,17 @@ struct cdvdman_settings_bdm
     bd_fragment_t frags[BDM_MAX_FRAGS];
 } __attribute__((packed));
 
+#define CDVDMAN_SETTINGS_DEFAULT_COMMON                    \
+    {                                                      \
+        0x68, 0x68, 0x1234, 0x39393939, "DSKID", 16, 8, 16 \
+    }
+#define CDVDMAN_SETTINGS_DEFAULT_HDD 0x12345678
+#define CDVDMAN_SETTINGS_DEFAULT_SMB                          \
+    "######  FILENAME  ######",                               \
+    {                                                         \
+        {                                                     \
+            "192.168.0.10", 0x8510, "PS2SMB", "", "GUEST", "" \
+        }                                                     \
+    }
+
 #endif

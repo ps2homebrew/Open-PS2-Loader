@@ -790,6 +790,8 @@ static int ethReadNetConfig(void)
     t_ip_info ip_info;
     int result;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
         lastIP = *(struct ip4_addr *)&ip_info.ipaddr;
         lastNM = *(struct ip4_addr *)&ip_info.netmask;
@@ -799,6 +801,7 @@ static int ethReadNetConfig(void)
         ip4_addr_set_zero(&lastNM);
         ip4_addr_set_zero(&lastGW);
     }
+#pragma GCC diagnostic pop
 
     return result;
 }
@@ -877,6 +880,8 @@ static int ethApplyIPConfig(void)
         IP4_ADDR(&dns, ps2_dns[0], ps2_dns[1], ps2_dns[2], ps2_dns[3]);
         dns_curr = dns_getserver(0);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
         // Check if it's the same. Otherwise, apply the new configuration.
         if ((ps2_ip_use_dhcp != ip_info.dhcp_enabled) || (!ps2_ip_use_dhcp &&
                                                           (!ip_addr_cmp(&ipaddr, (struct ip4_addr *)&ip_info.ipaddr) ||
@@ -903,6 +908,7 @@ static int ethApplyIPConfig(void)
                 dns_setserver(0, &dns);
         } else
             result = 0;
+#pragma GCC diagnostic pop
     }
 
     return result;

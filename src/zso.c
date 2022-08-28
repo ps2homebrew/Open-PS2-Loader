@@ -1,3 +1,11 @@
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <tamtypes.h>
+#include "include/opl.h"
+#include "include/hdd.h"
+#include "include/ioman.h"
+#include "include/hddsupport.h"
 #include "../modules/isofs/zso.c"
 
 int probed_fd = 0;

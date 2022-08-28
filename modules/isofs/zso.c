@@ -1,6 +1,10 @@
 #include "lz4.h"
 #include "zso.h"
 
+#ifdef _IOP
+#include <sysclib.h>
+#endif
+
 // block offset cache, reduces IO access
 u32 *ziso_idx_cache = NULL;
 int ziso_idx_start_block = -1;

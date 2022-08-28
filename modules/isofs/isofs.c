@@ -5,6 +5,7 @@
 #include <thsemap.h>
 #include <loadcore.h>
 #include <sysclib.h>
+#include <sysmem.h>
 
 #include <irx.h>
 

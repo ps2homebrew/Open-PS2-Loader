@@ -29,7 +29,7 @@ void ziso_init(ZISO_header *header, u32 first_block)
         if ((u32)ziso_tmp_buf & 63) // align 64
             ziso_tmp_buf = (void *)(((u32)ziso_tmp_buf & (~63)) + 64);
         if (ziso_tmp_buf) {
-            ziso_idx_cache = ziso_tmp_buf + 2048;
+            ziso_idx_cache = (u32 *)(ziso_tmp_buf + 2048);
         }
     }
 }

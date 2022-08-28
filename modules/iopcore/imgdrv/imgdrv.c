@@ -3,6 +3,9 @@
 #include <loadcore.h>
 #include <ioman.h>
 
+#define MODNAME "imgdrv"
+IRX_ID(MODNAME, 1, 1);
+
 unsigned int ioprpimg = 0xDEC1DEC1;
 int ioprpsiz = 0xDEC2DEC2;
 

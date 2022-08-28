@@ -6,6 +6,9 @@
 #include <thevent.h>
 #include <thsemap.h>
 
+#define MODNAME "apemodpatch"
+IRX_ID(MODNAME, 1, 1);
+
 #define JAL(addr) (0x0c000000 | (((addr)&0x03ffffff) >> 2))
 
 /* This game has a function that can be called by multiple threads.

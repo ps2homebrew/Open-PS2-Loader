@@ -14,6 +14,9 @@
 #include <cdvdman.h>
 #include "excepHandler.h"
 
+#define MODNAME "ps2link"
+IRX_ID(MODNAME, 1, 8);
+
 // Entry points
 extern int fsysMount(void);
 extern int cmdHandlerInit(void);

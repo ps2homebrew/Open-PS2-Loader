@@ -328,8 +328,6 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     iso_frag->frag_start = 0;
     iso_frag->frag_count = 0;
     for (i = 0; i < game->parts; i++) {
-        int fidx;
-
         // Open file
         sbCreatePath(game, partname, bdmPrefix, "/", i);
         fd = open(partname, O_RDONLY);

@@ -5,6 +5,9 @@
 #include <thbase.h>
 #include <thsemap.h>
 
+#define MODNAME "iremsndpatch"
+IRX_ID(MODNAME, 1, 1);
+
 #define JAL(addr) (0x0c000000 | (((addr)&0x03ffffff) >> 2))
 #define JMP(addr) (0x08000000 | (0x3ffffff & ((addr) >> 2)))
 

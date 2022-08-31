@@ -318,7 +318,10 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     settings = (struct cdvdman_settings_bdm *)((u8 *)irx + index);
     if (settings == NULL)
         return;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
     memset(&settings->frags[0], 0, sizeof(bd_fragment_t) * BDM_MAX_FRAGS);
+#pragma GCC diagnostic pop
     u8 iTotalFragCount = 0;
 
     //
@@ -328,8 +331,6 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     iso_frag->frag_start = 0;
     iso_frag->frag_count = 0;
     for (i = 0; i < game->parts; i++) {
-        int fidx;
-
         // Open file
         sbCreatePath(game, partname, bdmPrefix, "/", i);
         fd = open(partname, O_RDONLY);

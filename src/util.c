@@ -522,6 +522,7 @@ int CheckPS2Logo(int fd, u32 lba)
     char text[1024];
 
     w = 0;
+    memset(logo, 0, sizeof(logo));
     if ((fd > 0) && (lba == 0)) { // BDM_MODE & ETH_MODE
         lseek(fd, 0, SEEK_SET);
         w = read(fd, logo, sizeof(logo)) == sizeof(logo);
@@ -537,7 +538,7 @@ int CheckPS2Logo(int fd, u32 lba)
 
     if (*(u32 *)logo == ZSO_MAGIC) {
         // initialize ZSO
-        ziso_init(logo, *(u32 *)((u8 *)logo + sizeof(ZISO_header)));
+        ziso_init((ZISO_header *)logo, *(u32 *)((u8 *)logo + sizeof(ZISO_header)));
         probed_fd = fd;
         probed_lba = lba;
         // read ZISO data

@@ -197,7 +197,7 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
     u32 pos = (offset << shift) & 2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
 
     // prevent caching if already reading into ZSO index cache
-    int (*ReadSectors)(u32 lsn, void *buffer, unsigned int sectors) = (addr == ziso_idx_cache) ? &DeviceReadSectors : &DeviceReadSectorsCached;
+    int (*ReadSectors)(u32 lsn, void *buffer, unsigned int sectors) = (addr == (u8 *)ziso_idx_cache) ? &DeviceReadSectors : &DeviceReadSectorsCached;
 
     // read first block if not aligned to sector size
     if (pos) {

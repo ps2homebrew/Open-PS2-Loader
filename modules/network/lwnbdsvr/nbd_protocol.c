@@ -158,7 +158,7 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
                 while (*ptr_ctx) {
                     name_len = strlen((*ptr_ctx)->export_name);
                     DEBUGLOG("%s\n", (*ptr_ctx)->export_name);
-                    desc_len = (*ptr_ctx)->export_desc ? strlen((*ptr_ctx)->export_desc) : 0;
+                    desc_len = strlen((*ptr_ctx)->export_desc);
                     len = htonl(name_len);
                     fixed_new_option_reply.replylen = htonl(name_len + sizeof(len) +
                                                             desc_len);

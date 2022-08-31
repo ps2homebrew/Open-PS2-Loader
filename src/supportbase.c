@@ -537,7 +537,7 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
         if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
             if (ProbeZISO(fd)) {
                 if (ziso_read_sector(IOBuffer, layer1_offset, 1) == 1 &&
-                    ((IOBuffer[0x00] == 1) && (!strncmp(&IOBuffer[0x01], "CD001", 5)))) {
+                    ((IOBuffer[0x00] == 1) && (!strncmp((char *)(&IOBuffer[0x01]), "CD001", 5)))) {
                     result = 0;
                 }
             } else {

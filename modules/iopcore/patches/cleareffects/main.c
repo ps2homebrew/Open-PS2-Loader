@@ -7,6 +7,9 @@
 #include <libsd.h>
 #include <sysclib.h>
 
+#define MODNAME "cleareffects"
+IRX_ID(MODNAME, 1, 1);
+
 int _start(int argc, char **argv)
 {
     sceSdEffectAttr attr = {

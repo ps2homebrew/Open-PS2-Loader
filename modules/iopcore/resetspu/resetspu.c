@@ -15,6 +15,9 @@
 #include <loadcore.h>
 #include <spu2regs.h>
 
+#define MODNAME "resetspu"
+IRX_ID(MODNAME, 1, 1);
+
 static void nopdelay(void)
 {
     unsigned int i;

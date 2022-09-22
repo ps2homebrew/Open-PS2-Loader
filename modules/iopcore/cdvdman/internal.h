@@ -39,19 +39,6 @@
 #define iDPRINTF(args...)
 #endif
 
-#define CDVDMAN_SETTINGS_DEFAULT_COMMON                    \
-    {                                                      \
-        0x69, 0x69, 0x1234, 0x39393939, "B00BS", 16, 8, 16 \
-    }
-#define CDVDMAN_SETTINGS_DEFAULT_HDD 0x12345678
-#define CDVDMAN_SETTINGS_DEFAULT_SMB                          \
-    "######  FILENAME  ######",                               \
-    {                                                         \
-        {                                                     \
-            "192.168.0.10", 0x8510, "PS2SMB", "", "GUEST", "" \
-        }                                                     \
-    }
-
 #ifdef HDD_DRIVER
 #define CDVDMAN_SETTINGS_TYPE                    cdvdman_settings_hdd
 #define CDVDMAN_SETTINGS_DEFAULT_DEVICE_SETTINGS CDVDMAN_SETTINGS_DEFAULT_HDD,

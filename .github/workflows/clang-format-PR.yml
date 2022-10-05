@@ -1,0 +1,30 @@
+name: CI-format-pull-request
+
+# only perform this workflow if a developer manually triggers it from the actions tab
+on:
+  workflow_dispatch:
+
+jobs:
+  check-format:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: DoozyX/clang-format-lint-action@v0.12
+      with:
+        source: '.'
+        extensions: 'h,c'
+        clangFormatVersion: 12
+        inplace: true
+        
+    - name: Create Pull Request
+      id: prmaker
+      uses: peter-evans/create-pull-request@v4
+      with:
+        commit-message: "Format source code"
+        body: "clang-format"
+        title: "clang-format"
+        delete-branch: true
+        branch-suffix: random
+        add-paths: |
+          List/*/*

@@ -27,4 +27,4 @@ jobs:
         delete-branch: true
         branch-suffix: random
         add-paths: |
-          List/*/*
+          *

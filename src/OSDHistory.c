@@ -139,7 +139,7 @@ int AddHistoryRecord(const char *name)
     mcSync(0, NULL, &result);
     mcGetInfo(1, 0, &mcType1, 0, 0);
     mcSync(0, NULL, &result);
-    if (mcType != sceMcTypePS2 && mcType1 != sceMcTypePS2) { //don't even waste time if there are no PS2 MC's 
+    if (mcType != sceMcTypePS2 && mcType1 != sceMcTypePS2) { //don't even waste time if there are no PS2 MC's
         DEBUG_PRINTF("No PS2 memory cards detected\n\tslot[1]= 0x%x\n\tslot[2]= 0x%x", mcType, mcType1);
         return -1;
     }
@@ -148,32 +148,32 @@ int AddHistoryRecord(const char *name)
     sprintf(path, "mc0:/%s", GetSystemDataPath());
     if ((result = LoadHistoryFile(path, HistoryEntries)) != 0) {
         path[2] = '1';
-		DEBUG_PRINTF("Error: can't load history file from slot 0.\n");
+        DEBUG_PRINTF("Error: can't load history file from slot 0.\n");
         if ((result = LoadHistoryFile(path, HistoryEntries)) != 0) {
             DEBUG_PRINTF("Error: can't load history file from slot 1.\n");
 
             SystemRegionLetter = GetSystemFolderLetter();
 
             path[2] = '0';
-			if (mcType == sceMcTypePS2) {
-				if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
-					DEBUG_PRINTF("error: Can't create system data folder on slot 0 (%d)\n", result);
-					path[2] = '1';
-					if (mcType == sceMcTypePS2) {
-						if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
-							DEBUG_PRINTF("error: Can't create system data folder on slot 1 (%d)\n", result);
-							return result;
-						}
-					}
-				}
-			} else if (mcType1 == sceMcTypePS2) {
-				DEBUG_PRINTF("slot 0 has no ps2 memcard, trying on slot 1...\n");
-				path[2] = '1';
-				if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
-					DEBUG_PRINTF("error: Can't create system data folder on slot 1 (%d)\n", result);
-					return result;
-				}
-			}
+            if (mcType == sceMcTypePS2) {
+                if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
+                    DEBUG_PRINTF("error: Can't create system data folder on slot 0 (%d)\n", result);
+                    path[2] = '1';
+                    if (mcType == sceMcTypePS2) {
+                        if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
+                            DEBUG_PRINTF("error: Can't create system data folder on slot 1 (%d)\n", result);
+                            return result;
+                        }
+                    }
+                }
+            } else if (mcType1 == sceMcTypePS2) {
+                DEBUG_PRINTF("slot 0 has no ps2 memcard, trying on slot 1...\n");
+                path[2] = '1';
+                if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
+                    DEBUG_PRINTF("error: Can't create system data folder on slot 1 (%d)\n", result);
+                    return result;
+                }
+            }
 
             memset(HistoryEntries, 0, sizeof(HistoryEntries));
         }

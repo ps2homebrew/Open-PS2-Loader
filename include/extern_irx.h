@@ -1,7 +1,9 @@
 #ifndef EXTERN_IRX_H
 #define EXTERN_IRX_H
 
-#define IMPORT_BIN2C(_n) extern void *_n[]; extern int size_ ## _n
+#define IMPORT_BIN2C(_n) \
+    extern void *_n[];   \
+    extern int size_##_n
 // Try to keep this list alphabetical
 
 IMPORT_BIN2C(apemodpatch_irx);

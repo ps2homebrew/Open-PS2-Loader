@@ -77,7 +77,7 @@ jobs:
 
     - name: Get version
       id: version
-      run: echo "{version}={$(make oplversion)}" >> $GITHUB_OUTPUT
+      run: echo "::set-output name=version::$(make oplversion)"
 
     - name: Compile -> make ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
       run: |
@@ -148,7 +148,7 @@ jobs:
 
     - name: Get version
       id: version
-      run: echo "{version}={$(make oplversion)}" >> $GITHUB_OUTPUT
+      run: echo "::set-output name=version::$(make oplversion)"
 
     - name: Compile -> make debug
       run: |
@@ -176,7 +176,7 @@ jobs:
 
     - name: Get version
       id: version
-      run: echo "{version}={$(make oplversion)}" >> $GITHUB_OUTPUT
+      run: echo "::set-output name=version::$(make oplversion)"
 
     - name: Download all artifacts
       uses: actions/download-artifact@v3

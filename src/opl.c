@@ -1655,8 +1655,12 @@ static void init(void)
     setDefaults();
 
     padInit(0);
-    configInit(NULL);
-
+    int padStatus = 0;
+    while (!padStatus)
+        padStatus = startPads();
+    readPads();
+    if (!getKeyPressed(KEY_START))
+        configInit(NULL);//only load settings if emergency key is not being pressed
     rmInit();
     lngInit();
     thmInit();

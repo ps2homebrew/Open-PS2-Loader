@@ -302,7 +302,7 @@ static inline char *read_text_file(const char *filename, int maxsize, int* retco
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
         LOG("%s: Can't open text file %s\n", __FUNCTION__, filename);
-        retcode = -ENOENT;
+        retcode = -errno;
         return NULL;
     }
 

@@ -341,12 +341,12 @@ end:
 int load_cheats(const char *cheatfile)
 {
     char *buf = NULL;
-    int ret;
+    int ret, text_ret = 0;
 
     memset(gCheatList, 0, sizeof(gCheatList));
 
     LOG("%s: Reading cheat file '%s'...", __FUNCTION__, cheatfile);
-    buf = read_text_file(cheatfile, 0);
+    buf = read_text_file(cheatfile, 0, &text_ret);
     if (buf == NULL) {
         LOG("\n%s: Could not read cheats file '%s'\n", __FUNCTION__, cheatfile);
         return -1;
@@ -355,7 +355,7 @@ int load_cheats(const char *cheatfile)
     ret = parse_buf(buf);
     free(buf);
     if (ret < 0)
-        return -1;
+        return (text_ret == -ENOENT) ? text_ret : -1;
     else
         return 0;
 }

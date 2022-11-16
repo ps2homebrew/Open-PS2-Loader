@@ -158,11 +158,11 @@ jobs:
     - name: Upload variants artifact ELF
       uses: actions/upload-artifact@v3
       with:
-        name: opl-debug-${{ steps.version.outputs.version }}-${{ matrix.docker }}
+        name: opl-debug-${{ steps.version.outputs.version }}
         path: opl-*.elf
 
   release:
-    needs: [build, build-variants, build-lang]
+    needs: [build, build-variants, build-debug, build-lang]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     env:
@@ -185,6 +185,7 @@ jobs:
       run: |
         cp INFO/* OPNPS2LD/
         cp INFO/* OPNPS2LD-VARIANTS/
+        7z a -t7z OPNPS2LD-DEBUG-${{ steps.version.outputs.version }}.7z opl-debug-${{ steps.version.outputs.version }}/*.elf
         7z a -t7z OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD/*
         7z a -t7z OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS/*
         7z a -t7z OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z OPNPS2LD-LANGS/*
@@ -216,6 +217,7 @@ jobs:
         prerelease: "${{ contains(github.ref, '-rc') }}"
         title: "${{ steps.version.outputs.version }}"
         files: |
+          OPNPS2LD-DEBUG-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z

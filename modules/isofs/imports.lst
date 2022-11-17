@@ -5,13 +5,13 @@ I_SignalSema
 I_WaitSema
 thsemap_IMPORTS_end
 
-ioman_IMPORTS_start
+iomanX_IMPORTS_start
 I_open
 I_close
 I_read
 I_lseek
 I_AddDrv
-ioman_IMPORTS_end
+iomanX_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_memset

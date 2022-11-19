@@ -1660,7 +1660,7 @@ static void init(void)
         padStatus = startPads();
     readPads();
     if (!getKeyPressed(KEY_START))
-        configInit(NULL);//only load settings if emergency key is not being pressed
+        configInit(NULL); //only load settings if emergency key is not being pressed
     rmInit();
     lngInit();
     thmInit();

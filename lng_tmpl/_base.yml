@@ -662,3 +662,11 @@ gui_strings:
   string: OSD Language
 - label: ENABLE_LNG
   string: Change language
+- label: BGM
+  string: Background Music
+- label: BGM_VOLUME
+  string: Background Music Volume
+- label: DEF_BGM_PATH
+  string: Default Theme Music
+- label: DEF_BGM_PATH_HINT
+  string: Set path to stream music for internal theme.

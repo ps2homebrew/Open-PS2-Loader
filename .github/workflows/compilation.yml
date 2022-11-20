@@ -76,13 +76,13 @@ jobs:
       run: pip3 install -r requirements.txt
 
     - name: Get version
-      id: version
-      run: echo "::set-output name=version::$(make oplversion)"
+      run: |
+        echo "OPL_VERSION=$(make oplversion)" >> $GITHUB_ENV
 
     - name: Compile -> make ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
       run: |
         make --trace ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
-        mv opl.elf OPNPS2LD-${{ steps.version.outputs.version }}-${{ matrix.t10k }}-${{ matrix.igs }}-${{ matrix.pademu }}-${{ matrix.rtl }}.ELF
+        mv opl.elf OPNPS2LD-${{ env.OPL_VERSION }}-${{ matrix.t10k }}-${{ matrix.igs }}-${{ matrix.pademu }}-${{ matrix.rtl }}.ELF
 
     - name: Create detailed changelog
       run: sh ./make_changelog.sh
@@ -147,8 +147,8 @@ jobs:
       run: pip3 install -r requirements.txt
 
     - name: Get version
-      id: version
-      run: echo "::set-output name=version::$(make oplversion)"
+      run: |
+        echo "OPL_VERSION=$(make oplversion)" >> $GITHUB_ENV
 
     - name: Compile -> make debug
       run: |
@@ -158,7 +158,7 @@ jobs:
     - name: Upload variants artifact ELF
       uses: actions/upload-artifact@v3
       with:
-        name: opl-debug-${{ steps.version.outputs.version }}-${{ matrix.docker }}
+        name: opl-debug-${{ env.OPL_VERSION }}-${{ matrix.docker }}
         path: opl-*.elf
 
   release:
@@ -175,22 +175,23 @@ jobs:
     - run: git fetch --prune --unshallow
 
     - name: Get version
-      id: version
-      run: echo "::set-output name=version::$(make oplversion)"
+      run: |
+        echo "OPL_VERSION=$(make oplversion)" >> $GITHUB_ENV
 
     - name: Download all artifacts
       uses: actions/download-artifact@v3
 
     - name: Prepare artifacts for release
       run: |
+        echo packing release of OPL ${{ env.OPL_VERSION }}
         cp INFO/* OPNPS2LD/
         cp INFO/* OPNPS2LD-VARIANTS/
-        7z a -t7z OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD/*
-        7z a -t7z OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS/*
-        7z a -t7z OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z OPNPS2LD-LANGS/*
-        cp -f OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD.7z
-        cp -f OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS.7z
-        cp -f OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z OPNPS2LD-LANGS.7z
+        7z a -t7z OPNPS2LD-${{ env.OPL_VERSION }}.7z OPNPS2LD/*
+        7z a -t7z OPNPS2LD-VARIANTS-${{ env.OPL_VERSION }}.7z OPNPS2LD-VARIANTS/*
+        7z a -t7z OPNPS2LD-LANGS-${{ env.OPL_VERSION }}.7z OPNPS2LD-LANGS/*
+        cp -f OPNPS2LD-${{ env.OPL_VERSION }}.7z OPNPS2LD.7z
+        cp -f OPNPS2LD-VARIANTS-${{ env.OPL_VERSION }}.7z OPNPS2LD-VARIANTS.7z
+        cp -f OPNPS2LD-LANGS-${{ env.OPL_VERSION }}.7z OPNPS2LD-LANGS.7z
 
     - name: Create prerelease
       if: github.ref == 'refs/heads/master'
@@ -201,9 +202,9 @@ jobs:
         automatic_release_tag: "latest"
         title: "${{ steps.version.outputs.version }}"
         files: |
-          OPNPS2LD-${{ steps.version.outputs.version }}.7z
-          OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
-          OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z
+          OPNPS2LD-${{ env.OPL_VERSION }}.7z
+          OPNPS2LD-VARIANTS-${{ env.OPL_VERSION }}.7z
+          OPNPS2LD-LANGS-${{ env.OPL_VERSION }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z
           OPNPS2LD-LANGS.7z
@@ -214,11 +215,11 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: "${{ contains(github.ref, '-rc') }}"
-        title: "${{ steps.version.outputs.version }}"
+        title: "${{ env.OPL_VERSION }}"
         files: |
-          OPNPS2LD-${{ steps.version.outputs.version }}.7z
-          OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
-          OPNPS2LD-LANGS-${{ steps.version.outputs.version }}.7z
+          OPNPS2LD-${{ env.OPL_VERSION }}.7z
+          OPNPS2LD-VARIANTS-${{ env.OPL_VERSION }}.7z
+          OPNPS2LD-LANGS-${{ env.OPL_VERSION }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z
           OPNPS2LD-LANGS.7z
@@ -227,10 +228,10 @@ jobs:
       if: github.ref == 'refs/heads/master' && env.USERNAME != null
       uses: Difegue/action-megacmd@master
       with:
-        args: put -c OPNPS2LD.7z /OPL/Pre-Release/${{ steps.version.outputs.version }}/run_${{ github.run_number }}/
+        args: put -c OPNPS2LD.7z /OPL/Pre-Release/${{ env.OPL_VERSION }}/run_${{ github.run_number }}/
 
     - name: Upload release to Mega
       if: startsWith(github.ref, 'refs/tags/v') && env.USERNAME != null
       uses: Difegue/action-megacmd@master
       with:
-        args: put -c OPNPS2LD.7z /OPL/Release/${{ steps.version.outputs.version }}/
+        args: put -c OPNPS2LD.7z /OPL/Release/${{ env.OPL_VERSION }}/

@@ -136,8 +136,11 @@ extern int gHDDGameListCache;
 
 extern int gEnableSFX;
 extern int gEnableBootSND;
+extern int gEnableBGM;
 extern int gSFXVolume;
 extern int gBootSndVolume;
+extern int gBGMVolume;
+extern char gDefaultBGMPath[128];
 
 extern int gCheatSource;
 extern int gGSMSource;

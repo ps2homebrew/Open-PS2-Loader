@@ -4,7 +4,7 @@
 #include <irx.h>
 
 /* Please keep these in alphabetical order!  */
-#include <ioman.h>
+#include <iomanX.h>
 #include <stdio.h>
 #include <sysclib.h>
 #include <thsemap.h>

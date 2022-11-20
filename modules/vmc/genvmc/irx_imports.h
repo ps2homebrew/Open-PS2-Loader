@@ -5,7 +5,7 @@
 
 #include <cdvdman.h>
 #include <intrman.h>
-#include <ioman.h>
+#include <iomanX.h>
 #include <mcman.h>
 #ifdef DEBUG
 #include <stdio.h>

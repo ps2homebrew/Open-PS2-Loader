@@ -262,6 +262,23 @@ To run OPL, you need an entry point for running PS2 titles. You can use everythi
 </details>
 
 <details>
+  <summary> <b> Frequent Issues </b> </summary>
+<p>
+
+### OPL Freezes on logo or grey screen
+
+> Sometimes OPL freezes when loading config files made by older OPL builds.
+> hold start while OPL initializes to make it skip the config loading, then, you can save your own settings.
+> fixing the issue.
+
+### Game freezes on white screen
+
+> Main game executable could not be found. Either game is fragmented or image is corrupted
+
+</p>
+</details>
+
+<details>
   <summary> <b> Some notes for DEVS </b> </summary>
 <p>
 

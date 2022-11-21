@@ -268,7 +268,7 @@ To run OPL, you need an entry point for running PS2 titles. You can use everythi
 ### OPL Freezes on logo or grey screen
 
 > Sometimes OPL freezes when loading config files made by older OPL builds.
-> hold start while OPL initializes to make it skip the config loading, then, you can save your own settings.
+> hold __`START`__ while OPL initializes to make it skip the config loading, then, you can save your own settings.
 > fixing the issue.
 
 ### Game freezes on white screen

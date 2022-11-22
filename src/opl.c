@@ -1656,11 +1656,8 @@ static void init(void)
 
     padInit(0);
     int padStatus = 0;
-    while (!padStatus)
-        padStatus = startPads();
-    readPads();
-    if (!getKeyPressed(KEY_START))
-        configInit(NULL); //only load settings if emergency key is not being pressed
+
+    configInit(NULL);
     rmInit();
     lngInit();
     thmInit();
@@ -1679,8 +1676,11 @@ static void init(void)
 
     gSelectButton = (InitConsoleRegionData() == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
 
-    // try to restore config
-    _loadConfig();
+    while (!padStatus)
+        padStatus = startPads();
+    readPads();
+    if (!getKeyPressed(KEY_START))
+        _loadConfig(); // only try to restore config if emergency key is not being pressed
 
     // queue deffered init of sound effects, which will take place after the preceding initialization steps within the queue are complete.
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);

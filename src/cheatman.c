@@ -355,7 +355,7 @@ int load_cheats(const char *cheatfile)
     ret = parse_buf(buf);
     free(buf);
     if (ret < 0)
-        return (text_ret == -ENOENT) ? text_ret : -1;
+        return text_ret;
     else
         return 0;
 }

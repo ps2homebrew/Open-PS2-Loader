@@ -2,7 +2,7 @@ cdvdman_IMPORTS_start
 I_sceCdRC
 cdvdman_IMPORTS_end
 
-ioman_IMPORTS_start
+iomanX_IMPORTS_start
 I_DelDrv
 I_AddDrv
 I_open
@@ -10,7 +10,7 @@ I_lseek
 I_write
 I_close
 I_remove
-ioman_IMPORTS_end
+iomanX_IMPORTS_end
 
 intrman_IMPORTS_start
 I_CpuSuspendIntr

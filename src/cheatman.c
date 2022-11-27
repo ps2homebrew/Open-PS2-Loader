@@ -294,7 +294,7 @@ static int parse_buf(const char *buf)
  * @retcode: integer pointer wich gets the value of errno assigned if an error ocurrs
  * @return: ptr to NULL-terminated text buffer, or NULL if an error occured
  */
-static inline char *read_text_file(const char *filename, int maxsize, int* retcode)
+static inline char *read_text_file(const char *filename, int maxsize, int *retcode)
 {
     char *buf = NULL;
     int fd, filesize;

@@ -12,6 +12,11 @@
 #include "include/ioman.h"
 #include "include/themes.h"
 
+// Silence unused variable warnings from vorbisfile.h
+static ov_callbacks OV_CALLBACKS_NOCLOSE __attribute__((unused));
+static ov_callbacks OV_CALLBACKS_STREAMONLY __attribute__((unused));
+static ov_callbacks OV_CALLBACKS_STREAMONLY_NOCLOSE __attribute__((unused));
+
 /*--    Theme Sound Effects    ----------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------*/
 

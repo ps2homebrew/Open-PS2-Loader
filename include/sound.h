@@ -23,5 +23,7 @@ void sfxPlay(int id);
 void bgmStart(void);
 void bgmStop(void);
 int isBgmPlaying(void);
+void bgmMute(void);
+void bgmUnMute(void);
 
 #endif

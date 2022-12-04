@@ -1099,6 +1099,7 @@ void applyConfig(int themeID, int langID)
 
     int changed = rmSetMode(0);
     if (changed) {
+        bgmMute();
         // reinit the graphics...
         thmReloadScreenExtents();
         guiReloadScreenExtents();
@@ -1116,6 +1117,8 @@ void applyConfig(int themeID, int langID)
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);
     moduleUpdateMenu(APP_MODE, changed, langChanged);
+
+    bgmUnMute();
 
 #ifdef __DEBUG
     debugApplyConfig();

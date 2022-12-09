@@ -141,7 +141,7 @@ int AddHistoryRecord(const char *name)
             break;
     }
 
-    if ((mcType == sceMcTypePS2) && (format == MC_FORMATTED)) { // don't even waste time if there are no PS2 MC's
+    if ((mcType != sceMcTypePS2) || (format != MC_FORMATTED)) { // don't even waste time if there are no PS2 MC's
         DEBUG_PRINTF("\tNo PS2 memory cards detected\n");
         return -1;
     }

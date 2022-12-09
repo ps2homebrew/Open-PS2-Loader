@@ -622,9 +622,11 @@ void guiShowUIConfig(void)
         , NULL};
     // clang-format on
     int previousVMode;
+    int previousTheme;
 
 reselect_video_mode:
     previousVMode = gVMode;
+    previousTheme = thmGetGuiValue();
     diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());
     diaSetEnum(diaUIConfig, UICFG_LANG, (const char **)lngGetGuiList());
     diaSetEnum(diaUIConfig, UICFG_VMODE, vmodeNames);
@@ -664,8 +666,14 @@ reselect_video_mode:
         if (ret == UICFG_RESETCOL)
             setDefaultColors();
 
+        if (previousTheme != themeID && isBgmPlaying())
+            bgmStop();
+
         applyConfig(themeID, langID);
         sfxInit(0);
+
+        if (gEnableBGM && !isBgmPlaying())
+            bgmStart();
     }
 
     if (previousVMode != gVMode) {
@@ -828,9 +836,15 @@ static void guiSetAudioSettingsState(void)
 {
     diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
     diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
+    diaGetInt(diaAudioConfig, CFG_BGM, &gEnableBGM);
     diaGetInt(diaAudioConfig, CFG_SFX_VOLUME, &gSFXVolume);
     diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
-    sfxVolume();
+    diaGetInt(diaAudioConfig, CFG_BGM_VOLUME, &gBGMVolume);
+    diaGetString(diaAudioConfig, CFG_DEFAULT_BGM_PATH, gDefaultBGMPath, sizeof(gDefaultBGMPath));
+    audioSetVolume();
+
+    if (gEnableBGM && !isBgmPlaying())
+        bgmStart();
 }
 
 static int guiAudioUpdater(int modified)
@@ -846,8 +860,11 @@ void guiShowAudioConfig(void)
 {
     diaSetInt(diaAudioConfig, CFG_SFX, gEnableSFX);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND, gEnableBootSND);
+    diaSetInt(diaAudioConfig, CFG_BGM, gEnableBGM);
     diaSetInt(diaAudioConfig, CFG_SFX_VOLUME, gSFXVolume);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, gBootSndVolume);
+    diaSetInt(diaAudioConfig, CFG_BGM_VOLUME, gBGMVolume);
+    diaSetString(diaAudioConfig, CFG_DEFAULT_BGM_PATH, gDefaultBGMPath);
 
     diaExecuteDialog(diaAudioConfig, -1, 1, guiAudioUpdater);
 }
@@ -1493,6 +1510,9 @@ void guiMainLoop(void)
 
     if (gOPLPart[0] != '\0')
         showPartPopup = 1;
+
+    if (gEnableBGM)
+        bgmStart();
 
     while (!gTerminate) {
         guiStartFrame();

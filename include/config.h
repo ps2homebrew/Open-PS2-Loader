@@ -102,8 +102,11 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_PARENTAL_LOCK_PWD    "parental_lock_password"
 #define CONFIG_OPL_SFX                  "enable_sfx"
 #define CONFIG_OPL_BOOT_SND             "enable_boot_snd"
+#define CONFIG_OPL_BGM                  "enable_bgm"
 #define CONFIG_OPL_SFX_VOLUME           "sfx_volume"
 #define CONFIG_OPL_BOOT_SND_VOLUME      "boot_snd_volume"
+#define CONFIG_OPL_BGM_VOLUME           "bgm_volume"
+#define CONFIG_OPL_DEFAULT_BGM_PATH     "default_bgm_path"
 
 // Network config keys
 #define CONFIG_NET_ETH_LINKM          "eth_linkmode"

@@ -214,7 +214,7 @@ int AddHistoryRecord(const char *name)
             }
         }
     }
-    /*/
+    /*
     i = 0;
     do { // Original does this. I guess, it is used to ensure that the next random value is truly random?
         rand();

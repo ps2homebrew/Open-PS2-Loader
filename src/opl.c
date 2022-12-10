@@ -162,8 +162,11 @@ int gSelectButton;
 int gHDDGameListCache;
 int gEnableSFX;
 int gEnableBootSND;
+int gEnableBGM;
 int gSFXVolume;
 int gBootSndVolume;
+int gBGMVolume;
+char gDefaultBGMPath[128];
 int gCheatSource;
 int gGSMSource;
 int gPadEmuSource;
@@ -881,8 +884,11 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
+            configGetInt(configOPL, CONFIG_OPL_BGM, &gEnableBGM);
             configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, &gBootSndVolume);
+            configGetInt(configOPL, CONFIG_OPL_BGM_VOLUME, &gBGMVolume);
+            configGetStrCopy(configOPL, CONFIG_OPL_DEFAULT_BGM_PATH, gDefaultBGMPath, sizeof(gDefaultBGMPath));
         }
     }
 
@@ -1037,8 +1043,11 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
+        configSetInt(configOPL, CONFIG_OPL_BGM, gEnableBGM);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, gBootSndVolume);
+        configSetInt(configOPL, CONFIG_OPL_BGM_VOLUME, gBGMVolume);
+        configSetStr(configOPL, CONFIG_OPL_DEFAULT_BGM_PATH, gDefaultBGMPath);
 
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
@@ -1090,6 +1099,7 @@ void applyConfig(int themeID, int langID)
 
     int changed = rmSetMode(0);
     if (changed) {
+        bgmMute();
         // reinit the graphics...
         thmReloadScreenExtents();
         guiReloadScreenExtents();
@@ -1107,6 +1117,8 @@ void applyConfig(int themeID, int langID)
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);
     moduleUpdateMenu(APP_MODE, changed, langChanged);
+
+    bgmUnMute();
 
 #ifdef __DEBUG
     debugApplyConfig();
@@ -1407,7 +1419,7 @@ static int loadLwnbdSvr(void)
     int ret, padStatus;
 
     // deint audio lib while nbd server is running
-    sfxEnd();
+    audioEnd();
 
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
@@ -1466,8 +1478,10 @@ static void unloadLwnbdSvr(void)
     // init all supports again
     initAllSupport(1);
 
-    // deferred reinit of audio lib to avoid crashing if devices aren't ready
-    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
+    audioInit();
+    sfxInit(0);
+    if (gEnableBGM)
+        bgmStart();
 }
 
 void handleLwnbdSrv()
@@ -1528,7 +1542,7 @@ void deinit(int exception, int modeSelected)
 
     deinitAllSupport(exception, modeSelected);
 
-    sfxEnd();
+    audioEnd();
     ioEnd();
     guiEnd();
     menuEnd();
@@ -1622,8 +1636,11 @@ static void setDefaults(void)
     gWideScreen = 0;
     gEnableSFX = 0;
     gEnableBootSND = 0;
+    gEnableBGM = 0;
     gSFXVolume = 80;
     gBootSndVolume = 80;
+    gBGMVolume = 70;
+    gDefaultBGMPath[0] = '\0';
 
     gBDMStartMode = START_MODE_DISABLED;
     gHDDStartMode = START_MODE_DISABLED;
@@ -1700,6 +1717,7 @@ static void deferredAudioInit(void)
 {
     int ret;
 
+    audioInit();
     ret = sfxInit(1);
     if (ret < 0)
         LOG("sfxInit: failed to initialize - %d.\n", ret);

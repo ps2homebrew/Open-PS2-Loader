@@ -133,7 +133,7 @@ int AddHistoryRecord(const char *name)
     char path[32];
     DEBUG_PRINTF("OSDHistory@%s: starts\n", __func__);
 
-    for (i = 0; i < 2; i++) { //increase number of slots for mt (not sure how multi tap works haven’t looked at docs ie mc0 - mc4 ?)
+    for (i = 0; i < 2; i++) { // increase number of slots for mt (not sure how multi tap works haven’t looked at docs ie mc0 - mc4 ?)
         mcGetInfo(i, 0, &mcType, NULL, &format);
         mcSync(0, NULL, &result);
         DEBUG_PRINTF("\tslot=%d, mctype=%d, format=%d\n", i, mcType, format);
@@ -154,7 +154,7 @@ int AddHistoryRecord(const char *name)
     if ((result = LoadHistoryFile(path, HistoryEntries)) != 0) {
         DEBUG_PRINTF("\tcan't load history file.\n");
         SystemRegionLetter = GetSystemFolderLetter();
-        if (SystemRegionLetter == 'R') { // @El_isra: R is the default prefix on OPL and FreeMcBoot code, however, no known ps2 uses this prefix for system folders. So skip creating a folder named like that 
+        if (SystemRegionLetter == 'R') { // @El_isra: R is the default prefix on OPL and FreeMcBoot code, however, no known ps2 uses this prefix for system folders. So skip creating a folder named like that
             DEBUG_PRINTF("\n\tERROR: SystemRegionLetter is R\n\n");
             return -2;
         }
@@ -214,12 +214,12 @@ int AddHistoryRecord(const char *name)
             }
         }
     }
-    /*
-        i = 0;
-        do { //Original does this. I guess, it is used to ensure that the next random value is truly random?
-            rand();
-            i++;
-        } while (i < (currentMinute * 60 + currentSecond));
+    /*/
+    i = 0;
+    do { // Original does this. I guess, it is used to ensure that the next random value is truly random?
+        rand();
+        i++;
+    } while (i < (currentMinute * 60 + currentSecond));
     */
     if (IsNewRecord) {
         // Count and consolidate a list of blank slots.

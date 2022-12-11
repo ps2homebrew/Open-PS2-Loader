@@ -99,7 +99,7 @@ MISC_OBJS =	icon_sys_A.o icon_sys_J.o icon_sys_C.o conf_theme_OPL.o
 
 TRANSLATIONS = Albanian Arabic Bulgarian Cebuano Croatian Czech Danish Dutch Filipino French \
 	German Greek Hungarian Indonesian Italian Japanese Korean Laotian Persian Polish Portuguese \
-	Portuguese_BR Romana Russian SChinese Spanish Swedish TChinese Turkish Vietnamese
+	Portuguese_BR Romana Russian Ryukyuan SChinese Spanish Swedish TChinese Turkish Vietnamese
 
 EE_BIN = opl.elf
 EE_BIN_STRIPPED = opl_stripped.elf

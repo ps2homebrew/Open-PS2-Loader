@@ -57,7 +57,7 @@ int sbCreateSemaphore(void)
 }
 
 // 0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
-static int isValidIsoName(char *name, int *pNameLen)
+int isValidIsoName(char *name, int *pNameLen)
 {
     // Old ISO image naming format: SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
 

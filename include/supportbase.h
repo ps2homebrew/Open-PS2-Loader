@@ -37,6 +37,7 @@ typedef struct
     u8 unknown2[10];                // Always zero
 } USBExtreme_game_entry_t;
 
+int isValidIsoName(char *name, int *pNameLen);
 int sbIsSameSize(const char *prefix, int prevSize);
 int sbCreateSemaphore(void);
 int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gamecount);

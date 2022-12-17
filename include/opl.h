@@ -39,6 +39,7 @@
 #include "config.h"
 
 #include "include/hddsupport.h"
+#include "include/supportbase.h"
 
 // Last Played Auto Start
 #include <time.h>
@@ -199,6 +200,7 @@ extern unsigned char gDefaultSelTextColor[3];
 extern unsigned char gDefaultUITextColor[3];
 
 extern hdl_game_info_t *gAutoLaunchGame;
+extern base_game_info_t *gAutoLaunchBDMGame;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 

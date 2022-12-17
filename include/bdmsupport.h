@@ -21,5 +21,7 @@ void bdmInit();
 item_list_t *bdmGetObject(int initOnly);
 int bdmFindPartition(char *target, const char *name, int write);
 void bdmLoadModules(void);
+void bdmLaunchGame(int id, config_set_t *configSet);
+void bdmSetPrefix(void);
 
 #endif

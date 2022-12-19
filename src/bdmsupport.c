@@ -14,11 +14,6 @@
 
 #include <usbhdfsd-common.h>
 
-#ifdef PADEMU
-#include <libds34bt.h>
-#include <libds34usb.h>
-#endif
-
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
 
@@ -431,21 +426,13 @@ void bdmLaunchGame(int id, config_set_t *configSet)
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
 
-    if (gAutoLaunchBDMGame == NULL) {
+    if (gAutoLaunchBDMGame == NULL)
         deinit(NO_EXCEPTION, BDM_MODE); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
-    } else {
-        ioBlockOps(1);
-#ifdef PADEMU
-        ds34usb_reset();
-        ds34bt_reset();
-#endif
-        configFree(configSet);
+    else {
+        miniDeinit(configSet);
 
         free(gAutoLaunchBDMGame);
         gAutoLaunchBDMGame = NULL;
-
-        ioEnd();
-        configEnd();
     }
 
     if (!strcmp(bdmDriver, "usb")) {

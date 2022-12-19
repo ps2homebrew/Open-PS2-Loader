@@ -287,7 +287,7 @@ clean:	download_lwNBD
 	echo " -genvmc"
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo " -lwnbdsvr"
-	$(MAKE) -C modules/network/lwNBD clean
+	$(MAKE) -C modules/network/lwNBD/ -f Makefile.iop clean
 	echo " -udptty-ingame"
 	$(MAKE) -C modules/debug/udptty-ingame clean
 	echo " -ps2link"
@@ -608,7 +608,7 @@ $(EE_ASM_DIR)genvmc.s: modules/vmc/genvmc/genvmc.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ genvmc_irx
 
 modules/network/lwNBD/lwnbdsvr.irx: modules/network/lwNBD
-	$(MAKE) -C $<
+	$(MAKE) -f Makefile.iop -C $<
 
 $(EE_ASM_DIR)lwnbdsvr.s: modules/network/lwNBD/lwnbdsvr.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ lwnbdsvr_irx

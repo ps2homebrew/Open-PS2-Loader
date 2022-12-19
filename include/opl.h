@@ -79,6 +79,9 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged);
 void handleLwnbdSrv();
 void deinit(int exception, int modeSelected);
 
+// Shutdown minimal services initiated for auto loading.
+void miniDeinit(config_set_t *configSet);
+
 extern char *gBaseMCDir;
 
 enum ETH_OP_MODES {

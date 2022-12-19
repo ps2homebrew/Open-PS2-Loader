@@ -1726,48 +1726,81 @@ static void deferredAudioInit(void)
         LOG("sfxInit: %d samples loaded.\n", ret);
 }
 
-static void autoLaunchHDDGame(char *argv[])
+// ----------------------------------------------------------
+// --------------------- Auto Loading -----------------------
+// ----------------------------------------------------------
+
+static void miniInit(int mode)
 {
     int ret;
-    char path[256];
-    config_set_t *configSet;
 
     setDefaults();
-
-    gAutoLaunchGame = malloc(sizeof(hdl_game_info_t));
-    if (gAutoLaunchGame == NULL) {
-        PREINIT_LOG("Failed to allocate memory. Loading GUI\n");
-        return;
-    }
-
-    memset(gAutoLaunchGame, 0, sizeof(hdl_game_info_t));
-
-    snprintf(gAutoLaunchGame->startup, sizeof(gAutoLaunchGame->startup), argv[1]);
-    gAutoLaunchGame->start_sector = strtoul(argv[2], NULL, 0);
-    snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:%s", argv[3]);
-
     configInit(NULL);
 
     ioInit();
     LOG_ENABLE();
 
-    hddLoadModules();
+    if (mode == BDM_MODE) {
+        // Force load iLink & mx4sio modules.. we aren't using the gui so this is fine.
+        gEnableILK = 1; // iLink will break pcsx2 however.
+        gEnableMX4SIO = 1;
+        bdmLoadModules();
+        delay(3); // Wait for the device to be detected.
+    } else if (mode == HDD_MODE)
+        hddLoadModules();
+
     InitConsoleRegionData();
 
     ret = configReadMulti(CONFIG_ALL);
     if (CONFIG_ALL & CONFIG_OPL) {
         if (!(ret & CONFIG_OPL))
-            ret = checkLoadConfigHDD(CONFIG_ALL);
+            if (mode == BDM_MODE)
+                ret = checkLoadConfigBDM(CONFIG_ALL);
+            else if (mode == HDD_MODE)
+                ret = checkLoadConfigHDD(CONFIG_ALL);
 
         if (ret & CONFIG_OPL) {
             config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
-            configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
-            configGetInt(configOPL, CONFIG_OPL_HDD_CACHE, &hddCacheSize);
+            if (mode == BDM_MODE) {
+                configGetStrCopy(configOPL, CONFIG_OPL_BDM_PREFIX, gBDMPrefix, sizeof(gBDMPrefix));
+                configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &bdmCacheSize);
+            } else if (mode == HDD_MODE) {
+                configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
+                configGetInt(configOPL, CONFIG_OPL_HDD_CACHE, &hddCacheSize);
+            }
         }
     }
+}
+
+void miniDeinit(config_set_t *configSet)
+{
+    ioBlockOps(1);
+#ifdef PADEMU
+    ds34usb_reset();
+    ds34bt_reset();
+#endif
+    configFree(configSet);
+
+    ioEnd();
+    configEnd();
+}
+
+static void autoLaunchHDDGame(char *argv[])
+{
+    char path[256];
+    config_set_t *configSet;
+
+    miniInit(HDD_MODE);
+
+    gAutoLaunchGame = malloc(sizeof(hdl_game_info_t));
+    memset(gAutoLaunchGame, 0, sizeof(hdl_game_info_t));
+
+    snprintf(gAutoLaunchGame->startup, sizeof(gAutoLaunchGame->startup), argv[1]);
+    gAutoLaunchGame->start_sector = strtoul(argv[2], NULL, 0);
+    snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:%s", argv[3]);
 
     snprintf(path, sizeof(path), "%sCFG/%s.cfg", gHDDPrefix, gAutoLaunchGame->startup);
     configSet = configAlloc(0, NULL, path);
@@ -1778,39 +1811,11 @@ static void autoLaunchHDDGame(char *argv[])
 
 static void autoLaunchBDMGame(char *argv[])
 {
-    int ret;
     char path[256];
     config_set_t *configSet;
 
-    setDefaults();
-    configInit(NULL);
-
-    ioInit();
-    LOG_ENABLE();
-
-    // Force load iLink & mx4sio modules.. we aren't using the gui so this is fine.
-    gEnableILK = 1;
-    gEnableMX4SIO = 1;
-    bdmLoadModules();
-    InitConsoleRegionData();
-
-    ret = configReadMulti(CONFIG_ALL);
-    if (CONFIG_ALL & CONFIG_OPL) {
-        if (!(ret & CONFIG_OPL))
-            ret = checkLoadConfigBDM(CONFIG_ALL);
-
-        if (ret & CONFIG_OPL) {
-            config_set_t *configOPL = configGetByType(CONFIG_OPL);
-
-            configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
-            configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
-            configGetStrCopy(configOPL, CONFIG_OPL_BDM_PREFIX, gBDMPrefix, sizeof(gBDMPrefix));
-            configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &bdmCacheSize);
-        }
-    }
-
+    miniInit(BDM_MODE);
     bdmSetPrefix();
-    delay(3); // Wait for the device to be detected.
 
     gAutoLaunchBDMGame = malloc(sizeof(base_game_info_t));
     memset(gAutoLaunchBDMGame, 0, sizeof(base_game_info_t));

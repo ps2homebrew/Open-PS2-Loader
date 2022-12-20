@@ -31,6 +31,14 @@ static int mx4sioModLoaded = 0;
 // forward declaration
 static item_list_t bdmGameList;
 
+void bdmSetPrefix(void)
+{
+    if (gBDMPrefix[0] != '\0')
+        sprintf(bdmPrefix, "mass0:%s/", gBDMPrefix);
+    else
+        sprintf(bdmPrefix, "mass0:");
+}
+
 // Identifies the partition that the specified file is stored on and generates a full path to it.
 int bdmFindPartition(char *target, const char *name, int write)
 {
@@ -237,7 +245,7 @@ static void bdmRenameGame(int id, char *newName)
     bdmULSizePrev = -2;
 }
 
-static void bdmLaunchGame(int id, config_set_t *configSet)
+void bdmLaunchGame(int id, config_set_t *configSet)
 {
     int i, fd, index, compatmask = 0;
     int EnablePS2Logo = 0;
@@ -245,10 +253,15 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     unsigned int start;
     unsigned int startCluster;
     char partname[256], filename[32];
-    base_game_info_t *game = &bdmGames[id];
+    base_game_info_t *game;
     struct cdvdman_settings_bdm *settings;
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
+
+    if (gAutoLaunchBDMGame == NULL)
+        game = &bdmGames[id];
+    else
+        game = gAutoLaunchBDMGame;
 
     char vmc_name[32], vmc_path[256], have_error = 0;
     int vmc_id, size_mcemu_irx = 0;
@@ -291,16 +304,19 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
             }
         }
 
-        if (have_error) {
-            char error[256];
-            if (have_error == 2) // VMC file is fragmented
-                snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name, (vmc_id + 1));
-            else
-                snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
-            if (!guiMsgBox(error, 1, NULL)) {
-                return;
+        if (gAutoLaunchBDMGame == NULL) {
+            if (have_error) {
+                char error[256];
+                if (have_error == 2) // VMC file is fragmented
+                    snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name, (vmc_id + 1));
+                else
+                    snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+                if (!guiMsgBox(error, 1, NULL)) {
+                    return;
+                }
             }
-        }
+        } else
+            LOG("VMC error\n");
 
         for (i = 0; i < size_bdm_mcemu_irx; i++) {
             if (((u32 *)&bdm_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
@@ -390,13 +406,16 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     settings->common.zso_cache = bdmCacheSize;
 
     if ((result = sbLoadCheats(bdmPrefix, game->startup)) < 0) {
-        switch (result) {
-            case -ENOENT:
-                guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
-                break;
-            default:
-                guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
-        }
+        if (gAutoLaunchBDMGame == NULL) {
+            switch (result) {
+                case -ENOENT:
+                    guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
+                    break;
+                default:
+                    guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
+            }
+        } else
+            LOG("Cheats error\n");
     }
 
     if (gRememberLastPlayed) {
@@ -406,7 +425,15 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
-    deinit(NO_EXCEPTION, BDM_MODE); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
+
+    if (gAutoLaunchBDMGame == NULL)
+        deinit(NO_EXCEPTION, BDM_MODE); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
+    else {
+        miniDeinit(configSet);
+
+        free(gAutoLaunchBDMGame);
+        gAutoLaunchBDMGame = NULL;
+    }
 
     if (!strcmp(bdmDriver, "usb")) {
         settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_USBD;

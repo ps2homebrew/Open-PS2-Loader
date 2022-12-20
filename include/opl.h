@@ -39,6 +39,7 @@
 #include "config.h"
 
 #include "include/hddsupport.h"
+#include "include/supportbase.h"
 
 // Last Played Auto Start
 #include <time.h>
@@ -77,6 +78,9 @@ void menuDeferredUpdate(void *data);
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged);
 void handleLwnbdSrv();
 void deinit(int exception, int modeSelected);
+
+// Shutdown minimal services initiated for auto loading.
+void miniDeinit(config_set_t *configSet);
 
 extern char *gBaseMCDir;
 
@@ -199,6 +203,7 @@ extern unsigned char gDefaultSelTextColor[3];
 extern unsigned char gDefaultUITextColor[3];
 
 extern hdl_game_info_t *gAutoLaunchGame;
+extern base_game_info_t *gAutoLaunchBDMGame;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 

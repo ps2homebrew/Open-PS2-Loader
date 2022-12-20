@@ -13,11 +13,6 @@
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
-#ifdef PADEMU
-#include <libds34bt.h>
-#include <libds34usb.h>
-#endif
-
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioFormat, fileXioMount, fileXioUmount, fileXioDevctl
 #include <io_common.h>   // FIO_MT_RDWR
@@ -506,24 +501,16 @@ void hddLaunchGame(int id, config_set_t *configSet)
         }
     }
 
-    if (gAutoLaunchGame == NULL) {
+    if (gAutoLaunchGame == NULL)
         deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
-    } else {
-        ioBlockOps(1);
-#ifdef PADEMU
-        ds34usb_reset();
-        ds34bt_reset();
-#endif
-        configFree(configSet);
+    else {
+        miniDeinit(configSet);
 
         free(gAutoLaunchGame);
         gAutoLaunchGame = NULL;
 
         fileXioUmount("pfs0:");
         fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
-
-        ioEnd();
-        configEnd();
     }
 
     settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_DEV9;

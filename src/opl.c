@@ -1753,11 +1753,12 @@ static void miniInit(int mode)
 
     ret = configReadMulti(CONFIG_ALL);
     if (CONFIG_ALL & CONFIG_OPL) {
-        if (!(ret & CONFIG_OPL))
+        if (!(ret & CONFIG_OPL)) {
             if (mode == BDM_MODE)
                 ret = checkLoadConfigBDM(CONFIG_ALL);
             else if (mode == HDD_MODE)
                 ret = checkLoadConfigHDD(CONFIG_ALL);
+        }
 
         if (ret & CONFIG_OPL) {
             config_set_t *configOPL = configGetByType(CONFIG_OPL);

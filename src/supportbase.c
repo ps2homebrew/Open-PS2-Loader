@@ -303,7 +303,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                     }
                 } else {
                     if (queryISOGameListCache(&cache, &cachedGInfo, dirent->d_name) != 0) {
-                        sprintf(fullpath, "%s/%s", path, dirent->d_name);
+                        snprintf(fullpath, sizeof(fullpath), "%s/%s", path, dirent->d_name);
 
                         if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
                             if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {

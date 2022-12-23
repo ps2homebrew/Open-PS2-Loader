@@ -629,7 +629,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         saveConfig(CONFIG_LAST, 0);
     }
 
-    compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
+    compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, smb_cdvdman_irx, &i);
 
     if ((result = sbLoadCheats(ethPrefix, game->startup)) < 0) {
         switch (result) {
@@ -705,7 +705,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     // adjust ZSO cache
     settings->common.zso_cache = smbCacheSize;
 
-    sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
+    sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, smb_cdvdman_irx, size_mcemu_irx, smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
 
 static config_set_t *ethGetConfig(int id)

@@ -7,6 +7,7 @@
 #include "include/opl.h"
 #include "include/util.h"
 #include "include/ioman.h"
+#include "include/sound.h"
 #include <string.h>
 
 // FIXME: We should not need this function.
@@ -544,6 +545,7 @@ int configWrite(config_set_t *configSet)
         if (fileBuffer) {
             char line[512];
 
+            bgmMute();
             struct config_value_t *cur = configSet->head;
             while (cur) {
                 if ((cur->key[0] != '\0') && (cur->key[0] != '#')) {
@@ -557,6 +559,7 @@ int configWrite(config_set_t *configSet)
 
             closeFileBuffer(fileBuffer);
             configSet->modified = 0;
+            bgmUnMute();
             return 1;
         }
         return 0;

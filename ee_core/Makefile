@@ -26,6 +26,8 @@ EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
 
 ifeq ($(EESIO_DEBUG),1)
 EE_CFLAGS += -D__EESIO_DEBUG
+    EE_OBJS += SIOCookie.a
+    EE_INCS += -I../thirdparty/PS2-SIOCookie/include
 endif
 
 ifeq ($(DTL_T10000),1)
@@ -52,6 +54,13 @@ EE_LIBS += -lpatches
 ifeq ($(PADEMU),1)
 EE_CFLAGS += -DPADEMU
 endif
+
+
+../thirdparty/PS2-SIOCookie/SIOCookie.a: ../thirdparty/PS2-SIOCookie/
+	$(MAKE) -C $< all
+
+$(EE_OBJS_DIR)SIOCookie.a: ../thirdparty/PS2-SIOCookie/SIOCookie.a
+	cp $< $@
 
 EE_LIBS += -lkernel -lgcc
 

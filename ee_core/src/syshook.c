@@ -165,7 +165,7 @@ void sysExit(s32 exit_code)
 
 void hook_SetOsdConfigParam(ConfigParam *config)
 {
-    DPRINTF(__func__ ": called\n");
+    DPRINTF("%s: called\n", __func__);
     CustomOSDConfigParam.spdifMode = config->spdifMode;
     CustomOSDConfigParam.screenType = config->screenType;
     CustomOSDConfigParam.videoOutput = config->videoOutput;
@@ -178,7 +178,7 @@ void hook_SetOsdConfigParam(ConfigParam *config)
 
 void hook_GetOsdConfigParam(ConfigParam *config)
 {
-    DPRINTF(__func__ ": called\n");
+    DPRINTF("%s: called\n", __func__);
     config->spdifMode = CustomOSDConfigParam.spdifMode;
     config->screenType = CustomOSDConfigParam.screenType;
     config->videoOutput = CustomOSDConfigParam.videoOutput;

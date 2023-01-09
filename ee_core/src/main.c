@@ -122,7 +122,7 @@ static int eecoreInit(int argc, char **argv)
     enforceLanguage = _strtoi(_strtok(NULL, " "));
 
     if (enforceLanguage)
-        DPRINTF("Enforcing language...\n\tCustomOSDConfig2Param: %d %d %d %d %d %d %d %d\n", PARAM.spdifMode, PARAM.screenType, PARAM.videoOutput, PARAM.japLanguage, PARAM.ps1drvConfig, PARAM.version, PARAM.language, PARAM.timezoneOffset);
+        DPRINTF("Enforcing language...\n\tCustomOSDConfig2Param: %d %d %d %d %d %d %d %d\n", CustomOSDConfigParam.spdifMode, CustomOSDConfigParam.screenType, CustomOSDConfigParam.videoOutput, CustomOSDConfigParam.japLanguage, CustomOSDConfigParam.ps1drvConfig, CustomOSDConfigParam.version, CustomOSDConfigParam.language, CustomOSDConfigParam.timezoneOffset);
     else
         DPRINTF("Language will not be manipulated\n");
     i++;

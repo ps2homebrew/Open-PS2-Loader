@@ -172,6 +172,8 @@ ifeq ($(DEBUG),1)
     IOP_OBJS += udptty-ingame.o
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
+    EE_OBJS += SIOCookie.a
+    EE_INCS += -Ithirdparty/PS2-SIOCookie/include
     EECORE_EXTRA_FLAGS += EESIO_DEBUG=1
   else ifeq ($(INGAME_DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
@@ -301,6 +303,10 @@ clean:
 	$(MAKE) -C modules/pademu USE_USB=1 clean
 	echo "-pc tools"
 	$(MAKE) -C pc clean
+ifeq ($(EESIO_DEBUG), 1)
+	echo "-SIOCookie"
+	$(MAKE) -C thirdparty/PS2-SIOCookie clean
+endif
 
 realclean: clean
 	echo "-Language"
@@ -371,6 +377,12 @@ $(EE_ASM_DIR)imgdrv.s: modules/iopcore/imgdrv/imgdrv.irx | $(EE_ASM_DIR)
 
 $(EE_ASM_DIR)eesync.s: $(PS2SDK)/iop/irx/eesync-nano.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eesync_irx
+
+thirdparty/PS2-SIOCookie/SIOCookie.a: thirdparty/PS2-SIOCookie/
+	$(MAKE) -C $< all
+
+$(EE_OBJS_DIR)SIOCookie.a: thirdparty/PS2-SIOCookie/SIOCookie.a
+	cp $< $@
 
 modules/iopcore/cdvdman/bdm_cdvdman.irx: modules/iopcore/cdvdman
 	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_BDM=1 -C $< all

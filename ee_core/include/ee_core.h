@@ -22,9 +22,8 @@
 #include <smod.h>
 
 #ifdef __EESIO_DEBUG
-#include "SIOCookie.h"
-#define DPRINTF(args...) fprintf(EE_SIO, args)
-#define DINIT()          ee_sio_start(38400, 0, 0, 0, 0, _IONBF)
+#define DPRINTF(args...) ;
+#define DINIT() ;
 #else
 #define DPRINTF(args...) \
     do {                 \

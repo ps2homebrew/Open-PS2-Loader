@@ -23,11 +23,9 @@ MAPFILE = ee_core.map
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I$(PS2SDK)/ports/include -Iinclude -I.
 EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
-EE_LIBS += -L$(PS2SDK)/ports/lib
 
 ifeq ($(EESIO_DEBUG),1)
-	EE_CFLAGS += -D__EESIO_DEBUG
-    EE_LIBS += -lsiocookie
+    EE_CFLAGS += -D__EESIO_DEBUG
 endif
 
 ifeq ($(DTL_T10000),1)

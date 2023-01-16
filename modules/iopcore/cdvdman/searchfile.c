@@ -40,11 +40,11 @@ static void cdvdman_trimspaces(char *str)
 static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer)
 {
     char cdvdman_dirname[32]; /* Like below, but follow the original SCE limitation of 32-characters.
-                        Some games specify filenames like "\\FILEFILE.EXT;1", which result in a length longer than just 14.
-                        SCE does not perform bounds-checking on this buffer.	*/
+						Some games specify filenames like "\\FILEFILE.EXT;1", which result in a length longer than just 14.
+						SCE does not perform bounds-checking on this buffer.	*/
     char cdvdman_curdir[15];  /* Maximum 14 characters: the filename (8) + '.' + extension (3) + ';' + '1'.
-                        Unlike the SCE original which used a 32-character buffer,
-                        we'll assume that ISO9660 disc images are all _strictly_ compliant with ISO9660 level 1.	*/
+						Unlike the SCE original which used a 32-character buffer,
+						we'll assume that ISO9660 disc images are all _strictly_ compliant with ISO9660 level 1.	*/
     char *p = (char *)name;
     char *slash;
     int r, len, filename_len;
@@ -161,7 +161,7 @@ static int cdvdman_findfile(sceCdlFILE *pcdfile, const char *name, int layer)
 
     if (cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)
         layer = 0;
-    pLayerInfo = (layer != 0) ? &layer_info[1] : &layer_info[0]; // SCE CDVDMAN simply treats a non-zero value as a signal for the 2nd layer.
+    pLayerInfo = (layer != 0) ? &layer_info[1] : &layer_info[0]; //SCE CDVDMAN simply treats a non-zero value as a signal for the 2nd layer.
 
     WaitSema(cdvdman_searchfilesema);
 

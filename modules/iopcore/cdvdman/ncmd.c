@@ -53,7 +53,7 @@ int sceCdGetToc(u8 *toc)
 
     cdvdman_stat.err = SCECdErREAD;
 
-    return 0; // Not supported
+    return 0; //Not supported
 }
 
 //-------------------------------------------------------------------------

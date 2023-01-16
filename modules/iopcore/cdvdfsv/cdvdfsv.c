@@ -87,7 +87,7 @@ static void cdvdfsv_startrpcthreads(void)
     thread_param.attr = TH_C;
     thread_param.option = 0xABCD8001;
     thread_param.thread = (void *)cdvdfsv_rpc1_th;
-    thread_param.stacksize = 0x1000; // Original: 0x1900. Its operations probably won't need so much space, since its functions will never trigger a callback.
+    thread_param.stacksize = 0x1000; //Original: 0x1900. Its operations probably won't need so much space, since its functions will never trigger a callback.
     thread_param.priority = 0x51;
 
     rpc1_thread_id = CreateThread(&thread_param);
@@ -105,7 +105,7 @@ static void cdvdfsv_startrpcthreads(void)
     thread_param.attr = TH_C;
     thread_param.option = 0xABCD8000;
     thread_param.thread = (void *)cdvdfsv_rpc0_th;
-    thread_param.stacksize = 0x1000; // Original: 0x800. Its operations probably won't need so much space, since its functions will never trigger a callback.
+    thread_param.stacksize = 0x1000; //Original: 0x800. Its operations probably won't need so much space, since its functions will never trigger a callback.
     thread_param.priority = 0x51;
 
     rpc0_thread_id = CreateThread(&thread_param);
@@ -163,7 +163,7 @@ static void cdvdfsv_rpc2_th(void *args)
 }
 
 //-------------------------------------------------------------------------
-// Unofficial RPC for shutting down OPL.
+//Unofficial RPC for shutting down OPL.
 static void cdvdfsv_rpc_sd_th(void *args)
 {
     sceSifSetRpcQueue(&rpc_sd_DQ, GetThreadId());
@@ -180,7 +180,7 @@ static void *cbrpc_cdinit(int fno, void *buf, int size)
 
     r->cdvdfsv_ver = 0x223;
     r->cdvdman_ver = 0x223;
-    // r->debug_mode = 0xff;
+    //r->debug_mode = 0xff;
 
     return buf;
 }
@@ -224,8 +224,8 @@ static void *cbrpc_shutdown(int fno, void *buf, int size)
     int value;
 
     if (fno == 1) {
-        // Terminate operations.
-        // Shutdown OPL
+        //Terminate operations.
+        //Shutdown OPL
         value = *(int *)buf;
         sceCdSC(CDSC_OPL_SHUTDOWN, &value);
     }

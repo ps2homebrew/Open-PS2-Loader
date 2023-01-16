@@ -8,7 +8,7 @@
   Copyright (c) 2003 Marcus R. Brown <mrbrown@0xd6.org>
   Licenced under Academic Free License version 2.0
   Review ps2sdk README & LICENSE files for further details.
-
+ 
   ATA device driver.
 */
 
@@ -78,7 +78,7 @@ int ata_io_sema = -1;
 #define SIGNALIOSEMA(x) SignalSema(x)
 
 #define ATA_EV_TIMEOUT  1
-#define ATA_EV_COMPLETE 2 // Unused as there is no completion interrupt
+#define ATA_EV_COMPLETE 2 //Unused as there is no completion interrupt
 
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
@@ -166,7 +166,7 @@ int atad_start(void)
 
     M_PRINTF(BANNER, VERSION);
 
-    event.attr = EA_SINGLE; // In v1.04, EA_MULTI was specified.
+    event.attr = EA_SINGLE; //In v1.04, EA_MULTI was specified.
     event.bits = 0;
     if ((ata_evflg = CreateEventFlag(&event)) < 0) {
         M_PRINTF("Couldn't create event flag, exiting.\n");
@@ -209,7 +209,7 @@ int ata_get_error()
 #define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
 /* 0x80 for busy, 0x88 for bus busy.
-    In the original ATAD, the busy and bus-busy functions were separate, but similar.  */
+	In the original ATAD, the busy and bus-busy functions were separate, but similar.  */
 static int gen_ata_wait_busy(int bits)
 {
     int i, didx, delay;
@@ -223,7 +223,7 @@ static int gen_ata_wait_busy(int bits)
 
         hdpro_io_finish();
 
-        // Differs from the normal ATAD here.
+        //Differs from the normal ATAD here.
         if (r_control == 0xffff)
             return ATA_RES_ERR_TIMEOUT;
 
@@ -406,7 +406,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         return res;
 
     /* For the SCE and SMART commands, we need to search on the subcommand
-    specified in the feature register.  */
+	specified in the feature register.  */
     if (command == ATA_C_SMART) {
         cmd_table = smart_cmd_table;
         cmd_table_size = SMART_CMD_TABLE_SIZE;
@@ -453,7 +453,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         case 6:
             using_timeout = 1;
             break;
-            // Support for DMA commands (type = 4) is removed because HDPro cannot support DMA. The original HDPro driver still had code for it though.
+            //Support for DMA commands (type = 4) is removed because HDPro cannot support DMA. The original HDPro driver still had code for it though.
     }
 
     if (using_timeout) {
@@ -474,11 +474,11 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 
     /* Finally!  We send off the ATA command with arguments.  */
     hdpro_io_write(ATAreg_CONTROL_WR, (using_timeout == 0) << 1);
-    if (type & 0x80) { // For the sake of achieving improved performance, write the registers twice only if required!
+    if (type & 0x80) { //For the sake of achieving improved performance, write the registers twice only if required!
         /* 48-bit LBA requires writing to the address registers twice,
-           24 bits of the LBA address is written each time.
-           Writing to registers twice does not affect 28-bit LBA since
-           only the latest data stored in address registers is used.  */
+		   24 bits of the LBA address is written each time.
+		   Writing to registers twice does not affect 28-bit LBA since
+		   only the latest data stored in address registers is used.  */
         hdpro_io_write(ATAreg_FEATURE_WR, (feature & 0xffff) >> 8);
         hdpro_io_write(ATAreg_NSECTOR_WR, (nsector & 0xffff) >> 8);
         hdpro_io_write(ATAreg_SECTOR_WR, (sector & 0xffff) >> 8);
@@ -492,7 +492,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     hdpro_io_write(ATAreg_LCYL_WR, lcyl & 0xff);
     hdpro_io_write(ATAreg_HCYL_WR, hcyl & 0xff);
 
-    hdpro_io_write(ATAreg_SELECT_WR, (select | ATA_SEL_LBA) & 0xff); // In v1.04, LBA was enabled in the ata_device_sector_io function.
+    hdpro_io_write(ATAreg_SELECT_WR, (select | ATA_SEL_LBA) & 0xff); //In v1.04, LBA was enabled in the ata_device_sector_io function.
     hdpro_io_write(ATAreg_COMMAND_WR, command & 0xff);
 
     return 0;
@@ -592,7 +592,7 @@ int ata_io_finish(void)
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
 
-        // Unlike ATAD, poll until the device either completes its command or times out. There is no completion interrupt.
+        //Unlike ATAD, poll until the device either completes its command or times out. There is no completion interrupt.
         while (1) {
             suspend_intr();
 
@@ -703,7 +703,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             command = (dir == 1) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
         }
 
-        // Unlike ATAD, retry indefinitely until the I/O operation succeeds.
+        //Unlike ATAD, retry indefinitely until the I/O operation succeeds.
         if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
                                 hcyl, select, command)) != 0)
             continue;

@@ -1882,7 +1882,7 @@ int main(int argc, char *argv[])
         /* argv[0] boot path
            argv[1] file name (including extention)
            argv[2] game->startup
-           argv[3] game->media ("CD" / "DVD")
+           argv[3] game->media ("CD" / "DVD") 
            argv[4] "bdm" */
         if (!strcmp(argv[4], "bdm"))
             autoLaunchBDMGame(argv);

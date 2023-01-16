@@ -338,13 +338,14 @@ typedef enum { full = 0,
         } while (d < e);      \
     } /* at the end, d>=e; */
 #else
-#define LZ4_WILDCOPY(d, s, e)           \
-    {                                   \
-        if (likely(e - d <= 8))         \
-            LZ4_COPY8(d, s)             \
-            else do { LZ4_COPY8(d, s) } \
-        while (d < e)                   \
-            ;                           \
+#define LZ4_WILDCOPY(d, s, e)   \
+    {                           \
+        if (likely(e - d <= 8)) \
+            LZ4_COPY8(d, s)     \
+        else                    \
+            do {                \
+                LZ4_COPY8(d, s) \
+            } while (d < e);    \
     }
 #endif
 #define LZ4_SECURECOPY(d, s, e)    \

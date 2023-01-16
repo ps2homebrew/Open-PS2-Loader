@@ -1,15 +1,15 @@
 /****************************************************************/ /**
- *
- * @file lwnbd.c
- *
- * @author   Ronan Bignaux <ronan@aimao.org>
- *
- * @brief    Network Block Device Protocol server
- *
- * Copyright (c) Ronan Bignaux. 2021
- * All rights reserved.
- *
- ********************************************************************/
+                                                                    *
+                                                                    * @file lwnbd.c
+                                                                    *
+                                                                    * @author   Ronan Bignaux <ronan@aimao.org>
+                                                                    *
+                                                                    * @brief    Network Block Device Protocol server
+                                                                    *
+                                                                    * Copyright (c) Ronan Bignaux. 2021
+                                                                    * All rights reserved.
+                                                                    *
+                                                                    ********************************************************************/
 
 /*
  * Redistribution and use in source and binary forms, with or without

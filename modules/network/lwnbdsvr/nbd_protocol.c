@@ -1,15 +1,15 @@
 /****************************************************************/ /**
- *
- * @file nbd_protocol.c
- *
- * @author   Ronan Bignaux <ronan@aimao.org>
- *
- * @brief    Network Block Device Protocol server
- *
- * Copyright (c) Ronan Bignaux. 2021
- * All rights reserved.
- *
- ********************************************************************/
+                                                                    *
+                                                                    * @file nbd_protocol.c
+                                                                    *
+                                                                    * @author   Ronan Bignaux <ronan@aimao.org>
+                                                                    *
+                                                                    * @brief    Network Block Device Protocol server
+                                                                    *
+                                                                    * Copyright (c) Ronan Bignaux. 2021
+                                                                    * All rights reserved.
+                                                                    *
+                                                                    ********************************************************************/
 
 /*
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
 err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context **ctx)
 {
     register int size;
-    uint32_t cflags, gflags; //TODO: move in server_ctx struct
+    uint32_t cflags, gflags; // TODO: move in server_ctx struct
     struct nbd_new_option new_opt;
     struct nbd_fixed_new_option_reply fixed_new_option_reply;
     struct nbd_new_handshake new_hs;
@@ -120,12 +120,12 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
 
             case NBD_OPT_EXPORT_NAME: {
                 struct nbd_export_name_option_reply handshake_finish;
-                //temporary workaround
+                // temporary workaround
                 if (new_opt.optlen > 0) {
                     *ctx = nbd_context_getDefaultExportByName(ctxs, (const char *)&nbd_buffer);
                 } else
                     *ctx = nbd_context_getDefaultExportByName(ctxs, gdefaultexport);
-                //TODO: is that correct ?
+                // TODO: is that correct ?
                 if (*ctx == NULL)
                     *ctx = ctxs[0];
                 handshake_finish.exportsize = htonll((*ctx)->export_size);
@@ -193,7 +193,7 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
             case NBD_OPT_LIST_META_CONTEXT:
             case NBD_OPT_SET_META_CONTEXT:
             default:
-                //TODO: test
+                // TODO: test
                 fixed_new_option_reply.magic = htonll(NBD_REP_MAGIC);
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_ERR_UNSUP);
@@ -351,7 +351,7 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
                         blkremains -= bufbklsz;
                         retry = NBD_MAX_RETRIES;
                     } else {
-                        error = NBD_EOVERFLOW; //TODO
+                        error = NBD_EOVERFLOW; // TODO
                         sendflag = 0;
                         //                    	LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
                     }

@@ -23,7 +23,7 @@
 
 #ifdef __EESIO_DEBUG
 #define DPRINTF(args...) ;
-#define DINIT() ;
+#define DINIT()          ;
 #else
 #define DPRINTF(args...) \
     do {                 \

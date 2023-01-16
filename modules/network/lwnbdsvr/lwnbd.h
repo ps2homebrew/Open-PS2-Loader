@@ -1,15 +1,15 @@
 /****************************************************************/ /**
- *
- * @file lwnbd.h
- *
- * @author   Ronan Bignaux <ronan@aimao.org>
- *
- * @brief    Network Block Device Protocol implementation options
- *
- * Copyright (c) Ronan Bignaux. 2021
- * All rights reserved.
- *
- ********************************************************************/
+                                                                    *
+                                                                    * @file lwnbd.h
+                                                                    *
+                                                                    * @author   Ronan Bignaux <ronan@aimao.org>
+                                                                    *
+                                                                    * @brief    Network Block Device Protocol implementation options
+                                                                    *
+                                                                    * Copyright (c) Ronan Bignaux. 2021
+                                                                    * All rights reserved.
+                                                                    *
+                                                                    ********************************************************************/
 
 /*
  * Redistribution and use in source and binary forms, with or without
@@ -81,33 +81,33 @@ typedef struct nbd_context
 struct lwnbd_operations
 {
     /**
-    * Close block device handle
-    * @param handle File handle returned by open()
-    */
+     * Close block device handle
+     * @param handle File handle returned by open()
+     */
     //  void (*close)(nbd_context *me);
     /**
-    * Read from block device
-    * @param
-    * @param buffer Target buffer to copy read data to
-    * @param offset Offset in block to copy read data to
-    * @param length Number of blocks to copy to buffer
-    * @returns &gt;= 0: Success; &lt; 0: Error
-    */
+     * Read from block device
+     * @param
+     * @param buffer Target buffer to copy read data to
+     * @param offset Offset in block to copy read data to
+     * @param length Number of blocks to copy to buffer
+     * @returns &gt;= 0: Success; &lt; 0: Error
+     */
     int (*read)(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length);
     /**
-    * Write to block device
-    * @param me ()
-    * @param buffer Target buffer to copy write data to
-    * @param offset Offset in block to copy write data to
-    * @param length Number of blocks to copy to buffer
-    * @returns &gt;= 0: Success; &lt; 0: Error
-    */
+     * Write to block device
+     * @param me ()
+     * @param buffer Target buffer to copy write data to
+     * @param offset Offset in block to copy write data to
+     * @param length Number of blocks to copy to buffer
+     * @returns &gt;= 0: Success; &lt; 0: Error
+     */
     int (*write)(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length);
     /**
-    * Flush to block device
-    * @param me ()
-    * @returns &gt;= 0: Success; &lt; 0: Error
-    */
+     * Flush to block device
+     * @param me ()
+     * @returns &gt;= 0: Success; &lt; 0: Error
+     */
     int (*flush)(nbd_context const *const me);
 };
 
@@ -115,7 +115,7 @@ uint32_t nbd_recv(int s, void *mem, size_t len, int flags);
 int nbd_init(nbd_context **ctx);
 
 //********************* nbd_protocol.c *********************
-//todo: const ctxs
+// todo: const ctxs
 err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context **ctx);
 err_t transmission_phase(const int client_socket, nbd_context *ctx);
 
@@ -135,7 +135,7 @@ static inline int nbd_flush(nbd_context const *const me)
     return (*me->vptr->flush)(me);
 }
 
-//Todo: make a real server object
+// Todo: make a real server object
 extern char gdefaultexport[];
 extern uint8_t nbd_buffer[];
 nbd_context *nbd_context_getDefaultExportByName(nbd_context **nbd_contexts, const char *exportname);

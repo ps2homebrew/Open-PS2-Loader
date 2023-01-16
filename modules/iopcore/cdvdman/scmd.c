@@ -127,7 +127,7 @@ int cdvdman_readID(int mode, u8 *buf)
     if (mode == 0) { // GUID
         u32 *GUID0 = (u32 *)&buf[0];
         u32 *GUID1 = (u32 *)&buf[4];
-        *GUID0 = lbuf[0] | 0x08004600; //Replace the MODEL ID segment with the SCE OUI, to get the console's IEEE1394 EUI-64.
+        *GUID0 = lbuf[0] | 0x08004600; // Replace the MODEL ID segment with the SCE OUI, to get the console's IEEE1394 EUI-64.
         *GUID1 = *(u32 *)&lbuf[4];
     } else { // ModelID
         u32 *ModelID = (u32 *)&buf[0];
@@ -153,7 +153,7 @@ int sceCdReadModelID(unsigned long int *ModelID)
 int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 {
     if (cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL) {
-        //Make layer 1 point to layer 0.
+        // Make layer 1 point to layer 0.
         *layer1_start = 0;
         *on_dual = 1;
     } else {

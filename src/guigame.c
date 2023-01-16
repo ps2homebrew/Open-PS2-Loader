@@ -1109,7 +1109,7 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         configRemoveKey(configGame, CONFIG_ITEM_GSMXOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMFIELDFIX);
-        //OSD Language
+        // OSD Language
         configRemoveKey(configGame, CONFIG_ITEM_OSDLNG);
         configRemoveKey(configGame, CONFIG_ITEM_OSDLNG_ENABLE);
 
@@ -1145,7 +1145,7 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 
-        //OSD Language
+        // OSD Language
         configRemoveKey(configSet, CONFIG_ITEM_OSDLNG);
         configRemoveKey(configSet, CONFIG_ITEM_OSDLNG_SOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_OSDLNG_ENABLE);
@@ -1312,7 +1312,7 @@ static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *con
 }
 #endif
 
-//OSD
+// OSD
 
 static int guiGameOSDLanguageUpdater(int modified)
 {
@@ -1403,7 +1403,7 @@ static void guiGameLoadOSDLanguageConfig(config_set_t *configSet, config_set_t *
     diaSetInt(diaOSDConfig, OSD_LANGUAGE_ENABLE, gOSDLanguageEnable);
     diaSetInt(diaOSDConfig, OSD_LANGUAGE_VALUE, gOSDLanguageValue);
 }
-//OSD Language
+// OSD Language
 
 // loads defaults if no config found
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)

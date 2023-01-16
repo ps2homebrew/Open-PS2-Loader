@@ -63,15 +63,15 @@ enum CDIOC_CODE {
 };
 
 // DMA/reading alignment correction buffer. Used by CDVDMAN and CDVDFSV.
-//The minimum size is 2, as one sector may be used for buffer alignment correction.
+// The minimum size is 2, as one sector may be used for buffer alignment correction.
 #define CDVDMAN_FS_SECTORS 8
 
-//Codes for use with sceCdSC()
-#define CDSC_GET_DEBUG_STATUS 0xFFFFFFF0 //Get debug status flag.
-#define CDSC_GET_INTRFLAG     0xFFFFFFF5 //Get interrupt flag.
-#define CDSC_IO_SEMA          0xFFFFFFF6 //Wait (param != 0) or signal (param == 0) high-level I/O semaphore.
-#define CDSC_GET_VERSION      0xFFFFFFF7 //Get CDVDMAN version.
-#define CDSC_SET_ERROR        0xFFFFFFFE //Used by CDVDFSV and CDVDSTM to set the error code (Typically READCF*).
-#define CDSC_OPL_SHUTDOWN     0x00000001 //Shutdown OPL
+// Codes for use with sceCdSC()
+#define CDSC_GET_DEBUG_STATUS 0xFFFFFFF0 // Get debug status flag.
+#define CDSC_GET_INTRFLAG     0xFFFFFFF5 // Get interrupt flag.
+#define CDSC_IO_SEMA          0xFFFFFFF6 // Wait (param != 0) or signal (param == 0) high-level I/O semaphore.
+#define CDSC_GET_VERSION      0xFFFFFFF7 // Get CDVDMAN version.
+#define CDSC_SET_ERROR        0xFFFFFFFE // Used by CDVDFSV and CDVDSTM to set the error code (Typically READCF*).
+#define CDSC_OPL_SHUTDOWN     0x00000001 // Shutdown OPL
 
 #endif

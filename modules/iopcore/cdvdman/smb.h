@@ -510,6 +510,6 @@ void smb_CloseAll(void);
 int smb_Disconnect(void);
 
 #define MAX_SMB_BUF     896 // must fit on u16 !!!
-#define MAX_SMB_BUF_HDR 128 //Must be at least as large as the largest header structure.
+#define MAX_SMB_BUF_HDR 128 // Must be at least as large as the largest header structure.
 
 #endif

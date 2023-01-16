@@ -1681,6 +1681,8 @@ static void init(void)
     readPads();
     if (!getKeyPressed(KEY_START))
         _loadConfig(); // only try to restore config if emergency key is not being pressed
+    else
+        applyConfig(-1, -1);
 
     // queue deffered init of sound effects, which will take place after the preceding initialization steps within the queue are complete.
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);

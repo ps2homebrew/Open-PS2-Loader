@@ -120,11 +120,12 @@ static int eecoreInit(int argc, char **argv)
     CustomOSDConfigParam.language = _strtoi(_strtok(NULL, " "));
     CustomOSDConfigParam.timezoneOffset = _strtoi(_strtok(NULL, " "));
     enforceLanguage = _strtoi(_strtok(NULL, " "));
-
+#ifdef DPRINTF
     if (enforceLanguage)
         DPRINTF("Enforcing language...\n\tCustomOSDConfig2Param: %d %d %d %d %d %d %d %d\n", CustomOSDConfigParam.spdifMode, CustomOSDConfigParam.screenType, CustomOSDConfigParam.videoOutput, CustomOSDConfigParam.japLanguage, CustomOSDConfigParam.ps1drvConfig, CustomOSDConfigParam.version, CustomOSDConfigParam.language, CustomOSDConfigParam.timezoneOffset);
     else
         DPRINTF("Language will not be manipulated\n");
+#endif
     i++;
 
     eeloadCopy = (void *)_strtoui(_strtok(argv[i], " "));

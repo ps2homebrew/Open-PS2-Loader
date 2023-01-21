@@ -47,8 +47,8 @@ int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 #endif
 
 #ifdef __EESIO_DEBUG
-#include <sio.h>
-#define LOG_INIT() sio_init(38400, 0, 0, 0, 0)
+#include "SIOCookie.h"
+#define LOG_INIT() ee_sio_start(38400, 0, 0, 0, 0)
 #define LOG_ENABLE() \
     do {             \
     } while (0)

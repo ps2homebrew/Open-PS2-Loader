@@ -22,9 +22,8 @@
 #include <smod.h>
 
 #ifdef __EESIO_DEBUG
-#include <sio.h>
-#define DPRINTF(args...) sio_printf(args)
-#define DINIT()          sio_init(38400, 0, 0, 0, 0)
+#define DPRINTF(args...) ;
+#define DINIT()          ;
 #else
 #define DPRINTF(args...) \
     do {                 \

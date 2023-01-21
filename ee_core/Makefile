@@ -21,11 +21,11 @@ EE_OBJS = main.o syshook.o iopmgr.o modmgr.o util.o patches.o patches_asm.o \
 	  padhook.o cd_igr_rpc.o tlb.o asm.o crt0.o $(GSMCORE_EE_OBJS) $(CHEATCORE_EE_OBJS)
 MAPFILE = ee_core.map
 
-EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
+EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I$(PS2SDK)/ports/include -Iinclude -I.
 EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
 
 ifeq ($(EESIO_DEBUG),1)
-EE_CFLAGS += -D__EESIO_DEBUG
+    EE_CFLAGS += -D__EESIO_DEBUG
 endif
 
 ifeq ($(DTL_T10000),1)

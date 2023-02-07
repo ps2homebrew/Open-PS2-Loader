@@ -42,7 +42,7 @@
 #include <stddef.h>
 #include <lwnbd.h>
 
-uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
+uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(16)));
 
 /** @ingroup nbd
  * Fixed newstyle negotiation.

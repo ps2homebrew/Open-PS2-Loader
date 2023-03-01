@@ -205,11 +205,11 @@ EE_DEPS = $($(filter %.o,$(EE_OBJS)):%.o=%.d)
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng languages
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
 
 ifdef PS2SDK
 
-all: download_lng languages
+all: download_lng download_lwNBD languages
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
 ifneq ($(NOT_PACKED),1)
@@ -218,7 +218,7 @@ else
 	$(MAKE) $(EE_BIN)
 endif
 
-release: download_lng languages $(EE_VPKD).ZIP
+release: download_lng download_lwNBD languages $(EE_VPKD).ZIP
 
 debug:
 	$(MAKE) DEBUG=1 all
@@ -235,7 +235,7 @@ ingame_debug:
 deci2_debug:
 	$(MAKE) DEBUG=1 INGAME_DEBUG=1 DECI2_DEBUG=1 all
 
-clean:
+clean:	download_lwNBD
 	echo "Cleaning..."
 	echo "-Interface"
 	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PACKED) $(EE_BIN_STRIPPED) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
@@ -287,7 +287,7 @@ clean:
 	echo " -genvmc"
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo " -lwnbdsvr"
-	$(MAKE) -C modules/network/lwnbdsvr clean
+	$(MAKE) -C modules/network/lwNBD/ TARGET=iop clean
 	echo " -udptty-ingame"
 	$(MAKE) -C modules/debug/udptty-ingame clean
 	echo " -ps2link"
@@ -607,10 +607,10 @@ modules/vmc/genvmc/genvmc.irx: modules/vmc/genvmc
 $(EE_ASM_DIR)genvmc.s: modules/vmc/genvmc/genvmc.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ genvmc_irx
 
-modules/network/lwnbdsvr/lwnbdsvr.irx: modules/network/lwnbdsvr
-	$(MAKE) -C $<
+modules/network/lwNBD/lwnbdsvr.irx: modules/network/lwNBD
+	$(MAKE) TARGET=iop -C $<
 
-$(EE_ASM_DIR)lwnbdsvr.s: modules/network/lwnbdsvr/lwnbdsvr.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)lwnbdsvr.s: modules/network/lwNBD/lwnbdsvr.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ lwnbdsvr_irx
 
 $(EE_ASM_DIR)udptty.s: $(PS2SDK)/iop/irx/udptty.irx | $(EE_ASM_DIR)
@@ -742,6 +742,9 @@ languages: $(ENGLISH_TEMPLATE_YML) $(TRANSLATIONS_YML) $(ENGLISH_LNG) $(TRANSLAT
 
 download_lng:
 	./download_lng.sh
+
+download_lwNBD:
+	./download_lwNBD.sh
 
 $(TRANSLATIONS_LNG): $(LNG_DIR)lang_%.lng: $(LNG_SRC_DIR)%.yml $(BASE_LANGUAGE) $(LANG_COMPILER)
 	python3 $(LANG_COMPILER) --make_lng --base $(BASE_LANGUAGE) --translation $< $@

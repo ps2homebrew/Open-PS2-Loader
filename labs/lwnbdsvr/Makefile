@@ -19,7 +19,7 @@ clean:
 	$(MAKE) -C ../../modules/network/SMSMAP clean
 	$(MAKE) -C ../../modules/hdd/atad clean
 	$(MAKE) -C ../../modules/hdd/ps2hdd clean
-	$(MAKE) -C ../../modules/network/lwnbdsvr clean
+	$(MAKE) -C ../../modules/network/lwNBD clean
 	rm -f *.elf *.o *.a *.s
 
 rebuild: clean all
@@ -56,8 +56,8 @@ ps2hdd.s:
 	$(BIN2S) ../../modules/hdd/ps2hdd/ps2hdd.irx ps2hdd.s ps2hdd_irx
 
 lwnbdsvr.s:
-	$(MAKE) -C ../../modules/network/lwnbdsvr
-	$(BIN2S) ../../modules/network/lwnbdsvr/lwnbdsvr.irx lwnbdsvr.s lwnbdsvr_irx
+	$(MAKE) -C ../../modules/network/lwNBD
+	$(BIN2S) ../../modules/network/lwNBD/lwnbdsvr.irx lwnbdsvr.s lwnbdsvr_irx
 
 iomanx.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/iomanX.irx iomanx.s iomanx_irx

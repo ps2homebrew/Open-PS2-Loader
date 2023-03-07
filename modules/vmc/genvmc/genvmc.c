@@ -119,8 +119,8 @@ typedef struct
 
 #define BLOCKKB 16
 
-static MCDevInfo devinfo __attribute__((aligned(64)));
-static u8 cluster_buf[(BLOCKKB * 1024) + 16] __attribute__((aligned(64)));
+static MCDevInfo devinfo __attribute__((aligned(16)));
+static u8 cluster_buf[(BLOCKKB * 1024) + 16] __attribute__((aligned(16)));
 
 static int genvmc_io_sema = -1;
 static int genvmc_thread_sema = -1;

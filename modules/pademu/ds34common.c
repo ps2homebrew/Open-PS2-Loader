@@ -3,6 +3,53 @@
 #include "loadcore.h"
 #include "sysclib.h"
 
+void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out)
+{
+    out->RightStickX = 0x7F;
+    out->RightStickY = 0x7F;
+    out->LeftStickX = 0x7F;
+    out->LeftStickY = -(in->Whammy);
+
+    static const u8 dpad_mapping[] = {
+        (DS2ButtonUp),
+        (DS2ButtonUp | DS2ButtonRight),
+        (DS2ButtonRight),
+        (DS2ButtonDown | DS2ButtonRight),
+        (DS2ButtonDown),
+        (DS2ButtonDown | DS2ButtonLeft),
+        (DS2ButtonLeft),
+        (DS2ButtonUp | DS2ButtonLeft),
+        0,
+    };
+
+    u8 dpad = in->Dpad > DS4DpadDirectionReleased ? DS4DpadDirectionReleased : in->Dpad;
+
+    out->nButtonStateL = ~(in->Select | in->Start << 3 | dpad_mapping[dpad]);
+    out->nButtonStateH = ~(in->Green << 1 | in->Yellow << 4 | in->Red << 5 | in->Blue << 6 | in->Orange << 7);
+
+    out->PressureRight = in->PressureRight;
+    out->PressureLeft = in->PressureLeft;
+    out->PressureUp = in->PressureUp;
+    out->PressureDown = in->PressureDown;
+
+    out->PressureTriangle = in->PressureTriangle;
+    out->PressureCircle = in->PressureCircle;
+    out->PressureCross = in->PressureCross;
+    out->PressureSquare = in->PressureSquare;
+
+    out->PressureL1 = in->PressureL1;
+    out->PressureR1 = in->PressureR1;
+    out->PressureL2 = in->PressureL2;
+    out->PressureR2 = in->PressureR2;
+
+    out->nLeft = 0;
+    out->nL2 = 1;
+
+    if (in->AccelX > 512 || in->AccelX < 432) {
+        out->nL2 = 0;
+    }
+}
+
 void translate_pad_ds3(const struct ds3report *in, struct ds2report *out, u8 pressure_emu)
 {
     out->nButtonStateL = ~in->ButtonStateL;

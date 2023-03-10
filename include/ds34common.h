@@ -6,10 +6,12 @@
 #define USB_SUBCLASS_RF_CONTROLLER    0x01
 #define USB_PROTOCOL_BLUETOOTH_PROG   0x01
 
-#define DS34_VID     0x054C // Sony Corporation
-#define DS3_PID      0x0268 // PS3 Controller
-#define DS4_PID      0x05C4 // PS4 Controller
-#define DS4_PID_SLIM 0x09CC // PS4 Slim Controller
+#define SONY_VID            0x12ba // Sony
+#define DS34_VID            0x054C // Sony Corporation
+#define DS3_PID             0x0268 // PS3 Controller
+#define DS4_PID             0x05C4 // PS4 Controller
+#define DS4_PID_SLIM        0x09CC // PS4 Slim Controller
+#define GUITAR_HERO_PS3_PID 0x0100 // PS3 Guitar Hero Guitar
 
 // NOTE: struct member prefixed with "n" means it's active-low (i.e. value of 0 indicates button is pressed, value 1 is released)
 enum DS2ButtonBitNumber {
@@ -164,6 +166,66 @@ struct ds3report
 
 } __attribute__((packed));
 
+struct ds3guitarreport
+{
+    union
+    {
+        uint16_t ButtonState;
+        struct
+        {
+            uint8_t ButtonStateL; // Main buttons low byte
+            uint8_t ButtonStateH; // Main buttons high byte
+        };
+        struct
+        {
+            uint16_t Yellow    : 1;
+            uint16_t Green     : 1;
+            uint16_t Red       : 1;
+            uint16_t Blue      : 1;
+            uint16_t Orange    : 1;
+            uint16_t StarPower : 1;
+            uint16_t           : 1;
+            uint16_t           : 1;
+            uint16_t Select    : 1;
+            uint16_t Start     : 1;
+            uint16_t           : 1;
+            uint16_t           : 1;
+            uint16_t PSButton  : 1;
+            uint16_t           : 1;
+            uint16_t           : 1;
+            uint16_t           : 1;
+        };
+    };
+    uint8_t Dpad; // hat format, 0x08 is released, 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SW, 6=W, 7=NW
+    uint8_t : 8;
+    uint8_t : 8;
+    uint8_t Whammy; // Whammy axis 0 - 255, 128 is mid
+    uint8_t : 8;
+    uint8_t Reserved2[4];     // Unknown
+    uint8_t PressureUp;       // digital Pad Up button Pressure 0 - 255
+    uint8_t PressureRight;    // digital Pad Right button Pressure 0 - 255
+    uint8_t PressureDown;     // digital Pad Down button Pressure 0 - 255
+    uint8_t PressureLeft;     // digital Pad Left button Pressure 0 - 255
+    uint8_t PressureL2;       // digital Pad L2 button Pressure 0 - 255
+    uint8_t PressureR2;       // digital Pad R2 button Pressure 0 - 255
+    uint8_t PressureL1;       // digital Pad L1 button Pressure 0 - 255
+    uint8_t PressureR1;       // digital Pad R1 button Pressure 0 - 255
+    uint8_t PressureTriangle; // digital Pad Triangle button Pressure 0 - 255
+    uint8_t PressureCircle;   // digital Pad Circle button Pressure 0 - 255
+    uint8_t PressureCross;    // digital Pad Cross button Pressure 0 - 255
+    uint8_t PressureSquare;   // digital Pad Square button Pressure 0 - 255
+    uint8_t Reserved3[3];     // Unknown
+    uint8_t Charge;           // charging status ? 02 = charge, 03 = normal
+    uint8_t Power;            // Battery status ? 05=full - 02=dying, 01=just before shutdown, EE=charging
+    uint8_t Connection;       // Connection Type ? 14 when operating by bluetooth, 10 when operating by bluetooth with cable plugged in, 16 when bluetooh and rumble
+    uint8_t Reserved4[9];     // Unknown
+    int16_t AccelX;
+    int16_t AccelY;
+    int16_t AccelZ;
+    int16_t GyroZ;
+
+} __attribute__((packed));
+
 enum DS4DpadDirections {
     DS4DpadDirectionN = 0,
     DS4DpadDirectionNE,
@@ -238,6 +300,13 @@ struct ds4report
  * NOTE: if set to 0, ds3report must be large enough for that data to be read!
  */
 void translate_pad_ds3(const struct ds3report *in, struct ds2report *out, uint8_t pressure_emu);
+
+/**
+ * Translate PS3 Guitar pad data into DS2 Guitar pad data.
+ * @param in PS3 Guitar report
+ * @param out PS2 Guitar report
+ */
+void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out);
 
 /**
  * Translate DS3 pad data into DS2 pad data.

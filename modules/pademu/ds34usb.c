@@ -11,7 +11,7 @@
 #include "sys_utils.h"
 #include "padmacro.h"
 
-//#define DPRINTF(x...) printf(x)
+// #define DPRINTF(x...) printf(x)
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
@@ -83,6 +83,10 @@ int usb_probe(int devId)
         return 0;
     }
 
+    if (device->idVendor == SONY_VID && device->idProduct == GUITAR_HERO_PS3_PID) {
+        return 1;
+    }
+
     if (device->idVendor == DS34_VID && (device->idProduct == DS3_PID || device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
         return 1;
 
@@ -123,6 +127,9 @@ int usb_connect(int devId)
 
     if (device->idProduct == DS3_PID) {
         ds34pad[pad].type = DS3;
+        epCount = interface->bNumEndpoints - 1;
+    } else if (device->idProduct == GUITAR_HERO_PS3_PID) {
+        ds34pad[pad].type = GUITAR;
         epCount = interface->bNumEndpoints - 1;
     } else {
         ds34pad[pad].type = DS4;
@@ -261,6 +268,14 @@ static void DS3USB_init(int pad)
 static void readReport(u8 *data, int pad_idx)
 {
     ds34usb_device *pad = &ds34pad[pad_idx];
+    if (pad->type == GUITAR) {
+        struct ds3guitarreport *report;
+
+        report = (struct ds3guitarreport *)data;
+
+        translate_pad_guitar(report, &pad->ds2);
+        padMacroPerform(&pad->ds2, report->PSButton);
+    }
     if (data[0]) {
 
         if (pad->type == DS3) {
@@ -276,7 +291,6 @@ static void readReport(u8 *data, int pad_idx)
 
             translate_pad_ds3(report, &pad->ds2, 0);
             padMacroPerform(&pad->ds2, report->PSButton);
-
             if (report->PSButton) {                                    // display battery level
                 if (report->Select && (pad->btn_delay == MAX_DELAY)) { // PS + SELECT
                     if (pad->analog_btn < 2)                           // unlocked mode
@@ -492,6 +506,21 @@ int ds34usb_get_status(int port)
 
     WaitSema(ds34pad[port].sema);
     ret = ds34pad[port].status;
+    SignalSema(ds34pad[port].sema);
+
+    return ret;
+}
+
+int ds34usb_get_model(int port)
+{
+    int ret;
+
+    WaitSema(ds34pad[port].sema);
+    if (ds34pad[port].type == GUITAR) {
+        ret = MODEL_GUITAR;
+    } else {
+        ret = MODEL_PS2;
+    }
     SignalSema(ds34pad[port].sema);
 
     return ret;

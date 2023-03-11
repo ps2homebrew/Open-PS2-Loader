@@ -207,6 +207,8 @@ extern base_game_info_t *gAutoLaunchBDMGame;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 
+void initSupport(item_list_t *itemList, int mode, int force_reinit);
+
 void setDefaultColors(void);
 
 #define MENU_ITEM_HEIGHT 19

@@ -131,7 +131,7 @@ int guiGameVmcNameHandler(char *text, int maxLen)
 
 static int guiGameRefreshVMCConfig(item_list_t *support, char *name)
 {
-    int size = support->itemCheckVMC(name, 0);
+    int size = support->itemCheckVMC(support, name, 0);
 
     if (size != -1) {
         diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
@@ -212,7 +212,7 @@ static int guiGameShowVMCConfig(int id, item_list_t *support, char *VMCName, int
         if (validate)
             return 1; // nothing to validate if no user input
 
-        char *startup = support->itemGetStartup(id);
+        char *startup = support->itemGetStartup(support, id);
         snprintf(vmc, sizeof(vmc), "%s_%d", startup, slot);
     }
 
@@ -242,7 +242,7 @@ static int guiGameShowVMCConfig(int id, item_list_t *support, char *VMCName, int
                     sizeUI = 8;
 
                 if (sizeUI != size) {
-                    support->itemCheckVMC(vmc, sizeUI);
+                    support->itemCheckVMC(support, vmc, sizeUI);
 
                     diaSetEnabled(diaVMC, VMC_NAME, 0);
                     diaSetEnabled(diaVMC, VMC_SIZE, 0);
@@ -263,7 +263,7 @@ static int guiGameShowVMCConfig(int id, item_list_t *support, char *VMCName, int
             }
         } else if (result == VMC_BUTTON_DELETE) {
             if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, diaVMC)) {
-                support->itemCheckVMC(vmc, -1);
+                support->itemCheckVMC(support, vmc, -1);
                 diaSetString(diaVMC, VMC_NAME, "");
                 break;
             }
@@ -1169,7 +1169,7 @@ void guiGameRemoveSettings(config_set_t *configSet)
 void guiGameTestSettings(int id, item_list_t *support, config_set_t *configSet)
 {
     guiGameSaveConfig(configSet, support);
-    support->itemLaunch(id, configSet);
+    support->itemLaunch(support, id, configSet);
 }
 
 static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame)

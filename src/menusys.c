@@ -93,13 +93,13 @@ static void menuRenameGame(submenu_list_t **submenu)
         if (support->itemRename) {
             if (menuCheckParentalLock() == 0) {
                 sfxPlay(SFX_MESSAGE);
-                int nameLength = support->itemGetNameLength(selected_item->item->current->item.id);
+                int nameLength = support->itemGetNameLength(support, selected_item->item->current->item.id);
                 char newName[nameLength];
                 strncpy(newName, selected_item->item->current->item.text, nameLength);
                 if (guiShowKeyboard(newName, nameLength)) {
                     guiSwitchScreen(GUI_SCREEN_MAIN);
                     submenuDestroy(submenu);
-                    support->itemRename(selected_item->item->current->item.id, newName);
+                    support->itemRename(support, selected_item->item->current->item.id, newName);
                     ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
                 }
             }
@@ -124,7 +124,7 @@ static void menuDeleteGame(submenu_list_t **submenu)
                 if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
                     guiSwitchScreen(GUI_SCREEN_MAIN);
                     submenuDestroy(submenu);
-                    support->itemDelete(selected_item->item->current->item.id);
+                    support->itemDelete(support, selected_item->item->current->item.id);
                     ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
                 }
             }
@@ -138,7 +138,7 @@ static void _menuLoadConfig()
     WaitSema(menuSemaId);
     if (!itemConfig) {
         item_list_t *list = selected_item->item->userdata;
-        itemConfig = list->itemGetConfig(itemConfigId);
+        itemConfig = list->itemGetConfig(list, itemConfigId);
     }
     actionStatus = 0;
     SignalSema(menuSemaId);
@@ -335,6 +335,8 @@ static menu_list_t *AllocMenuItem(menu_item_t *item)
 void menuAppendItem(menu_item_t *item)
 {
     assert(item);
+
+    LOG("Appending menu item: %s\n", item->text);
 
     if (menu == NULL) {
         menu = AllocMenuItem(item);

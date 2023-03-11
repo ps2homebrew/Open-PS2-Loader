@@ -505,7 +505,7 @@ static GSTEXTURE *getGameImageTexture(image_cache_t *cache, void *support, struc
 {
     if (gEnableArt) {
         item_list_t *list = (item_list_t *)support;
-        char *startup = list->itemGetStartup(item->id);
+        char *startup = list->itemGetStartup(list, item->id);
         return cacheGetTexture(cache, list, &item->cache_id[cache->userId], &item->cache_uid[cache->userId], startup);
     }
 
@@ -831,7 +831,7 @@ static void drawItemText(struct menu_list *menu, struct submenu_list *item, conf
 {
     if (item) {
         item_list_t *support = menu->item->userdata;
-        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, support->itemGetStartup(item->item.id), elem->color);
+        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, support->itemGetStartup(support, item->item.id), elem->color);
     }
 }
 

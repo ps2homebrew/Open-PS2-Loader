@@ -17,11 +17,23 @@ typedef struct
 
 #define MAX_BDM_DEVICES 5
 
+typedef struct
+{
+    int massDeviceIndex;            // Device index, mass0 = 0, mass1 = 1, etc
+    char bdmPrefix[40];             // Contains the full path to the folder where all the games are.
+    int bdmULSizePrev;
+    time_t bdmModifiedCDPrev;
+    time_t bdmModifiedDVDPrev;
+    int bdmGameCount;
+    base_game_info_t *bdmGames;
+    char bdmDriver[32];
+} bdm_device_data_t;
+
 void bdmInit();
-item_list_t *bdmGetObject(int initOnly);
 int bdmFindPartition(char *target, const char *name, int write);
 void bdmLoadModules(void);
-void bdmLaunchGame(int id, config_set_t *configSet);
-void bdmSetPrefix(void);
+void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet);
+
+void bdmEnumerateDevices();
 
 #endif

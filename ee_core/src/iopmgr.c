@@ -96,6 +96,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     DPRINTF("Loading extra IOP modules...\n");
 
 #ifdef __LOAD_DEBUG_MODULES
+    //LoadOPLModule(OPL_MODULE_ID_SMSUTILS, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
 #ifdef __DECI2_DEBUG
@@ -122,6 +123,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
             break;
         case ETH_MODE:
 #ifndef __LOAD_DEBUG_MODULES
+            //LoadOPLModule(OPL_MODULE_ID_SMSUTILS, 0, 0, NULL);
             LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
             LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
 #endif
@@ -135,6 +137,10 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
             break;
         case BDM_M4S_MODE:
             LoadOPLModule(OPL_MODULE_ID_MX4SIOBD, 0, 0, NULL);
+            break;
+        case BDM_HDD_MODE:
+            //LoadOPLModule(OPL_MODULE_ID_BDM, 0, 0, NULL);
+            LoadOPLModule(OPL_MODULE_ID_BDM_FAT, 0, 0, NULL);
             break;
     };
 }

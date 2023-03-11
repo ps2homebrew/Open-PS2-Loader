@@ -32,6 +32,11 @@
 #include <speedregs.h>
 #include <atahw.h>
 
+#ifdef USE_BDM_ATA
+#include <bdm.h>
+#include <errno.h>
+#endif
+
 //#define NETLOG_DEBUG
 
 #ifdef NETLOG_DEBUG
@@ -67,6 +72,15 @@ int ata_io_sema = -1;
 
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
+
+#ifdef USE_BDM_ATA
+static struct block_device g_ata_bd;
+
+static int ata_bd_read(struct block_device *bd, u64 sector, void *buffer, u16 count);
+static int ata_bd_write(struct block_device *bd, u64 sector, const void *buffer, u16 count);
+static void ata_bd_flush(struct block_device *bd);
+static int ata_bd_stop(struct block_device *bd);
+#endif
 
 /* ATA command info.  */
 typedef struct _ata_cmd_info
@@ -172,6 +186,26 @@ int atad_start(void)
     smp.option = 0;
     smp.attr = SA_THPRI;
     ata_io_sema = CreateSema(&smp);
+
+#ifdef USE_BDM_ATA
+
+    g_ata_bd.priv  = (void *)&atad_devinfo;
+    g_ata_bd.name  = "ata";
+    g_ata_bd.devNr = 0;
+    g_ata_bd.parNr = 0;
+    g_ata_bd.parId = 0x00;
+    g_ata_bd.sectorSize = 512;
+    g_ata_bd.sectorOffset = 0;
+    g_ata_bd.sectorCount = 0;
+    
+    g_ata_bd.read  = ata_bd_read;
+    g_ata_bd.write = ata_bd_write;
+    g_ata_bd.flush = ata_bd_flush;
+    g_ata_bd.stop  = ata_bd_stop;
+
+    bdm_connect_bd(&g_ata_bd);
+
+#endif
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
@@ -670,3 +704,70 @@ static void ata_shutdown_cb(void)
     if (atad_devinfo.exists)
         ata_device_standby_immediate(0);
 }
+
+#ifdef USE_BDM_ATA
+static int ata_bd_io_common(struct block_device* bd, u64 lba, void* buf, u16 nsectors, int dir)
+{
+    USE_SPD_REGS;
+    int res = 0;
+    
+    // Setup the LBA parameters.
+    u16 sector = (u16)((u16)((lba >> 24) & 0xFF) | (u16)(lba & 0xFF));
+    u16 lcyl = (u16)((u16)((lba >> 32) & 0xFF) | (u16)((lba >> 8) & 0xFF));
+    u16 hcyl = (u16)((u16)((lba >> 40) & 0xFF) | (u16)((lba >> 16) & 0xFF));
+
+    u16 select  = (bd->devNr << 4) & 0xffff;
+    u16 command = (dir == 1) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;
+
+    // Retry a maximum of 3 times before failing out.
+    for (int i = 0; i < 3; i++)
+    {
+        if ((res = ata_io_start(buf, nsectors, 0, nsectors, sector, lcyl, hcyl, select, command)) != 0)
+            break;
+
+        /* Set up (part of) the transfer here. In v1.04, this was called at the top of the outer loop. */
+        ata_set_dir(dir);
+
+        res = ata_io_finish();
+
+        /* In v1.04, this was not done. Neither was there a mechanism to retry if a non-permanent error occurs. */
+        SPD_REG16(SPD_R_IF_CTRL) &= ~SPD_IF_DMA_ENABLE;
+
+        if (res != ATA_RES_ERR_ICRC)
+            break;
+    }
+
+    return res;
+}
+
+//
+// Block device interface
+//
+static int ata_bd_read(struct block_device *bd, u64 sector, void *buffer, u16 count)
+{
+    if (ata_bd_io_common(bd, sector, buffer, count, 0) != 0)
+        return -EIO;
+
+    return count;
+}
+
+static int ata_bd_write(struct block_device *bd, u64 sector, const void *buffer, u16 count)
+{
+    if (ata_bd_io_common(bd, sector, (void*)buffer, count, 1) != 0)
+        return -EIO;
+
+    return count;
+}
+
+static void ata_bd_flush(struct block_device *bd)
+{
+    ata_device_flush_cache(bd->devNr);
+}
+
+static int ata_bd_stop(struct block_device *bd)
+{
+    ata_device_standby_immediate(bd->devNr);
+
+    return 0;
+}
+#endif

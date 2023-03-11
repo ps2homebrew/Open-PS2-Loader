@@ -38,7 +38,7 @@ NOT_PACKED ?= 0
 
 # ======== END OF CONFIGURABLE SECTION. DO NOT MODIFY VARIABLES AFTER THIS POINT!! ========
 DEBUG ?= 0
-EESIO_DEBUG ?= 0
+EESIO_DEBUG ?= 1
 INGAME_DEBUG ?= 0
 DECI2_DEBUG ?= 0
 
@@ -79,7 +79,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o bdmevent.o \
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
 		udnl.o imgdrv.o eesync.o \
-		bdm_cdvdman.o IOPRP_img.o smb_cdvdman.o \
+		bdm_cdvdman.o bdm_ata_cdvdman.o IOPRP_img.o smb_cdvdman.o \
 		hdd_cdvdman.o hdd_hdpro_cdvdman.o cdvdfsv.o \
 		ingame_smstcpip.o smap_ingame.o smbman.o smbinit.o
 
@@ -170,10 +170,12 @@ ifeq ($(DEBUG),1)
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
     SMSTCPIP_INGAME_CFLAGS =
     IOP_OBJS += udptty-ingame.o
-  else ifeq ($(EESIO_DEBUG),1)
+  endif
+  ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
     EE_LIBS += -lsiocookie
-  else ifeq ($(INGAME_DEBUG),1)
+  endif
+  ifeq ($(INGAME_DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
     EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
@@ -246,6 +248,7 @@ clean:
 	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo " -cdvdman"
 	$(MAKE) -C modules/iopcore/cdvdman USE_BDM=1 clean
+	$(MAKE) -C modules/iopcore/cdvdman USE_BDM_ATA=1 clean
 	$(MAKE) -C modules/iopcore/cdvdman USE_SMB=1 clean
 	$(MAKE) -C modules/iopcore/cdvdman USE_HDD=1 clean
 	$(MAKE) -C modules/iopcore/cdvdman USE_HDPRO=1 clean
@@ -377,6 +380,12 @@ modules/iopcore/cdvdman/bdm_cdvdman.irx: modules/iopcore/cdvdman
 
 $(EE_ASM_DIR)bdm_cdvdman.s: modules/iopcore/cdvdman/bdm_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ bdm_cdvdman_irx
+
+modules/iopcore/cdvdman/bdm_ata_cdvdman.irx: modules/iopcore/cdvdman
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_BDM_ATA=1 -C $< all
+
+$(EE_ASM_DIR)bdm_ata_cdvdman.s: modules/iopcore/cdvdman/bdm_ata_cdvdman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ bdm_ata_cdvdman_irx
 
 modules/iopcore/cdvdman/smb_cdvdman.irx: modules/iopcore/cdvdman
 	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< all

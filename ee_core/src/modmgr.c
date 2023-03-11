@@ -152,9 +152,12 @@ int LoadOPLModule(int id, int mode, int arg_len, const char *args)
     void *pointer;
     unsigned int size;
 
+    DPRINTF("LoadOPLModule: %d ", id);
+
     if ((result = GetOPLModInfo(id, &pointer, &size)) == 0) {
         if (size > 0)
             result = LoadMemModule(mode, pointer, size, arg_len, args);
+            DPRINTF("ret=%d\n", result);
     }
 
     return result;

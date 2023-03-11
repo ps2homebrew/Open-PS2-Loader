@@ -80,3 +80,10 @@ sifman_IMPORTS_start
 I_sceSifSetDma
 I_sceSifDmaStat
 sifman_IMPORTS_end
+
+#ifdef ____USE_BDM_ATA
+bdm_IMPORTS_start
+I_bdm_connect_bd
+I_bdm_disconnect_bd
+bdm_IMPORTS_end
+#endif

@@ -22,7 +22,9 @@
 #include <smod.h>
 
 #ifdef __EESIO_DEBUG
-#define DPRINTF(args...) ;
+void ee_printf(const char* format, ...);
+
+#define DPRINTF(...) ee_printf(__VA_ARGS__)
 #define DINIT()          ;
 #else
 #define DPRINTF(args...) \
@@ -75,6 +77,7 @@ enum GAME_MODE {
     BDM_ILK_MODE,
     BDM_M4S_MODE,
     BDM_USB_MODE,
+    BDM_HDD_MODE,
     ETH_MODE,
     HDD_MODE,
 };

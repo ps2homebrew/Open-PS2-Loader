@@ -14,6 +14,8 @@ IMPORT_BIN2C(bdm_irx);
 
 IMPORT_BIN2C(bdm_cdvdman_irx);
 
+IMPORT_BIN2C(bdm_ata_cdvdman_irx);
+
 IMPORT_BIN2C(bdm_mcemu_irx);
 
 IMPORT_BIN2C(bdmevent_irx);

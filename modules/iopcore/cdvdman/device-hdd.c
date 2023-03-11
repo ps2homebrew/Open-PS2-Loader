@@ -108,19 +108,19 @@ void DeviceStop(void)
     // This will be handled by ATAD.
 }
 
-int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
+int DeviceReadSectors(u64 lsn, void *buffer, unsigned int sectors)
 {
     u32 offset = 0;
     while (sectors) {
-        if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)))))
-            if (cdvdman_get_part_specs(lsn) != 0)
+        if (!(((u32)lsn >= cdvdman_partspecs[CurrentPart].part_offset) && ((u32)lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)))))
+            if (cdvdman_get_part_specs((u32)lsn) != 0)
                 return SCECdErTRMOPN;
 
-        u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)) - lsn;
+        u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)) - (u32)lsn;
         if (sectors < nsectors)
             nsectors = sectors;
 
-        u32 lba = cdvdman_partspecs[CurrentPart].data_start + ((lsn - cdvdman_partspecs[CurrentPart].part_offset) << 2);
+        u32 lba = cdvdman_partspecs[CurrentPart].data_start + (((u32)lsn - cdvdman_partspecs[CurrentPart].part_offset) << 2);
         if (ata_device_sector_io(0, (void *)((u8 *)buffer + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
             return SCECdErREAD;
         }

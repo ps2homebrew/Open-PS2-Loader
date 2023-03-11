@@ -358,6 +358,7 @@ void sysExecExit(void)
 #define CORE_IRX_DECI2  0x40
 #define CORE_IRX_ILINK  0x80
 #define CORE_IRX_MX4SIO 0x100
+#define CORE_IRX_BDM    0x200
 
 typedef struct
 {
@@ -441,6 +442,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         modules |= CORE_IRX_MX4SIO;
     else if (!strcmp(mode_str, "ETH_MODE"))
         modules |= CORE_IRX_ETH | CORE_IRX_SMB;
+    else if (!strcmp(mode_str, "BDM_MASS_ATA_MODE"))
+        modules |= CORE_IRX_BDM | CORE_IRX_HDD;
     else
         modules |= CORE_IRX_HDD;
 
@@ -472,6 +475,13 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount].info = size_usbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
         irxptr_tab[modcount++].ptr = (void *)&usbd_irx;
     }
+    if (modules & CORE_IRX_BDM)
+    {
+        irxptr_tab[modcount].info = size_bdm_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_BDM);
+        irxptr_tab[modcount++].ptr = (void *)&bdm_irx;
+        irxptr_tab[modcount].info = size_bdmfs_fatfs_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_BDM_FAT);
+        irxptr_tab[modcount++].ptr = (void *)&bdmfs_fatfs_irx;
+    }
     if (modules & CORE_IRX_USB) {
         irxptr_tab[modcount].info = size_usbmass_bd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBMASSBD);
         irxptr_tab[modcount++].ptr = (void *)&usbmass_bd_irx;
@@ -491,6 +501,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount++].ptr = (void *)&smap_ingame_irx;
         irxptr_tab[modcount].info = size_ingame_smstcpip_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMSTCPIP);
         irxptr_tab[modcount++].ptr = (void *)&ingame_smstcpip_irx;
+        //irxptr_tab[modcount].info = size_smsutils_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMSUTILS);
+        //irxptr_tab[modcount++].ptr = (void *)&smsutils_irx;
     }
     if (modules & CORE_IRX_SMB) {
         irxptr_tab[modcount].info = size_smbinit_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMBINIT);

@@ -12,6 +12,9 @@
 #include "irx.h"
 
 /* Please keep these in alphabetical order!  */
+#ifdef USE_BDM_ATA____
+#include <bdm.h>
+#endif
 #include "dmacman.h"
 #include "intrman.h"
 #include "ioman.h"

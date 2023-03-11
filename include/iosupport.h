@@ -71,7 +71,7 @@ enum ERROR_CODE {
 
 #define COMPAT_MODE_COUNT 6 // only count modes in use
 
-#define OPL_MOD_STORAGE 0x00097000 //(default) Address of the module storage region
+#define OPL_MOD_STORAGE 0x000A0300 //(default) Address of the module storage region
 
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
 #define MENU_MIN_INACTIVE_FRAMES 8

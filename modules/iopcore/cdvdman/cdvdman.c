@@ -25,8 +25,8 @@ extern struct irx_export_table _exp_dev9;
 #endif
 
 // reader function interface, raw reader impementation by default
-int DeviceReadSectorsCached(u32 sector, void *buffer, unsigned int count);
-int (*DeviceReadSectorsPtr)(u32 sector, void *buffer, unsigned int count) = &DeviceReadSectors;
+int DeviceReadSectorsCached(u64 sector, void *buffer, unsigned int count);
+int (*DeviceReadSectorsPtr)(u64 sector, void *buffer, unsigned int count) = &DeviceReadSectors;
 
 // internal functions prototypes
 static void oplShutdown(int poff);
@@ -41,7 +41,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
 // Sector cache to improve IO
 static u8 MAX_SECTOR_CACHE = 0;
 static u8 *sector_cache = NULL;
-static int cur_sector = -1;
+static u64 cur_sector = 0xffffffffffffffff;
 
 struct cdvdman_cb_data
 {
@@ -170,10 +170,10 @@ void *ziso_alloc(u32 size)
   If we do a consecutive read of many ISO sectors we will have a huge amount of ZSO sectors ready.
   Therefore reducing IO access for ZSO files.
 */
-int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
+int DeviceReadSectorsCached(u64 lsn, void *buffer, unsigned int sectors)
 {
     if (sectors < MAX_SECTOR_CACHE) { // if MAX_SECTOR_CACHE is 0 then it will act as disabled and passthrough
-        if (cur_sector < 0 || lsn < cur_sector || (lsn + sectors) - cur_sector > MAX_SECTOR_CACHE) {
+        if (cur_sector == 0xffffffffffff || lsn < cur_sector || (lsn + sectors) - cur_sector > MAX_SECTOR_CACHE) {
             DeviceReadSectors(lsn, sector_cache, MAX_SECTOR_CACHE);
             cur_sector = lsn;
         }
@@ -193,11 +193,11 @@ int DeviceReadSectorsCached(u32 lsn, void *buffer, unsigned int sectors)
 int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
 {
     u32 o_size = size;
-    u32 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
+    u64 lba = offset / (2048 >> shift); // avoid overflow by shifting sector size instead of offset
     u32 pos = (offset << shift) & 2047; // doesn't matter if it overflows since we only care about the 11 LSB anyways
 
     // prevent caching if already reading into ZSO index cache
-    int (*ReadSectors)(u32 lsn, void *buffer, unsigned int sectors) = (addr == (u8 *)ziso_idx_cache) ? &DeviceReadSectors : &DeviceReadSectorsCached;
+    int (*ReadSectors)(u64 lsn, void *buffer, unsigned int sectors) = (addr == (u8 *)ziso_idx_cache) ? &DeviceReadSectors : &DeviceReadSectorsCached;
 
     // read first block if not aligned to sector size
     if (pos) {

@@ -192,6 +192,8 @@ int findGame(const char *gameid, cfg_t *item)
 int exportGame(const char *gameid)
 {
     cfg_t grecord;
+    FILE *fdest;
+    FILE *fsrc;
 
     // first try to load the game record with specified code
     if (!findGame(gameid, &grecord)) {
@@ -230,7 +232,7 @@ int exportGame(const char *gameid)
 
     printf("Game found in the ul.cfg. Resulting file name: '%s'\n", rname);
 
-    FILE *fdest = fopen(rname, "wb");
+    fdest = fopen(rname, "wb");
 
     if (!fdest) {
         printf("Could not open destination file '%s', exiting\n", rname);
@@ -245,7 +247,7 @@ int exportGame(const char *gameid)
 
         printf("Processing part %d/%d: '%s'...\n", part + 1, grecord.parts, sname);
 
-        FILE *fsrc = fopen(sname, "rb");
+      fsrc = fopen(sname, "rb");
 
         if (!fsrc) {
             fclose(fdest);

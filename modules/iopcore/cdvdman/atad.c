@@ -35,6 +35,7 @@
 #ifdef USE_BDM_ATA
 #include <bdm.h>
 #include <errno.h>
+#include "device.h"
 #endif
 
 //#define NETLOG_DEBUG
@@ -47,7 +48,7 @@ extern int netlog_inited;
 
 #ifdef DEV9_DEBUG
 #define M_PRINTF(format, args...) \
-    printf(MODNAME ": " format, ##args)
+    printf("atad: " format, ##args)
 #else
 #define M_PRINTF(format, args...) \
     do {                          \
@@ -203,7 +204,8 @@ int atad_start(void)
     g_ata_bd.flush = ata_bd_flush;
     g_ata_bd.stop  = ata_bd_stop;
 
-    bdm_connect_bd(&g_ata_bd);
+    // Let bdm device support handle registering the block device.
+    BdmDeviceSetBlockDevice(&g_ata_bd);
 
 #endif
 

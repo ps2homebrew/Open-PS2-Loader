@@ -28,7 +28,7 @@ RTL ?= 0
 IGS ?= 1
 
 #Enables/disables pad emulator
-PADEMU ?= 1
+PADEMU ?= 0
 
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 ?= 0

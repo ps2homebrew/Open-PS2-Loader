@@ -27,6 +27,8 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     unsigned int length_rounded, CommandLen, size_IOPRP_img, size_imgdrv_irx;
     char command[RESET_ARG_MAX + 1];
 
+    DPRINTF("ResetIopSpecial: (0x%08x) %s\n", args, args != NULL ? args : "(null)");
+
     if (arglen > 0) {
         strncpy(command, args, arglen);
         command[arglen] = '\0'; /* In a normal IOP reset process, the IOP reset command line will be NULL-terminated properly somewhere.
@@ -96,7 +98,6 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     DPRINTF("Loading extra IOP modules...\n");
 
 #ifdef __LOAD_DEBUG_MODULES
-    //LoadOPLModule(OPL_MODULE_ID_SMSUTILS, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
 #ifdef __DECI2_DEBUG
@@ -104,7 +105,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     LoadOPLModule(OPL_MODULE_ID_TIFINET, 0, 0, NULL);
 #else
     LoadOPLModule(OPL_MODULE_ID_UDPTTY, 0, 0, NULL);
-    LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
+    //LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
 #endif
 #endif
 
@@ -123,7 +124,6 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
             break;
         case ETH_MODE:
 #ifndef __LOAD_DEBUG_MODULES
-            //LoadOPLModule(OPL_MODULE_ID_SMSUTILS, 0, 0, NULL);
             LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
             LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
 #endif
@@ -139,7 +139,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
             LoadOPLModule(OPL_MODULE_ID_MX4SIOBD, 0, 0, NULL);
             break;
         case BDM_HDD_MODE:
-            //LoadOPLModule(OPL_MODULE_ID_BDM, 0, 0, NULL);
+            LoadOPLModule(OPL_MODULE_ID_BDM, 0, 0, NULL);
             LoadOPLModule(OPL_MODULE_ID_BDM_FAT, 0, 0, NULL);
             break;
     };
@@ -171,14 +171,18 @@ int New_Reset_Iop(const char *arg, int arglen)
     LoadFileInit();
     sbv_patch_enable_lmb();
 
-    ResetIopSpecial(NULL, 0);
-    if (EnableDebug)
-        GS_BGCOLOUR = 0x00A5FF; // Orange
+    
 
     if (arglen > 0) {
         ResetIopSpecial(&arg[10], arglen - 10);
         if (EnableDebug)
             GS_BGCOLOUR = 0x00FFFF; // Yellow
+    }
+    else
+    {
+        ResetIopSpecial(NULL, 0);
+        if (EnableDebug)
+            GS_BGCOLOUR = 0x00A5FF; // Orange
     }
 
     if (iop_reboot_count >= 2) {

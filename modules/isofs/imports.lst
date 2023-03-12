@@ -28,3 +28,7 @@ sysclib_IMPORTS_end
 sysmem_IMPORTS_start
 I_AllocSysMemory
 sysmem_IMPORTS_end
+
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end

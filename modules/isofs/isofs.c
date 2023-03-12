@@ -14,7 +14,7 @@
 #define MODNAME "isofs"
 IRX_ID(MODNAME, 1, 1);
 
-#define DPRINTF(args...) // printf(args)
+#define DPRINTF(args...) printf(args)
 
 struct dirTocEntry
 {

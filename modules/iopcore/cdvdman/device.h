@@ -8,3 +8,9 @@ void DeviceUnmount(void); // Called when OPL is shutting down.
 void DeviceStop(void);    // Called before the PS2 is to be shut down.
 
 int DeviceReadSectors(u64 lsn, void *buffer, unsigned int sectors);
+
+#ifdef USE_BDM_ATA
+struct block_device;
+
+void BdmDeviceSetBlockDevice(struct block_device *bd);
+#endif

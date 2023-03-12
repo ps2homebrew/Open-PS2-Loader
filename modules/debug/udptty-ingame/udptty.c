@@ -35,190 +35,7 @@ extern struct irx_export_table _exp_udptty;
 #define DEVNAME "tty"
 
 static int udp_socket;
-static int tty_sema = -1;
-
-static int tty_init(iop_device_t *device);
-static int tty_deinit(iop_device_t *device);
-static int tty_stdout_fd(void);
-static int tty_write(iop_file_t *file, void *buf, size_t size);
-static int tty_error(void);
-
-/* device ops */
-static iop_device_ops_t tty_ops = {
-    tty_init,
-    tty_deinit,
-    (void *)tty_error,
-    (void *)tty_stdout_fd,
-    (void *)tty_stdout_fd,
-    (void *)tty_error,
-    (void *)tty_write,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error,
-    (void *)tty_error};
-
-/* device descriptor */
-static iop_device_t tty_device = {
-    DEVNAME,
-    IOP_DT_CHAR | IOP_DT_CONS,
-    1,
-    "TTY via SMAP UDP",
-    &tty_ops};
-
-
-/* KPRTTY */
-#ifdef KPRTTY
-#define PRNT_IO_BEGIN 0x200
-#define PRNT_IO_END   0x201
-
-typedef struct _KprArg
-{
-    int eflag;
-    int bsize;
-    char *kpbuf;
-    int prpos;
-    int calls;
-} KprArg;
-
-static KprArg g_kprarg;
-
-#define KPR_BUFFER_SIZE 0x1000
-static char kprbuffer[KPR_BUFFER_SIZE];
-
-
-static void PrntFunc(void *common, int chr)
-{
-    KprArg *kpa = (KprArg *)common;
-
-    switch (chr) {
-        case 0:
-            break;
-        case PRNT_IO_BEGIN:
-            kpa->calls++;
-            break;
-        case PRNT_IO_END:
-            break;
-        case '\n':
-            PrntFunc(common, '\r');
-        default:
-            if (kpa->prpos < kpa->bsize)
-                kpa->kpbuf[kpa->prpos++] = chr;
-            break;
-    }
-}
-
-void *Kprnt(void *common, const char *format, void *arg)
-{
-    if (format)
-        prnt((print_callback_t)PrntFunc, common, format, arg);
-
-    return 0;
-}
-
-static void *Kprintf_Handler(void *common, const char *format, va_list ap)
-{
-    KprArg *kpa = (KprArg *)common;
-    void *res;
-
-    res = (void *)CpuInvokeInKmode(Kprnt, kpa, format, ap);
-
-    if (QueryIntrContext())
-        iSetEventFlag(kpa->eflag, 1);
-    else
-        SetEventFlag(kpa->eflag, 1);
-
-    return res;
-}
-
-static void KPRTTY_Thread(void *args)
-{
-    u32 flags;
-    KprArg *kpa = (KprArg *)args;
-
-    while (1) {
-        WaitEventFlag(kpa->eflag, 1, WEF_AND | WEF_CLEAR, &flags);
-
-        if (kpa->prpos) {
-            write(1, kpa->kpbuf, kpa->prpos);
-            kpa->prpos = 0;
-        }
-    }
-}
-
-static void kprtty_init(void)
-{
-    iop_event_t efp;
-    iop_thread_t thp;
-    KprArg *kpa;
-    int thid;
-
-    kpa = &g_kprarg;
-
-    efp.attr = EA_SINGLE;
-    efp.option = 0;
-    efp.bits = 0;
-
-    thp.attr = TH_C;
-    thp.option = 0;
-    thp.thread = (void *)KPRTTY_Thread;
-    thp.stacksize = 0x800;
-    thp.priority = 8;
-
-    kpa->eflag = CreateEventFlag(&efp);
-    kpa->bsize = KPR_BUFFER_SIZE;
-    kpa->kpbuf = kprbuffer;
-    kpa->prpos = 0;
-    kpa->calls = 0;
-
-    thid = CreateThread(&thp);
-    StartThread(thid, (void *)kpa);
-
-    KprintfSet((KprintfHandler_t *)Kprintf_Handler, (u32 *)kpa);
-}
-#endif
-
-int _start(int argc, char **argv)
-{
-    // register exports
-    RegisterLibraryEntries(&_exp_udptty);
-
-    // create the socket
-    udp_socket = lwip_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (udp_socket < 0)
-        return MODULE_NO_RESIDENT_END;
-
-    close(0);
-    close(1);
-    DelDrv(DEVNAME);
-
-    if (AddDrv(&tty_device) < 0)
-        return MODULE_NO_RESIDENT_END;
-
-    open(DEVNAME "00:", 0x1000 | O_RDWR);
-    open(DEVNAME "00:", O_WRONLY);
-
-    printf("UDPTTY loaded!\n");
-
-#ifdef KPRTTY
-    kprtty_init();
-    printf("KPRTTY enabled!\n");
-#endif
-
-    return MODULE_RESIDENT_END;
-}
-
-int _shutdown()
-{
-    lwip_close(udp_socket);
-
-    return 0;
-}
+static int g_uart_sema = -1;
 
 /* Copy the data into place, calculate the various checksums, and send the
    final packet.  */
@@ -226,8 +43,8 @@ static int udp_send(void *buf, size_t size)
 {
     struct sockaddr_in peer;
 
-    peer.sin_family = AF_INET;
-    peer.sin_port = htons(18194);
+    peer.sin_family      = AF_INET;
+    peer.sin_port        = htons(18194);
     peer.sin_addr.s_addr = inet_addr("255.255.255.255");
 
     lwip_sendto(udp_socket, buf, size, 0, (struct sockaddr *)&peer, sizeof(peer));
@@ -235,39 +52,209 @@ static int udp_send(void *buf, size_t size)
     return 0;
 }
 
-/* TTY driver.  */
-
-static int tty_init(iop_device_t *device)
+typedef struct _prnt_callback_context
 {
-    if ((tty_sema = CreateMutex(IOP_MUTEX_UNLOCKED)) < 0)
-        return -1;
+     short position;
+     char buffer[256];
+} PrntCallbackContext;
+
+void prnt_callback(PrntCallbackContext* context, int c)
+{
+     // Check for special case characters.
+     if (c == 0x200)
+     {
+          // Reset position.
+          context->position = 0;
+     }
+     else if (c == 0x201)
+     {
+          // Flush buffer.
+          if (context->position > 0)
+          {
+               udp_send(context->buffer, context->position);
+               context->position = 0;
+          }
+     }
+     else
+     {
+          // Check for new line/line feed.
+          if (c == 0xA)
+               prnt_callback(context, 0xD);
+          
+          // Store the character and flush buffer if needed.
+          context->buffer[context->position++] = (char)c;
+          if (context->position == 256)
+          {
+               udp_send(context->buffer, context->position);
+               context->position = 0;
+          }
+     }
+}
+
+void ac_printf(const char* format, ...)
+{
+     PrntCallbackContext prntContext;
+     va_list args;
+     
+     prntContext.position = 0;
+     
+     // Format the string and let our prnt callback flush it to rs232.
+     va_start(args, format);
+     WaitSema(g_uart_sema);
+     
+     prnt((void(*)(void*, int))prnt_callback, &prntContext, format, args);
+     
+     SignalSema(g_uart_sema);
+     va_end(args);
+}
+
+int ac_kprintf(void* context, const char* format, va_list ap)
+{
+     PrntCallbackContext prntContext;
+     
+     prntContext.position = 0;
+     
+     // Format the string and let our prnt callback flush it to rs232.
+     WaitSema(g_uart_sema);
+     int length = prnt((void(*)(void*, int))prnt_callback, &prntContext, format, ap);
+     SignalSema(g_uart_sema);
+     
+     return length;
+}
+
+void hook_printf()
+{
+     u32 patchIns[2];
+     int intrState;
+
+     // Calculate the target address of STDIO printf function.
+     u32* ptr = (u32*)&printf;
+     u32 printfAddress = ((u32)&ptr[1] & 0xF0000000) | ((ptr[0] & 0x3FFFFFF) << 2);
+
+     //ac_printf("printf import address: 0x%08x\n", (u32)ptr);
+     //ac_printf("printf address: 0x%08x\n", printfAddress);
+     //ac_printf("printf import ins: 0x%08x 0x%08x\n", ptr[0], ptr[1]);
+
+     // Setup the instructions to patch in.
+     patchIns[0] = 0x8000000 | (((u32)&ac_printf & 0xFFFFFFF) >> 2);       // j      <addr>
+     patchIns[1] = 0;                                                      // nop
+
+     //ac_printf("ac_printf address: 0x%08x\n", (u32)&ac_printf);
+     //ac_printf("hook instructions: 0x%08x 0x%08x\n", patchIns[0], patchIns[1]);
+
+     // Suspend interrupts while we patch in the new code.
+     CpuSuspendIntr(&intrState);
+
+     // Patch printf to jump to our hook.
+     u32* pPrintf = (u32*)printfAddress;
+     pPrintf[0] = patchIns[0];
+     pPrintf[1] = patchIns[1];
+
+     // Flush cache.
+     FlushIcache();
+     FlushDcache();
+
+     // Resume interrupts.
+     CpuResumeIntr(intrState);
+}
+
+int tty_noop()
+{
+     return 0;
+}
+
+int tty_write(iop_file_t*, void* buffer, int size)
+{
+     // Acquire the uart lock and write the message.
+     WaitSema(g_uart_sema);
+     udp_send(buffer, size);
+     SignalSema(g_uart_sema);
+     
+     return size;
+}
+
+iop_device_ops_t tty_dev_ops =
+{
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_write,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+     tty_noop,
+};
+
+/* device descriptor */
+static iop_device_t tty_device = {
+    DEVNAME,
+    IOP_DT_CHAR | IOP_DT_CONS,
+    1,
+    "TTY via SMAP UDP",
+    &tty_dev_ops,
+};
+
+int _start(int argc, char *argv[])
+{
+    (void)argc;
+    (void)argv;
+
+    // register exports
+    RegisterLibraryEntries(&_exp_udptty);
+
+    // Create a semaphore for uart writing that is initially signaled, this acts as a lock for
+     // multi-threaded write access.
+     if ((g_uart_sema = CreateMutex(IOP_MUTEX_UNLOCKED)) < 0)
+          return MODULE_NO_RESIDENT_END;
+
+    // create the socket
+    udp_socket = lwip_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (udp_socket < 0)
+        return MODULE_NO_RESIDENT_END;
+     
+     ac_printf("Hello from ACDBG!\n");
+     
+     // Close STDIN and STDOUT.
+     close(0);
+     close(1);
+     
+     // Delete the default tty device driver and replace it with our own that forwards printf to
+     // the arcade rs232 port.
+     DelDrv("tty");
+     AddDrv(&tty_device);
+     
+     // Re-open STDOUT and STDIN.
+     if (open("tty00:", FIO_O_RDWR) != 0)
+          ac_printf("STDIN file handle != 0!\n");
+     
+     if (open("tty00:", FIO_O_WRONLY) != 1)
+          ac_printf("STDOUT file handle != 1!\n");
+     
+     // Set our kprintf handler.
+     KprintfSet(ac_kprintf, NULL);
+
+     // Hook printf function in STDIO.
+     hook_printf();
+     
+     // Test STDOUT and kprintf.
+     printf("** (STDOUT) Hello from ACDBG!\n");
+     Kprintf("** (Kprintf) Hello from ACDBG!\n");
+     
+     return MODULE_RESIDENT_END;
+}
+
+int _shutdown()
+{
+    lwip_close(udp_socket);
 
     return 0;
-}
-
-static int tty_deinit(iop_device_t *device)
-{
-    DeleteSema(tty_sema);
-    return 0;
-}
-
-static int tty_stdout_fd(void)
-{
-    return 1;
-}
-
-static int tty_write(iop_file_t *file, void *buf, size_t size)
-{
-    int res = 0;
-
-    WaitSema(tty_sema);
-    res = udp_send(buf, size);
-    SignalSema(tty_sema);
-
-    return res;
-}
-
-static int tty_error(void)
-{
-    return -EIO;
 }

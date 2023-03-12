@@ -47,6 +47,7 @@ IOP_CFLAGS += -DBDM_DRIVER -DUSE_BDM_ATA
 IOP_LIBS += -L$(PS2SDK)/iop/lib -lbdm
 ifeq ($(IOPCORE_DEBUG),1)
 USE_DEV9 = 1
+IOP_CFLAGS += -DDEV9_DEBUG
 endif
 endif
 

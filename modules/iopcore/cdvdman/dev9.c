@@ -33,7 +33,7 @@ extern char atad_inited;
 
 #ifdef DEV9_DEBUG
 #define M_PRINTF(format, args...) \
-    printf(MODNAME ": " format, ##args)
+    printf("dev9: " format, ##args)
 #else
 #define M_PRINTF(format, args...) \
     do {                          \

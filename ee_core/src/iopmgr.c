@@ -105,7 +105,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     LoadOPLModule(OPL_MODULE_ID_TIFINET, 0, 0, NULL);
 #else
     LoadOPLModule(OPL_MODULE_ID_UDPTTY, 0, 0, NULL);
-    //LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
+    LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
 #endif
 #endif
 
@@ -150,9 +150,9 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 /*----------------------------------------------------------------*/
 int New_Reset_Iop(const char *arg, int arglen)
 {
-    DPRINTF("New_Reset_Iop start!\n");
     if (EnableDebug)
         GS_BGCOLOUR = 0xFF00FF; // Purple
+    DPRINTF("New_Reset_Iop start!\n");
 
     SifInitRpc(0);
 
@@ -171,18 +171,14 @@ int New_Reset_Iop(const char *arg, int arglen)
     LoadFileInit();
     sbv_patch_enable_lmb();
 
-    
+    ResetIopSpecial(NULL, 0);
+    if (EnableDebug)
+        GS_BGCOLOUR = 0x00A5FF; // Orange
 
     if (arglen > 0) {
         ResetIopSpecial(&arg[10], arglen - 10);
         if (EnableDebug)
             GS_BGCOLOUR = 0x00FFFF; // Yellow
-    }
-    else
-    {
-        ResetIopSpecial(NULL, 0);
-        if (EnableDebug)
-            GS_BGCOLOUR = 0x00A5FF; // Orange
     }
 
     if (iop_reboot_count >= 2) {

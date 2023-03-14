@@ -19,6 +19,10 @@
 #include "include/nbns.h"
 #include "httpclient.h"
 
+#ifdef __DEBUG
+#include "include/debug.h"
+#endif
+
 static char ethPrefix[40]; // Contains the full path to the folder where all the games are.
 static char *ethBase;
 static int ethULSizePrev = -2;
@@ -293,6 +297,12 @@ static int ethLoadModules(void)
                     sysLoadModuleBuffer(&httpclient_irx, size_httpclient_irx, 0, NULL);
                     ps2ip_init();
                     HttpInit();
+
+#ifdef __DEBUG
+                    LOG("ETHSUPPORT loading debugging modules...\n");
+                    debugApplyConfig();
+                    debugSetActive();
+#endif
 
                     LOG("ETHSUPPORT Modules loaded\n");
                     return 0;

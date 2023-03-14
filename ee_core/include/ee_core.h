@@ -24,7 +24,7 @@
 #ifdef __EESIO_DEBUG
 void ee_printf(const char* format, ...);
 
-#define DPRINTF(...) ee_printf(__VA_ARGS__)
+#define DPRINTF(...) //ee_printf(__VA_ARGS__)
 #define DINIT()          ;
 #else
 #define DPRINTF(args...) \

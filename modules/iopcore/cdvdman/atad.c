@@ -714,9 +714,9 @@ static int ata_bd_io_common(struct block_device* bd, u64 lba, void* buf, u16 nse
     int res = 0;
     
     // Setup the LBA parameters.
-    u16 sector = (u16)((u16)((lba >> 24) & 0xFF) | (u16)(lba & 0xFF));
-    u16 lcyl = (u16)((u16)((lba >> 32) & 0xFF) | (u16)((lba >> 8) & 0xFF));
-    u16 hcyl = (u16)((u16)((lba >> 40) & 0xFF) | (u16)((lba >> 16) & 0xFF));
+    u16 sector = (u16)((u16)((lba >> (24 - 8)) & 0xFF00) | (u16)(lba & 0xFF));
+    u16 lcyl = (u16)((u16)((lba >> (32 - 8)) & 0xFF00) | (u16)((lba >> 8) & 0xFF));
+    u16 hcyl = (u16)((u16)((lba >> (40 - 8)) & 0xFF00) | (u16)((lba >> 16) & 0xFF));
 
     u16 select  = (bd->devNr << 4) & 0xffff;
     u16 command = (dir == 1) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;

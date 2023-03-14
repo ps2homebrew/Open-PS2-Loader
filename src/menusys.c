@@ -336,7 +336,8 @@ void menuAppendItem(menu_item_t *item)
 {
     assert(item);
 
-    LOG("Appending menu item: %s\n", item->text);
+    item_list_t* pSupport = (item_list_t*)item->userdata;
+    LOG("Appending menu item: %s\n", pSupport->itemGetPrefix(pSupport));
 
     if (menu == NULL) {
         menu = AllocMenuItem(item);

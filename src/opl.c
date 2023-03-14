@@ -276,11 +276,13 @@ static void itemExecSelect(struct menu_item *curMenu)
 static void itemExecRefresh(struct menu_item *curMenu)
 {
     item_list_t *support = curMenu->userdata;
+    //LOG("itemExecRefresh for %s (0x%08x)\n", support->itemGetPrefix(support), support->owner);
 
     if (support && support->enabled) {
         ioPutRequest(IO_MENU_UPDATE_DEFFERED, support->owner);
         sfxPlay(SFX_CONFIRM);
     }
+    //LOG("itemExecRefresh exit\n");
 }
 
 static void itemExecCross(struct menu_item *curMenu)
@@ -391,6 +393,7 @@ void initSupport(item_list_t *itemList, int mode, int force_reinit)
     if (startMode) {
         if (!mod->support) {
             mod->support = itemList;
+            mod->support->owner = mod;
             initMenuForListSupport(mod);
         }
 
@@ -405,6 +408,9 @@ void initSupport(item_list_t *itemList, int mode, int force_reinit)
 
 static void initAllSupport(int force_reinit)
 {
+    // Load network modules before initializing device support so we have IOP debugging info if enabled.
+    ethLoadInitModules();
+
     // Init hdd and modules so when we enumerate mass devices we detect internal hdds using bdmfs.
     hddGetObject(1);
 
@@ -698,8 +704,11 @@ void menuDeferredUpdate(void *data)
     if (!mod->support)
         return;
 
+    //LOG("menuDeferredUpdate for %s\n", mod->support->itemGetPrefix(mod->support));
+
     // see if we have to update
     if (mod->support->itemNeedsUpdate(mod->support)) {
+        LOG("menuDeferredUpdate: updating game list...\n");
         updateMenuFromGameList(mod);
 
         // If other modes have been updated, then the apps list should be updated too.
@@ -1165,9 +1174,12 @@ void applyConfig(int themeID, int langID)
 
     bgmUnMute();
 
+/*
 #ifdef __DEBUG
     debugApplyConfig();
+    debugSetActive();
 #endif
+*/
 }
 
 int loadConfig(int types)
@@ -1935,7 +1947,8 @@ int main(int argc, char *argv[])
     init();
 
     // until this point in the code is reached, only PREINIT_LOG macro should be used
-    LOG_ENABLE();
+    //LOG_ENABLE();
+    ee_sio_start(38400, 0, 0, 0, 0);
 
     // queue deffered init which shuts down the intro screen later
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredInit);

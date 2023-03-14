@@ -58,6 +58,8 @@ void bdm_disconnect_bd(struct block_device *bd)
 // Event flags for sleeping while waiting for the block device fs mounting operations to complete.
 int bdm_ata_ef;
 
+void BdmDeviceMountedCallback(int event);
+
 // Note: When running in bdm ata mode we "delay load" the imports for bdm.irx. Cdvdman.irx can't import from bdm.irx without
 // changing the IOP reset procedure to make sure bdm.irx is loaded first (otherwise cdvdman.irx fails to resolve the imports and
 // thus fails to load). Making that change is more work than just delay loading the import addresses.
@@ -65,14 +67,19 @@ int bdm_ata_ef;
 void BdmDeviceSetBlockDevice(struct block_device *bd)
 {
     static void (*bdm_connect_bd_imp)(struct block_device *bd) = NULL;
+    static void (*bdm_RegisterCallback_imp)(bdm_cb cb) = NULL;
 
-    if (bdm_connect_bd_imp == NULL)
+    if (bdm_connect_bd_imp == NULL || bdm_RegisterCallback_imp == NULL)
     {
         // Get the module info for bdm and resolve the import address.
         modinfo_t bdmInfo;
         if (getModInfo("bdm\0\0\0\0\0", &bdmInfo) == 1)
         {
             bdm_connect_bd_imp = (void(*)(struct block_device*))bdmInfo.exports[4];
+            bdm_RegisterCallback_imp = (void (*)(bdm_cb))bdmInfo.exports[9];
+
+            // Register our callback handler to get alerted when devices are mounted.
+            bdm_RegisterCallback_imp(BdmDeviceMountedCallback);
         }
         else
         {
@@ -89,6 +96,8 @@ int BdmFindTargetBlockDevice(int devNum, int partNum)
     struct block_device* pBlockDevices[10] = { 0 };
 
     static void (*bdm_get_bd_imp)(struct block_device **pbd, unsigned int count) = NULL;
+
+    DPRINTF("BdmFindTargetBlockDevice start\n");
 
     if (bdm_get_bd_imp == NULL)
     {
@@ -121,8 +130,17 @@ int BdmFindTargetBlockDevice(int devNum, int partNum)
         }
     }
 
+    DPRINTF("BdmFindTargetBlockDevice device not found\n");
+
     // Target device not found.
     return 0;
+}
+
+void BdmDeviceMountedCallback(int event)
+{
+    BdmFindTargetBlockDevice(0, 2);
+
+    //SetEventFlag(bdm_ata_ef, 1);
 }
 
 unsigned int BdmFindDeviceSleepCallback(void *arg)
@@ -198,7 +216,9 @@ void DeviceFSInit(void)
     atad_start();
 
     DPRINTF("After atad_start()\n");
+    //WaitEventFlag(bdm_ata_ef, 1, WEF_AND, NULL);
 
+/*
     // Scan the block devices mounted and find the one the game ISO is on.
     while (BdmFindTargetBlockDevice(0, 2) == 0)
     {
@@ -206,12 +226,12 @@ void DeviceFSInit(void)
         TargetTime.lo = 100000;
 
         // Sleep for 1000 (msec?) and then check if the fs init operations have completed.
-        ClearEventFlag(bdm_ata_ef, 1);
-        SetAlarm(&TargetTime, &BdmFindDeviceSleepCallback, NULL);
+        //ClearEventFlag(bdm_ata_ef, 1);
+        //SetAlarm(&TargetTime, &BdmFindDeviceSleepCallback, NULL);
 
         DPRINTF("DeviceFSInit: fs init not ready yet...\n");
-        WaitEventFlag(bdm_ata_ef, 1, WEF_AND, NULL);
-    }
+        //WaitEventFlag(bdm_ata_ef, 1, WEF_AND, NULL);
+    }*/
 
     // TODO: there's more cdvdman init stuff after this in device-hdd.c...
     DPRINTF("DiskType=%d Layer1Start=0x%08x\n", cdvdman_settings.common.media, cdvdman_settings.common.layer1_start);

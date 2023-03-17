@@ -91,7 +91,7 @@ void BdmDeviceSetBlockDevice(struct block_device *bd)
     bdm_connect_bd_imp(bd);
 }
 
-int BdmFindTargetBlockDevice(int devNum, int partNum)
+int BdmFindTargetBlockDevice(int devNum)
 {
     struct block_device* pBlockDevices[10] = { 0 };
 
@@ -118,9 +118,9 @@ int BdmFindTargetBlockDevice(int devNum, int partNum)
     bdm_get_bd_imp(pBlockDevices, 10);
     for (int i = 0; i < 10; i++)
     {
-        if (pBlockDevices[i] != NULL && pBlockDevices[i]->devNr == devNum && pBlockDevices[i]->parNr == partNum)
+        if (pBlockDevices[i] != NULL && pBlockDevices[i]->devNr == devNum)
         {
-            DPRINTF("BdmFindTargetBlockDevice: using device %s%dp%d\n", pBlockDevices[i]->name, pBlockDevices[i]->devNr, pBlockDevices[i]->parNr);
+            DPRINTF("BdmFindTargetBlockDevice: using device %s%d\n", pBlockDevices[i]->name, pBlockDevices[i]->devNr);
             
             g_bd = pBlockDevices[i];
             g_bd_sectors_per_sector = (2048 / pBlockDevices[i]->sectorSize);
@@ -138,9 +138,7 @@ int BdmFindTargetBlockDevice(int devNum, int partNum)
 
 void BdmDeviceMountedCallback(int event)
 {
-    BdmFindTargetBlockDevice(0, 2);
-
-    //SetEventFlag(bdm_ata_ef, 1);
+    BdmFindTargetBlockDevice(cdvdman_settings.bdDeviceId);
 }
 
 unsigned int BdmFindDeviceSleepCallback(void *arg)
@@ -214,24 +212,6 @@ void DeviceFSInit(void)
     // Atad cannot be initialized in DeviceInit because bdm.irx is not yet loaded and it will fail to register the HDD as
     // a block device. Now that bdm.irx has been loaded, run atad init.
     atad_start();
-
-    DPRINTF("After atad_start()\n");
-    //WaitEventFlag(bdm_ata_ef, 1, WEF_AND, NULL);
-
-/*
-    // Scan the block devices mounted and find the one the game ISO is on.
-    while (BdmFindTargetBlockDevice(0, 2) == 0)
-    {
-        iop_sys_clock_t TargetTime;
-        TargetTime.lo = 100000;
-
-        // Sleep for 1000 (msec?) and then check if the fs init operations have completed.
-        //ClearEventFlag(bdm_ata_ef, 1);
-        //SetAlarm(&TargetTime, &BdmFindDeviceSleepCallback, NULL);
-
-        DPRINTF("DeviceFSInit: fs init not ready yet...\n");
-        //WaitEventFlag(bdm_ata_ef, 1, WEF_AND, NULL);
-    }*/
 
     // TODO: there's more cdvdman init stuff after this in device-hdd.c...
     DPRINTF("DiskType=%d Layer1Start=0x%08x\n", cdvdman_settings.common.media, cdvdman_settings.common.layer1_start);

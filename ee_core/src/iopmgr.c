@@ -140,7 +140,6 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
             break;
         case BDM_HDD_MODE:
             LoadOPLModule(OPL_MODULE_ID_BDM, 0, 0, NULL);
-            LoadOPLModule(OPL_MODULE_ID_BDM_FAT, 0, 0, NULL);
             break;
     };
 }

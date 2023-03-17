@@ -70,6 +70,7 @@
 .globl  Hook_Exit
 .globl  CleanExecPS2
 .globl  iResetEE
+.globl  print
 
 /*
  * _SifSetDma: function designed to use our own stack during IOP reboot trap
@@ -459,5 +460,13 @@ iResetEE:
     jr      $ra
     nop
 .end iResetEE
+
+.ent print
+print:
+    li      $v1, __NR__print
+    syscall
+    jr      $ra
+    nop
+.end print
 
 .set pop

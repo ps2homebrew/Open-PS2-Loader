@@ -247,9 +247,15 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
 {
     register int ret;
 
+    // Some irx modules (like LIBSD.IRX in Tony Hawk's Pro Skater 4) will suspend interrupts before calling RegisterLibraryEntries.
+    // This causes issues if mcemu is built with debug output enabled and will hang the IOP when calling DPRINTF. To work around this
+    // don't use DPRINTF/printf in this function else you know for sure the calling module did not suspend interrupts before calling
+    // RegisterLibraryEntries.
+
     if (!strcmp(lib->name, "sio2man")) {
         ret = pRegisterLibraryEntires(lib);
         if (ret == 0) {
+            DPRINTF("Hooking sio2man...\n");
             ReleaseLibraryEntries((struct irx_export_table *)lib);
             /* hooking SIO2MAN's routines */
             InstallSio2manHook(&lib[1], GetExportTableSize(&lib[1]) >= 61);
@@ -260,6 +266,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
     } else if (!strcmp(lib->name, "secrman")) {
         ret = pRegisterLibraryEntires(lib);
         if (ret == 0) {
+            DPRINTF("Hooking secrman...\n");
             ReleaseLibraryEntries((struct irx_export_table *)lib);
             /* hooking the SecrAuthCard() calls */
             InstallSecrmanHook(&lib[1]);
@@ -270,6 +277,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
     } else if (!strcmp(lib->name, "mcman")) {
         ret = pRegisterLibraryEntires(lib);
         if (ret == 0) {
+            DPRINTF("Hooking mcman...\n");
             ReleaseLibraryEntries((struct irx_export_table *)lib);
             /* hooking MCMAN's sceMcReadFast() & sceMcWriteFast() calls */
             if (lib->version >= 0x208)
@@ -283,8 +291,6 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
         pademu_hookSio2man = GetExportEntry(&lib[1], 4);
 #endif
     }
-
-    DPRINTF("registering library %s\n", lib->name);
 
     return pRegisterLibraryEntires(lib);
 }

@@ -17,6 +17,8 @@
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
 
+#define U64_2XU32(val)  ((u32*)val)[1], ((u32*)val)[0]
+
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
 
@@ -238,7 +240,7 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
     int i, fd, index, compatmask = 0;
     int EnablePS2Logo = 0;
     int result;
-    unsigned int start;
+    u64 startingLBA;
     unsigned int startCluster;
     char partname[256], filename[32];
     base_game_info_t *game;
@@ -273,16 +275,19 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
                 sprintf(vmc_path, "%sVMC/%s.bin", pDeviceData->bdmPrefix, vmc_name);
 
                 fd = open(vmc_path, O_RDONLY);
-                if (fd >= 0) {
-                    if ((start = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, vmc_path)) != 0 && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
-
+                if (fd >= 0)
+                {
+                    // Get the absolute LBA of the VMC file and starting cluster number.
+                    if (fileXioIoctl2(fd, USBMASS_IOCTL_GET_LBA, NULL, 0, &startingLBA, sizeof(startingLBA)) == 0 && 
+                        (startCluster = fileXioIoctl2(fd, USBMASS_IOCTL_GET_CLUSTER, NULL, 0, NULL, 0)) != 0)
+                    {
                         // Check VMC cluster chain for fragmentation (write operation can cause damage to the filesystem).
                         if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") == 1) {
                             LOG("BDMSUPPORT Cluster Chain OK\n");
                             have_error = 0;
                             bdm_vmc_infos.active = 1;
-                            bdm_vmc_infos.start_sector = start;
-                            LOG("BDMSUPPORT VMC slot %d start: 0x%X\n", vmc_id, start);
+                            bdm_vmc_infos.start_sector = startingLBA;
+                            LOG("BDMSUPPORT VMC slot %d start: 0x%08x%08x\n", vmc_id, U64_2XU32(&startingLBA));
                         } else {
                             LOG("BDMSUPPORT Cluster Chain NG\n");
                             have_error = 2;
@@ -433,6 +438,7 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
         gAutoLaunchBDMGame = NULL;
     }
 
+    settings->bdDeviceId = pDeviceData->massDeviceIndex;
     if (!strcmp(pDeviceData->bdmDriver, "usb")) {
         settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
         sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
@@ -577,7 +583,6 @@ void bdmEnumerateDevices()
             // Setup the per-device data.
             bdm_device_data_t* pDeviceData = (bdm_device_data_t*)malloc(sizeof(bdm_device_data_t));
             memset(pDeviceData, 0, sizeof(bdm_device_data_t));
-            pDeviceData->massDeviceIndex = i;
             pDeviceData->bdmULSizePrev = -2;
             pDeviceSupport->priv = pDeviceData;
 
@@ -588,6 +593,7 @@ void bdmEnumerateDevices()
 
             // Get the name of the underlying device driver that backs the fat fs.
             fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, NULL, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
+            fileXioIoctl2(dir, BDM_GET_DEVICE_INDEX, NULL, NULL, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
 
             LOG("Mass device: %d %s -> %s\n", i, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
 

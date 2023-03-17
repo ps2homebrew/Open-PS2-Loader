@@ -34,7 +34,6 @@ enum OPL_MODULE_ID {
 
     // BDM modules
     OPL_MODULE_ID_BDM,
-    OPL_MODULE_ID_BDM_FAT,
 
     // Special patches
     OPL_MODULE_ID_IOP_PATCH,

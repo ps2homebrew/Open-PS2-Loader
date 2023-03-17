@@ -10,7 +10,7 @@
 typedef struct
 {
     int active;       /* Activation flag */
-    u32 start_sector; /* Start sector of vmc file */
+    u64 start_sector; /* Start sector of vmc file */
     int flags;        /* Card flag */
     vmc_spec_t specs; /* Card specifications */
 } bdm_vmc_infos_t;
@@ -19,7 +19,7 @@ typedef struct
 
 typedef struct
 {
-    int massDeviceIndex;            // Device index, mass0 = 0, mass1 = 1, etc
+    int massDeviceIndex;            // Underlying device index backing the mass fs partition, ex: usb0 = 0, usb1 = 1, ata master = 0, ata slave = 1, etc.
     char bdmPrefix[40];             // Contains the full path to the folder where all the games are.
     int bdmULSizePrev;
     time_t bdmModifiedCDPrev;

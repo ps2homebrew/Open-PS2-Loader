@@ -7,6 +7,8 @@
 
 #include "mcemu.h"
 
+#define U64_2XU32(val)  ((u32*)val)[1], ((u32*)val)[0]
+
 int mc_configure(MemoryCard *mcds)
 {
     register int i;
@@ -22,6 +24,10 @@ int mc_configure(MemoryCard *mcds)
         DPRINTF("vmcSpec[%d].cspec.PageSize  = 0x%X\n", i, vmcSpec[i].cspec.PageSize);
         DPRINTF("vmcSpec[%d].cspec.BlockSize = 0x%X\n", i, vmcSpec[i].cspec.BlockSize);
         DPRINTF("vmcSpec[%d].cspec.CardSize  = 0x%X\n", i, (unsigned int)vmcSpec[i].cspec.CardSize);
+
+#ifdef BDM_DRIVER
+        DPRINTF("vmcSpec[%d].stsec           = 0x%08x%08x\n", i, U64_2XU32(&vmcSpec[i].stsec));
+#endif
 
         if (vmcSpec[i].active == 1) {
             // Set virtual memorycard informations

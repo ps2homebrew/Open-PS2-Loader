@@ -479,8 +479,6 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     {
         irxptr_tab[modcount].info = size_bdm_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_BDM);
         irxptr_tab[modcount++].ptr = (void *)&bdm_irx;
-        irxptr_tab[modcount].info = size_bdmfs_fatfs_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_BDM_FAT);
-        irxptr_tab[modcount++].ptr = (void *)&bdmfs_fatfs_irx;
     }
     if (modules & CORE_IRX_USB) {
         irxptr_tab[modcount].info = size_usbmass_bd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBMASSBD);

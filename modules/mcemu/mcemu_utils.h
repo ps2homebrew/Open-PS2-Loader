@@ -41,10 +41,10 @@ int oplRegisterShutdownCallback(oplShutdownCb_t cb);
 /* BDM Transfer Imports */
 #ifdef BDM_DRIVER
 
-void bdm_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer);
+void bdm_readSector(u64 lba, unsigned short int nsectors, unsigned char *buffer);
 #define I_bdm_readSector DECLARE_IMPORT(6, bdm_readSector)
 
-void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer);
+void bdm_writeSector(u64 lba, unsigned short int nsectors, const unsigned char *buffer);
 #define I_bdm_writeSector DECLARE_IMPORT(7, bdm_writeSector)
 
 #endif

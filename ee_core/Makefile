@@ -28,8 +28,6 @@ EESIO_DEBUG=1
 
 ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
-	EE_OBJS += debug.o
-	EE_LIBS += -lc_nano -lcglue
 endif
 
 ifeq ($(DTL_T10000),1)

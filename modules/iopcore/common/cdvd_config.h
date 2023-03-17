@@ -80,6 +80,9 @@ struct cdvdman_settings_bdm
 
     // Fragment table, containing the fragments of all files
     bd_fragment_t frags[BDM_MAX_FRAGS];
+
+    // Device ID of the block device to bind to.
+    u32 bdDeviceId;
 } __attribute__((packed));
 
 #define CDVDMAN_SETTINGS_DEFAULT_COMMON                    \

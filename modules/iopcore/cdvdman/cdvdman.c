@@ -232,9 +232,9 @@ int read_raw_data(u8 *addr, u32 size, u32 offset, u32 shift)
     return o_size - size;
 }
 
-int DeviceReadSectorsCompressed(u32 lsn, void *addr, unsigned int count)
+int DeviceReadSectorsCompressed(u64 lsn, void *addr, unsigned int count)
 {
-    return (ziso_read_sector(addr, lsn, count) == count) ? SCECdErNO : SCECdErEOM;
+    return (ziso_read_sector(addr, (u32)lsn, count) == count) ? SCECdErNO : SCECdErEOM;
 }
 
 static int probed = 0;

@@ -55,6 +55,8 @@ extern int netlog_inited;
     } while (0)
 #endif
 
+#define U64_2XU32(val)  ((u32*)val)[1], ((u32*)val)[0]
+
 #define BANNER  "ATA device driver %s - Copyright (c) 2003 Marcus R. Brown\n"
 #define VERSION "v1.2"
 
@@ -717,6 +719,8 @@ static int ata_bd_io_common(struct block_device* bd, u64 lba, void* buf, u16 nse
     u16 sector = (u16)((u16)((lba >> (24 - 8)) & 0xFF00) | (u16)(lba & 0xFF));
     u16 lcyl = (u16)((u16)((lba >> (32 - 8)) & 0xFF00) | (u16)((lba >> 8) & 0xFF));
     u16 hcyl = (u16)((u16)((lba >> (40 - 8)) & 0xFF00) | (u16)((lba >> 16) & 0xFF));
+
+    //M_PRINTF("ata_bd_io_common: lba=0x%08x%08x sector=0x%04x lcyl=0x%04x hcyl=0x%04x\n", U64_2XU32(&lba), sector, lcyl, hcyl);
 
     u16 select  = (bd->devNr << 4) & 0xffff;
     u16 command = (dir == 1) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;

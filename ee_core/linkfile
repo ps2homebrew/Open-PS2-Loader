@@ -15,8 +15,8 @@ ENTRY(_start);
 
 MEMORY {
 	ram84	: ORIGIN = 0x00084000, LENGTH = 114688 /* 0x00084000 - 0x000A0000: free */
-	stack	: ORIGIN = 0x000A0000, LENGTH = 768   /* 0x000A0000 - 0x000A0200: free */
-	modules	: ORIGIN = 0x000A0300, LENGTH = 195840  /* 0x000A0200 - 0x000D0000: free */
+	stack	: ORIGIN = 0x000A0000, LENGTH = 512   /* 0x000A0000 - 0x000A0200: free */
+	modules	: ORIGIN = 0x000A0200, LENGTH = 196096  /* 0x000A0200 - 0x000D0000: free */
 	ramD0	: ORIGIN = 0x000D0000, LENGTH = 192K  /* 0x000D0000 - 0x00100000: usually free, but some games use it. */
 }
 
@@ -106,7 +106,7 @@ SECTIONS {
 	/* Symbols needed by crt0.s.  */
 	PROVIDE(_heap_size = -1);
 	PROVIDE(_stack = .);
-	PROVIDE(_stack_size = 0x000A0300 - _stack);	/* Any remaining space up to the module storage region, is available for the stack. */
+	PROVIDE(_stack_size = 0x00097000 - _stack);	/* Any remaining space up to the module storage region, is available for the stack. */
 
 	_end = _stack + _stack_size ;
 	PROVIDE(end = _end);

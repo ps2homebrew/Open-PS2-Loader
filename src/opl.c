@@ -1947,8 +1947,7 @@ int main(int argc, char *argv[])
     init();
 
     // until this point in the code is reached, only PREINIT_LOG macro should be used
-    //LOG_ENABLE();
-    ee_sio_start(38400, 0, 0, 0, 0);
+    LOG_ENABLE();
 
     // queue deffered init which shuts down the intro screen later
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredInit);

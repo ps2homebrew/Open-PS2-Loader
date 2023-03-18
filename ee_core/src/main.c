@@ -18,6 +18,9 @@
 void *ModStorageStart, *ModStorageEnd;
 void *eeloadCopy, *initUserMemory;
 
+// Address of the printf function in EE kernel memory. Can only be called while in kernel mode or the EE will hang.
+void (*krnl_print)(const char* format, ...) = NULL;
+
 int isInit = 0;
 
 // Global data
@@ -53,8 +56,6 @@ DISABLE_EXTRA_TIMERS_FUNCTIONS(); // Disable the extra functionalities for timer
 
 void eecoreDebugInit()
 {
-    void (*ee_printf)(const char* format, ...) = NULL;
-
      // Get the address of ResetEE so we can find where printf is located.
      u32* resetEEAddress = (u32*)GetSyscallHandler(__NR_ResetEE);
      
@@ -67,15 +68,15 @@ void eecoreDebugInit()
           if ((jalPrintf & 0xFC000000) == 0xC000000)
           {
                // Get the call target which is the address of printf.
-               ee_printf = (void(*)(const char*, ...))(0x80000000 + ((jalPrintf & 0x3FFFFFF) << 2));
+               krnl_print = (void(*)(const char*, ...))(0x80000000 + ((jalPrintf & 0x3FFFFFF) << 2));
                break;
           }
      }
      ee_kmode_exit();
 
      // If we found the printf function address re-enable the printf syscall.
-     if (ee_printf != NULL)
-        SetSyscall(__NR__print, ee_printf);
+     if (krnl_print != NULL)
+        SetSyscall(__NR__print, krnl_print);
 }
 
 static int eecoreInit(int argc, char **argv)

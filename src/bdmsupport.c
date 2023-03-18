@@ -592,8 +592,8 @@ void bdmEnumerateDevices()
                 snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:", i);
 
             // Get the name of the underlying device driver that backs the fat fs.
-            fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, NULL, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
-            fileXioIoctl2(dir, BDM_GET_DEVICE_INDEX, NULL, NULL, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
+            fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
+            fileXioIoctl2(dir, BDM_GET_DEVICE_INDEX, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
 
             LOG("Mass device: %d %s -> %s\n", i, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
 

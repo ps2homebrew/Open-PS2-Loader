@@ -237,10 +237,9 @@ void hddLoadModules(void)
 
         ret = fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
         if (ret == -ENOENT) {
-            // nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
             // Attempt to create the partition.
-            //if ((hddCreateOPLPartition(gOPLPart)) >= 0)
-            //    fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
+            if ((hddCreateOPLPartition(gOPLPart)) >= 0)
+                fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
         }
 
         if (gOPLPart[5] != '+') {

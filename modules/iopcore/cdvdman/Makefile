@@ -54,7 +54,7 @@ endif
 IOP_INCS += -I../common
 
 ifeq ($(IOPCORE_DEBUG),1)
-IOP_CFLAGS += -D__IOPCORE_DEBUG
+IOP_CFLAGS += -D__IOPCORE_DEBUG -Wno-strict-aliasing
 endif
 
 ifeq ($(USE_DEV9),1)

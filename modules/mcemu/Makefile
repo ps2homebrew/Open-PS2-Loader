@@ -22,7 +22,7 @@ IOP_CFLAGS += -DBDM_DRIVER
 endif
 
 ifeq ($(IOPCORE_DEBUG),1)
-IOP_CFLAGS += -DDEBUG
+IOP_CFLAGS += -DDEBUG -Wno-strict-aliasing
 endif
 
 ifeq ($(PADEMU),1)

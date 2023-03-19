@@ -129,7 +129,10 @@ int usb_connect(int devId)
         ds34pad[pad].type = DS3;
         epCount = interface->bNumEndpoints - 1;
     } else if (device->idProduct == GUITAR_HERO_PS3_PID) {
-        ds34pad[pad].type = GUITAR;
+        ds34pad[pad].type = GUITAR_GH;
+        epCount = interface->bNumEndpoints - 1;
+    } else if (device->idProduct == ROCK_BAND_PS3_PID) {
+        ds34pad[pad].type = GUITAR_RB;
         epCount = interface->bNumEndpoints - 1;
     } else {
         ds34pad[pad].type = DS4;
@@ -268,12 +271,12 @@ static void DS3USB_init(int pad)
 static void readReport(u8 *data, int pad_idx)
 {
     ds34usb_device *pad = &ds34pad[pad_idx];
-    if (pad->type == GUITAR) {
+    if (pad->type == GUITAR_GH || pad->type == GUITAR_RB) {
         struct ds3guitarreport *report;
 
         report = (struct ds3guitarreport *)data;
 
-        translate_pad_guitar(report, &pad->ds2);
+        translate_pad_guitar(report, &pad->ds2, pad->type == GUITAR_GH);
         padMacroPerform(&pad->ds2, report->PSButton);
     }
     if (data[0]) {
@@ -516,7 +519,7 @@ int ds34usb_get_model(int port)
     int ret;
 
     WaitSema(ds34pad[port].sema);
-    if (ds34pad[port].type == GUITAR) {
+    if (ds34pad[port].type == GUITAR_GH || ds34pad[port].type == GUITAR_RB) {
         ret = MODEL_GUITAR;
     } else {
         ret = MODEL_PS2;

@@ -201,27 +201,16 @@ struct ds3guitarreport
     uint8_t : 8;
     uint8_t Whammy; // Whammy axis 0 - 255, 128 is mid
     uint8_t : 8;
-    uint8_t Reserved2[4];     // Unknown
-    uint8_t PressureUp;       // digital Pad Up button Pressure 0 - 255
-    uint8_t PressureRight;    // digital Pad Right button Pressure 0 - 255
-    uint8_t PressureDown;     // digital Pad Down button Pressure 0 - 255
-    uint8_t PressureLeft;     // digital Pad Left button Pressure 0 - 255
-    uint8_t PressureL2;       // digital Pad L2 button Pressure 0 - 255
-    uint8_t PressureR2;       // digital Pad R2 button Pressure 0 - 255
-    uint8_t PressureL1;       // digital Pad L1 button Pressure 0 - 255
-    uint8_t PressureR1;       // digital Pad R1 button Pressure 0 - 255
-    uint8_t PressureTriangle; // digital Pad Triangle button Pressure 0 - 255
-    uint8_t PressureCircle;   // digital Pad Circle button Pressure 0 - 255
-    uint8_t PressureCross;    // digital Pad Cross button Pressure 0 - 255
-    uint8_t PressureSquare;   // digital Pad Square button Pressure 0 - 255
-    uint8_t Reserved3[3];     // Unknown
-    uint8_t Charge;           // charging status ? 02 = charge, 03 = normal
-    uint8_t Power;            // Battery status ? 05=full - 02=dying, 01=just before shutdown, EE=charging
-    uint8_t Connection;       // Connection Type ? 14 when operating by bluetooth, 10 when operating by bluetooth with cable plugged in, 16 when bluetooh and rumble
-    uint8_t Reserved4[9];     // Unknown
+    uint8_t PressureRightYellow; // digital Pad Right + Yellow button Pressure 0 - 255 (if both are pressed, then they cancel eachother out)
+    uint8_t PressureLeft;        // digital Pad Left button Pressure 0 - 255
+    uint8_t PressureUpGreen;     // digital Pad Up + Green button Pressure 0 - 255 (if both are pressed, then they cancel eachother out)
+    uint8_t PressureDownOrange;  // digital Pad Down + Orange button Pressure 0 - 255 (if both are pressed, then they cancel eachother out)
+    uint8_t PressureBlue;        // digital Pad Blue button Pressure 0 - 255
+    uint8_t PressureRed;         // digital Pad Red button Pressure 0 - 255
+    uint8_t Reserved3[6];        // Unknown
     int16_t AccelX;
-    int16_t AccelY;
     int16_t AccelZ;
+    int16_t AccelY;
     int16_t GyroZ;
 
 } __attribute__((packed));

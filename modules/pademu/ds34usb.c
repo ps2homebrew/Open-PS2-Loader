@@ -83,7 +83,7 @@ int usb_probe(int devId)
         return 0;
     }
 
-    if (device->idVendor == SONY_VID && device->idProduct == GUITAR_HERO_PS3_PID) {
+    if (device->idVendor == SONY_VID && (device->idProduct == GUITAR_HERO_PS3_PID || device->idProduct == ROCK_BAND_PS3_PID)) {
         return 1;
     }
 

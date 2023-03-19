@@ -12,6 +12,7 @@
 #define DS4_PID             0x05C4 // PS4 Controller
 #define DS4_PID_SLIM        0x09CC // PS4 Slim Controller
 #define GUITAR_HERO_PS3_PID 0x0100 // PS3 Guitar Hero Guitar
+#define ROCK_BAND_PS3_PID   0x0200 // PS3 Rock Band Guitar
 
 // NOTE: struct member prefixed with "n" means it's active-low (i.e. value of 0 indicates button is pressed, value 1 is released)
 enum DS2ButtonBitNumber {
@@ -294,8 +295,9 @@ void translate_pad_ds3(const struct ds3report *in, struct ds2report *out, uint8_
  * Translate PS3 Guitar pad data into DS2 Guitar pad data.
  * @param in PS3 Guitar report
  * @param out PS2 Guitar report
+ * @param guitar_hero_format set to 1 if this is a guitar hero guitar, set to 0 if this is a rock band guitar
  */
-void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out);
+void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out, uint8_t guitar_hero_format);
 
 /**
  * Translate DS3 pad data into DS2 pad data.

@@ -5,9 +5,10 @@
 
 #include <ds34common.h>
 
-#define DS3    0
-#define DS4    1
-#define GUITAR 2
+#define DS3       0
+#define DS4       1
+#define GUITAR_GH 2
+#define GUITAR_RB 2
 
 #define MODEL_GUITAR 1
 #define MODEL_PS2    3

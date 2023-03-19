@@ -408,8 +408,12 @@ void initSupport(item_list_t *itemList, int mode, int force_reinit)
 
 static void initAllSupport(int force_reinit)
 {
+#ifdef __INGAME_DEBUG
+#ifndef _DTL_T10000
     // Load network modules before initializing device support so we have IOP debugging info if enabled.
     ethLoadInitModules();
+#endif
+#endif
 
     // Init hdd and modules so when we enumerate mass devices we detect internal hdds using bdmfs.
     hddGetObject(1);
@@ -431,7 +435,7 @@ static void deinitAllSupport(int exception, int modeSelected)
                 continue;
 
             // If the selected device is a mass device and it's backed by the ATA drivers skip unloading them as well.
-            if (i == HDD_MODE && (modeSelected >= BDM_MODE && modeSelected <= BDM_MODE4 && i <= BDM_MODE4))
+            if (i == HDD_MODE && (modeSelected >= BDM_MODE && modeSelected <= BDM_MODE4))
             {
                 bdm_device_data_t* pDeviceData = list_support[modeSelected].support->priv;
                 if (strncmp(pDeviceData->bdmDriver, "ata", 3) == 0)

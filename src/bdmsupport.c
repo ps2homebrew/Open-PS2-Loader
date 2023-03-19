@@ -430,7 +430,7 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
         strcpy(filename, game->startup);
 
     if (gAutoLaunchBDMGame == NULL)
-        deinit(NO_EXCEPTION, BDM_MODE); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
+        deinit(NO_EXCEPTION, pItemList->mode); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
     else {
         miniDeinit(configSet);
 

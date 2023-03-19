@@ -3,7 +3,7 @@
 #include "loadcore.h"
 #include "sysclib.h"
 
-void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out)
+void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out, uint8_t guitar_hero_format)
 {
     out->RightStickX = 0x7F;
     out->RightStickY = 0x7F;
@@ -25,13 +25,18 @@ void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *ou
     u8 dpad = in->Dpad > DS4DpadDirectionReleased ? DS4DpadDirectionReleased : in->Dpad;
 
     out->nButtonStateL = ~(in->Select | in->Start << 3 | dpad_mapping[dpad]);
-    out->nButtonStateH = ~(in->Green << 1 | in->Yellow << 4 | in->Red << 5 | in->Blue << 6 | in->Orange << 7);
 
     out->nLeft = 0;
     out->nL2 = 1;
 
-    if (in->AccelX > 512 || in->AccelX < 432) {
-        out->nL2 = 0;
+    if (guitar_hero_format) {
+        // GH PS3 Guitars swap Yellow and Blue
+        out->nButtonStateH = ~(in->Green << 1 | in->Yellow << 4 | in->Red << 5 | in->Blue << 6 | in->Orange << 7);
+        if (in->AccelX > 512 || in->AccelX < 432) {
+            out->nL2 = 0;
+        }
+    } else {
+        out->nButtonStateH = ~(in->StarPower | in->Green << 1 | in->Blue << 4 | in->Red << 5 | in->Yellow << 6 | in->Orange << 7);
     }
 }
 

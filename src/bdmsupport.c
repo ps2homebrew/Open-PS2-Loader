@@ -566,6 +566,10 @@ void bdmEnumerateDevices()
 
     LOG("bdmEnumerateDevices\n");
 
+    // Because bdmLoadModules is called before the config file is loaded bdmLoadBlockDeviceModules will not have loaded any
+    // optional bdm modules. Now that the config file has been loaded try loading any optional modules that weren't previously loaded.
+    bdmLoadBlockDeviceModules();
+
     // Enumerate bdm devices mounted as massX:
     for (int i = BDM_MODE; i <= BDM_MODE4; i++)
     {
@@ -595,7 +599,7 @@ void bdmEnumerateDevices()
             fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
             fileXioIoctl2(dir, BDM_GET_DEVICE_INDEX, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
 
-            LOG("Mass device: %d %s -> %s\n", i, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
+            LOG("Mass device: %d (%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
 
             // Register the device structure into the UI.
             initSupport(pDeviceSupport, i, 0);

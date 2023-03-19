@@ -83,8 +83,8 @@ typedef struct
     short inMenu;
 } gui_screen_handler_t;
 
-static gui_screen_handler_t screenHandlers[] = {{&menuHandleInputMain, &menuRenderMain, 0},
-                                                {&menuHandleInputMenu, &menuRenderMenu, 1},
+static gui_screen_handler_t screenHandlers[] = {{&menuHandleInputMain, &menuRenderMain, 0},             // GUI_SCREEN_MAIN - Game selection menu
+                                                {&menuHandleInputMenu, &menuRenderMenu, 1},             // GUI_SCREEN_MENU - Settings menu
                                                 {&menuHandleInputInfo, &menuRenderInfo, 1},
                                                 {&menuHandleInputGameMenu, &menuRenderGameMenu, 1},
                                                 {&menuHandleInputAppMenu, &menuRenderAppMenu, 1}};
@@ -464,6 +464,34 @@ static int guiUpdater(int modified)
     return 0;
 }
 
+int guiDeviceTypeToIoMode(int deviceType)
+{
+    // Translates an index into deviceNames into an IO mode index used internally.
+    if (deviceType == 0)
+        return BDM_MODE;
+    else if (deviceType == 1)
+        return ETH_MODE;
+    else if (deviceType == 2)
+        return HDD_MODE;
+    else
+        return APP_MODE;
+}
+
+int guiIoModeToDeviceType(int ioMode)
+{
+    switch (ioMode)
+    {
+        case BDM_MODE:
+        case BDM_MODE1:
+        case BDM_MODE2:
+        case BDM_MODE3:
+        case BDM_MODE4: return 0;
+        case ETH_MODE: return 1;
+        case HDD_MODE: return 2;
+        default: return 0;
+    }
+}
+
 void guiShowConfig()
 {
     // configure the enumerations
@@ -493,7 +521,8 @@ void guiShowConfig()
     diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, gRememberLastPlayed);
     diaSetVisible(diaConfig, CFG_LBL_AUTOSTARTLAST, gRememberLastPlayed);
 
-    diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
+    int deviceModeIndex = guiIoModeToDeviceType(gDefaultDevice);
+    diaSetInt(diaConfig, CFG_DEFDEVICE, deviceModeIndex);
     diaSetInt(diaConfig, CFG_BDMMODE, gBDMStartMode);
     diaSetVisible(diaConfig, BLOCKDEVICE_BUTTON, gBDMStartMode);
     diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
@@ -513,7 +542,8 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
         diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
         DisableCron = 1; // Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
-        diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
+        diaGetInt(diaConfig, CFG_DEFDEVICE, &deviceModeIndex);
+        gDefaultDevice = guiIoModeToDeviceType(deviceModeIndex);
         diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);

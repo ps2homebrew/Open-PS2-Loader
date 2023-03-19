@@ -31,12 +31,13 @@ void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *ou
 
     if (guitar_hero_format) {
         // GH PS3 Guitars swap Yellow and Blue
-        out->nButtonStateH = ~(in->Green << 1 | in->Yellow << 4 | in->Red << 5 | in->Blue << 6 | in->Orange << 7);
+        // Interestingly, it is only GH PS3 Guitars that do this, all the other instruments including GH Drums don't have this swapped.
+        out->nButtonStateH = ~(in->Green << 1 | in->Blue << 4 | in->Red << 5 | in->Yellow << 6 | in->Orange << 7);
         if (in->AccelX > 512 || in->AccelX < 432) {
             out->nL2 = 0;
         }
     } else {
-        out->nButtonStateH = ~(in->StarPower | in->Green << 1 | in->Blue << 4 | in->Red << 5 | in->Yellow << 6 | in->Orange << 7);
+        out->nButtonStateH = ~(in->StarPower | in->Green << 1 | in->Yellow << 4 | in->Red << 5 | in->Blue << 6 | in->Orange << 7);
     }
 }
 

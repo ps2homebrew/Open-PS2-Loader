@@ -179,10 +179,10 @@ struct ds3guitarreport
         };
         struct
         {
-            uint16_t Yellow    : 1;
+            uint16_t Blue      : 1;
             uint16_t Green     : 1;
             uint16_t Red       : 1;
-            uint16_t Blue      : 1;
+            uint16_t Yellow    : 1;
             uint16_t Orange    : 1;
             uint16_t StarPower : 1;
             uint16_t           : 1;

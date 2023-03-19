@@ -322,11 +322,12 @@ pc_tools_win32:
 	echo "Building WIN32 iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=1 -C pc
 
-format:
-	find . -type f -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -i
+cfla = "thirdparty/clang-format-lint-action"
+format-check: download_cfla
+	@python3 $(cfla)/run-clang-format.py --clang-format-executable $(cfla)/clang-format/clang-format12 -r .
 
-format-check:
-	@! find . -type f -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -style=file -output-replacements-xml | grep "<replacement " >/dev/null
+format: download_cfla
+	@python3 $(cfla)/run-clang-format.py --clang-format-executable $(cfla)/clang-format/clang-format12 -r . -i true
 
 $(EE_ASM_DIR):
 	@mkdir -p $@
@@ -745,6 +746,9 @@ download_lng:
 
 download_lwNBD:
 	./download_lwNBD.sh
+
+download_cfla:
+	./download_cfla.sh
 
 $(TRANSLATIONS_LNG): $(LNG_DIR)lang_%.lng: $(LNG_SRC_DIR)%.yml $(BASE_LANGUAGE) $(LANG_COMPILER)
 	python3 $(LANG_COMPILER) --make_lng --base $(BASE_LANGUAGE) --translation $< $@

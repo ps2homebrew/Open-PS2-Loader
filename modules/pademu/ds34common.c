@@ -27,21 +27,6 @@ void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *ou
     out->nButtonStateL = ~(in->Select | in->Start << 3 | dpad_mapping[dpad]);
     out->nButtonStateH = ~(in->Green << 1 | in->Yellow << 4 | in->Red << 5 | in->Blue << 6 | in->Orange << 7);
 
-    out->PressureRight = in->PressureRight;
-    out->PressureLeft = in->PressureLeft;
-    out->PressureUp = in->PressureUp;
-    out->PressureDown = in->PressureDown;
-
-    out->PressureTriangle = in->PressureTriangle;
-    out->PressureCircle = in->PressureCircle;
-    out->PressureCross = in->PressureCross;
-    out->PressureSquare = in->PressureSquare;
-
-    out->PressureL1 = in->PressureL1;
-    out->PressureR1 = in->PressureR1;
-    out->PressureL2 = in->PressureL2;
-    out->PressureR2 = in->PressureR2;
-
     out->nLeft = 0;
     out->nL2 = 1;
 

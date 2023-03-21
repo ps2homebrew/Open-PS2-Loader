@@ -44,7 +44,8 @@ IOPRP_img.c
 #
 # 3rd party
 #
-*modules/network/lwNBD/
+*modules/network/lwNBD
+*thirdparty/clang-format-lint-action
 
 # language
 lng/lang_*.lng

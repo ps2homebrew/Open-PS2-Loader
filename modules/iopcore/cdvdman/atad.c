@@ -35,7 +35,6 @@
 #ifdef USE_BDM_ATA
 #include <bdm.h>
 #include <errno.h>
-#include "device.h"
 #endif
 
 //#define NETLOG_DEBUG
@@ -211,7 +210,7 @@ int atad_start(void)
     g_ata_bd.ioctl = ata_bd_ioctl;
 
     // Let bdm device support handle registering the block device.
-    BdmDeviceSetBlockDevice(&g_ata_bd);
+    bdm_connect_bd(&g_ata_bd);
 
 #endif
 

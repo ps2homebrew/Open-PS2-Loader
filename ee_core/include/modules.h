@@ -32,9 +32,6 @@ enum OPL_MODULE_ID {
     OPL_MODULE_ID_DRVTIF,
     OPL_MODULE_ID_TIFINET,
 
-    // BDM modules
-    OPL_MODULE_ID_BDM,
-
     // Special patches
     OPL_MODULE_ID_IOP_PATCH,
 

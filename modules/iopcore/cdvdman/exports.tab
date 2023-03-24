@@ -137,7 +137,6 @@ DECLARE_EXPORT_TABLE(cdvdstm, 1, 1)
 END_EXPORT_TABLE
 
 #ifdef BDM_DRIVER
-#ifndef USE_BDM_ATA
 DECLARE_EXPORT_TABLE(bdm, 1, 1)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_retonly)
@@ -150,7 +149,6 @@ DECLARE_EXPORT_TABLE(bdm, 1, 1)
 //	DECLARE_EXPORT(bdm_get_bd)
 //	DECLARE_EXPORT(bdm_RegisterCallback)
 END_EXPORT_TABLE
-#endif
 #endif
 
 #ifdef HDD_DRIVER

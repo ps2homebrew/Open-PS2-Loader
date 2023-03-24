@@ -267,7 +267,7 @@ static void itemExecSelect(struct menu_item *curMenu)
             moduleUpdateMenuInternal((opl_io_module_t*)support->owner, 0, 0);
             // Manual refreshing can only be done if either auto refresh is disabled or auto refresh is disabled for the item.
             if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
-                ioPutRequest(IO_MENU_UPDATE_DEFFERED, support->owner);
+                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
         }
     } else
         guiMsgBox("NULL Support object. Please report", 0, NULL);
@@ -279,7 +279,7 @@ static void itemExecRefresh(struct menu_item *curMenu)
     //LOG("itemExecRefresh for %s (0x%08x)\n", support->itemGetPrefix(support), support->owner);
 
     if (support && support->enabled) {
-        ioPutRequest(IO_MENU_UPDATE_DEFFERED, support->owner);
+        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
         sfxPlay(SFX_CONFIRM);
     }
     //LOG("itemExecRefresh exit\n");
@@ -401,7 +401,7 @@ void initSupport(item_list_t *itemList, int mode, int force_reinit)
             mod->support->itemInit(mod->support);
             moduleUpdateMenuInternal(mod, 0, 0);
 
-            ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[mode]); // can't use mode as the variable will die at end of execution
+            ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[mode].support->mode); // can't use mode as the variable will die at end of execution
         }
     }
 }
@@ -704,7 +704,8 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
 
 void menuDeferredUpdate(void *data)
 {
-    opl_io_module_t *mod = (opl_io_module_t*)data;
+    short int *mode = data;
+    opl_io_module_t *mod = &list_support[*mode];
     if (!mod->support)
         return;
 
@@ -734,7 +735,7 @@ static void menuUpdateHook()
     if (gAutoRefresh) {
         for (i = 0; i < MODE_COUNT; i++) {
             if ((list_support[i].support && list_support[i].support->enabled) && ((list_support[i].support->updateDelay > 0) && (frameCounter % list_support[i].support->updateDelay == 0)))
-                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i]);
+                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
         }
     }
 
@@ -742,7 +743,7 @@ static void menuUpdateHook()
     if (frameCounter % MENU_GENERAL_UPDATE_DELAY == 0) {
         for (i = 0; i < MODE_COUNT; i++) {
             if ((list_support[i].support && list_support[i].support->enabled) && (list_support[i].support->updateDelay == 0))
-                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i]);
+                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
         }
     }
 }

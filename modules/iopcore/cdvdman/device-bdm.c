@@ -49,10 +49,15 @@ void bdm_disconnect_bd(struct block_device *bd)
 {
     DPRINTF("disconnecting device %s%dp%d\n", bd->name, bd->devNr, bd->parNr);
 
-    // Lock usage of block device
-    WaitSema(bdm_io_sema);
-    if (g_bd == bd)
-        g_bd = NULL;
+    if (bd->devNr == cdvdman_settings.bdDeviceId)
+    {
+        DPRINTF("detatching from %s%dp%d\n", bd->name, bd->devNr, bd->parNr);
+
+        // Lock usage of block device
+        WaitSema(bdm_io_sema);
+        if (g_bd == bd)
+            g_bd = NULL;
+    }
 }
 
 //

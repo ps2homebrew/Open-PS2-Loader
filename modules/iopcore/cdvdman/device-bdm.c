@@ -38,7 +38,7 @@ void bdm_connect_bd(struct block_device *bd)
     if (g_bd == NULL && bd->devNr == cdvdman_settings.bdDeviceId)
     {
         DPRINTF("attaching to %s%dp%d\n", bd->name, bd->devNr, bd->parNr);
-        
+
         g_bd = bd;
         g_bd_sectors_per_sector = (2048 / bd->sectorSize);
         // Free usage of block device
@@ -210,14 +210,14 @@ void DeviceFSInit(void)
     DPRINTF("DeviceFSInit [BDM]\n");
 
 #ifdef USE_BDM_ATA
-    lba_48bit = 1; //cdvdman_settings.common.media;
+    lba_48bit = cdvdman_settings.lbaBitCount == 48 ? 1 : 0;
 
     // Atad cannot be initialized in DeviceInit because bdm.irx is not yet loaded and it will fail to register the HDD as
     // a block device. Now that bdm.irx has been loaded, run atad init.
     atad_start();
 
     // TODO: there's more cdvdman init stuff after this in device-hdd.c...
-    DPRINTF("DiskType=%d Layer1Start=0x%08x\n", cdvdman_settings.common.media, cdvdman_settings.common.layer1_start);
+    DPRINTF("DiskType=%d Layer1Start=0x%08x Lba48=%d\n", cdvdman_settings.common.media, cdvdman_settings.common.layer1_start, (u32)lba_48bit);
 #endif
 
     DPRINTF("Waiting for device...\n");

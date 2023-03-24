@@ -27,6 +27,7 @@ typedef struct
     int bdmGameCount;
     base_game_info_t *bdmGames;
     char bdmDriver[32];
+    int bdmLbaSize;                 // Max size of a logical block address in bits
 } bdm_device_data_t;
 
 void bdmInit();

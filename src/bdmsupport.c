@@ -13,6 +13,7 @@
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include <usbhdfsd-common.h>
+#include <bdm-common.h>
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
@@ -439,6 +440,7 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
     }
 
     settings->bdDeviceId = pDeviceData->massDeviceIndex;
+    settings->lbaBitCount = pDeviceData->bdmLbaSize;
     if (!strcmp(pDeviceData->bdmDriver, "usb")) {
         settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
         sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
@@ -597,9 +599,10 @@ void bdmEnumerateDevices()
 
             // Get the name of the underlying device driver that backs the fat fs.
             fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
-            fileXioIoctl2(dir, BDM_GET_DEVICE_INDEX, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
+            fileXioIoctl2(dir, BDM_IOCTL_GET_DEVICE_INDEX, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
+            fileXioIoctl2(dir, BDM_IOCTL_GET_LBA_BITS, NULL, 0, &pDeviceData->bdmLbaSize, sizeof(pDeviceData->bdmLbaSize));
 
-            LOG("Mass device: %d (%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
+            LOG("Mass device: %d (%d LBA%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, pDeviceData->bdmLbaSize, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
 
             // Register the device structure into the UI.
             initSupport(pDeviceSupport, i, 0);

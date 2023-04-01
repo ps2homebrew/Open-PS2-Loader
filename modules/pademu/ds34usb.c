@@ -87,6 +87,10 @@ int usb_probe(int devId)
         return 1;
     }
 
+    if (device->idVendor == SANTROLLER_VID && device->idProduct == SANTROLLER_PID) {
+        return 1;
+    }
+
     if (device->idVendor == DS34_VID && (device->idProduct == DS3_PID || device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
         return 1;
 
@@ -125,7 +129,7 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    if (device->idProduct == DS3_PID) {
+    if (device->idProduct == DS3_PID || device->idProduct == SANTROLLER_PID) {
         ds34pad[pad].type = DS3;
         epCount = interface->bNumEndpoints - 1;
     } else if (device->idProduct == GUITAR_HERO_PS3_PID) {

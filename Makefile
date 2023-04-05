@@ -155,7 +155,7 @@ else
 endif
 
 ifeq ($(DEBUG),1)
-  EE_CFLAGS += -D__DEBUG -g
+  EE_CFLAGS += -D__DEBUG -g -Wno-strict-aliasing
   ifeq ($(DECI2_DEBUG),1)
     EE_OBJS += debug.o drvtif_irx.o tifinet_irx.o deci2_img.o
     EE_LDFLAGS += -liopreboot

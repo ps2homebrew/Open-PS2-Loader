@@ -147,6 +147,13 @@ static int Hook_LoadStartModule(char *modpath, int arg_len, char *args, int *mod
 
     DPRINTF("Hook_LoadStartModule() modpath = %s\n", modpath);
 
+#ifdef __IOPCORE_DEBUG
+    u32 freeMemSize = QueryTotalFreeMemSize();
+    u32 totalMemSize = QueryMemSize();
+
+    DPRINTF("IOP memory stats: Used=0x%08x Free=0x%08x Total=0x%08x\n", totalMemSize - freeMemSize, freeMemSize, totalMemSize);
+#endif
+
     mod = checkFakemodByFile(modpath, modulefake_list);
     if (mod != NULL && mod->flag) {
         *modres = mod->returnValue;

@@ -82,7 +82,6 @@ static int ata_bd_read(struct block_device *bd, u64 sector, void *buffer, u16 co
 static int ata_bd_write(struct block_device *bd, u64 sector, const void *buffer, u16 count);
 static void ata_bd_flush(struct block_device *bd);
 static int ata_bd_stop(struct block_device *bd);
-static int ata_bd_ioctl(struct block_device *bd, int ioctl, void* inp, u32 inpsize, void* outp, u32 outpsize);
 #endif
 
 /* ATA command info.  */
@@ -207,7 +206,6 @@ int atad_start(void)
     g_ata_bd.write = ata_bd_write;
     g_ata_bd.flush = ata_bd_flush;
     g_ata_bd.stop  = ata_bd_stop;
-    g_ata_bd.ioctl = ata_bd_ioctl;
 
     // Let bdm device support handle registering the block device.
     bdm_connect_bd(&g_ata_bd);
@@ -757,18 +755,5 @@ static int ata_bd_stop(struct block_device *bd)
     ata_device_standby_immediate(bd->devNr);
 
     return 0;
-}
-
-static int ata_bd_ioctl(struct block_device *bd, int ioctl, void* inp, u32 inpsize, void* outp, u32 outpsize)
-{
-    (void)bd;
-    (void)ioctl;
-    (void)inp;
-    (void)inpsize;
-    (void)outp;
-    (void)outpsize;
-
-    M_PRINTF("ata_bd_ioctl: ioctl=0x%08x\n", ioctl);
-    return -ENOTSUP;
 }
 #endif

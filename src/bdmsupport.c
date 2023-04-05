@@ -13,7 +13,6 @@
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include <usbhdfsd-common.h>
-#include <bdm-common.h>
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
@@ -22,9 +21,6 @@
 
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
-
-// forward declaration
-static item_list_t bdmGameList;
 
 // Identifies the partition that the specified file is stored on and generates a full path to it.
 int bdmFindPartition(char *target, const char *name, int write)
@@ -83,6 +79,9 @@ static void bdmLoadBlockDeviceModules(void)
 
         mx4sioModLoaded = 1;
     }
+
+    if (gEnableBdmHDD)
+        hddLoadModules();
 }
 
 void bdmLoadModules(void)
@@ -440,7 +439,6 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
     }
 
     settings->bdDeviceId = pDeviceData->massDeviceIndex;
-    settings->lbaBitCount = pDeviceData->bdmLbaSize;
     if (!strcmp(pDeviceData->bdmDriver, "usb")) {
         settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
         sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
@@ -454,6 +452,7 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
     else if (!strcmp(pDeviceData->bdmDriver, "ata") && strlen(pDeviceData->bdmDriver) == 3)
     {
         settings->common.fakemodule_flags |= 0;
+        settings->hddIsLBA48 = pDeviceData->bdmHddIsLBA48;
         sysLaunchLoaderElf(filename, "BDM_MASS_ATA_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
     }
 }
@@ -599,10 +598,24 @@ void bdmEnumerateDevices()
 
             // Get the name of the underlying device driver that backs the fat fs.
             fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
-            fileXioIoctl2(dir, BDM_IOCTL_GET_DEVICE_INDEX, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
-            fileXioIoctl2(dir, BDM_IOCTL_GET_LBA_BITS, NULL, 0, &pDeviceData->bdmLbaSize, sizeof(pDeviceData->bdmLbaSize));
+            fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
 
-            LOG("Mass device: %d (%d LBA%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, pDeviceData->bdmLbaSize, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
+            // If the device is backed by the ATA driver then get the supported LBA size for the drive.
+            if (strncmp(pDeviceData->bdmDriver, "ata", 3) == 0)
+            {
+                // If atad is loaded then xhdd is also loaded, query the hdd to see if it supports LBA48 or not.
+                pDeviceData->bdmHddIsLBA48 = fileXioDevctl("xhdd0:", ATA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
+                if (pDeviceData->bdmHddIsLBA48 < 0)
+                {
+                    // Failed to query the LBA limit of the device, fail safe to LBA28.
+                    LOG("Mass device %d is backed by ATA but failed to get LBA limit %d\n", pDeviceData->massDeviceIndex, pDeviceData->bdmHddIsLBA48);
+                    pDeviceData->bdmHddIsLBA48 = 0;
+                }
+
+                LOG("Mass device: %d (%d LBA%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, (pDeviceData->bdmHddIsLBA48 == 1 ? 48 : 28), pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
+            }
+            else
+                LOG("Mass device: %d (%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
 
             // Register the device structure into the UI.
             initSupport(pDeviceSupport, i, 0);

@@ -111,7 +111,7 @@ void DeviceFSInit(void)
     DPRINTF("DeviceFSInit [BDM]\n");
 
 #ifdef USE_BDM_ATA
-    lba_48bit = cdvdman_settings.lbaBitCount == 48 ? 1 : 0;
+    lba_48bit = cdvdman_settings.hddIsLBA48;
 
     // TODO: there's more cdvdman init stuff after this in device-hdd.c...
     DPRINTF("DiskType=%d Layer1Start=0x%08x Lba48=%d\n", cdvdman_settings.common.media, cdvdman_settings.common.layer1_start, (u32)lba_48bit);

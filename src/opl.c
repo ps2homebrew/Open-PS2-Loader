@@ -148,6 +148,7 @@ int hddCacheSize;
 int smbCacheSize;
 int gEnableILK;
 int gEnableMX4SIO;
+int gEnableBdmHDD;
 int gAutosort;
 int gAutoRefresh;
 int gEnableNotifications;
@@ -415,9 +416,6 @@ static void initAllSupport(int force_reinit)
 #endif
 #endif
 
-    // Init hdd and modules so when we enumerate mass devices we detect internal hdds using bdmfs.
-    hddGetObject(1);
-
     bdmEnumerateDevices();
     initSupport(ethGetObject(0), ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), HDD_MODE, force_reinit);
@@ -445,11 +443,6 @@ static void deinitAllSupport(int exception, int modeSelected)
             moduleCleanup(&list_support[i], exception, modeSelected);
         }
     }
-
-    //moduleCleanup(&list_support[BDM_MODE], exception, modeSelected);
-    //moduleCleanup(&list_support[ETH_MODE], exception, modeSelected);
-    //moduleCleanup(&list_support[HDD_MODE], exception, modeSelected);
-    //moduleCleanup(&list_support[APP_MODE], exception, modeSelected);
 }
 
 // For resolving the mode, given an app's path
@@ -933,6 +926,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, &gEnableILK);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_BDMHDD, &gEnableBdmHDD);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
             configGetInt(configOPL, CONFIG_OPL_BGM, &gEnableBGM);
@@ -1092,6 +1086,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_SMB_CACHE, smbCacheSize);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, gEnableILK);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_BDMHDD, gEnableBdmHDD);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
         configSetInt(configOPL, CONFIG_OPL_BGM, gEnableBGM);
@@ -1712,6 +1707,7 @@ static void setDefaults(void)
 
     gEnableILK = 0;
     gEnableMX4SIO = 0;
+    gEnableBdmHDD = 0;
 
     frameCounter = 0;
 
@@ -1806,6 +1802,7 @@ static void miniInit(int mode)
         // Force load iLink & mx4sio modules.. we aren't using the gui so this is fine.
         gEnableILK = 1; // iLink will break pcsx2 however.
         gEnableMX4SIO = 1;
+        gEnableBdmHDD = 1;
         bdmLoadModules();
         delay(3); // Wait for the device to be detected.
     } else if (mode == HDD_MODE)

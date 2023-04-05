@@ -84,8 +84,8 @@ struct cdvdman_settings_bdm
     // Device ID of the block device to bind to.
     u32 bdDeviceId;
 
-    // Max number of bits in a logical block address for the device.
-    u32 lbaBitCount;
+    // Indicates the supported LBA size of the HDD (1 for LBA48, 0 for LBA28).
+    u32 hddIsLBA48;
 } __attribute__((packed));
 
 #define CDVDMAN_SETTINGS_DEFAULT_COMMON                    \

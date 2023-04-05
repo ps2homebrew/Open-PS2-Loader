@@ -15,6 +15,9 @@ static int isHDPro;
 
 static int xhddInit(iop_device_t *device)
 {
+    // Force atad to initialize the hdd devices.
+    ata_get_devinfo(0);
+
     return 0;
 }
 
@@ -38,6 +41,14 @@ static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsi
                 return ata_device_set_transfer_mode(fd->unit, ((hddAtaSetMode_t *)arg)->type, ((hddAtaSetMode_t *)arg)->mode);
             else
                 return hdproata_device_set_transfer_mode(fd->unit, ((hddAtaSetMode_t *)arg)->type, ((hddAtaSetMode_t *)arg)->mode);
+        case ATA_DEVCTL_READ_PARTITION_SECTOR:
+        {
+            // Make sure the length is a multiple of the device sector size.
+            if (buflen % 512 != 0)
+                return -EINVAL;
+
+            return ata_device_sector_io(fd->unit, buf, 0, buflen / 512, ATA_DIR_READ);
+        }
         default:
             return -EINVAL;
     }

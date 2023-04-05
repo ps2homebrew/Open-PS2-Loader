@@ -2,6 +2,7 @@ atad_IMPORTS_start
 I_ata_get_devinfo
 I_ata_io_start
 I_ata_io_finish
+I_ata_device_sector_io
 atad_IMPORTS_end
 
 ioman_IMPORTS_start

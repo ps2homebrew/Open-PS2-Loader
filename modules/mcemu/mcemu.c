@@ -249,7 +249,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
 
     // Some irx modules (like LIBSD.IRX in Tony Hawk's Pro Skater 4) will suspend interrupts before calling RegisterLibraryEntries.
     // This causes issues if mcemu is built with debug output enabled and will hang the IOP when calling DPRINTF. To work around this
-    // don't use DPRINTF/printf in this function else you know for sure the calling module did not suspend interrupts before calling
+    // don't use DPRINTF/printf in this function unless you know for sure the calling module did not suspend interrupts before calling
     // RegisterLibraryEntries.
 
     if (!strcmp(lib->name, "sio2man")) {

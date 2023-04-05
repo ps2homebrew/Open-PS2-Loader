@@ -27,7 +27,7 @@ typedef struct
     int bdmGameCount;
     base_game_info_t *bdmGames;
     char bdmDriver[32];
-    int bdmLbaSize;                 // Max size of a logical block address in bits
+    int bdmHddIsLBA48;              // 1 if the HDD supports LBA48, 0 if the HDD only supports LBA28
 } bdm_device_data_t;
 
 void bdmInit();

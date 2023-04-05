@@ -18,6 +18,7 @@
 
 #include "include/nbns.h"
 #include "httpclient.h"
+#include "include/lwnbdsupport.h"
 
 static char ethPrefix[40]; // Contains the full path to the folder where all the games are.
 static char *ethBase;
@@ -291,8 +292,10 @@ static int ethLoadModules(void)
                 if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
                     sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
                     sysLoadModuleBuffer(&httpclient_irx, size_httpclient_irx, 0, NULL);
+                    sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 0, NULL);
                     ps2ip_init();
                     HttpInit();
+                    NBDInit();
 
                     LOG("ETHSUPPORT Modules loaded\n");
                     return 0;
@@ -316,6 +319,7 @@ void ethDeinitModules(void)
         HttpDeinit();
         nbnsDeinit();
         NetManDeinit();
+        NBDDeinit();
         ethModulesLoaded = 0;
         gNetworkStartup = ERROR_ETH_NOT_STARTED;
 

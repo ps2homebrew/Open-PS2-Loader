@@ -110,7 +110,7 @@ void bdmLoadModules(void)
     sysLoadModuleBuffer(&bdm_irx, size_bdm_irx, 0, NULL);
 
     // Load FATFS (mass:) driver
-    LOG("[BDMFS_FSTFS]:\n");
+    LOG("[BDMFS_FATFS]:\n");
     sysLoadModuleBuffer(&bdmfs_fatfs_irx, size_bdmfs_fatfs_irx, 0, NULL);
 
     // Load USB Block Device drivers

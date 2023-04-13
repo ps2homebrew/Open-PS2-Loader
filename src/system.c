@@ -124,7 +124,7 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 
     // load the module
     id = SifExecModuleBuffer(buffer, size, argc, argv, &ret);
-    LOG("ID=%d, ret=%d\n", id, ret);
+    LOG("\t-- ID=%d, ret=%d\n", id, ret);
     if ((id < 0) || (ret))
         return -2;
 

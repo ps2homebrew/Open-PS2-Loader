@@ -195,14 +195,14 @@ void hddLoadModules(void)
         // if detected it loads the specific ATAD module
         hddHDProKitDetected = hddCheckHDProKit();
         if (hddHDProKitDetected) {
-            DPRINTF("[ATAD (HDPRO)]:");
+            LOG("[ATAD (HDPRO)]:");
             ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
-            DPRINTF("[XHDD]:");
+            LOG("[XHDD]:");
             sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 6, "-hdpro");
         } else {
-            DPRINTF("[ATAD]:");
+            LOG("[ATAD]:");
             ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
-            DPRINTF("[XHDD]:");
+            LOG("[XHDD]:");
             sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 0, NULL);
         }
         if (ret < 0) {
@@ -210,7 +210,7 @@ void hddLoadModules(void)
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_IF_NOT_DETECTED);
             return;
         }
-        DPRINTF("[PS2HDD]:");
+        LOG("[PS2HDD]:");
         ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
         if (ret < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
@@ -224,7 +224,7 @@ void hddLoadModules(void)
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_NOT_DETECTED);
             return;
         }
-        DPRINTF("[PS2FS]:");
+        LOG("[PS2FS]:");
         ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
         if (ret < 0) {
             LOG("HDD: HardDisk Drive not formatted (PFS).\n");

@@ -1453,10 +1453,10 @@ static int loadLwnbdSvr(void)
     // see gETHStartMode, gNetworkStartup ? this is slow, so if we don't have to do it (like debug build).
     ret = ethLoadInitModules();
     if (ret == 0) {
-        DPRINTF("[ATAD]:");
+        LOG("[ATAD]:");
         ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL); /* gHDDStartMode ? */
         if (ret >= 0) {
-            DPRINTF("[LWNBDSVR]:");
+            LOG("[LWNBDSVR]:");
             ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, sizeof(config), (char *)&config);
             if (ret >= 0)
                 ret = 0;

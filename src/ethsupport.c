@@ -279,21 +279,21 @@ static int ethLoadModules(void)
 
         sysInitDev9();
 
-        DPRINTF("[NETMAN]:");
+        LOG("[NETMAN]:");
         if (sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL) >= 0) {
             NetManInit();
-            DPRINTF("[SMSUTILS]:");
+            LOG("[SMSUTILS]:");
             sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
-            DPRINTF("[SMAP]:");
+            LOG("[SMAP]:");
             if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL) >= 0) {
                 // Before the network stack is loaded, attempt to set the link settings in order to avoid needing double-initialization of the IF.
                 // But do not fail here because there is currently no way to re-start initialization.
                 ethApplyNetIFConfig();
-                DPRINTF("[PS2IP]:");
+                LOG("[PS2IP]:");
                 if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
-                    DPRINTF("[PS2IPS]:");
+                    LOG("[PS2IPS]:");
                     sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
-                    DPRINTF("[HTTPCLIENT]:");
+                    LOG("[HTTPCLIENT]:");
                     sysLoadModuleBuffer(&httpclient_irx, size_httpclient_irx, 0, NULL);
                     ps2ip_init();
                     HttpInit();
@@ -400,9 +400,9 @@ static void smbLoadModules(void)
 
     if (ret == 0) {
         gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
-        DPRINTF("[SMBMAN]:");
+        LOG("[SMBMAN]:");
         if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
-            DPRINTF("[NBNS]:");
+            LOG("[NBNS]:");
             sysLoadModuleBuffer(&nbns_irx, size_nbns_irx, 0, NULL);
             nbnsInit();
 

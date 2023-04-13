@@ -180,9 +180,13 @@ void hddLoadModules(void)
 {
     int ret;
 
-    LOG("HDDSUPPORT LoadModules\n");
+    LOG("HDDSUPPORT LoadModules %d\n", hddModulesLoadCount);
 
-    if (hddModulesLoadCount == 0) {
+    if (hddModulesLoadCount == 0)
+    {
+        // Increment the load count as soon as possible to prevent thread scheduling from allowing another thread to
+        // call into here and try to double load modules.
+        hddModulesLoadCount = 1;
 
         // DEV9 must be loaded, as HDD.IRX depends on it. Even if not required by the I/F (i.e. HDPro)
         sysInitDev9();
@@ -203,8 +207,10 @@ void hddLoadModules(void)
             return;
         }
     }
+    else
+        hddModulesLoadCount++;
 
-    hddModulesLoadCount++;
+    LOG("HDDSUPPORT LoadModules done\n");
 }
 
 // Returns 1 for MBR/GPT, 0 for APA, and -1 if an error occured

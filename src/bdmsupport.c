@@ -70,7 +70,10 @@ static unsigned int BdmGeneration = 0;
 
 static void bdmEventHandler(void *packet, void *opt)
 {
-    LOG("bdmEventHandler: device mount/unmount\n");
+    // Note: It may not be safe to use LOG here. Need to do further testing, but it's probably best to perform
+    // as few operations as possible in RPC callback functions...
+    
+    //LOG("bdmEventHandler: device mount/unmount\n");
     BdmGeneration++;
 }
 
@@ -94,8 +97,9 @@ static void bdmLoadBlockDeviceModules(void)
     if (gEnableBdmHDD && !hddModLoaded)
     {
         // Load dev9 and atad device drivers.
-        hddLoadModules();
+        LOG("bdmLoadBlockDeviceModules loading hdd drivers...\n");
         hddModLoaded = 1;
+        hddLoadModules();
     }
 }
 
@@ -645,6 +649,7 @@ void bdmEnumerateDevices()
     // Because bdmLoadModules is called before the config file is loaded bdmLoadBlockDeviceModules will not have loaded any
     // optional bdm modules. Now that the config file has been loaded try loading any optional modules that weren't previously loaded.
     LOG("bdmEnumerateDevices 1\n");
+    //ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
     bdmLoadBlockDeviceModules();
 
     LOG("bdmEnumerateDevices done\n");
@@ -672,8 +677,11 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
             snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:", pItemList->mode);
 
         // Get the name of the underlying device driver that backs the fat fs.
+        LOG("1\n");
         fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
+        LOG("2\n");
         fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
+        LOG("3\n");
 
         // Determine the bdm device type based on the underlying device driver.
         if (!strcmp(pDeviceData->bdmDriver, "usb"))
@@ -691,6 +699,7 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
         if (pDeviceData->bdmDeviceType == BDM_TYPE_ATA)
         {
             // If atad is loaded then xhdd is also loaded, query the hdd to see if it supports LBA48 or not.
+            LOG("4\n");
             pDeviceData->bdmHddIsLBA48 = fileXioDevctl("xhdd0:", ATA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
             if (pDeviceData->bdmHddIsLBA48 < 0)
             {

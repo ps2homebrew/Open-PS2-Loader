@@ -21,6 +21,16 @@
 
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
+static int hddModLoaded = 0;
+
+// Used to supress device enumeration during shutdown.
+int gSupressBdmNotifications;
+
+static item_list_t bdmDeviceList[MAX_BDM_DEVICES];
+static int bdmDeviceListInitialized = 0;
+
+void bdmInitDevicesData();
+int bdmUpdateDeviceData(item_list_t* pItemList);
 
 // Identifies the partition that the specified file is stored on and generates a full path to it.
 int bdmFindPartition(char *target, const char *name, int write)
@@ -60,6 +70,7 @@ static unsigned int BdmGeneration = 0;
 
 static void bdmEventHandler(void *packet, void *opt)
 {
+    LOG("bdmEventHandler: device mount/unmount\n");
     BdmGeneration++;
 }
 
@@ -80,13 +91,20 @@ static void bdmLoadBlockDeviceModules(void)
         mx4sioModLoaded = 1;
     }
 
-    if (gEnableBdmHDD)
+    if (gEnableBdmHDD && !hddModLoaded)
+    {
+        // Load dev9 and atad device drivers.
         hddLoadModules();
+        hddModLoaded = 1;
+    }
 }
 
 void bdmLoadModules(void)
 {
     LOG("BDMSUPPORT LoadModules\n");
+
+    // Initially supress bdm notifications until after the UI loads config files.
+    gSupressBdmNotifications = 1;
 
     // Load Block Device Manager (BDM)
     sysLoadModuleBuffer(&bdm_irx, size_bdm_irx, 0, NULL);
@@ -124,19 +142,22 @@ void bdmInit(item_list_t* pItemList)
 static int bdmNeedsUpdate(item_list_t* pItemList)
 {
     char path[256];
-    static unsigned int OldGeneration = 0;
-    static unsigned char ThemesLoaded = 0;
-    static unsigned char LanguagesLoaded = 0;
     int result = 0;
     struct stat st;
+
+    //LOG("bdmNeedsUpdate %d\n", pItemList->mode);
 
     bdm_device_data_t* pDeviceData = (bdm_device_data_t*)pItemList->priv;
 
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
 
-    if (pDeviceData->bdmULSizePrev != -2 && OldGeneration == BdmGeneration)
+    if (pDeviceData->bdmULSizePrev != -2 && pDeviceData->bdmDeviceTick == BdmGeneration)
         return 0;
-    OldGeneration = BdmGeneration;
+    pDeviceData->bdmDeviceTick = BdmGeneration;
+
+    // Check if the device has been connected or removed.
+    if ((result = bdmUpdateDeviceData(pItemList)) == 0)
+        return 0;
 
     sprintf(path, "%sCD", pDeviceData->bdmPrefix);
     if (stat(path, &st) != 0)
@@ -158,17 +179,17 @@ static int bdmNeedsUpdate(item_list_t* pItemList)
         result = 1;
 
     // update Themes
-    if (!ThemesLoaded) {
+    if (!pDeviceData->ThemesLoaded) {
         sprintf(path, "%sTHM", pDeviceData->bdmPrefix);
         if (thmAddElements(path, "/", 1) > 0)
-            ThemesLoaded = 1;
+            pDeviceData->ThemesLoaded = 1;
     }
 
     // update Languages
-    if (!LanguagesLoaded) {
+    if (!pDeviceData->LanguagesLoaded) {
         sprintf(path, "%sLNG", pDeviceData->bdmPrefix);
         if (lngAddLanguages(path, "/", pItemList->mode) > 0)
-            LanguagesLoaded = 1;
+            pDeviceData->LanguagesLoaded = 1;
     }
 
     sbCreateFolders(pDeviceData->bdmPrefix, 1);
@@ -451,6 +472,19 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
     }
     else if (!strcmp(pDeviceData->bdmDriver, "ata") && strlen(pDeviceData->bdmDriver) == 3)
     {
+        // Set DMA mode and spindown time.
+        int dmaType = 0, dmaMode = 7;
+        configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
+        if (dmaMode < 3)
+            dmaType = 0x20;
+        else {
+            dmaType = 0x40;
+            dmaMode -= 3;
+        }
+        hddSetTransferMode(dmaType, dmaMode);
+        // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
+        hddSetIdleTimeout(gHDDSpindown * 12);
+
         settings->common.fakemodule_flags |= 0;
         settings->hddIsLBA48 = pDeviceData->bdmHddIsLBA48;
         sysLaunchLoaderElf(filename, "BDM_MASS_ATA_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
@@ -520,8 +554,8 @@ static void bdmCleanUp(item_list_t* pItemList, int exception)
 
         bdm_device_data_t* pDeviceData = (bdm_device_data_t*)pItemList->priv;
         free(pDeviceData->bdmGames);
-
-        // TODO: free pDeviceData and pItemList
+        free(pDeviceData);
+        pItemList->priv = NULL;
 
         //      if ((exception & UNMOUNT_EXCEPTION) == 0)
         //          ...
@@ -531,17 +565,25 @@ static void bdmCleanUp(item_list_t* pItemList, int exception)
 // This may be called, even if bdmInit() was not.
 static void bdmShutdown(item_list_t* pItemList)
 {
-    if (pItemList->enabled) {
-        LOG("BDMSUPPORT Shutdown\n");
+    char path[10] = { 0 };
 
-        bdm_device_data_t* pDeviceData = (bdm_device_data_t*)pItemList->priv;
-        free(pDeviceData->bdmGames);
+    LOG("BDMSUPPORT Shutdown\n");
 
-        // TODO: free pDeviceData and pItemList
-    }
+    // Format the device path.
+    bdm_device_data_t* pDeviceData = (bdm_device_data_t*)pItemList->priv;
+    sprintf(path, "mass%d:", pDeviceData->massDeviceIndex);
 
     // As required by some (typically 2.5") HDDs, issue the SCSI STOP UNIT command to avoid causing an emergency park.
-    fileXioDevctl("mass:", USBMASS_DEVCTL_STOP_ALL, NULL, 0, NULL, 0);
+    fileXioDevctl(path, USBMASS_DEVCTL_STOP_ALL, NULL, 0, NULL, 0);
+
+    if (pItemList->enabled) {
+        LOG("BDMSUPPORT Shutdown free data\n");
+
+        // Free device data.
+        free(pDeviceData->bdmGames);
+        free(pDeviceData);
+        pItemList->priv = NULL;
+    }
 }
 
 static int bdmCheckVMC(item_list_t* pItemList, char *name, int createSize)
@@ -561,67 +603,132 @@ static item_list_t bdmGameList = {
     &bdmUpdateGameList, &bdmGetGameCount, &bdmGetGame, &bdmGetGameName, &bdmGetGameNameLength, &bdmGetGameStartup, &bdmDeleteGame, &bdmRenameGame,
     &bdmLaunchGame, &bdmGetConfig, &bdmGetImage, &bdmCleanUp, &bdmShutdown, &bdmCheckVMC, &bdmGetIconId};
 
-void bdmEnumerateDevices()
+void bdmInitDevicesData()
 {
-    char path[10] = { 0 };
-
-    LOG("bdmEnumerateDevices\n");
-
-    // Because bdmLoadModules is called before the config file is loaded bdmLoadBlockDeviceModules will not have loaded any
-    // optional bdm modules. Now that the config file has been loaded try loading any optional modules that weren't previously loaded.
-    bdmLoadBlockDeviceModules();
-
-    // Enumerate bdm devices mounted as massX:
-    for (int i = BDM_MODE; i <= BDM_MODE4; i++)
+    // If the device list hasn't been initialized do it now.
+    if (bdmDeviceListInitialized == 0)
     {
-        // Format the device path and try to open the device.
-        sprintf(path, "mass%d:/", i);
-        int dir = fileXioDopen(path);
-        LOG("opendir %s -> %d\n", path, dir);
-        if (dir >= 0)
+        bdmDeviceListInitialized = 1;
+
+        for (int i = 0; i < MAX_BDM_DEVICES; i++)
         {
-            // Allocate and initialize the device support structure.
-            item_list_t* pDeviceSupport = (item_list_t*)malloc(sizeof(item_list_t));
+            // Setup the device list item.
+            item_list_t *pDeviceSupport = &bdmDeviceList[i];
             memcpy(pDeviceSupport, &bdmGameList, sizeof(item_list_t));
             pDeviceSupport->mode = i;
 
             // Setup the per-device data.
             bdm_device_data_t* pDeviceData = (bdm_device_data_t*)malloc(sizeof(bdm_device_data_t));
             memset(pDeviceData, 0, sizeof(bdm_device_data_t));
-            pDeviceData->bdmULSizePrev = -2;
             pDeviceSupport->priv = pDeviceData;
-
-            if (gBDMPrefix[0] != '\0')
-                snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:%s/", i, gBDMPrefix);
-            else
-                snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:", i);
-
-            // Get the name of the underlying device driver that backs the fat fs.
-            fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
-            fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
-
-            // If the device is backed by the ATA driver then get the supported LBA size for the drive.
-            if (strncmp(pDeviceData->bdmDriver, "ata", 3) == 0)
-            {
-                // If atad is loaded then xhdd is also loaded, query the hdd to see if it supports LBA48 or not.
-                pDeviceData->bdmHddIsLBA48 = fileXioDevctl("xhdd0:", ATA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
-                if (pDeviceData->bdmHddIsLBA48 < 0)
-                {
-                    // Failed to query the LBA limit of the device, fail safe to LBA28.
-                    LOG("Mass device %d is backed by ATA but failed to get LBA limit %d\n", pDeviceData->massDeviceIndex, pDeviceData->bdmHddIsLBA48);
-                    pDeviceData->bdmHddIsLBA48 = 0;
-                }
-
-                LOG("Mass device: %d (%d LBA%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, (pDeviceData->bdmHddIsLBA48 == 1 ? 48 : 28), pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
-            }
-            else
-                LOG("Mass device: %d (%d) %s -> %s\n", i, pDeviceData->massDeviceIndex, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
 
             // Register the device structure into the UI.
             initSupport(pDeviceSupport, i, 0);
 
-            // Close the device handle.
-            fileXioDclose(dir);
+            // Set the page to be initially invisible.
+            if (pDeviceSupport->owner != NULL)
+            {
+                LOG("bdmInitDevicesData: setting device %d invisible\n", i);
+                ((opl_io_module_t*)pDeviceSupport->owner)->menuItem.visible = 0;
+            }
         }
     }
+}
+
+void bdmEnumerateDevices()
+{
+    LOG("bdmEnumerateDevices\n");
+
+    // Initialize the device list data if it hasn't been initialized yet.
+    bdmInitDevicesData();
+
+    // Because bdmLoadModules is called before the config file is loaded bdmLoadBlockDeviceModules will not have loaded any
+    // optional bdm modules. Now that the config file has been loaded try loading any optional modules that weren't previously loaded.
+    LOG("bdmEnumerateDevices 1\n");
+    bdmLoadBlockDeviceModules();
+
+    LOG("bdmEnumerateDevices done\n");
+}
+
+int bdmUpdateDeviceData(item_list_t* pItemList)
+{
+    char path[16] = { 0 };
+
+    LOG("bdmUpdateDeviceData: %d\n", pItemList->mode);
+
+    // Get the per-device data and check if the menu item is currently visible.
+    bdm_device_data_t* pDeviceData = pItemList->priv;
+    int visible = pItemList->owner != NULL ? ((opl_io_module_t*)pItemList->owner)->menuItem.visible : 0;
+
+    // Format the device path and try to open the device.
+    sprintf(path, "mass%d:/", pItemList->mode);
+    int dir = fileXioDopen(path);
+    LOG("opendir %s -> %d\n", path, dir);
+    if (dir >= 0 && visible == 0)
+    {
+        if (gBDMPrefix[0] != '\0')
+            snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:%s/", pItemList->mode, gBDMPrefix);
+        else
+            snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:", pItemList->mode);
+
+        // Get the name of the underlying device driver that backs the fat fs.
+        fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
+        fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
+
+        // Determine the bdm device type based on the underlying device driver.
+        if (!strcmp(pDeviceData->bdmDriver, "usb"))
+            pDeviceData->bdmDeviceType = BDM_TYPE_USB;
+        else if (!strcmp(pDeviceData->bdmDriver, "sd") && strlen(pDeviceData->bdmDriver) == 2)
+            pDeviceData->bdmDeviceType = BDM_TYPE_ILINK;
+        else if (!strcmp(pDeviceData->bdmDriver, "sdc") && strlen(pDeviceData->bdmDriver) == 3)
+            pDeviceData->bdmDeviceType = BDM_TYPE_SDC;
+        else if (!strcmp(pDeviceData->bdmDriver, "ata") && strlen(pDeviceData->bdmDriver) == 3)
+            pDeviceData->bdmDeviceType = BDM_TYPE_ATA;
+        else
+            pDeviceData->bdmDeviceType = BDM_TYPE_UNKNOWN;
+
+        // If the device is backed by the ATA driver then get the supported LBA size for the drive.
+        if (pDeviceData->bdmDeviceType == BDM_TYPE_ATA)
+        {
+            // If atad is loaded then xhdd is also loaded, query the hdd to see if it supports LBA48 or not.
+            pDeviceData->bdmHddIsLBA48 = fileXioDevctl("xhdd0:", ATA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
+            if (pDeviceData->bdmHddIsLBA48 < 0)
+            {
+                // Failed to query the LBA limit of the device, fail safe to LBA28.
+                LOG("Mass device %d is backed by ATA but failed to get LBA limit %d\n", pDeviceData->massDeviceIndex, pDeviceData->bdmHddIsLBA48);
+                pDeviceData->bdmHddIsLBA48 = 0;
+            }
+
+            LOG("Mass device: %d (%d LBA%d) %s -> %s\n", pItemList->mode, pDeviceData->massDeviceIndex, (pDeviceData->bdmHddIsLBA48 == 1 ? 48 : 28), pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
+        }
+        else
+            LOG("Mass device: %d (%d) %s -> %s\n", pItemList->mode, pDeviceData->massDeviceIndex, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
+
+        // Make the menu item visible.
+        if (pItemList->owner != NULL)
+        {
+            LOG("bdmUpdateDeviceData: setting device %d visible\n", pItemList->mode);
+            ((opl_io_module_t*)pItemList->owner)->menuItem.visible = 1;
+        }
+
+        // Close the device handle.
+        fileXioDclose(dir);
+        return 1;
+    }
+    else if (dir < 0 && visible == 1)
+    {
+        // Device has been removed, make the menu item invisible. We can't really cleanup resources (like the game list) just yet
+        // as we don't know if the data is being used asynchronously.
+        if (pItemList->owner != NULL)
+        {
+            LOG("bdmUpdateDeviceData: setting device %d invisible\n", pItemList->mode);
+            ((opl_io_module_t*)pItemList->owner)->menuItem.visible = 0;
+        }
+
+        LOG("Mass device: %d (%d) disconnected\n", pItemList->mode, pDeviceData->massDeviceIndex);
+        return 1;
+    }
+
+    // No change to the device state detected.
+    return 0;
 }

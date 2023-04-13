@@ -580,8 +580,13 @@ void submenuSort(submenu_list_t **submenu)
 
 static void menuNextH()
 {
-    if (selected_item->next != NULL) {
-        selected_item = selected_item->next;
+    struct menu_list* pNext = selected_item->next;
+    while (pNext != NULL && pNext->item->visible == 0)
+        pNext = pNext->next;
+
+    // If we found a valid menu transition to it.
+    if (pNext != NULL) {
+        selected_item = pNext;
         itemConfigId = -1;
         sfxPlay(SFX_CURSOR);
     }
@@ -589,8 +594,12 @@ static void menuNextH()
 
 static void menuPrevH()
 {
-    if (selected_item->prev != NULL) {
-        selected_item = selected_item->prev;
+    struct menu_list* pPrev = selected_item->prev;
+    while (pPrev != NULL && pPrev->item->visible == 0)
+        pPrev = pPrev->prev;
+
+    if (pPrev != NULL) {
+        selected_item = pPrev;
         itemConfigId = -1;
         sfxPlay(SFX_CURSOR);
     }

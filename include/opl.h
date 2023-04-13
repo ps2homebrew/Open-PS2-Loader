@@ -208,11 +208,26 @@ extern base_game_info_t *gAutoLaunchBDMGame;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 
+extern int gSupressBdmNotifications;
+
 void initSupport(item_list_t *itemList, int mode, int force_reinit);
 
 void setDefaultColors(void);
 
 #define MENU_ITEM_HEIGHT 19
+
+#include "include/menusys.h"
+
+typedef struct
+{
+    item_list_t *support;
+
+    /// menu item used with this list support
+    menu_item_t menuItem;
+
+    /// submenu list
+    submenu_list_t *subMenu;
+} opl_io_module_t;
 
 /*
 BLURT output char blurttext[128];

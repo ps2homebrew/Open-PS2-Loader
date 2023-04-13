@@ -69,17 +69,6 @@ int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 #endif
 #endif
 
-typedef struct
-{
-    item_list_t *support;
-
-    /// menu item used with this list support
-    menu_item_t menuItem;
-
-    /// submenu list
-    submenu_list_t *subMenu;
-} opl_io_module_t;
-
 // App support stuff.
 static unsigned char shouldAppsUpdate;
 
@@ -333,6 +322,7 @@ static void initMenuForListSupport(opl_io_module_t* mod)
     mod->menuItem.icon_id = mod->support->itemIconId(mod->support);
     mod->menuItem.text = NULL;
     mod->menuItem.text_id = mod->support->itemTextId(mod->support);
+    mod->menuItem.visible = 1;
 
     mod->menuItem.userdata = mod->support;
 
@@ -420,10 +410,16 @@ static void initAllSupport(int force_reinit)
     initSupport(ethGetObject(0), ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), HDD_MODE, force_reinit);
     initSupport(appGetObject(0), APP_MODE, force_reinit);
+
+    // Enable bdm notifications so we can auto-rescan when a device is mounted/unmounted.
+    gSupressBdmNotifications = 0;
 }
 
 static void deinitAllSupport(int exception, int modeSelected)
 {
+    // Supress bdm notifications so it doesn't try to handle device unmounting notifications.
+    gSupressBdmNotifications = 1;
+
     for (int i = 0; i < MODE_COUNT; i++)
     {
         if (list_support[i].support != NULL)

@@ -17,6 +17,12 @@ typedef struct
 
 #define MAX_BDM_DEVICES 5
 
+#define BDM_TYPE_UNKNOWN    -1
+#define BDM_TYPE_USB        0
+#define BDM_TYPE_ILINK      1
+#define BDM_TYPE_SDC        2
+#define BDM_TYPE_ATA        3
+
 typedef struct
 {
     int massDeviceIndex;            // Underlying device index backing the mass fs partition, ex: usb0 = 0, usb1 = 1, ata master = 0, ata slave = 1, etc.
@@ -27,7 +33,12 @@ typedef struct
     int bdmGameCount;
     base_game_info_t *bdmGames;
     char bdmDriver[32];
+    int bdmDeviceType;              // Type of BDM device, see BDM_TYPE_* above
     int bdmHddIsLBA48;              // 1 if the HDD supports LBA48, 0 if the HDD only supports LBA28
+
+    int bdmDeviceTick;              // Used alongside BdmGeneration to tell if device data needs to be refreshed
+    unsigned char ThemesLoaded;
+    unsigned char LanguagesLoaded;
 } bdm_device_data_t;
 
 void bdmInit();

@@ -29,7 +29,7 @@ extern u8 IOBuffer[2048];
 
 static unsigned char hddForceUpdate = 0;
 static unsigned char hddHDProKitDetected = 0;
-static unsigned char hddModulesLoaded = 0;
+static unsigned char hddModulesLoadCount = 0;
 static unsigned char hddSupportModulesLoaded = 0;
 
 static char *hddPrefix = "pfs0:";
@@ -180,10 +180,9 @@ void hddLoadModules(void)
 {
     int ret;
 
-    if (!hddModulesLoaded) {
-        hddModulesLoaded = 1;
+    LOG("HDDSUPPORT LoadModules\n");
 
-        LOG("HDDSUPPORT LoadModules\n");
+    if (hddModulesLoadCount == 0) {
 
         // DEV9 must be loaded, as HDD.IRX depends on it. Even if not required by the I/F (i.e. HDPro)
         sysInitDev9();
@@ -204,6 +203,8 @@ void hddLoadModules(void)
             return;
         }
     }
+
+    hddModulesLoadCount++;
 }
 
 // Returns 1 for MBR/GPT, 0 for APA, and -1 if an error occured
@@ -684,16 +685,18 @@ static void hddShutdown(item_list_t* pItemList)
         hddSupportModulesLoaded = 0;
     }
 
-    if (hddModulesLoaded)
+    if (hddModulesLoadCount > 0)
     {
-        // DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
-        // The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
-        hddSetIdleImmediate();
+        hddModulesLoadCount -= 1;
+        if (hddModulesLoadCount == 0)
+        {
+            // DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
+            // The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
+            hddSetIdleImmediate();
+        }
 
         // Only shut down dev9 from here, if it was initialized from here before.
         sysShutdownDev9();
-
-        hddModulesLoaded = 0;
     }
 }
 

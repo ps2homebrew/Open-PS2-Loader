@@ -109,8 +109,7 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
             break;
         }
     }
-    if (i == MAX_MODULES)
-    {
+    if (i == MAX_MODULES) {
         LOG(" MAX AMMOUNT OF MODULES REACHED!\n");
         return -1;
     }

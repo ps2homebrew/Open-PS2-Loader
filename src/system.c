@@ -110,17 +110,22 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
         }
     }
     if (i == MAX_MODULES)
+    {
+        DPRINTF(" MAX AMMOUNT OF MODULES REACHED!\n");
         return -1;
+    }
 
     // check if the module was already loaded
     for (i = 0; i < MAX_MODULES; i++) {
         if (g_sysLoadedModBuffer[i] == buffer) {
+            DPRINTF(" MODULE ALREADY LOADED! (ID=%d)\n");
             return 0;
         }
     }
 
     // load the module
     id = SifExecModuleBuffer(buffer, size, argc, argv, &ret);
+    DPRINTF(" ID=%d, ret=%d\n", id, ret);
     if ((id < 0) || (ret))
         return -2;
 
@@ -139,6 +144,7 @@ void sysInitDev9(void)
     int ret;
 
     if (!dev9Initialized) {
+        DPRINTF("[DEV9]:");
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
         dev9Loaded = (ret == 0); // DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
@@ -207,30 +213,41 @@ void sysReset(int modload_mask)
     memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES * 4);
 
     // load modules
+    DPRINTF("[IOMANX]:");
     sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
+    DPRINTF("[FILEXIO]:");
     sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 
+    DPRINTF("[SIO2MAN]:");
     sysLoadModuleBuffer(&sio2man_irx, size_sio2man_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_MC_MODULES) {
+        DPRINTF("[MCMAN]:");
         sysLoadModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL);
+        DPRINTF("[MCSERV]:");
         sysLoadModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL);
     }
 
+    DPRINTF("[PADMAN]:");
     sysLoadModuleBuffer(&padman_irx, size_padman_irx, 0, NULL);
 
+    DPRINTF("[POWEROFF]:");
     sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
         bdmLoadModules();
     }
     if (modload_mask & SYS_LOAD_ISOFS_MODULE) {
+        DPRINTF("[ISOFS]:");
         sysLoadModuleBuffer(&isofs_irx, size_isofs_irx, 0, NULL);
     }
 
+    DPRINTF("[GENVMC]:");
     sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 
+    DPRINTF("[LIBSD]:");
     sysLoadModuleBuffer(&libsd_irx, size_libsd_irx, 0, NULL);
+    DPRINTF("[AUDSRV]:");
     sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
 
 #ifdef PADEMU
@@ -240,7 +257,9 @@ void sysReset(int modload_mask)
     ds34bt_deinit();
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
+        DPRINTF("[DS34 USB]:");
         sysLoadModuleBuffer(&ds34usb_irx, size_ds34usb_irx, 4, (char *)&ds3pads);
+        DPRINTF("[DS34 BT]:");
         sysLoadModuleBuffer(&ds34bt_irx, size_ds34bt_irx, 4, (char *)&ds3pads);
 
         ds34usb_init();
@@ -742,6 +761,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
     // Disable sound effects via libsd, to prevent some games with improper initialization from inadvertently using digital effect settings from other software.
+    DPRINTF("[CLEAREFFECTS]:");
     sysLoadModuleBuffer(&cleareffects_irx, size_cleareffects_irx, 0, NULL);
 
     // Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.

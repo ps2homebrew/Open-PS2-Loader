@@ -256,9 +256,9 @@ void sysReset(int modload_mask)
     ds34bt_deinit();
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
-    LOG("[DS34_USB]:\n");
+        LOG("[DS34_USB]:\n");
         sysLoadModuleBuffer(&ds34usb_irx, size_ds34usb_irx, 4, (char *)&ds3pads);
-    LOG("[DS34_BT]:\n");
+        LOG("[DS34_BT]:\n");
         sysLoadModuleBuffer(&ds34bt_irx, size_ds34bt_irx, 4, (char *)&ds3pads);
 
         ds34usb_init();

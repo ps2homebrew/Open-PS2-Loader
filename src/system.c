@@ -109,18 +109,22 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
             break;
         }
     }
-    if (i == MAX_MODULES)
+    if (i == MAX_MODULES) {
+        LOG("WARNING: REACHED MODULES LIMIT (%d)\n", MAX_MODULES);
         return -1;
+    }
 
     // check if the module was already loaded
     for (i = 0; i < MAX_MODULES; i++) {
         if (g_sysLoadedModBuffer[i] == buffer) {
+            LOG("MODULE ALREADY LOADED (%d)\n", i);
             return 0;
         }
     }
 
     // load the module
     id = SifExecModuleBuffer(buffer, size, argc, argv, &ret);
+    LOG("ID=%d, ret=%d\n");
     if ((id < 0) || (ret))
         return -2;
 

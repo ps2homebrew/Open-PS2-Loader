@@ -7,14 +7,14 @@
 #define USB_PROTOCOL_BLUETOOTH_PROG   0x01
 
 #define SONY_VID            0x12ba // Sony
+#define SONY_WII_VID        0x1bad // Sony
 #define DS34_VID            0x054C // Sony Corporation
-#define SANTROLLER_VID      0x1209 // Generic VID used by Sanjay900's Arduino / Pi Pico controllers
 #define DS3_PID             0x0268 // PS3 Controller
 #define DS4_PID             0x05C4 // PS4 Controller
 #define DS4_PID_SLIM        0x09CC // PS4 Slim Controller
 #define GUITAR_HERO_PS3_PID 0x0100 // PS3 Guitar Hero Guitar
 #define ROCK_BAND_PS3_PID   0x0200 // PS3 Rock Band Guitar
-#define SANTROLLER_PID      0x2882 // Sanjay900's Arduino / Pi Pico based controller
+#define ROCK_BAND_WII_PID   0x0004 // Wii Rock Band Guitar
 
 // NOTE: struct member prefixed with "n" means it's active-low (i.e. value of 0 indicates button is pressed, value 1 is released)
 enum DS2ButtonBitNumber {

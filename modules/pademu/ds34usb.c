@@ -87,7 +87,7 @@ int usb_probe(int devId)
         return 1;
     }
 
-    if (device->idVendor == SANTROLLER_VID && device->idProduct == SANTROLLER_PID) {
+    if (device->idVendor == SONY_WII_VID && device->idProduct == ROCK_BAND_WII_PID) {
         return 1;
     }
 
@@ -129,13 +129,13 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    if (device->idProduct == DS3_PID || device->idProduct == SANTROLLER_PID) {
+    if (device->idProduct == DS3_PID) {
         ds34pad[pad].type = DS3;
         epCount = interface->bNumEndpoints - 1;
     } else if (device->idProduct == GUITAR_HERO_PS3_PID) {
         ds34pad[pad].type = GUITAR_GH;
         epCount = interface->bNumEndpoints - 1;
-    } else if (device->idProduct == ROCK_BAND_PS3_PID) {
+    } else if (device->idProduct == ROCK_BAND_PS3_PID || device->idProduct == ROCK_BAND_WII_PID) {
         ds34pad[pad].type = GUITAR_RB;
         epCount = interface->bNumEndpoints - 1;
     } else {

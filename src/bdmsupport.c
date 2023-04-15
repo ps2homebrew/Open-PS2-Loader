@@ -250,7 +250,7 @@ void bdmLaunchGame(int id, config_set_t *configSet)
     int i, fd, index, compatmask = 0;
     int EnablePS2Logo = 0;
     int result;
-    unsigned int start;
+    u64 startingLBA;
     unsigned int startCluster;
     char partname[256], filename[32];
     base_game_info_t *game;
@@ -273,7 +273,8 @@ void bdmLaunchGame(int id, config_set_t *configSet)
         configGetVMC(configSet, vmc_name, sizeof(vmc_name), vmc_id);
         if (vmc_name[0]) {
             have_error = 1;
-            if (sysCheckVMC(bdmPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
+            int vmcSizeInMb = sysCheckVMC(bdmPrefix, "/", vmc_name, 0, &vmc_superblock);
+            if (vmcSizeInMb > 0) {
                 bdm_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
                 bdm_vmc_infos.flags |= 0x100;
                 bdm_vmc_infos.specs.page_size = vmc_superblock.page_size;
@@ -284,15 +285,22 @@ void bdmLaunchGame(int id, config_set_t *configSet)
 
                 fd = open(vmc_path, O_RDONLY);
                 if (fd >= 0) {
-                    if ((start = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, vmc_path)) != 0 && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
+                    if (fileXioIoctl2(fd, USBMASS_IOCTL_GET_LBA, NULL, 0, &startingLBA, sizeof(startingLBA)) == 0 && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
 
+                        // VMC only supports 32bit LBAs at the moment, so if the starting LBA + size of the VMC crosses the 32bit boundary
+                        // just report the VMC as being fragmented to prevent file system corruption.
+                        int vmcSectorCount = vmcSizeInMb * ((1024 * 1024) / 512);   // size in MB * sectors per MB
+                        if (startingLBA + vmcSectorCount > 0x100000000) {
+                            LOG("BDMSUPPORT VMC bad LBA range\n");
+                            have_error = 2;
+                        }
                         // Check VMC cluster chain for fragmentation (write operation can cause damage to the filesystem).
-                        if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") == 1) {
+                        else if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") == 1) {
                             LOG("BDMSUPPORT Cluster Chain OK\n");
                             have_error = 0;
                             bdm_vmc_infos.active = 1;
-                            bdm_vmc_infos.start_sector = start;
-                            LOG("BDMSUPPORT VMC slot %d start: 0x%X\n", vmc_id, start);
+                            bdm_vmc_infos.start_sector = (u32)startingLBA;
+                            LOG("BDMSUPPORT VMC slot %d start: 0x%X\n", vmc_id, (u32)startingLBA);
                         } else {
                             LOG("BDMSUPPORT Cluster Chain NG\n");
                             have_error = 2;

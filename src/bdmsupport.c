@@ -289,7 +289,7 @@ void bdmLaunchGame(int id, config_set_t *configSet)
 
                         // VMC only supports 32bit LBAs at the moment, so if the starting LBA + size of the VMC crosses the 32bit boundary
                         // just report the VMC as being fragmented to prevent file system corruption.
-                        int vmcSectorCount = vmcSizeInMb * ((1024 * 1024) / 512);   // size in MB * sectors per MB
+                        int vmcSectorCount = vmcSizeInMb * ((1024 * 1024) / 512); // size in MB * sectors per MB
                         if (startingLBA + vmcSectorCount > 0x100000000) {
                             LOG("BDMSUPPORT VMC bad LBA range\n");
                             have_error = 2;

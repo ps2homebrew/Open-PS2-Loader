@@ -27,7 +27,7 @@
 
 #include "dev9.h"
 
-#ifdef HDD_DRIVER
+#if defined(HDD_DRIVER) || defined(USE_BDM_ATA)
 extern char atad_inited;
 #endif
 
@@ -163,7 +163,7 @@ int dev9d_init(void)
 /* Export 4 */
 void dev9RegisterIntrCb(int intr, dev9_intr_cb_t cb)
 {
-#ifdef HDD_DRIVER
+#if defined(HDD_DRIVER) || defined(USE_BDM_ATA)
     //Don't let anything else change the HDD interrupt handlers.
     if (intr < 2) {
         if (atad_inited)

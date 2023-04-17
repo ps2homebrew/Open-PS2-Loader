@@ -10,6 +10,7 @@
 #include "include/system.h"
 #include "include/extern_irx.h"
 #include "include/cheatman.h"
+#include "include/sound.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include <usbhdfsd-common.h>
@@ -72,7 +73,7 @@ static void bdmEventHandler(void *packet, void *opt)
 {
     // Note: It may not be safe to use LOG here. Need to do further testing, but it's probably best to perform
     // as few operations as possible in RPC callback functions...
-    
+
     //LOG("bdmEventHandler: device mount/unmount\n");
     BdmGeneration++;
 }
@@ -163,6 +164,13 @@ static int bdmNeedsUpdate(item_list_t* pItemList)
     if ((result = bdmUpdateDeviceData(pItemList)) == 0)
         return 0;
 
+    // If a device was added or removed play the appropriate UI sound.
+    // TODO: New sound effects for these would be nice.
+    if (result == -1)
+        sfxPlay(SFX_CANCEL);
+    else if (result == 1)
+        sfxPlay(SFX_CONFIRM);
+
     sprintf(path, "%sCD", pDeviceData->bdmPrefix);
     if (stat(path, &st) != 0)
         st.st_mtime = 0;
@@ -181,6 +189,9 @@ static int bdmNeedsUpdate(item_list_t* pItemList)
 
     if (!sbIsSameSize(pDeviceData->bdmPrefix, pDeviceData->bdmULSizePrev))
         result = 1;
+
+    // TODO: Theme and language support for devices that might be hot-plugged is going to be problematic. It's
+    // probably best to limit them but idk what the best strategy for that is.
 
     // update Themes
     if (!pDeviceData->ThemesLoaded) {
@@ -433,6 +444,10 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
     // adjust ZSO cache
     settings->common.zso_cache = bdmCacheSize;
 
+    // Get DMA settings for ATA mode.
+    int dmaType = 0, dmaMode = 7;
+    configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
+
     if ((result = sbLoadCheats(pDeviceData->bdmPrefix, game->startup)) < 0) {
         if (gAutoLaunchBDMGame == NULL) {
             switch (result) {
@@ -463,6 +478,7 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
         gAutoLaunchBDMGame = NULL;
     }
 
+    LOG("bdm pre sysLaunchLoaderElf\n");
     settings->bdDeviceId = pDeviceData->massDeviceIndex;
     if (!strcmp(pDeviceData->bdmDriver, "usb")) {
         settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
@@ -477,20 +493,25 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
     else if (!strcmp(pDeviceData->bdmDriver, "ata") && strlen(pDeviceData->bdmDriver) == 3)
     {
         // Set DMA mode and spindown time.
-        int dmaType = 0, dmaMode = 7;
-        configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
         if (dmaMode < 3)
             dmaType = 0x20;
         else {
             dmaType = 0x40;
-            dmaMode -= 3;
+            /*if (dmaMode == 7)
+                dmaMode = 6;
+            else*/
+                dmaMode -= 3;
         }
+        LOG("1\n");
         hddSetTransferMode(dmaType, dmaMode);
         // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
+        LOG("2\n");
         hddSetIdleTimeout(gHDDSpindown * 12);
 
-        settings->common.fakemodule_flags |= 0;
+        settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_DEV9;
+        settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_ATAD;
         settings->hddIsLBA48 = pDeviceData->bdmHddIsLBA48;
+        LOG("3\n");
         sysLaunchLoaderElf(filename, "BDM_MASS_ATA_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
     }
 }
@@ -683,6 +704,8 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
         fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
         LOG("3\n");
 
+        pItemList->flags = 0;
+
         // Determine the bdm device type based on the underlying device driver.
         if (!strcmp(pDeviceData->bdmDriver, "usb"))
             pDeviceData->bdmDeviceType = BDM_TYPE_USB;
@@ -691,7 +714,10 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
         else if (!strcmp(pDeviceData->bdmDriver, "sdc") && strlen(pDeviceData->bdmDriver) == 3)
             pDeviceData->bdmDeviceType = BDM_TYPE_SDC;
         else if (!strcmp(pDeviceData->bdmDriver, "ata") && strlen(pDeviceData->bdmDriver) == 3)
+        {
             pDeviceData->bdmDeviceType = BDM_TYPE_ATA;
+            pItemList->flags =  MODE_FLAG_COMPAT_DMA;
+        }
         else
             pDeviceData->bdmDeviceType = BDM_TYPE_UNKNOWN;
 
@@ -735,7 +761,7 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
         }
 
         LOG("Mass device: %d (%d) disconnected\n", pItemList->mode, pDeviceData->massDeviceIndex);
-        return 1;
+        return -1;
     }
 
     // No change to the device state detected.

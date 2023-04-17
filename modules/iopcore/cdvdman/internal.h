@@ -109,7 +109,7 @@ extern void cdvdman_initdev(void);
 
 extern struct CDVDMAN_SETTINGS_TYPE cdvdman_settings;
 
-#ifdef HDD_DRIVER
+#if defined(HDD_DRIVER) || defined(USE_BDM_ATA)
 // HDD driver also uses this buffer, for aligning unaligned reads.
 #define CDVDMAN_BUF_SECTORS 2
 #else

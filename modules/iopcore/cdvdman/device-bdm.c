@@ -15,6 +15,7 @@
 #include "atad.h"
 
 char lba_48bit = 0;
+char atad_inited = 0;
 #endif
 
 #define U64_2XU32(val)  ((u32*)val)[1], ((u32*)val)[0]
@@ -25,6 +26,10 @@ static u32 g_bd_sectors_per_sector = 4;
 static int bdm_io_sema;
 
 extern struct irx_export_table _exp_bdm;
+
+#ifdef USE_BDM_ATA
+extern struct irx_export_table _exp_atad;
+#endif
 
 //
 // BDM exported functions
@@ -81,8 +86,11 @@ void DeviceInit(void)
     RegisterLibraryEntries(&_exp_bdm);
 
 #ifdef USE_BDM_ATA
+    RegisterLibraryEntries(&_exp_atad);
+
     // Initialize ATA interface which will register the HDD as a block device.
     atad_start();
+    atad_inited = 1;
 #endif
 }
 

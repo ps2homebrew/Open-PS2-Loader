@@ -490,6 +490,7 @@ int guiIoModeToDeviceType(int ioMode)
         case BDM_MODE4: return 0;
         case ETH_MODE: return 1;
         case HDD_MODE: return 2;
+        case APP_MODE: return 3;
         default: return 0;
     }
 }

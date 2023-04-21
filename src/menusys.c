@@ -76,6 +76,7 @@ static submenu_list_t *appMenu;
 static submenu_list_t *appMenuCurrent;
 
 static s32 menuSemaId;
+static s32 menuListSemaId;
 static ee_sema_t menuSema;
 
 static void menuRenameGame(submenu_list_t **submenu)
@@ -294,6 +295,7 @@ void menuInit()
     menuSema.max_count = 1;
     menuSema.option = 0;
     menuSemaId = CreateSema(&menuSema);
+    menuListSemaId = CreateSema(&menuSema);
 }
 
 void menuEnd()
@@ -323,6 +325,7 @@ void menuEnd()
     }
 
     DeleteSema(menuSemaId);
+    DeleteSema(menuListSemaId);
 }
 
 static menu_list_t *AllocMenuItem(menu_item_t *item)
@@ -342,14 +345,23 @@ void menuAppendItem(menu_item_t *item)
 {
     assert(item);
 
+    // TODO: Create assert .c/.h files with our own implementation and assert this shit for APP support.
+
 #ifdef __DEBUG
     item_list_t* pSupport = (item_list_t*)item->userdata;
-    LOG("Appending menu item: %s\n", pSupport->itemGetPrefix(pSupport));
+    if (pSupport->itemGetPrefix != NULL)
+        LOG("Appending menu item: %s\n", pSupport->itemGetPrefix(pSupport));
+    else
+        LOG("Appending menu item: mode=%d\n", pSupport->mode);
 #endif
+
+    WaitSema(menuListSemaId);
 
     if (menu == NULL) {
         menu = AllocMenuItem(item);
         selected_item = menu;
+
+        SignalSema(menuListSemaId);
         return;
     }
 
@@ -365,6 +377,15 @@ void menuAppendItem(menu_item_t *item)
     // link
     cur->next = newitem;
     newitem->prev = cur;
+
+    SignalSema(menuListSemaId);
+
+#ifdef __DEBUG
+    if (pSupport->itemGetPrefix != NULL)
+        LOG("Appending menu item: %s done\n", pSupport->itemGetPrefix(pSupport));
+    else
+        LOG("Appending menu item: mode=%d done\n", pSupport->mode);
+#endif
 }
 
 void submenuRebuildCache(submenu_list_t *submenu)

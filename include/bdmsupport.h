@@ -39,6 +39,7 @@ typedef struct
     int bdmDeviceTick;              // Used alongside BdmGeneration to tell if device data needs to be refreshed
     unsigned char ThemesLoaded;
     unsigned char LanguagesLoaded;
+    unsigned char ForceRefresh;
 } bdm_device_data_t;
 
 void bdmInit();
@@ -46,6 +47,7 @@ int bdmFindPartition(char *target, const char *name, int write);
 void bdmLoadModules(void);
 void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet);
 
+void bdmInitSemaphore();
 void bdmEnumerateDevices();
 
 #endif

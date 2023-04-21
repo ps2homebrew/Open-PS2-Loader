@@ -195,6 +195,34 @@ int gOSDLanguageValue;
 int gOSDLanguageEnable;
 int gOSDLanguageSource;
 
+void __assert_fail (const char *__assertion, const char *__file, unsigned int __line, const char *__function)
+{
+    LOG("*** ASSERTION FAILURE ***\n");
+    LOG("File: %s\n", __file);
+    LOG("Line Number: %d\n", __line);
+    LOG("Function: %s\n", __function);
+    LOG("Expression: %s\n", __assertion);
+    SleepThread();
+}
+
+# if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
+#   define __ASSERT_FUNCTION	__extension__ __PRETTY_FUNCTION__
+# else
+#  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#   define __ASSERT_FUNCTION	__func__
+#  else
+#   define __ASSERT_FUNCTION	((const char *) 0)
+#  endif
+# endif
+
+#  define assert(expr)							\
+  ((void) sizeof ((expr) ? 1 : 0), __extension__ ({			\
+      if (expr)								\
+        ; /* empty */							\
+      else								\
+        __assert_fail (#expr, __FILE__, __LINE__, __ASSERT_FUNCTION);	\
+    }))
+
 void moduleUpdateMenuInternal(opl_io_module_t* mod, int themeChanged, int langChanged);
 
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
@@ -236,9 +264,19 @@ void moduleUpdateMenuInternal(opl_io_module_t* mod, int themeChanged, int langCh
 
     // refresh Cache
     if (themeChanged) {
+        if (mod->subMenu)
         submenuRebuildCache(mod->subMenu);
         guiCheckNotifications(themeChanged, 0);
     }
+}
+
+static void itemInitSupport(item_list_t *support)
+{
+    support->itemInit(support);
+    moduleUpdateMenuInternal((opl_io_module_t*)support->owner, 0, 0);
+    // Manual refreshing can only be done if either auto refresh is disabled or auto refresh is disabled for the item.
+    if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
+        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 }
 
 static void itemExecSelect(struct menu_item *curMenu)
@@ -253,11 +291,24 @@ static void itemExecSelect(struct menu_item *curMenu)
                 support->itemLaunch(support, curMenu->current->item.id, configSet);
             }
         } else {
-            support->itemInit(support);
-            moduleUpdateMenuInternal((opl_io_module_t*)support->owner, 0, 0);
-            // Manual refreshing can only be done if either auto refresh is disabled or auto refresh is disabled for the item.
-            if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
-                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+            // If we're trying to enable BDM support we need to enable it for all BDM menu slots.
+            if (support->mode == BDM_MODE)
+            {
+                // Initialize support for all bdm modules.
+                for (int i = 0; i <= BDM_MODE4; i++)
+                {
+                    opl_io_module_t *mod = &list_support[i];
+                    assert(mod);
+                    assert(mod->support);
+
+                    itemInitSupport(mod->support);
+                }
+            }
+            else
+            {
+                // Normal initialization.
+                itemInitSupport(support);
+            }
         }
     } else
         guiMsgBox("NULL Support object. Please report", 0, NULL);
@@ -266,7 +317,7 @@ static void itemExecSelect(struct menu_item *curMenu)
 static void itemExecRefresh(struct menu_item *curMenu)
 {
     item_list_t *support = curMenu->userdata;
-    //LOG("itemExecRefresh for %s (0x%08x)\n", support->itemGetPrefix(support), support->owner);
+    //LOG("itemExecRefresh for %d (0x%08x)\n", support->mode, support->owner);
 
     if (support && support->enabled) {
         ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
@@ -459,8 +510,10 @@ int oplPath2Mode(const char *path)
             if (blkdevnameend != NULL) {
                 blkdevnamelen = (int)(blkdevnameend - appsPath);
 
-                while ((blkdevnamelen > 0) && isdigit((int)appsPath[blkdevnamelen - 1]))
-                    blkdevnamelen--; // Ignore the unit number.
+                // NOTE: Commenting this out because we now support multiple block devices at once, and the device number matters.
+                // Since I don't use apps I don't really know if this will introduce a new issue or not.
+                //while ((blkdevnamelen > 0) && isdigit((int)appsPath[blkdevnamelen - 1]))
+                //    blkdevnamelen--; // Ignore the unit number.
 
                 if (strncmp(path, appsPath, blkdevnamelen) == 0)
                     return listSupport->mode;
@@ -698,11 +751,9 @@ void menuDeferredUpdate(void *data)
     if (!mod->support)
         return;
 
-    //LOG("menuDeferredUpdate for %s\n", mod->support->itemGetPrefix(mod->support));
-
     // see if we have to update
     if (mod->support->itemNeedsUpdate(mod->support)) {
-        LOG("menuDeferredUpdate: updating game list...\n");
+        LOG("menuDeferredUpdate: updating game list for %d...\n", mod->support->mode);
         updateMenuFromGameList(mod);
 
         // If other modes have been updated, then the apps list should be updated too.
@@ -1737,6 +1788,8 @@ static void init(void)
     menuInit();
 
     startPads();
+
+    bdmInitSemaphore();
 
     // compatibility update handler
     ioRegisterHandler(IO_COMPAT_UPDATE_DEFFERED, &compatDeferredUpdate);

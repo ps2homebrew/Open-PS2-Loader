@@ -23,6 +23,7 @@
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
 static int hddModLoaded = 0;
+static s32 bdmLoadModuleLock;
 
 // Used to supress device enumeration during shutdown.
 int gSupressBdmNotifications;
@@ -80,19 +81,19 @@ static void bdmEventHandler(void *packet, void *opt)
 
 static void bdmLoadBlockDeviceModules(void)
 {
+    WaitSema(bdmLoadModuleLock);
+
     if (gEnableILK && !iLinkModLoaded) {
         // Load iLink Block Device drivers
+        iLinkModLoaded = 1;
         sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
         sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
-
-        iLinkModLoaded = 1;
     }
 
     if (gEnableMX4SIO && !mx4sioModLoaded) {
         // Load MX4SIO Block Device drivers
-        sysLoadModuleBuffer(&mx4sio_bd_irx, size_mx4sio_bd_irx, 0, NULL);
-
         mx4sioModLoaded = 1;
+        sysLoadModuleBuffer(&mx4sio_bd_irx, size_mx4sio_bd_irx, 0, NULL);
     }
 
     if (gEnableBdmHDD && !hddModLoaded)
@@ -102,6 +103,8 @@ static void bdmLoadBlockDeviceModules(void)
         hddModLoaded = 1;
         hddLoadModules();
     }
+
+    SignalSema(bdmLoadModuleLock);
 }
 
 void bdmLoadModules(void)
@@ -155,6 +158,13 @@ static int bdmNeedsUpdate(item_list_t* pItemList)
     bdm_device_data_t* pDeviceData = (bdm_device_data_t*)pItemList->priv;
 
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
+
+    // Check for forced refresh from deleting or renaming a game.
+    if (pDeviceData->ForceRefresh != 0)
+    {
+        pDeviceData->ForceRefresh = 0;
+        return 1;
+    }
 
     if (pDeviceData->bdmULSizePrev != -2 && pDeviceData->bdmDeviceTick == BdmGeneration)
         return 0;
@@ -261,6 +271,7 @@ static void bdmDeleteGame(item_list_t* pItemList, int id)
 
     sbDelete(&pDeviceData->bdmGames, pDeviceData->bdmPrefix, "/", pDeviceData->bdmGameCount, id);
     pDeviceData->bdmULSizePrev = -2;
+    pDeviceData->ForceRefresh = 1;
 }
 
 static void bdmRenameGame(item_list_t* pItemList, int id, char *newName)
@@ -269,6 +280,7 @@ static void bdmRenameGame(item_list_t* pItemList, int id, char *newName)
 
     sbRename(&pDeviceData->bdmGames, pDeviceData->bdmPrefix, "/", pDeviceData->bdmGameCount, id, newName);
     pDeviceData->bdmULSizePrev = -2;
+    pDeviceData->ForceRefresh = 1;
 }
 
 void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
@@ -650,14 +662,25 @@ void bdmInitDevicesData()
             // Register the device structure into the UI.
             initSupport(pDeviceSupport, i, 0);
 
-            // Set the page to be initially invisible.
+            // If bdm support is set to auto then make the page invisible, when a bdm device is mounted it will dynamically be made visible.
+            // If bdm support is set to manual then only make the first page visible.
             if (pDeviceSupport->owner != NULL)
             {
-                LOG("bdmInitDevicesData: setting device %d invisible\n", i);
-                ((opl_io_module_t*)pDeviceSupport->owner)->menuItem.visible = 0;
+                ((opl_io_module_t*)pDeviceSupport->owner)->menuItem.visible = (gBDMStartMode == START_MODE_MANUAL && i == 0 ? 1 : 0);
+                LOG("bdmInitDevicesData: setting device %d %s\n", i, (gBDMStartMode == START_MODE_MANUAL && i == 0 ? "visible" : "invisible"));
             }
         }
     }
+}
+
+void bdmInitSemaphore()
+{
+    // Create a semaphore so only one thread can load IOP modules at a time.
+    ee_sema_t semaphore;
+    semaphore.init_count = 1;
+    semaphore.max_count = 1;
+    semaphore.option = 0;
+    bdmLoadModuleLock = CreateSema(&semaphore);
 }
 
 void bdmEnumerateDevices()
@@ -669,7 +692,6 @@ void bdmEnumerateDevices()
 
     // Because bdmLoadModules is called before the config file is loaded bdmLoadBlockDeviceModules will not have loaded any
     // optional bdm modules. Now that the config file has been loaded try loading any optional modules that weren't previously loaded.
-    LOG("bdmEnumerateDevices 1\n");
     //ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
     bdmLoadBlockDeviceModules();
 
@@ -690,7 +712,9 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
     sprintf(path, "mass%d:/", pItemList->mode);
     int dir = fileXioDopen(path);
     LOG("opendir %s -> %d\n", path, dir);
-    if (dir >= 0 && visible == 0)
+
+    // If we opened the device and the menu isn't visible (OR is visible but hasn't been initialized ex: manual device start) initialize device info.
+    if (dir >= 0 && (visible == 0 || pDeviceData->bdmPrefix[0] == '\0'))
     {
         if (gBDMPrefix[0] != '\0')
             snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:%s/", pItemList->mode, gBDMPrefix);
@@ -698,11 +722,8 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
             snprintf(pDeviceData->bdmPrefix, sizeof(pDeviceData->bdmPrefix), "mass%d:", pItemList->mode);
 
         // Get the name of the underlying device driver that backs the fat fs.
-        LOG("1\n");
         fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &pDeviceData->bdmDriver, sizeof(pDeviceData->bdmDriver) - 1);
-        LOG("2\n");
         fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &pDeviceData->massDeviceIndex, sizeof(pDeviceData->massDeviceIndex));
-        LOG("3\n");
 
         pItemList->flags = 0;
 
@@ -725,7 +746,6 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
         if (pDeviceData->bdmDeviceType == BDM_TYPE_ATA)
         {
             // If atad is loaded then xhdd is also loaded, query the hdd to see if it supports LBA48 or not.
-            LOG("4\n");
             pDeviceData->bdmHddIsLBA48 = fileXioDevctl("xhdd0:", ATA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
             if (pDeviceData->bdmHddIsLBA48 < 0)
             {
@@ -765,5 +785,7 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
     }
 
     // No change to the device state detected.
+    if (dir >= 0)
+        fileXioDclose(dir);
     return 0;
 }

@@ -54,6 +54,8 @@ void _ps2sdk_timezone_update() {}
 DISABLE_PATCHED_FUNCTIONS();      // Disable the patched functionalities
 DISABLE_EXTRA_TIMERS_FUNCTIONS(); // Disable the extra functionalities for timers
 
+#ifdef __EESIO_DEBUG
+
 void eecoreDebugInit()
 {
      // Get the address of ResetEE so we can find where printf is located.
@@ -78,6 +80,8 @@ void eecoreDebugInit()
      if (krnl_print != NULL)
         SetSyscall(__NR__print, krnl_print);
 }
+
+#endif
 
 static int eecoreInit(int argc, char **argv)
 {

@@ -719,8 +719,8 @@ void bdmEnumerateDevices()
 
     // Because bdmLoadModules is called before the config file is loaded bdmLoadBlockDeviceModules will not have loaded any
     // optional bdm modules. Now that the config file has been loaded try loading any optional modules that weren't previously loaded.
-    //ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
-    bdmLoadBlockDeviceModules();
+    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
+    //bdmLoadBlockDeviceModules();
 
     LOG("bdmEnumerateDevices done\n");
 }

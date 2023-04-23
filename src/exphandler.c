@@ -69,7 +69,8 @@ void pkoDebug(int cause, int badvaddr, int status, int epc, eeReg *regs)
     _exceptionTriggered = 1;
     //_print("Exception Cause %08x  BadVAddr %08x  Status %08x  EPC %08x\n", cause, badvaddr, status, epc);
 
-    excpPrintf("\n\n           EE Exception handler: %s exception\n\n",
+    excpPrintf("OPL Version: %s\n", OPL_VERSION);
+    excpPrintf("\n           EE Exception handler: %s exception\n\n",
                codeTxt[code >> 2]);
 
     excpPrintf("      Cause %08X  BadVAddr %08X  Status %08X  EPC %08X\n\n",

@@ -269,7 +269,7 @@ void moduleUpdateMenuInternal(opl_io_module_t* mod, int themeChanged, int langCh
     // refresh Cache
     if (themeChanged) {
         if (mod->subMenu)
-        submenuRebuildCache(mod->subMenu);
+            submenuRebuildCache(mod->subMenu);
         guiCheckNotifications(themeChanged, 0);
     }
 }
@@ -450,6 +450,11 @@ void initSupport(item_list_t *itemList, int mode, int force_reinit)
             ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[mode].support->mode); // can't use mode as the variable will die at end of execution
         }
     }
+    else
+    {
+        // If the module has a valid menu instance try to refresh the visibility state.
+        mod->menuItem.visible = 0;
+    }
 }
 
 static void initAllSupport(int force_reinit)
@@ -465,16 +470,10 @@ static void initAllSupport(int force_reinit)
     initSupport(ethGetObject(0), ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), HDD_MODE, force_reinit);
     initSupport(appGetObject(0), APP_MODE, force_reinit);
-
-    // Enable bdm notifications so we can auto-rescan when a device is mounted/unmounted.
-    gSupressBdmNotifications = 0;
 }
 
 static void deinitAllSupport(int exception, int modeSelected)
 {
-    // Supress bdm notifications so it doesn't try to handle device unmounting notifications.
-    gSupressBdmNotifications = 1;
-
     for (int i = 0; i < MODE_COUNT; i++)
     {
         if (list_support[i].support != NULL)

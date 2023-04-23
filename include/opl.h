@@ -208,8 +208,6 @@ extern base_game_info_t *gAutoLaunchBDMGame;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 
-extern int gSupressBdmNotifications;
-
 void initSupport(item_list_t *itemList, int mode, int force_reinit);
 
 void setDefaultColors(void);

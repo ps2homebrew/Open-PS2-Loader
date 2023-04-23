@@ -737,12 +737,30 @@ static void drawMenuIcon(struct menu_list *menu, struct submenu_list *item, conf
         rmDrawPixmap(menuIconTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
 }
 
+static int findMenuNext(struct menu_list* menu)
+{
+    struct menu_list* pNext = menu->next;
+    while (pNext != NULL && pNext->item->visible == 0)
+        pNext = pNext->next;
+
+    return pNext == NULL ? 0 : pNext->item->visible;
+}
+
+static int findMenuPrev(struct menu_list* menu)
+{
+    struct menu_list* pPrev = menu->prev;
+    while (pPrev != NULL && pPrev->item->visible == 0)
+        pPrev = pPrev->prev;
+
+    return pPrev == NULL ? 0 : pPrev->item->visible;
+}
+
 static void drawMenuText(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
     GSTEXTURE *leftIconTex = NULL, *rightIconTex = NULL;
-    if (menu->prev != NULL)
+    if (findMenuPrev(menu) != 0)
         leftIconTex = thmGetTexture(LEFT_ICON);
-    if (menu->next != NULL)
+    if (findMenuNext(menu) != 0)
         rightIconTex = thmGetTexture(RIGHT_ICON);
 
     if (elem->aligned) {

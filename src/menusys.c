@@ -32,7 +32,11 @@ enum MENU_IDs {
     MENU_ABOUT,
     MENU_SAVE_CHANGES,
     MENU_EXIT,
-    MENU_POWER_OFF
+    MENU_POWER_OFF,
+
+#ifdef CATCH_EXCEPTIONS_TEST
+    MENU_CRASH_NULLDEREF,
+#endif
 };
 
 enum GAME_MENU_IDs {
@@ -228,6 +232,10 @@ static void menuInitMainMenu(void)
     submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_POWER_OFF, _STR_POWEROFF);
 
+#ifdef CATCH_EXCEPTIONS_TEST
+    submenuAppendItem(&mainMenu, -1, "Null De-ref", MENU_CRASH_NULLDEREF, -1);
+#endif
+
     mainMenuCurrent = mainMenu;
 }
 
@@ -345,8 +353,6 @@ void menuAppendItem(menu_item_t *item)
 {
     assert(item);
 
-    // TODO: Create assert .c/.h files with our own implementation and assert this shit for APP support.
-
 #ifdef __DEBUG
     item_list_t* pSupport = (item_list_t*)item->userdata;
     if (pSupport->itemGetPrefix != NULL)
@@ -386,6 +392,22 @@ void menuAppendItem(menu_item_t *item)
     else
         LOG("Appending menu item: mode=%d done\n", pSupport->mode);
 #endif
+}
+
+void refreshMenuPosition()
+{
+    // Find the first menu in the list that is visible and set it as the active menu.
+    menu_list_t* pCur = menu;
+    while (pCur->item->visible == 0 && pCur->next != NULL)
+        pCur = pCur->next;
+
+    if (pCur == NULL || pCur->item->visible == 0)
+    {
+        // No visible menu was found, just set the current menu to the first one in the list.
+        selected_item = menu;
+    }
+    else
+        selected_item = pCur;
 }
 
 void submenuRebuildCache(submenu_list_t *submenu)
@@ -836,6 +858,10 @@ int menuCheckParentalLock(void)
     return result;
 }
 
+#ifdef CATCH_EXCEPTIONS_TEST
+static int* pTest = NULL;
+#endif
+
 void menuHandleInputMenu()
 {
     if (!mainMenu)
@@ -912,7 +938,20 @@ void menuHandleInputMenu()
         } else if (id == MENU_POWER_OFF) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_POFF), 1, NULL))
                 sysPowerOff();
+
+#ifdef CATCH_EXCEPTIONS_TEST
+            pTest = (int*)0x80000000;
+#endif
         }
+        
+#ifdef CATCH_EXCEPTIONS_TEST
+        else if (id == MENU_CRASH_NULLDEREF)
+        {
+            int crash = *pTest;
+            _print("crash: 0x%08x\n", crash);
+        }
+#endif
+
 
         // so the exit press wont propagate twice
         readPads();

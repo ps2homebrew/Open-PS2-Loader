@@ -24,9 +24,7 @@ static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
 static int hddModLoaded = 0;
 static s32 bdmLoadModuleLock;
-
-// Used to supress device enumeration during shutdown.
-int gSupressBdmNotifications;
+int bdmDeviceModeStarted;
 
 static item_list_t bdmDeviceList[MAX_BDM_DEVICES];
 static int bdmDeviceListInitialized = 0;
@@ -111,9 +109,6 @@ void bdmLoadModules(void)
 {
     LOG("BDMSUPPORT LoadModules\n");
 
-    // Initially supress bdm notifications until after the UI loads config files.
-    gSupressBdmNotifications = 1;
-
     // Load Block Device Manager (BDM)
     sysLoadModuleBuffer(&bdm_irx, size_bdm_irx, 0, NULL);
 
@@ -154,6 +149,13 @@ static int bdmNeedsUpdate(item_list_t* pItemList)
     struct stat st;
 
     //LOG("bdmNeedsUpdate %d\n", pItemList->mode);
+
+    // If we made it here then BDM device mode has been started.
+    bdmDeviceModeStarted = 1;
+
+    // If bdm mode is disabled bail out as we don't want to update the visibility state of the device pages.
+    if (gBDMStartMode == START_MODE_DISABLED)
+        return 0;
 
     bdm_device_data_t* pDeviceData = (bdm_device_data_t*)pItemList->priv;
 
@@ -658,17 +660,42 @@ void bdmInitDevicesData()
             bdm_device_data_t* pDeviceData = (bdm_device_data_t*)malloc(sizeof(bdm_device_data_t));
             memset(pDeviceData, 0, sizeof(bdm_device_data_t));
             pDeviceSupport->priv = pDeviceData;
+        }
+    }
 
-            // Register the device structure into the UI.
-            initSupport(pDeviceSupport, i, 0);
+    // Refresh the visibility of the menu.
+    for (int i = 0; i < MAX_BDM_DEVICES; i++)
+    {
+        // Register the device structure into the UI.
+        initSupport(&bdmDeviceList[i], i, 0);
 
-            // If bdm support is set to auto then make the page invisible, when a bdm device is mounted it will dynamically be made visible.
-            // If bdm support is set to manual then only make the first page visible.
-            if (pDeviceSupport->owner != NULL)
+        // If bdm support is set to auto then make the page invisible and reset the bdm tick counter, when a bdm device is mounted it will dynamically be made visible.
+        // If bdm support is set to manual then only make the first page visible.
+        if (bdmDeviceList[i].owner != NULL)
+        {
+            if (gBDMStartMode == START_MODE_DISABLED)
             {
-                ((opl_io_module_t*)pDeviceSupport->owner)->menuItem.visible = (gBDMStartMode == START_MODE_MANUAL && i == 0 ? 1 : 0);
-                LOG("bdmInitDevicesData: setting device %d %s\n", i, (gBDMStartMode == START_MODE_MANUAL && i == 0 ? "visible" : "invisible"));
+                ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = 0;
             }
+            else if (gBDMStartMode == START_MODE_MANUAL)
+            {
+                // If BDM has already been started then make the page invisible and reset the bdm tick counter so visibility status is refreshed
+                // according to device state.
+                if (bdmDeviceModeStarted == 1)
+                {
+                    ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = 0;
+                    ((bdm_device_data_t*)bdmDeviceList[i].priv)->bdmDeviceTick = -1;
+                }
+                else
+                    ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = (i == 0 ? 1 : 0);
+            }
+            else if (gBDMStartMode == START_MODE_AUTO)
+            {
+                ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = 0;
+                ((bdm_device_data_t*)bdmDeviceList[i].priv)->bdmDeviceTick = -1;
+            }
+
+            LOG("bdmInitDevicesData: setting device %d %s\n", i, (((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible != 0 ? "visible" : "invisible"));
         }
     }
 }
@@ -701,6 +728,10 @@ void bdmEnumerateDevices()
 int bdmUpdateDeviceData(item_list_t* pItemList)
 {
     char path[16] = { 0 };
+
+    // If bdm mode is disabled bail out as we don't want to update the visibility state of the device pages.
+    if (gBDMStartMode == START_MODE_DISABLED)
+        return 0;
 
     LOG("bdmUpdateDeviceData: %d\n", pItemList->mode);
 

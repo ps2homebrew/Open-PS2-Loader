@@ -1587,6 +1587,9 @@ void guiSwitchScreen(int target)
     sfxPlay(SFX_TRANSITION);
     transIndex = 0;
     screenHandlerTarget = &screenHandlers[target];
+
+    if (target == GUI_SCREEN_MAIN)
+        refreshMenuPosition();
 }
 
 struct gui_update_t *guiOpCreate(gui_op_type_t type)

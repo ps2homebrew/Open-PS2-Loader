@@ -42,6 +42,8 @@ EESIO_DEBUG ?= 0
 INGAME_DEBUG ?= 0
 DECI2_DEBUG ?= 0
 
+EXCEPTION_HANDLER ?= 1
+
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
 REVISION = $(shell expr $(shell git rev-list --count HEAD) + 2)
 
@@ -152,6 +154,11 @@ ifeq ($(PADEMU),1)
   PADEMU_FLAGS = PADEMU=1
 else
   PADEMU_FLAGS = PADEMU=0
+endif
+
+ifeq ($(EXCEPTION_HANDLER),1)
+  EE_CFLAGS += -DCATCH_EXCEPTIONS
+  FRONTEND_OBJS += exphandler.o exceptions.o
 endif
 
 ifeq ($(DEBUG),1)
@@ -731,6 +738,9 @@ $(EE_OBJS_DIR)%.o: $(EE_SRC_DIR)%.c | $(EE_OBJS_DIR)
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
 $(EE_OBJS_DIR)%.o: $(EE_ASM_DIR)%.s | $(EE_OBJS_DIR)
+	$(EE_AS) $(EE_ASFLAGS) $< -o $@
+
+$(EE_OBJS_DIR)%.o: $(EE_SRC_DIR)%.s | $(EE_OBJS_DIR)
 	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 
 $(PNG_ASSETS:%=$(EE_ASM_DIR)%_png.s): $(EE_ASM_DIR)%_png.s: $(PNG_ASSETS_DIR)%.png | $(EE_ASM_DIR)

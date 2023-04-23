@@ -69,6 +69,10 @@ int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 #endif
 #endif
 
+#ifdef CATCH_EXCEPTIONS
+#include "include/exceptions.h"
+#endif
+
 // App support stuff.
 static unsigned char shouldAppsUpdate;
 
@@ -1973,6 +1977,13 @@ int main(int argc, char *argv[])
     LOG_INIT();
     PREINIT_LOG("OPL GUI start!\n");
 
+#ifdef CATCH_EXCEPTIONS
+    //InitDebug();
+
+    // Setup the debug exception handlers.
+    installExceptionHandlers();
+#endif
+
     ChangeThreadPriority(GetThreadId(), 31);
 
     // reset, load modules
@@ -2005,6 +2016,11 @@ int main(int argc, char *argv[])
 
     guiIntroLoop();
     guiMainLoop();
+
+#ifdef CATCH_EXCEPTIONS
+    // Uninstall debug exception handlers.
+    restoreExceptionHandlers();
+#endif
 
     return 0;
 }

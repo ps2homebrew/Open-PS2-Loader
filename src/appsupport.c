@@ -13,6 +13,10 @@
 
 #include <elf-loader.h>
 
+#ifdef CATCH_EXCEPTIONS
+#include "include/exceptions.h"
+#endif
+
 static int appForceUpdate = 1;
 static int appItemCount = 0;
 
@@ -389,6 +393,12 @@ static void appLaunchItem(item_list_t* pItemList, int id, config_set_t *configSe
         }
 
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
+
+#ifdef CATCH_EXCEPTIONS
+        // Uninstall debug exception handlers.
+        restoreExceptionHandlers();
+#endif
+
         LoadELFFromFileWithPartition(filename, partition, argc, argv);
     } else
         guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);

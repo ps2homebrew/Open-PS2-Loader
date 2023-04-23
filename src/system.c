@@ -26,6 +26,10 @@
 #include "include/pggsm.h"
 #include "include/cheatman.h"
 
+#ifdef CATCH_EXCEPTIONS
+#include "include/exceptions.h"
+#endif
+
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
@@ -279,6 +283,12 @@ static void poweroffHandler(void *arg)
 void sysPowerOff(void)
 {
     deinit(NO_EXCEPTION, IO_MODE_SELECTED_NONE);
+
+#ifdef CATCH_EXCEPTIONS
+    // Uninstall debug exception handlers.
+    restoreExceptionHandlers();
+#endif
+
     poweroffShutdown();
 }
 
@@ -363,6 +373,12 @@ void sysExecExit(void)
 {
     // Deinitialize without shutting down active devices.
     deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
+
+#ifdef CATCH_EXCEPTIONS
+    // Uninstall debug exception handlers.
+    restoreExceptionHandlers();
+#endif
+
     Exit(0);
 }
 
@@ -884,6 +900,11 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     // Let's go.
     fileXioExit();
     SifExitRpc();
+
+#ifdef CATCH_EXCEPTIONS
+    // Uninstall debug exception handlers.
+    restoreExceptionHandlers();
+#endif
 
     FlushCache(0);
     FlushCache(2);

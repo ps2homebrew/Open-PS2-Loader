@@ -19,6 +19,8 @@
 #include "include/sound.h"
 #include <assert.h>
 
+//#define CATCH_EXCEPTIONS_TEST 1
+
 enum MENU_IDs {
     MENU_SETTINGS = 0,
     MENU_GFX_SETTINGS,
@@ -960,7 +962,10 @@ void menuHandleInputMenu()
     if (getKeyOn(KEY_START) || getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
         // Check if there is anything to show the user, at all.
         if (gAPPStartMode || gETHStartMode || gBDMStartMode || gHDDStartMode)
+        {
             guiSwitchScreen(GUI_SCREEN_MAIN);
+            refreshMenuPosition();
+        }
     }
 }
 
@@ -1072,6 +1077,20 @@ void menuRenderGameMenu()
     guiDrawBGPlasma();
 
     if (!gameMenu)
+        return;
+
+    // If the device menu that has the selected game suddenly goes invisible (device was removed), switch
+    // back to the game list menu.
+    if (selected_item->item->visible == 0)
+    {
+        guiSwitchScreen(GUI_SCREEN_MAIN);
+        return;
+    }
+
+    // If we enter the game settings menu and there's no selected item bail out. I'm not entirely sure how we get into
+    // this state but it seems to happen on some consoles when transitioning from the game settings menu back to the game
+    // list menu.
+    if (selected_item->item->current == NULL)
         return;
 
     // draw the animated menu

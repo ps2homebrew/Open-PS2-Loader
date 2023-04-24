@@ -1584,12 +1584,13 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target)
 {
-    sfxPlay(SFX_TRANSITION);
-    transIndex = 0;
-    screenHandlerTarget = &screenHandlers[target];
-
-    if (target == GUI_SCREEN_MAIN)
-        refreshMenuPosition();
+    // Only initiate the transition once or else we could get stuck in an infinite loop.
+    if (screenHandlerTarget == NULL)
+    {
+        sfxPlay(SFX_TRANSITION);
+        transIndex = 0;
+        screenHandlerTarget = &screenHandlers[target];
+    }
 }
 
 struct gui_update_t *guiOpCreate(gui_op_type_t type)

@@ -221,6 +221,8 @@ static bool changeInternalState(struct ds2report *rep, bool special_button)
 
 static void performTurbo(struct ds2report *rep)
 {
+    int i;
+
     gTurboButtonCounter++;
     if (gTurboButtonCounter >= 2 * gTurboSpeed) {
         // Reset counter
@@ -232,7 +234,7 @@ static void performTurbo(struct ds2report *rep)
         rep->nButtonState |= gTurboButtonMask;
         // First 4 bits correspond to buttons without pressure sensing
         u16 turbo_button_tmp = gTurboButtonMask >> 4;
-        for (int i = 0; i < 12; i++) {
+        for (i = 0; i < 12; i++) {
             if (turbo_button_tmp & 1) {
                 // Set analog pressure to 0 as well
                 ((u8 *)rep)[button_to_analog_lookup[i]] = 0;

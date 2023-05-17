@@ -25,6 +25,7 @@
 #include <osd_config.h>
 #include "include/pggsm.h"
 #include "include/cheatman.h"
+#include "include/xparam.h"
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -786,6 +787,8 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         if (eph[i].memsz > eph[i].filesz)
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
+
+    ApplyDeckardXParam(filename);
 
     // Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
     if (initKernel((void *)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0) { // Should not happen, but...

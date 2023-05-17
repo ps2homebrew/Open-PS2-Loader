@@ -33,6 +33,7 @@
 
 #include "include/cheatman.h"
 #include "include/sound.h"
+#include "include/xparam.h"
 
 // FIXME: We should not need this function.
 //        Use newlib's 'stat' to get GMT time.
@@ -1887,6 +1888,7 @@ int main(int argc, char *argv[])
 
     // reset, load modules
     reset();
+    ResetDeckardXParams();
 
     if (argc >= 5) {
         /* argv[0] boot path
@@ -1899,7 +1901,7 @@ int main(int argc, char *argv[])
         /* argv[0] boot path
            argv[1] file name (including extention)
            argv[2] game->startup
-           argv[3] game->media ("CD" / "DVD") 
+           argv[3] game->media ("CD" / "DVD")
            argv[4] "bdm" */
         if (!strcmp(argv[4], "bdm"))
             autoLaunchBDMGame(argv);

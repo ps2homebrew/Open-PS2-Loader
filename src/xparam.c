@@ -69,7 +69,7 @@ void ApplyExtraXParamTitle(const char *title, char *params)
     result |= !strncmp("SLPM_653.08", title, 11);
 
     // Initial D: Special Stage (Japan)
-    result |= !strncmp("SLPM_653.08", title, 11);
+    result |= !strncmp("SLPM_652.68", title, 11);
 
     // Bakusou Dekotora Densetsu: Otoko Hanamichi Yume Roman (Japan)
     result |= !strncmp("SLPM_652.34", title, 11);

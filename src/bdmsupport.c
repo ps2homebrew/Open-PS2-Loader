@@ -84,7 +84,9 @@ static void bdmLoadBlockDeviceModules(void)
 {
     if (gEnableILK && !iLinkModLoaded) {
         // Load iLink Block Device drivers
+        LOG("[ILINKMAN]:\n");
         sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
+        LOG("[IEEE1394_BD]:\n");
         sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
 
         iLinkModLoaded = 1;
@@ -92,6 +94,7 @@ static void bdmLoadBlockDeviceModules(void)
 
     if (gEnableMX4SIO && !mx4sioModLoaded) {
         // Load MX4SIO Block Device drivers
+        LOG("[MX4SIO_BD]:\n");
         sysLoadModuleBuffer(&mx4sio_bd_irx, size_mx4sio_bd_irx, 0, NULL);
 
         mx4sioModLoaded = 1;
@@ -103,18 +106,23 @@ void bdmLoadModules(void)
     LOG("BDMSUPPORT LoadModules\n");
 
     // Load Block Device Manager (BDM)
+    LOG("[BDM]:\n");
     sysLoadModuleBuffer(&bdm_irx, size_bdm_irx, 0, NULL);
 
     // Load FATFS (mass:) driver
+    LOG("[BDMFS_FATFS]:\n");
     sysLoadModuleBuffer(&bdmfs_fatfs_irx, size_bdmfs_fatfs_irx, 0, NULL);
 
     // Load USB Block Device drivers
+    LOG("[USBD]:\n");
     sysLoadModuleBuffer(&usbd_irx, size_usbd_irx, 0, NULL);
+    LOG("[USBMASS_BD]:\n");
     sysLoadModuleBuffer(&usbmass_bd_irx, size_usbmass_bd_irx, 0, NULL);
 
     // Load Optional Block Device drivers
     bdmLoadBlockDeviceModules();
 
+    LOG("[BDMEVENT]:\n");
     sysLoadModuleBuffer(&bdmevent_irx, size_bdmevent_irx, 0, NULL);
     SifAddCmdHandler(0, &bdmEventHandler, NULL);
 

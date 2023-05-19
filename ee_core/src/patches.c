@@ -37,7 +37,7 @@ typedef struct
 #define PATCH_GENERIC_SLOW_READS 0xDEADBEE2
 #define PATCH_VIRTUA_QUEST       0xDEADBEE3
 #define PATCH_SDF_MACROSS        0x00065405
-#define PATCH_SRW_IMPACT         0x0021e808
+#define PATCH_SRW_IMPACT         0x0021E808
 #define PATCH_RNC_UYA            0x00398498
 #define PATCH_ZOMBIE_ZONE        0xEEE62525
 #define PATCH_DOT_HACK           0x0D074A37
@@ -47,6 +47,8 @@ typedef struct
 #define PATCH_PRO_SNOWBOARDER    0x01020199
 #define PATCH_SHADOW_MAN_2       0x01020413
 #define PATCH_HARVEST_MOON_AWL   0xFF025421
+#define PATCH_MTV_PMR_V200_ADDR  0x001F3AB8 // MTV Pimp My Ride v2.00 patch address
+#define PATCH_SRS_V200_ADDR      0x0033B744 // SRS Stree Racing Syndicate v2.00 patch address
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", BDM_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -133,6 +135,7 @@ static const patchlist_t patch_list[] = {
     {"SLES_529.80", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00146124, 0x00000000}},   // Big Mutha Truckers 2 - Truck Me Harder (PAL)
     {"SLES_546.32", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x001f60f8, 0x00000000}},   // MTV Pimp My Ride (PAL)
     {"SLES_546.07", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x001f37d0, 0x00000000}},   // MTV Pimp My Ride (PAL-Australia)
+    {"SLUS_215.80", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x01f52d8, 0x00000000}},    // MTV Pimp My Ride (v1.00/default) (NTSC-U/C)
     {"SLUS_201.99", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-U/C)
     {"SLES_504.00", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL)
     {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French)
@@ -706,6 +709,43 @@ static void EutechnyxWakeupTIDPatch(u32 addr)
 { // Eutechnyx games have the main thread ID hardcoded for a call to WakeupThread().
     // addiu $a0, $zero, 1
     // This breaks when the thread IDs change after IGR is used.
+
+    /*
+    MTV Pimp My Ride uses same serial for v1.00 and v2.00 of USA release.
+    We need to tell which offsets to use.
+    */
+    if (_strcmp(GameID, "SLUS_215.80") == 0) {
+        // Check version v1.00 by default.
+        if (*(vu16 *)addr == 1) {
+            *(vu16 *)addr = (u16)GetThreadId();
+            return;
+        }
+
+        // Now check if v2.00.
+        if (*(vu16 *)(PATCH_MTV_PMR_V200_ADDR) == 1) {
+            *(vu16 *)(PATCH_MTV_PMR_V200_ADDR) = (u16)GetThreadId();
+        }
+        return;
+    }
+
+    /*
+    Same problem with SRS: Street Racing Syndicate
+    The patch already exists but it was for v1.03 of the game so if it was trying to boot v2.00 then it would be wrong patched. This handles both cases correctly.
+    */
+    if (_strcmp(GameID, "SLUS_205.82") == 0) {
+        // Check version v1.03 by default.
+        if (*(vu16 *)addr == 1) {
+            *(vu16 *)addr = (u16)GetThreadId();
+            return;
+        }
+
+        // Now check if v2.00.
+        if (*(vu16 *)(PATCH_SRS_V200_ADDR) == 1) {
+            *(vu16 *)(PATCH_SRS_V200_ADDR) = (u16)GetThreadId();
+        }
+        return;
+    }
+
     *(vu16 *)addr = (u16)GetThreadId();
 }
 

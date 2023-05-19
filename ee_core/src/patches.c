@@ -127,6 +127,8 @@ static const patchlist_t patch_list[] = {
     {"SLES_541.58", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00388a84, 0x00000000}},   // Hummer Badlands (PAL)
     {"SLUS_211.62", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00144bcc, 0x00000000}},   // Ford Mustang - The Legend Lives (NTSC-U/C)
     {"SLES_532.96", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00144cc4, 0x00000000}},   // Ford Mustang - The Legend Lives (PAL)
+    {"SLUS_212.76", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00332814, 0x00000000}},   // Ford vs. Chevy (NTSC-U/C)
+    {"SLES_536.98", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00335674, 0x00000000}},   // Ford vs. Chevy  (PAL)
     {"SLUS_201.99", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-U/C)
     {"SLES_504.00", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL)
     {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French)

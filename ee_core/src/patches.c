@@ -132,6 +132,12 @@ static const patchlist_t patch_list[] = {
     {"SLPS_732.22", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000000, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-J) (PlayStation 2 The Best)
     {"SLUS_211.71", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000001, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-U/C)
     {"SLES_534.80", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000002, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-PAL)
+    {"SLUS_214.38", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0034c944, 0x00000000}},   // Cartoon Network Racing (NTSC-U/C)
+    {"SLES_543.06", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0034c8A4, 0x00000000}},   // Cartoon Network Racing (PAL)
+    {"SLUS_216.28", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0023cbc8, 0x00000000}},   // Hot Wheels - Beat That! (NTSC-U/C)
+    {"SLES_549.71", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0023d7b8, 0x00000000}},   // Hot Wheels - Beat That! (PAL)
+    {"SLUS_213.57", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00386b14, 0x00000000}},   // Hummer Badlands (NTSC-U/C)
+    {"SLES_541.58", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00388a84, 0x00000000}},   // Hummer Badlands (PAL)
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 

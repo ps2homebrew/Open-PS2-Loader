@@ -38,7 +38,7 @@ extern u32 ziso_total_block;
 // temp block buffer (2048 bytes)
 extern u8 *ziso_tmp_buf;
 
-void ziso_init(ZISO_header *header, u32 first_block);
+void ziso_init(ZISO_header *header);
 int ziso_read_sector(u8 *buf, u32 sector, unsigned int count);
 
 // This must be implemented by isofs/cdvdman/frontend

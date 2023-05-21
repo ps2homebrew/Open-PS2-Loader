@@ -245,7 +245,7 @@ static int ProbeZSO(u8 *buffer)
     probed = 1;
     if (*(u32 *)buffer == ZSO_MAGIC) {
         // initialize ZSO
-        ziso_init((ZISO_header *)buffer, *(u32 *)(buffer + sizeof(ZISO_header)));
+        ziso_init((ZISO_header *)buffer);
         // initialize cache
         initCache();
         // redirect sector reader

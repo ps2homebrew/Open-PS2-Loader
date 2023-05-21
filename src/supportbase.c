@@ -484,15 +484,11 @@ extern u8 IOBuffer[2048];
 
 static int ProbeZISO(int fd)
 {
-    struct
-    {
-        ZISO_header header;
-        u32 first_block;
-    } ziso_data;
+    ZISO_header header;
     lseek(fd, 0, SEEK_SET);
-    if (read(fd, &ziso_data, sizeof(ziso_data)) == sizeof(ziso_data) && ziso_data.header.magic == ZSO_MAGIC) {
+    if (read(fd, &header, sizeof(header)) == sizeof(header) && header.magic == ZSO_MAGIC) {
         // initialize ZSO
-        ziso_init(&ziso_data.header, ziso_data.first_block);
+        ziso_init(&header);
         // set ISO file descriptor for ZSO reader
         probed_fd = fd;
         probed_lba = 0;

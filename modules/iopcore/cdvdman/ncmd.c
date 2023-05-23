@@ -70,6 +70,14 @@ int sceCdSeek(u32 lsn)
 
     cdvdman_stat.status = SCECdStatPause;
 
+    // Set the invalid parament error in case of trying to seek more than max lsn.
+    if (mediaLsnCount) {
+        if (lsn >= mediaLsnCount) {
+            DPRINTF("cdvdman_searchfile_init mediaLsnCount=%d\n", mediaLsnCount);
+            cdvdman_stat.err = SCECdErIPI;
+        }
+    }
+
     cdvdman_cb_event(SCECdFuncSeek);
 
     return 1;

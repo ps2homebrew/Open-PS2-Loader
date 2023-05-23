@@ -393,8 +393,7 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
             cdvd_readee(buf);
             break;
         case CD_NCMD_GETTOC:
-            DPRINTF("cbrpc_cdvdNcmds CD_NCMD_GETTOC NOT IMPLEMENTED buf=%x\n", (int)buf);
-            *(int *)buf = 1;
+            *(int *)buf = sceCdGetToc((u8 *)(*(u32 *)buf));
             break;
         case CD_NCMD_SEEK:
             *(int *)buf = sceCdSeek(*(u32 *)buf);

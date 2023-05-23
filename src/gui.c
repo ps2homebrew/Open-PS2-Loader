@@ -546,7 +546,7 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
         DisableCron = 1; // Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
         diaGetInt(diaConfig, CFG_DEFDEVICE, &deviceModeIndex);
-        gDefaultDevice = guiIoModeToDeviceType(deviceModeIndex);
+        gDefaultDevice = guiDeviceTypeToIoMode(deviceModeIndex);
         diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
@@ -1416,6 +1416,9 @@ static void guiDrawOverlays()
 
     if (prevtime != 0) {
         clock_t diff = curtime - prevtime;
+        if (diff == 0)
+            diff = 1;
+            
         // Raw FPS value with 2 decimal places
         float rawfps = ((100 * CLOCKS_PER_SEC) / diff) / 100.0f;
 

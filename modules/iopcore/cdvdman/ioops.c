@@ -510,6 +510,7 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
             result = sceCdGetToc(buf);
             if (result != 1)
                 result = -EIO;
+            sceCdSync(0);
             break;
         case CDIOC_GETINTREVENTFLG:
             *(int *)buf = cdvdman_stat.intr_ef;

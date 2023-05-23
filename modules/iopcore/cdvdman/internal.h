@@ -52,6 +52,8 @@
 #error Unknown driver type. Please check the Makefile.
 #endif
 
+#define btoi(b) ((b) / 16 * 10 + (b) % 16) /* BCD to u_char */
+#define itob(i) ((i) / 10 * 16 + (i) % 10) /* u_char to BCD */
 struct SteamingData
 {
     unsigned short int StBufmax;

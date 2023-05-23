@@ -125,5 +125,6 @@ extern cdvdman_status_t cdvdman_stat;
 
 extern unsigned char sync_flag;
 extern unsigned char cdvdman_cdinited;
+extern u32 mediaLsnCount;
 
 #endif

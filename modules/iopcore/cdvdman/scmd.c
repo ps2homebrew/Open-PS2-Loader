@@ -40,11 +40,13 @@ int sceCdGetError(void)
 //-------------------------------------------------------------------------
 int sceCdTrayReq(int mode, u32 *traycnt)
 {
-    DPRINTF("sceCdTrayReq(%d, 0x%lX)\n", mode, *traycnt);
+    DPRINTF("sceCdTrayReq(%d, 0x08%X)\n", mode, traycnt);
 
     if (mode == SCECdTrayCheck) {
         if (traycnt)
             *traycnt = cdvdman_media_changed;
+
+        DPRINTF("sceCdTrayReq TrayCheck result=%d\n", cdvdman_media_changed);
 
         cdvdman_media_changed = 0;
 
@@ -78,7 +80,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 //-------------------------------------------------------------------------
 int sceCdApplySCmd(u8 cmd, const void *in, u16 in_size, void *out)
 {
-    DPRINTF("sceCdApplySCmd\n");
+    DPRINTF("sceCdApplySCmd cmd=%02x\n", cmd & 0xFF);
 
     return cdvdman_sendSCmd(cmd & 0xff, in, in_size, out, 16);
 }
@@ -127,7 +129,7 @@ int cdvdman_readID(int mode, u8 *buf)
     if (mode == 0) { // GUID
         u32 *GUID0 = (u32 *)&buf[0];
         u32 *GUID1 = (u32 *)&buf[4];
-        *GUID0 = lbuf[0] | 0x08004600; //Replace the MODEL ID segment with the SCE OUI, to get the console's IEEE1394 EUI-64.
+        *GUID0 = lbuf[0] | 0x08004600; // Replace the MODEL ID segment with the SCE OUI, to get the console's IEEE1394 EUI-64.
         *GUID1 = *(u32 *)&lbuf[4];
     } else { // ModelID
         u32 *ModelID = (u32 *)&buf[0];
@@ -153,7 +155,7 @@ int sceCdReadModelID(unsigned long int *ModelID)
 int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 {
     if (cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL) {
-        //Make layer 1 point to layer 0.
+        // Make layer 1 point to layer 0.
         *layer1_start = 0;
         *on_dual = 1;
     } else {

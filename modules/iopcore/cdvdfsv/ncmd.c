@@ -172,7 +172,7 @@ static inline void cdvd_readee(void *buf)
             }
 
             if (flag_64b == 0) { // not 64 bytes aligned buf
-                //The data of the last sector of the chunk will be used to correct buffer alignment.
+                // The data of the last sector of the chunk will be used to correct buffer alignment.
                 if (sectors_to_read < CDVDMAN_FS_SECTORS - 1)
                     nsectors = sectors_to_read;
                 else
@@ -222,7 +222,7 @@ static inline void cdvd_readee(void *buf)
 
         } while ((flag_64b) || (sectors_to_read));
 
-        //At the very last pass, copy readee.b2len bytes from the last sector, to complete the alignment correction.
+        // At the very last pass, copy readee.b2len bytes from the last sector, to complete the alignment correction.
         memcpy((void *)readee.buf2, (void *)(fsvRbuf + size_64b - readee.b2len), readee.b2len);
     }
 
@@ -357,7 +357,7 @@ static inline void cdvd_readchain(void *buf)
             }
         }
 
-        //The pointer to the read position variable within EE RAM is stored at ((RpcCdvdchain_t *)buf)[65].sectors.
+        // The pointer to the read position variable within EE RAM is stored at ((RpcCdvdchain_t *)buf)[65].sectors.
         sysmemSendEE(&readpos, (void *)((RpcCdvdchain_t *)buf)[65].sectors, sizeof(readpos));
     }
 }
@@ -393,6 +393,7 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
             cdvd_readee(buf);
             break;
         case CD_NCMD_GETTOC:
+            DPRINTF("cbrpc_cdvdNcmds CD_NCMD_GETTOC NOT IMPLEMENTED buf=%x\n", (int)buf);
             *(int *)buf = 1;
             break;
         case CD_NCMD_SEEK:
@@ -426,6 +427,7 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
             rpcNCmd_cdgetdisktype(buf);
             break;
         default:
+            DPRINTF("cbrpc_cdvdNcmds unknown rpc fno=%x buf=%x size=%x\n", fno, (int)buf, size);
             *(int *)buf = 0;
             break;
     }

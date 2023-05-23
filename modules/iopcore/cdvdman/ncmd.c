@@ -48,12 +48,14 @@ int sceCdReadCdda(u32 lsn, u32 sectors, void *buf, sceCdRMode *mode)
 //-------------------------------------------------------------------------
 int sceCdGetToc(u8 *toc)
 {
+    DPRINTF("sceCdGetToc toc=%08x  NOT IMPLEMENTED \n", (int)toc);
+
     if (sync_flag)
         return 0;
 
     cdvdman_stat.err = SCECdErREAD;
 
-    return 0; //Not supported
+    return 0; // Not supported
 }
 
 //-------------------------------------------------------------------------

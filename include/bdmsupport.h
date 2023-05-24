@@ -35,6 +35,7 @@ typedef struct
     char bdmDriver[32];
     int bdmDeviceType;              // Type of BDM device, see BDM_TYPE_* above
     int bdmHddIsLBA48;              // 1 if the HDD supports LBA48, 0 if the HDD only supports LBA28
+    int ataHighestUDMAMode;         // Highest UDMA mode supported by the HDD
 
     int bdmDeviceTick;              // Used alongside BdmGeneration to tell if device data needs to be refreshed
     unsigned char ThemesLoaded;

@@ -44,6 +44,8 @@ DECI2_DEBUG ?= 0
 
 EXCEPTION_HANDLER ?= 1
 
+ATA_UDMA_PLUS ?= 1
+
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
 REVISION = $(shell expr $(shell git rev-list --count HEAD) + 2)
 
@@ -127,6 +129,10 @@ BIN2O = $(PS2SDK)/bin/bin2o
 
 # WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)
 # but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule!
+
+ifeq ($(ATA_UDMA_PLUS),1)
+  EE_CFLAGS += -DATA_UDMA_PLUS
+endif
 
 ifeq ($(RTL),1)
   EE_CFLAGS += -D__RTL

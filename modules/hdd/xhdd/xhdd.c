@@ -7,11 +7,14 @@
 
 #include "opl-hdd-ioctl.h"
 #include "xhdd.h"
+#include "ata_identify.h"
 
 #define MODNAME "xhdd"
 IRX_ID(MODNAME, 1, 2);
 
 static int isHDPro;
+
+static IDENTIFY_DEVICE_DATA deviceIdentifyData;
 
 static int xhddInit(iop_device_t *device)
 {
@@ -48,6 +51,23 @@ static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsi
                 return -EINVAL;
 
             return ata_device_sector_io(fd->unit, buf, 0, buflen / 512, ATA_DIR_READ);
+        }
+        case ATA_DEVCTL_GET_HIGHEST_UDMA_MODE:
+        {
+            // Get the device info.
+            int result = ata_device_identify(fd->unit, &deviceIdentifyData);
+            if (result != 0)
+                return result;
+
+            // Check the highest UDMA mode supported.
+            for (int i = 7; i >= 0; i--)
+            {
+                // Check if the current UDMA mode is supported.
+                if ((deviceIdentifyData.UltraDMASupport & (1 << i)) != 0)
+                    return i;
+            }
+
+            return -EINVAL;
         }
         default:
             return -EINVAL;

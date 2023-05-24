@@ -168,6 +168,26 @@ static int bdmNeedsUpdate(item_list_t* pItemList)
         return 1;
     }
 
+    // If the device menu is visible double check the device type and if support for this device type is enabled. If the user switches device support
+    // to off for a bdm device we want to hide the menu even though the drivers are still loaded and the device is being detected by bdm.
+    opl_io_module_t* pOwner = (opl_io_module_t*)pItemList->owner;
+    if (pOwner != NULL && pOwner->menuItem.visible == 1)
+    {
+        int deviceEnabled = 0;
+        switch (pDeviceData->bdmDeviceType)
+        {
+            case BDM_TYPE_USB: deviceEnabled = (gBDMStartMode != START_MODE_DISABLED); break;
+            case BDM_TYPE_ILINK: deviceEnabled = gEnableILK; break;
+            case BDM_TYPE_SDC: deviceEnabled = gEnableMX4SIO; break;
+            case BDM_TYPE_ATA: deviceEnabled = gEnableBdmHDD; break;
+            default: deviceEnabled = 0; break;
+        }
+
+        // If the device page is visible but the device support is not enabled, hide the device page.
+        if (deviceEnabled == 0)
+            pOwner->menuItem.visible = 0;
+    }
+
     if (pDeviceData->bdmULSizePrev != -2 && pDeviceData->bdmDeviceTick == BdmGeneration)
         return 0;
     pDeviceData->bdmDeviceTick = BdmGeneration;
@@ -511,10 +531,12 @@ void bdmLaunchGame(item_list_t* pItemList, int id, config_set_t *configSet)
             dmaType = 0x20;
         else {
             dmaType = 0x40;
-            /*if (dmaMode == 7)
-                dmaMode = 6;
-            else*/
-                dmaMode -= 3;
+#ifdef ATA_UDMA_PLUS
+            dmaMode = pDeviceData->ataHighestUDMAMode;
+#else
+            dmaMode -= 3;
+#endif
+
         }
         LOG("1\n");
         hddSetTransferMode(dmaType, dmaMode);
@@ -673,9 +695,11 @@ void bdmInitDevicesData()
         // If bdm support is set to manual then only make the first page visible.
         if (bdmDeviceList[i].owner != NULL)
         {
+            opl_io_module_t* pOwner = (opl_io_module_t*)bdmDeviceList[i].owner;
+
             if (gBDMStartMode == START_MODE_DISABLED)
             {
-                ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = 0;
+                pOwner->menuItem.visible = 0;
             }
             else if (gBDMStartMode == START_MODE_MANUAL)
             {
@@ -683,19 +707,19 @@ void bdmInitDevicesData()
                 // according to device state.
                 if (bdmDeviceModeStarted == 1)
                 {
-                    ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = 0;
+                    pOwner->menuItem.visible = 0;
                     ((bdm_device_data_t*)bdmDeviceList[i].priv)->bdmDeviceTick = -1;
                 }
                 else
-                    ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = (i == 0 ? 1 : 0);
+                    pOwner->menuItem.visible = (i == 0 ? 1 : 0);
             }
             else if (gBDMStartMode == START_MODE_AUTO)
             {
-                ((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible = 0;
+                pOwner->menuItem.visible = 0;
                 ((bdm_device_data_t*)bdmDeviceList[i].priv)->bdmDeviceTick = -1;
             }
 
-            LOG("bdmInitDevicesData: setting device %d %s\n", i, (((opl_io_module_t*)bdmDeviceList[i].owner)->menuItem.visible != 0 ? "visible" : "invisible"));
+            LOG("bdmInitDevicesData: setting device %d %s\n", i, (pOwner->menuItem.visible != 0 ? "visible" : "invisible"));
         }
     }
 }
@@ -733,7 +757,7 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
     if (gBDMStartMode == START_MODE_DISABLED)
         return 0;
 
-    LOG("bdmUpdateDeviceData: %d\n", pItemList->mode);
+    //LOG("bdmUpdateDeviceData: %d\n", pItemList->mode);
 
     // Get the per-device data and check if the menu item is currently visible.
     bdm_device_data_t* pDeviceData = pItemList->priv;
@@ -742,7 +766,7 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
     // Format the device path and try to open the device.
     sprintf(path, "mass%d:/", pItemList->mode);
     int dir = fileXioDopen(path);
-    LOG("opendir %s -> %d\n", path, dir);
+    //LOG("opendir %s -> %d\n", path, dir);
 
     // If we opened the device and the menu isn't visible (OR is visible but hasn't been initialized ex: manual device start) initialize device info.
     if (dir >= 0 && (visible == 0 || pDeviceData->bdmPrefix[0] == '\0'))
@@ -785,7 +809,21 @@ int bdmUpdateDeviceData(item_list_t* pItemList)
                 pDeviceData->bdmHddIsLBA48 = 0;
             }
 
-            LOG("Mass device: %d (%d LBA%d) %s -> %s\n", pItemList->mode, pDeviceData->massDeviceIndex, (pDeviceData->bdmHddIsLBA48 == 1 ? 48 : 28), pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
+            // Query the drive for the highest UDMA mode.
+            pDeviceData->ataHighestUDMAMode = fileXioDevctl("xhdd0:", ATA_DEVCTL_GET_HIGHEST_UDMA_MODE, NULL, 0, NULL, 0);
+            if (pDeviceData->ataHighestUDMAMode < 0 || pDeviceData->ataHighestUDMAMode > 7)
+            {
+                // Failed to query highest UDMA mode supported.
+                LOG("Mass device %d is backed by ATA but failed to get highest UDMA mode %d\n", pDeviceData->ataHighestUDMAMode);
+                pDeviceData->ataHighestUDMAMode = 4;
+            }
+
+#ifdef ATA_UDMA_PLUS
+            // Set the UDMA mode to highest available.
+            hddSetTransferMode(0x40, pDeviceData->ataHighestUDMAMode);
+#endif
+
+            LOG("Mass device: %d (%d LBA%d UDMA%d) %s -> %s\n", pItemList->mode, pDeviceData->massDeviceIndex, (pDeviceData->bdmHddIsLBA48 == 1 ? 48 : 28), pDeviceData->ataHighestUDMAMode, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);
         }
         else
             LOG("Mass device: %d (%d) %s -> %s\n", pItemList->mode, pDeviceData->massDeviceIndex, pDeviceData->bdmPrefix, pDeviceData->bdmDriver);

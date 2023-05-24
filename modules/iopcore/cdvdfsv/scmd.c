@@ -172,6 +172,7 @@ static void *cbrpc_cdvdScmds(int fno, void *buf, int size)
             rpcSCmd_cdreaddvddualinfo(buf);
             break;
         default:
+            DPRINTF("cbrpc_cdvdScmds unknown rpc fno=%x buf=%x size=%x\n", fno, (int)buf, size);
             *(int *)buf = 0;
             break;
     }

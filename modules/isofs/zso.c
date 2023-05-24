@@ -11,7 +11,6 @@ int ziso_idx_start_block = -1;
 
 // header data that we need for the reader
 u32 ziso_align;
-u32 ziso_total_block;
 
 // block buffers
 u8 *ziso_tmp_buf = NULL;
@@ -20,14 +19,12 @@ void ziso_init(ZISO_header *header)
 {
     // read header information
     ziso_align = header->align;
+    // invalidate block offset cache
     ziso_idx_start_block = -1;
-    // calculate number of blocks without using 64 bit division
-    u32 *total_bytes_p = (u32 *)&(header->total_bytes);
-    ziso_total_block = (total_bytes_p[0] >> 11) | ((total_bytes_p[1] & 0x7ff) << 21);
     // allocate memory
     if (ziso_tmp_buf == NULL) {
         ziso_tmp_buf = ziso_alloc(2048 + sizeof(u32) * ZISO_IDX_MAX_ENTRIES + 64);
-        if ((u32)ziso_tmp_buf & 63) // align 64
+        if ((u32)ziso_tmp_buf & 63) // align 64 (is 64 needed? is 4 enough?)
             ziso_tmp_buf = (void *)(((u32)ziso_tmp_buf & (~63)) + 64);
         if (ziso_tmp_buf) {
             ziso_idx_cache = (u32 *)(ziso_tmp_buf + 2048);
@@ -46,16 +43,8 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
 
     u32 cur_block = lsn;
 
-    if (lsn >= ziso_total_block) {
-        return 0; // can't seek beyond file
-    }
-
-    if (lsn + count > ziso_total_block) {
-        count = ziso_total_block - lsn; // adjust if reading more than available
-    }
-
     // refresh index table if needed
-    if (ziso_idx_start_block < 0 || lsn < ziso_idx_start_block || lsn + count >= ziso_idx_start_block + ZISO_IDX_MAX_ENTRIES - 1) {
+    if (ziso_idx_start_block < 0 || lsn < ziso_idx_start_block || (lsn + count) - ziso_idx_start_block >= ZISO_IDX_MAX_ENTRIES - 1) {
         read_raw_data((u8 *)ziso_idx_cache, ZISO_IDX_MAX_ENTRIES * sizeof(u32), lsn * 4 + sizeof(ZISO_header), 0);
         ziso_idx_start_block = lsn;
     }

@@ -33,7 +33,6 @@ extern int ziso_idx_start_block;
 
 // header data that we need for the reader
 extern u32 ziso_align;
-extern u32 ziso_total_block;
 
 // temp block buffer (2048 bytes)
 extern u8 *ziso_tmp_buf;

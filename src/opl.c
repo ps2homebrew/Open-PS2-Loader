@@ -1023,7 +1023,7 @@ static void _loadConfig()
         }
     }
 
-    applyConfig(themeID, langID);
+    applyConfig(themeID, langID, 0);
 
     lscret = result;
     lscstatus = 0;
@@ -1184,7 +1184,7 @@ static void _saveConfig()
     lscstatus = 0;
 }
 
-void applyConfig(int themeID, int langID)
+void applyConfig(int themeID, int langID, int skipDeviceRefresh)
 {
     if (gDefaultDevice < 0 || gDefaultDevice > APP_MODE)
         gDefaultDevice = APP_MODE;
@@ -1207,20 +1207,19 @@ void applyConfig(int themeID, int langID)
 
     guiUpdateScreenScale();
 
-    initAllSupport(0);
-
-    for (int i = 0; i < MODE_COUNT; i++)
+    // Check if we should refresh device support as well.
+    if (skipDeviceRefresh == 0)
     {
-        if (list_support[i].support == NULL)
-            continue;
+        initAllSupport(0);
 
-        moduleUpdateMenuInternal(&list_support[i], changed, langChanged);
+        for (int i = 0; i < MODE_COUNT; i++)
+        {
+            if (list_support[i].support == NULL)
+                continue;
+
+            moduleUpdateMenuInternal(&list_support[i], changed, langChanged);
+        }
     }
-
-    //moduleUpdateMenu(BDM_MODE, changed, langChanged);
-    //moduleUpdateMenu(ETH_MODE, changed, langChanged);
-    //moduleUpdateMenu(HDD_MODE, changed, langChanged);
-    //moduleUpdateMenu(APP_MODE, changed, langChanged);
 
     bgmUnMute();
 

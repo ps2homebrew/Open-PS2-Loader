@@ -557,7 +557,7 @@ void guiShowConfig()
         if (ret == BLOCKDEVICE_BUTTON)
             guiShowBlockDeviceConfig();
 
-        applyConfig(-1, -1);
+        applyConfig(-1, -1, 0);
         menuReinitMainMenu();
     }
 }
@@ -702,7 +702,7 @@ reselect_video_mode:
         if (previousTheme != themeID && isBgmPlaying())
             bgmStop();
 
-        applyConfig(themeID, langID);
+        applyConfig(themeID, langID, 1);
         sfxInit(0);
 
         if (gEnableBGM && !isBgmPlaying())
@@ -713,7 +713,7 @@ reselect_video_mode:
         if (guiConfirmVideoMode() == 0) {
             // Restore previous video mode, without changing the theme & language settings.
             gVMode = previousVMode;
-            applyConfig(themeID, langID);
+            applyConfig(themeID, langID, 1);
             goto reselect_video_mode;
         }
     }
@@ -829,7 +829,7 @@ void guiShowNetConfig(void)
         if (result == NETCFG_RECONNECT && gNetworkStartup < ERROR_ETH_SMB_CONN)
             gNetworkStartup = ERROR_ETH_SMB_LOGON;
 
-        applyConfig(-1, -1);
+        applyConfig(-1, -1, 0);
     }
 }
 
@@ -931,7 +931,7 @@ void guiShowControllerConfig(void)
             guiGameShowPadMacroConfig(1);
         }
 #endif
-        applyConfig(-1, -1);
+        applyConfig(-1, -1, 1);
     }
 }
 

@@ -648,13 +648,13 @@ int MceEraseBlock(MemoryCard *mcd, int page)
     r = (mcd->flags & 0x10) ? 0x0 : 0xFF;
     mips_memset(mcd->dbufp, r, mcd->cspec.PageSize);
 
-    for (i = 0; i < mcd->cspec.BlockSize; i++) {
-        r = DeviceWritePage(mcd->mcnum, mcd->dbufp, page + i);
-        if (!r) {
-            DPRINTF("erase error\n");
-            return 0;
-        }
-    }
+    // for (i = 0; i < mcd->cspec.BlockSize; i++) {
+    //     r = DeviceWritePage(mcd->mcnum, mcd->dbufp, page + i);
+    //     if (!r) {
+    //         DPRINTF("erase error\n");
+    //         return 0;
+    //     }
+    // }
 
     return 1;
 }

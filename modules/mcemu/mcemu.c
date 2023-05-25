@@ -769,11 +769,11 @@ restart:
         size = tot_size - size;
         mcd->wroff = 0;
 
-        r = DeviceWritePage(mcd->mcnum, mcd->dbufp, mcd->wpage);
-        if (!r) {
-            DPRINTF("write error.\n");
-            return 0;
-        }
+        // r = DeviceWritePage(mcd->mcnum, mcd->dbufp, mcd->wpage);
+        // if (!r) {
+        //     DPRINTF("write error.\n");
+        //     return 0;
+        // }
 
         mcd->wpage++;
         if (size > 0)

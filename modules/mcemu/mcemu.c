@@ -329,6 +329,7 @@ void hookSio2man(Sio2Packet *sd, Sio2McProc sio2proc)
                 break;
             /* unknown transfer mode, setting wrong command code */
             default:
+                DPRINTF("hookSio2man ctrl=%08X\n", ctrl);
                 ctrl = 0;
                 break;
         }

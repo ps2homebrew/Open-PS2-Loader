@@ -144,8 +144,8 @@ void PrepareGSM(char *cmdline)
             predef_vmode[gGSMVMode].display,
             predef_vmode[gGSMVMode].syncv,
             ((predef_vmode[gGSMVMode].ffmd) << 1) | (predef_vmode[gGSMVMode].interlace),
-            gGSMXOffset,
-            gGSMYOffset,
+            (u32)gGSMXOffset,
+            (u32)gGSMYOffset,
             k576p_fix,
             kGsDxDyOffsetSupported,
             FIELD_fix);

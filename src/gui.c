@@ -215,6 +215,9 @@ void guiShowAbout()
 #ifdef PADEMU
                                                        " - PADEMU"
 #endif
+#ifdef ATA_UDMA_PLUS
+                                                       " - UDMA+"
+#endif
              // Version numbers
              ,
              GSM_VERSION

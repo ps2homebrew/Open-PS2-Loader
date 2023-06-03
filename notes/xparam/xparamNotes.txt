@@ -1,0 +1,30 @@
+There are only two unique XPARAM modules out there, the first one appearing in SCPH-750xx models only (datever 20050620) and every single XPARAM after it from SCPH-770xx (bios datever 20060210-20100415) up to the very last one in Bravia TV is the same (the second one).
+
+Both params are included here for further research so it can be seen what was changed. The new XPARAM add some CPU delay to Tekken 5 games and add an entry for Tekken 5 Australia release that was missing. Together with it, a few more games were added that are:
+
+SLPM_660.22 Kaidou: Touge no Densetsu (Japan)
+SLPM_658.82 Duel Masters: Birth of Super Dragon (Japan)
+SLPM_658.16 Shin Bakusou Dekotora Densetsu: Tenka Touitsu Choujou Kessen (Japan)
+SLPM_653.08 Shutokou Battle 01 (Japan)
+SLPM_652.68 Initial D: Special Stage (Japan)
+SLPM_652.34 Bakusou Dekotora Densetsu: Otoko Hanamichi Yume Roman (Japan)
+
+
+
+XPARAM from the disc.
+Sony planned a way to have params applied from discs too. Some games will have an XPARAM entry in them in SYSTEM.CNF also has a hash for its integrity. This hash check and param parsing is done by PS2LOGO so all these launched without it always had problems in DECKARD. The code provided handles even this weird case. All known games have been found. They are the following:
+
+SLPS_256.23 Another Century's Episode 2 (Japan)
+SLPS_255.32 Critical Velocity (Japan)
+SLPS_255.56 Hissatsu Pachinko Station V11 (Japan)
+            Hissatsu Pachinko Station V11 - CR Gyaatoruzu (Japan)
+SLPM_661.41 Matantei Loki Ragnarok - Mayouga - Ushinawareta Bishou (Japan)
+            Ibara has the same hash but it's an error from the leftover file of the above game. Ibara does NOT need config applied.
+SLPM_627.09 Sega Ages 2500 Series Vol. 23 - Sega Memorial Selection (Japan)
+SLPM_663.87 Shin Bakusou Dekotora Densetsu - Tenka Touitsu Choujou Kessen (Japan) (Spike the Best)
+
+
+
+These notes serve more as research, it's better to use the xparam.c code for any launcher out there that is missing the DECKARD param stage (uLaunchElf, ESR, modchips, etc..). The code will handle any edge case needed for PS3/4 as well and has the benefit of saving space due to not needing to include all the config databases.
+
+by krat0s

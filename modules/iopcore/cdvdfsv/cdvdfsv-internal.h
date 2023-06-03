@@ -22,6 +22,14 @@
 
 #include "smsutils.h"
 
+#ifdef __IOPCORE_DEBUG
+#define DPRINTF(args...)  printf(args)
+#define iDPRINTF(args...) Kprintf(args)
+#else
+#define DPRINTF(args...)
+#define iDPRINTF(args...)
+#endif
+
 extern void cdvdfsv_register_scmd_rpc(SifRpcDataQueue_t *rpc_DQ);
 extern void cdvdfsv_register_ncmd_rpc(SifRpcDataQueue_t *rpc_DQ);
 extern void cdvdfsv_register_searchfile_rpc(SifRpcDataQueue_t *rpc_DQ);

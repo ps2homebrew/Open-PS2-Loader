@@ -38,7 +38,7 @@ int hddCheck(void)
     int ret;
 
     ret = fileXioDevctl("hdd0:", HDIOC_STATUS, NULL, 0, NULL, 0);
-
+    LOG("HDD: Status is %d\n", ret);
     // 0 = HDD connected and formatted, 1 = not formatted, 2 = HDD not usable, 3 = HDD not connected.
     if ((ret >= 3) || (ret < 0))
         return -1;

@@ -83,6 +83,9 @@ static int GetStartupExecName(const char *path, char *filename, int maxlength)
     int ret;
 
     if ((ret = ps2cnfGetBootFile(path, ps2disc_boot)) == 0) {
+        int length = 0;
+        const char *start;
+
         /* Skip the device name part of the path ("cdrom0:\"). */
         key = ps2disc_boot;
 
@@ -94,11 +97,29 @@ static int GetStartupExecName(const char *path, char *filename, int maxlength)
         }
 
         ++key;
-        if (*key == '\\')
+        while (*key == '\\') {
             key++;
+        }
 
-        strncpy(filename, key, maxlength);
-        filename[maxlength] = '\0';
+        start = key;
+
+        while ((*key != ';') && (*key != '\0')) {
+            length++;
+            key++;
+        }
+
+        if (length > maxlength) {
+            length = maxlength;
+        }
+
+        if (length == 0) {
+            LOG("GetStartupExecName: serial len 0 ':' (%s).\n", ps2disc_boot);
+            return -1;
+        }
+
+        strncpy(filename, start, length);
+        filename[length] = '\0';
+        LOG("GetStartupExecName: serial len %d %s \n", length, filename);
 
         return 0;
     } else {

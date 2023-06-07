@@ -258,8 +258,27 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 {
     unsigned int remaining;
     void *ptr;
+    int endOfMedia = 0;
 
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
+
+    if (mediaLsnCount) {
+
+        // If lsn to read is already bigger error already.
+        if (lsn >= mediaLsnCount) {
+            DPRINTF("cdvdman_read eom lsn=%d sectors=%d leftsectors=%d MaxLsn=%d \n", lsn, sectors, mediaLsnCount - lsn, mediaLsnCount);
+            cdvdman_stat.err = SCECdErIPI;
+            return 1;
+        }
+
+        // As per PS2 mecha code continue to read what you can and then signal end of media error.
+        if ((lsn + sectors) > mediaLsnCount) {
+            DPRINTF("cdvdman_read eom lsn=%d sectors=%d leftsectors=%d MaxLsn=%d \n", lsn, sectors, mediaLsnCount - lsn, mediaLsnCount);
+            endOfMedia = 1;
+            // Limit how much sectors we can read.
+            sectors = mediaLsnCount - lsn;
+        }
+    }
 
     if (probed == 0) { // Probe for ZSO before first read
         // check for ZSO
@@ -322,6 +341,11 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
             // Sleep until the required amount of time has been spent.
             WaitEventFlag(cdvdman_stat.intr_ef, 0x1000, WEF_AND, NULL);
         }
+    }
+
+    // If we had a read that went past the end of media, after reading what we can, set the end of media error.
+    if (endOfMedia) {
+        cdvdman_stat.err = SCECdErEOM;
     }
 
     return (cdvdman_stat.err == SCECdErNO ? 0 : 1);

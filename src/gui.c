@@ -1383,6 +1383,9 @@ static void guiDrawOverlays()
 
     if (prevtime != 0) {
         clock_t diff = curtime - prevtime;
+        if (diff == 0)
+            diff = 1;
+
         // Raw FPS value with 2 decimal places
         float rawfps = ((100 * CLOCKS_PER_SEC) / diff) / 100.0f;
 

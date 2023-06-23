@@ -9,8 +9,19 @@
 #include "thsemap.h"
 #include "xboxoneusb.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
+
+#define MODNAME "xboxoneusb"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 #define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
@@ -26,7 +37,7 @@ int usb_disconnect(int devId);
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
 
-UsbDriver usb_driver = {NULL, NULL, "xboxoneusb", usb_probe, usb_connect, usb_disconnect};
+UsbDriver usb_driver = {NULL, NULL, MODNAME, usb_probe, usb_connect, usb_disconnect};
 
 static void readReport(u8 *data, int pad);
 static int Rumble(u8 lrum, u8 rrum, int pad);
@@ -38,11 +49,11 @@ int usb_probe(int devId)
 {
     UsbDeviceDescriptor *device = NULL;
 
-    DPRINTF("XBOXONEUSB: probe: devId=%i\n", devId);
+    DPRINTF("probe: devId=%i\n", devId);
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
-        DPRINTF("XBOXONEUSB: Error - Couldn't get device descriptor\n");
+        DPRINTF("Error - Couldn't get device descriptor\n");
         return 0;
     }
 
@@ -63,7 +74,7 @@ int usb_connect(int devId)
     UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
-    DPRINTF("XBOXONEUSB: connect: devId=%i\n", devId);
+    DPRINTF("connect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (xboxonedev[pad].usb_id == -1)
@@ -71,7 +82,7 @@ int usb_connect(int devId)
     }
 
     if (pad >= MAX_PADS) {
-        DPRINTF("XBOXONEUSB: Error - only %d device allowed !\n", MAX_PADS);
+        DPRINTF("Error - only %d device allowed !\n", MAX_PADS);
         return 1;
     }
 
@@ -92,7 +103,7 @@ int usb_connect(int devId)
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && xboxonedev[pad].interruptEndp < 0) {
                 xboxonedev[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
                 xboxonedev[pad].endin = endpoint;
-                DPRINTF("XBOXONEUSB: register Event endpoint id =%i addr=%02X packetSize=%i\n", xboxonedev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Event endpoint id =%i addr=%02X packetSize=%i\n", xboxonedev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && xboxonedev[pad].outEndp < 0) {
                 xboxonedev[pad].outEndp = UsbOpenEndpointAligned(devId, endpoint);
@@ -120,7 +131,7 @@ int usb_disconnect(int devId)
 {
     u8 pad;
 
-    DPRINTF("XBOXONEUSB: disconnect: devId=%i\n", devId);
+    DPRINTF("disconnect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (xboxonedev[pad].usb_id == devId) {
@@ -157,7 +168,7 @@ static void usb_data_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("XBOXONEUSB: usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    //DPRINTF("usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     xboxonedev[pad].usb_resultcode = resultCode;
 
@@ -168,7 +179,7 @@ static void usb_cmd_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("XBOXONEUSB: usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    //DPRINTF("usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     SignalSema(xboxonedev[pad].cmd_sema);
 }
@@ -295,7 +306,7 @@ int xboxoneusb_get_data(u8 *dst, int size, int port)
     } else {
         UsbCloseEndpoint(xboxonedev[port].interruptEndp);
         xboxonedev[port].interruptEndp = UsbOpenEndpointAligned(xboxonedev[port].usb_id, xboxonedev[port].endin);
-        DPRINTF("XBOXONEUSB: XBOXONEUSB_get_data usb transfer error %d\n", ret);
+        DPRINTF("XBOXONEUSB_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, xboxonedev[port].data, size);
@@ -308,7 +319,7 @@ int xboxoneusb_get_data(u8 *dst, int size, int port)
         } else {
             UsbCloseEndpoint(xboxonedev[port].outEndp);
             xboxonedev[port].outEndp = UsbOpenEndpointAligned(xboxonedev[port].usb_id, xboxonedev[port].endout);
-            DPRINTF("XBOXONEUSB: LEDRumble usb transfer error %d\n", ret);
+            DPRINTF("LEDRumble usb transfer error %d\n", ret);
         }
 
         xboxonedev[port].update_rum = 0;
@@ -366,13 +377,13 @@ int _start(int argc, char *argv[])
         xboxonedev[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
         if (xboxonedev[pad].sema < 0 || xboxonedev[pad].cmd_sema < 0) {
-            DPRINTF("XBOXONEUSB: Failed to allocate I/O semaphore.\n");
+            DPRINTF("Failed to allocate I/O semaphore.\n");
             return MODULE_NO_RESIDENT_END;
         }
     }
 
     if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
-        DPRINTF("XBOXONEUSB: Error registering USB devices\n");
+        DPRINTF("Error registering USB devices\n");
         return MODULE_NO_RESIDENT_END;
     }
 

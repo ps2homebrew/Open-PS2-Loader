@@ -22,8 +22,18 @@
 #include "pademu.h"
 #include "padmacro.h"
 
-#define DPRINTF(x...) printf(x)
-//#define DPRINTF(x...)
+
+
+#define MODNAME "pademu"
+IRX_ID(MODNAME, 1, 1);
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 typedef struct
 {
@@ -44,10 +54,7 @@ typedef struct
 #define ANALOG_MODE  0x73
 #define ANALOGP_MODE 0x79
 #define CONFIG_MODE  0xF3
-
 #define MAX_PORTS 4
-
-IRX_ID("pademu", 1, 1);
 
 PtrRegisterLibraryEntires pRegisterLibraryEntires; /* Pointer to RegisterLibraryEntires routine */
 Sio2McProc pSio2man25, pSio2man51;                 /* Pointers to SIO2MAN routines */
@@ -142,7 +149,7 @@ int install_sio2hook()
     /* looking for LOADCORE's library entry table */
     exp = GetExportTable("loadcore", 0x100);
     if (exp == NULL) {
-        DPRINTF("PADEMU: Unable to find loadcore exports.\n");
+        DPRINTF("Unable to find loadcore exports.\n");
         return 0;
     }
 
@@ -155,7 +162,7 @@ int install_sio2hook()
         /* hooking SIO2MAN's routines */
         InstallSio2manHook(exp, 1);
     } else {
-        DPRINTF("PADEMU: SIO2MAN exports not found.\n");
+        DPRINTF("SIO2MAN exports not found.\n");
     }
 
     return 1;
@@ -163,7 +170,7 @@ int install_sio2hook()
 
 void InstallSio2manHook(void *exp, int ver)
 {
-    DPRINTF("PADEMU: Install sio2man hooks \n");
+    DPRINTF("Install sio2man hooks \n");
     /* hooking SIO2MAN entry #25 (used by MCMAN and old PADMAN) */
     pSio2man25 = HookExportEntry(exp, 25, hookSio2man25);
     /* hooking SIO2MAN entry #51 (used by MC2_* modules and PADMAN) */
@@ -182,12 +189,12 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
             /* hooking SIO2MAN's routines */
             InstallSio2manHook(&lib[1], GetExportTableSize(&lib[1]) >= 61);
         } else {
-            DPRINTF("PADEMU: registering library %s failed, error %d\n", lib->name, ret);
+            DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
             return ret;
         }
     }
 
-    DPRINTF("PADEMU: registering library %s\n", lib->name);
+    DPRINTF("registering library %s\n", lib->name);
 
     return pRegisterLibraryEntires(lib);
 }
@@ -298,7 +305,7 @@ void pademu_connect(pad_device_t *dev)
         if (pad[i].enabled && pad[i].dev == NULL) {
             pad[i].dev = dev;
             pad[i].dev->id = i;
-            DPRINTF("PADEMU: Device connected\n");
+            DPRINTF("Device connected\n");
             break;
         }
     }
@@ -310,7 +317,7 @@ void pademu_disconnect(pad_device_t *dev)
     for (i = 0; i < MAX_PORTS; i++) {
         if (pad[i].dev == dev) {
             pad[i].dev = NULL;
-            DPRINTF("PADEMU: Device disconnected\n");
+            DPRINTF("Device disconnected\n");
             break;
         }
     }
@@ -349,7 +356,7 @@ void pademu(sio2_transfer_data_t *td)
         }
 
         if (cmd_size + 3 == td->in_size) {
-            DPRINTF("PADEMU: Second cmd not found!\n");
+            DPRINTF("Second cmd not found!\n");
             return;
         }
 
@@ -398,7 +405,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 {
     u8 i;
 
-    //DPRINTF("PADEMU: sio cmd %02x port %d\n", in[1], port);
+    //DPRINTF("sio cmd %02x port %d\n", in[1], port);
 
     mips_memset(out, 0x00, out_size);
 

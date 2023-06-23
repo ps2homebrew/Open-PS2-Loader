@@ -10,8 +10,19 @@
 #include "../btstack/btstack.h"
 #include "ds4bt.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
+
+#define MODNAME "ds4bt"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 static u8 rgbled_patterns[][2][3] =
     {
@@ -34,7 +45,7 @@ bt_paddrv_t ds4btdrv = {0x0070, 0x0071, ds4bt_connect, ds4bt_init, ds4bt_read_re
 int ds4bt_connect(bt_paddata_t *data, u8 *str, int size)
 {
     if (strncmp(str, "Wireless Controller", 19) == 0) {
-        DPRINTF("BS4BT: %s \n", str);
+        DPRINTF("%s \n", str);
         return 1;
     }
     return 0;
@@ -177,8 +188,8 @@ void ds4bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
             }
         }
     } else {
-        DPRINTF("BS4BT: Unmanaged Input Report: THDR 0x%02X ", in[8]);
-        DPRINTF("BS4BT: ID 0x%02X \n", in[9]);
+        DPRINTF("Unmanaged Input Report: THDR 0x%02X ", in[8]);
+        DPRINTF("ID 0x%02X \n", in[9]);
     }
 }
 

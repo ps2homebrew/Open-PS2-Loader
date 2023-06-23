@@ -9,8 +9,19 @@
 #include "thsemap.h"
 #include "ds3usb.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
+
+#define MODNAME "ds3usb"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 #define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
@@ -53,7 +64,7 @@ int usb_disconnect(int devId);
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
 
-UsbDriver usb_driver = {NULL, NULL, "ds3usb", usb_probe, usb_connect, usb_disconnect};
+UsbDriver usb_driver = {NULL, NULL, MODNAME, usb_probe, usb_connect, usb_disconnect};
 
 static void readReport(u8 *data, int pad);
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
@@ -64,11 +75,11 @@ int usb_probe(int devId)
 {
     UsbDeviceDescriptor *device = NULL;
 
-    DPRINTF("DS3USB: probe: devId=%i\n", devId);
+    DPRINTF("probe: devId=%i\n", devId);
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
-        DPRINTF("DS3USB: Error - Couldn't get device descriptor\n");
+        DPRINTF("Error - Couldn't get device descriptor\n");
         return 0;
     }
 
@@ -86,7 +97,7 @@ int usb_connect(int devId)
     UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
-    DPRINTF("DS3USB: connect: devId=%i\n", devId);
+    DPRINTF("connect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (ds3dev[pad].usb_id == -1)
@@ -94,7 +105,7 @@ int usb_connect(int devId)
     }
 
     if (pad >= MAX_PADS) {
-        DPRINTF("DS3USB: Error - only %d device allowed !\n", MAX_PADS);
+        DPRINTF("Error - only %d device allowed !\n", MAX_PADS);
         return 1;
     }
 
@@ -114,7 +125,7 @@ int usb_connect(int devId)
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds3dev[pad].interruptEndp < 0) {
                 ds3dev[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("DS3USB: register Event endpoint id =%i addr=%02X packetSize=%i\n", ds3dev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Event endpoint id =%i addr=%02X packetSize=%i\n", ds3dev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 
@@ -137,7 +148,7 @@ int usb_disconnect(int devId)
 {
     u8 pad;
 
-    DPRINTF("DS3USB: disconnect: devId=%i\n", devId);
+    DPRINTF("disconnect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (ds3dev[pad].usb_id == devId) {
@@ -170,7 +181,7 @@ static void usb_data_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("DS3USB: usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    //DPRINTF("usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     ds3dev[pad].usb_resultcode = resultCode;
 
@@ -181,7 +192,7 @@ static void usb_cmd_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("DS3USB: usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    //DPRINTF("usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     SignalSema(ds3dev[pad].cmd_sema);
 }
@@ -346,7 +357,7 @@ int ds3usb_get_data(u8 *dst, int size, int port)
 
         ds3dev[port].usb_resultcode = 1;
     } else {
-        DPRINTF("DS3USB: DS3USB_get_data usb transfer error %d\n", ret);
+        DPRINTF("DS3USB_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, ds3dev[port].data, size);
@@ -357,7 +368,7 @@ int ds3usb_get_data(u8 *dst, int size, int port)
         if (ret == USB_RC_OK)
             TransferWait(ds3dev[port].cmd_sema);
         else
-            DPRINTF("DS3USB: LEDRumble usb transfer error %d\n", ret);
+            DPRINTF("LEDRumble usb transfer error %d\n", ret);
 
         ds3dev[port].update_rum = 0;
     }
@@ -415,13 +426,13 @@ int _start(int argc, char *argv[])
         ds3dev[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
         if (ds3dev[pad].sema < 0 || ds3dev[pad].cmd_sema < 0) {
-            DPRINTF("DS3USB: Failed to allocate I/O semaphore.\n");
+            DPRINTF("Failed to allocate I/O semaphore.\n");
             return MODULE_NO_RESIDENT_END;
         }
     }
 
     if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
-        DPRINTF("DS3USB: Error registering USB devices\n");
+        DPRINTF("Error registering USB devices\n");
         return MODULE_NO_RESIDENT_END;
     }
 

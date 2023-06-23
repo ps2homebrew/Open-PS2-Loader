@@ -9,8 +9,19 @@
 #include "thsemap.h"
 #include "ds4usb.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
+
+#define MODNAME "ds4usb"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 #define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
@@ -34,7 +45,7 @@ int usb_disconnect(int devId);
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
 
-UsbDriver usb_driver = {NULL, NULL, "ds4usb", usb_probe, usb_connect, usb_disconnect};
+UsbDriver usb_driver = {NULL, NULL, MODNAME, usb_probe, usb_connect, usb_disconnect};
 
 static void readReport(u8 *data, int pad);
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
@@ -45,11 +56,11 @@ int usb_probe(int devId)
 {
     UsbDeviceDescriptor *device = NULL;
 
-    DPRINTF("DS4USB: probe: devId=%i\n", devId);
+    DPRINTF("probe: devId=%i\n", devId);
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
-        DPRINTF("DS4USB: Error - Couldn't get device descriptor\n");
+        DPRINTF("Error - Couldn't get device descriptor\n");
         return 0;
     }
 
@@ -67,7 +78,7 @@ int usb_connect(int devId)
     UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
-    DPRINTF("DS4USB: connect: devId=%i\n", devId);
+    DPRINTF("connect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (ds4dev[pad].usb_id == -1)
@@ -75,7 +86,7 @@ int usb_connect(int devId)
     }
 
     if (pad >= MAX_PADS) {
-        DPRINTF("DS4USB: Error - only %d device allowed !\n", MAX_PADS);
+        DPRINTF("Error - only %d device allowed !\n", MAX_PADS);
         return 1;
     }
 
@@ -100,7 +111,7 @@ int usb_connect(int devId)
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds4dev[pad].interruptEndp < 0) {
                 ds4dev[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("DS4USB: register Event endpoint id =%i addr=%02X packetSize=%i\n", ds4dev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Event endpoint id =%i addr=%02X packetSize=%i\n", ds4dev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && ds4dev[pad].outEndp < 0) {
                 ds4dev[pad].outEndp = UsbOpenEndpointAligned(devId, endpoint);
@@ -127,7 +138,7 @@ int usb_disconnect(int devId)
 {
     u8 pad;
 
-    DPRINTF("DS4USB: disconnect: devId=%i\n", devId);
+    DPRINTF("disconnect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (ds4dev[pad].usb_id == devId) {
@@ -164,7 +175,7 @@ static void usb_data_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("DS4USB: usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    //DPRINTF("usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     ds4dev[pad].usb_resultcode = resultCode;
 
@@ -175,7 +186,7 @@ static void usb_cmd_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    //DPRINTF("DS4USB: usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    //DPRINTF("usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     SignalSema(ds4dev[pad].cmd_sema);
 }
@@ -395,7 +406,7 @@ int ds4usb_get_data(u8 *dst, int size, int port)
 
         ds4dev[port].usb_resultcode = 1;
     } else {
-        DPRINTF("DS4USB: DS4USB_get_data usb transfer error %d\n", ret);
+        DPRINTF("DS4USB_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, ds4dev[port].data, size);
@@ -406,7 +417,7 @@ int ds4usb_get_data(u8 *dst, int size, int port)
         if (ret == USB_RC_OK)
             TransferWait(ds4dev[port].cmd_sema);
         else
-            DPRINTF("DS4USB: LEDRumble usb transfer error %d\n", ret);
+            DPRINTF("LEDRumble usb transfer error %d\n", ret);
 
         ds4dev[port].update_rum = 0;
     }
@@ -465,13 +476,13 @@ int _start(int argc, char *argv[])
         ds4dev[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
         if (ds4dev[pad].sema < 0 || ds4dev[pad].cmd_sema < 0) {
-            DPRINTF("DS4USB: Failed to allocate I/O semaphore.\n");
+            DPRINTF("Failed to allocate I/O semaphore.\n");
             return MODULE_NO_RESIDENT_END;
         }
     }
 
     if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
-        DPRINTF("DS4USB: Error registering USB devices\n");
+        DPRINTF("Error registering USB devices\n");
         return MODULE_NO_RESIDENT_END;
     }
 

@@ -9,8 +9,19 @@
 #include "thsemap.h"
 #include "hidusb.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
+
+#define MODNAME "hidusb"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 #define MAX_PADS 4
 
@@ -23,7 +34,7 @@ int usb_disconnect(int devId);
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
 
-UsbDriver usb_driver = {NULL, NULL, "hidusb", usb_probe, usb_connect, usb_disconnect};
+UsbDriver usb_driver = {NULL, NULL, MODNAME, usb_probe, usb_connect, usb_disconnect};
 
 int read_report_descriptor(u8 *data, int size, hidreport_t *report);
 static void read_report(u8 *data, int pad);
@@ -36,7 +47,7 @@ int usb_probe(int devId)
     UsbConfigDescriptor *config;
     UsbInterfaceDescriptor *interface;
 
-    DPRINTF("HIDUSB: probe: devId=%i\n", devId);
+    DPRINTF("probe: devId=%i\n", devId);
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
@@ -58,7 +69,7 @@ int usb_connect(int devId)
     UsbHidDescriptor *hid;
     u8 buf[512];
 
-    DPRINTF("HIDUSB: connect: devId=%i\n", devId);
+    DPRINTF("connect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (hiddev[pad].usb_id == -1)
@@ -66,7 +77,7 @@ int usb_connect(int devId)
     }
 
     if (pad >= MAX_PADS) {
-        DPRINTF("HIDUSB: Error - only %d device allowed !\n", MAX_PADS);
+        DPRINTF("Error - only %d device allowed !\n", MAX_PADS);
         return 1;
     }
 
@@ -332,7 +343,7 @@ int hidusb_get_data(u8 *dst, int size, int port)
 
         hiddev[port].usb_resultcode = 1;
     } else {
-        DPRINTF("HIDUSB: hidusb_get_data usb transfer error %d\n", ret);
+        DPRINTF("hidusb_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, hiddev[port].data, size);
@@ -399,13 +410,13 @@ int _start(int argc, char *argv[])
         hiddev[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
         if (hiddev[pad].sema < 0 || hiddev[pad].cmd_sema < 0) {
-            DPRINTF("HIDUSB: Failed to allocate I/O semaphore.\n");
+            DPRINTF("Failed to allocate I/O semaphore.\n");
             return MODULE_NO_RESIDENT_END;
         }
     }
 
     if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
-        DPRINTF("HIDUSB: Error registering USB devices\n");
+        DPRINTF("Error registering USB devices\n");
         return MODULE_NO_RESIDENT_END;
     }
 

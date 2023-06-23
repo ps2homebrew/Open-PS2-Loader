@@ -9,8 +9,19 @@
 #include "thsemap.h"
 #include "xbox360usb.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
+
+#define MODNAME "xbox360usb"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 #define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
@@ -26,7 +37,7 @@ int usb_disconnect(int devId);
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
 
-UsbDriver usb_driver = {NULL, NULL, "xbox360usb", usb_probe, usb_connect, usb_disconnect};
+UsbDriver usb_driver = {NULL, NULL, MODNAME, usb_probe, usb_connect, usb_disconnect};
 
 static void readReport(u8 *data, int pad);
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
@@ -37,11 +48,11 @@ int usb_probe(int devId)
 {
     UsbDeviceDescriptor *device = NULL;
 
-    DPRINTF("XBOX360USB: probe: devId=%i\n", devId);
+   DPRINTF("probe: devId=%i\n", devId);
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
-        DPRINTF("XBOX360USB: Error - Couldn't get device descriptor\n");
+       DPRINTF("Error - Couldn't get device descriptor\n");
         return 0;
     }
 
@@ -61,7 +72,7 @@ int usb_connect(int devId)
     UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
-    DPRINTF("XBOX360USB: connect: devId=%i\n", devId);
+   DPRINTF("connect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (xbox360dev[pad].usb_id == -1)
@@ -69,7 +80,7 @@ int usb_connect(int devId)
     }
 
     if (pad >= MAX_PADS) {
-        DPRINTF("XBOX360USB: Error - only %d device allowed !\n", MAX_PADS);
+       DPRINTF("Error - only %d device allowed !\n", MAX_PADS);
         return 1;
     }
 
@@ -89,7 +100,7 @@ int usb_connect(int devId)
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && xbox360dev[pad].interruptEndp < 0) {
                 xbox360dev[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("XBOX360USB: register Event endpoint id =%i addr=%02X packetSize=%i\n", xbox360dev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+               DPRINTF("register Event endpoint id =%i addr=%02X packetSize=%i\n", xbox360dev[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 
@@ -112,7 +123,7 @@ int usb_disconnect(int devId)
 {
     u8 pad;
 
-    DPRINTF("XBOX360USB: disconnect: devId=%i\n", devId);
+   DPRINTF("disconnect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (xbox360dev[pad].usb_id == devId) {
@@ -305,7 +316,7 @@ int xbox360usb_get_data(u8 *dst, int size, int port)
 
         xbox360dev[port].usb_resultcode = 1;
     } else {
-        DPRINTF("XBOX360USB: XBOX360USB_get_data usb transfer error %d\n", ret);
+       DPRINTF("XBOX360USB_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, xbox360dev[port].data, size);
@@ -316,7 +327,7 @@ int xbox360usb_get_data(u8 *dst, int size, int port)
         if (ret == USB_RC_OK)
             TransferWait(xbox360dev[port].cmd_sema);
         else
-            DPRINTF("XBOX360USB: LEDRumble usb transfer error %d\n", ret);
+           DPRINTF("LEDRumble usb transfer error %d\n", ret);
 
         xbox360dev[port].update_rum = 0;
     }
@@ -374,13 +385,13 @@ int _start(int argc, char *argv[])
         xbox360dev[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
         if (xbox360dev[pad].sema < 0 || xbox360dev[pad].cmd_sema < 0) {
-            DPRINTF("XBOX360USB: Failed to allocate I/O semaphore.\n");
+           DPRINTF("Failed to allocate I/O semaphore.\n");
             return MODULE_NO_RESIDENT_END;
         }
     }
 
     if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
-        DPRINTF("XBOX360USB: Error registering USB devices\n");
+       DPRINTF("Error registering USB devices\n");
         return MODULE_NO_RESIDENT_END;
     }
 

@@ -10,8 +10,19 @@
 #include "../btstack/btstack.h"
 #include "ds3bt.h"
 
-#define DPRINTF(x...) printf(x)
-//#define DPRINTF(x...)
+
+
+#define MODNAME "ds3bt"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
+
 
 static u8 output_01_report[] =
     {
@@ -54,7 +65,7 @@ static u8 press_emu = 0;
 
 int ds3bt_connect(bt_paddata_t *data, u8 *str, int size)
 {
-    DPRINTF("BS3BT: %s \n", str); //PLAYSTATION(R)3 Controller
+    DPRINTF("%s \n", str); //PLAYSTATION(R)3 Controller
 
     if (strncmp(str, "PLAYSTATION(R)3 Controller", 26) != 0) {
         return 0;
@@ -170,8 +181,8 @@ void ds3bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
             }
         }
     } else {
-        DPRINTF("BS3BT: Unmanaged Input Report: THDR 0x%02X ", in[8]);
-        DPRINTF("BS3BT: ID 0x%02X \n", in[9]);
+        DPRINTF("Unmanaged Input Report: THDR 0x%02X ", in[8]);
+        DPRINTF("ID 0x%02X \n", in[9]);
     }
 }
 

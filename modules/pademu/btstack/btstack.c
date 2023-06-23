@@ -16,15 +16,24 @@
 #include "../sys_utils.h"
 #include "btstack.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
+#define MODNAME "btstack"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
 
 static int bt_probe(int devId);
 static int bt_connect(int devId);
 static int bt_disconnect(int devId);
 static void bt_config_set(int result, int count, void *arg);
 
-static UsbDriver bt_driver = {NULL, NULL, "btstack", bt_probe, bt_connect, bt_disconnect};
+static UsbDriver bt_driver = {NULL, NULL, MODNAME, bt_probe, bt_connect, bt_disconnect};
 static bt_adapter_t bt_adp = {-1, -1, -1, -1, -1, -1};
 
 static void dev_clear(int pad);
@@ -37,16 +46,16 @@ static int bt_probe(int devId)
     UsbConfigDescriptor *config = NULL;
     UsbInterfaceDescriptor *intf = NULL;
 
-    DPRINTF("BTSTACK: probe: devId=%i\n", devId);
+    DPRINTF("probe: devId=%i\n", devId);
 
     if (bt_adp.devId != -1) {
-        DPRINTF("BTSTACK: Error - only one device allowed !\n");
+        DPRINTF("Error - only one device allowed !\n");
         return 0;
     }
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
-        DPRINTF("BTSTACK: Error - Couldn't get device descriptor\n");
+        DPRINTF("Error - Couldn't get device descriptor\n");
         return 0;
     }
 
@@ -55,18 +64,18 @@ static int bt_probe(int devId)
 
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     if (config == NULL) {
-        DPRINTF("BTSTACK: Error - Couldn't get configuration descriptor\n");
+        DPRINTF("Error - Couldn't get configuration descriptor\n");
         return 0;
     }
 
     if ((config->bNumInterfaces < 1) || (config->wTotalLength < (sizeof(UsbConfigDescriptor) + sizeof(UsbInterfaceDescriptor)))) {
-        DPRINTF("BTSTACK: Error - No interfaces available\n");
+        DPRINTF("Error - No interfaces available\n");
         return 0;
     }
 
     intf = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    DPRINTF("BTSTACK: bInterfaceClass %X bInterfaceSubClass %X bInterfaceProtocol %X\n", intf->bInterfaceClass, intf->bInterfaceSubClass, intf->bInterfaceProtocol);
+    DPRINTF("bInterfaceClass %X bInterfaceSubClass %X bInterfaceProtocol %X\n", intf->bInterfaceClass, intf->bInterfaceSubClass, intf->bInterfaceProtocol);
 
     if ((intf->bInterfaceClass != USB_CLASS_WIRELESS_CONTROLLER) ||
         (intf->bInterfaceSubClass != USB_SUBCLASS_RF_CONTROLLER) ||
@@ -86,10 +95,10 @@ static int bt_connect(int devId)
     UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
-    DPRINTF("BTSTACK: connect: devId=%i\n", devId);
+    DPRINTF("connect: devId=%i\n", devId);
 
     if (bt_adp.devId != -1) {
-        DPRINTF("BTSTACK: Error - only one device allowed !\n");
+        DPRINTF("Error - only one device allowed !\n");
         return 1;
     }
 
@@ -105,7 +114,7 @@ static int bt_connect(int devId)
 
     epCount = interface->bNumEndpoints - 1;
 
-    DPRINTF("BTSTACK: Endpoint Count %d \n", epCount + 1);
+    DPRINTF("Endpoint Count %d \n", epCount + 1);
 
     endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
@@ -114,15 +123,15 @@ static int bt_connect(int devId)
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_BULK) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && bt_adp.outEndp < 0) {
                 bt_adp.outEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("BTSTACK: register Output endpoint id =%i addr=%02X packetSize=%i\n", bt_adp.outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", bt_adp.outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             } else if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_adp.inEndp < 0) {
                 bt_adp.inEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("BTSTACK: register Input endpoint id =%i addr=%02X packetSize=%i\n", bt_adp.inEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Input endpoint id =%i addr=%02X packetSize=%i\n", bt_adp.inEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         } else if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_adp.interruptEndp < 0) {
                 bt_adp.interruptEndp = UsbOpenEndpoint(devId, endpoint);
-                DPRINTF("BTSTACK: register Interrupt endpoint id =%i addr=%02X packetSize=%i\n", bt_adp.interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Interrupt endpoint id =%i addr=%02X packetSize=%i\n", bt_adp.interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 
@@ -131,7 +140,7 @@ static int bt_connect(int devId)
     } while (epCount--);
 
     if (bt_adp.interruptEndp < 0 || bt_adp.inEndp < 0 || bt_adp.outEndp < 0) {
-        DPRINTF("BTSTACK: Error - connect failed: not enough endpoints! \n");
+        DPRINTF("Error - connect failed: not enough endpoints! \n");
         return -1;
     }
 
@@ -144,7 +153,7 @@ static int bt_connect(int devId)
 
 static int bt_disconnect(int devId)
 {
-    DPRINTF("BTSTACK: disconnect: devId=%i\n", devId);
+    DPRINTF("disconnect: devId=%i\n", devId);
 
     if (bt_adp.devId != -1) {
 
@@ -1036,7 +1045,7 @@ int btpad_get_data(u8 *dst, int size, int port)
 
     WaitSema(bt_adp.hid_sema);
 
-    //DPRINTF("BTSTACK: Get data\n");
+    //DPRINTF("Get data\n");
     mips_memcpy(dst, dev[port].data.data, size);
     ret = dev[port].data.analog_btn & 1;
 
@@ -1049,7 +1058,7 @@ void btpad_set_rumble(u8 lrum, u8 rrum, int port)
 {
     WaitSema(bt_adp.hid_sema);
 
-    //DPRINTF("BTSTACK: Rumble\n");
+    //DPRINTF("Rumble\n");
     dev[port].data.update_rum = 1;
     dev[port].data.lrum = lrum;
     dev[port].data.rrum = rrum;
@@ -1061,7 +1070,7 @@ void btpad_set_mode(int mode, int lock, int port)
 {
     WaitSema(bt_adp.hid_sema);
 
-    //DPRINTF("BTSTACK: Set mode\n");
+    //DPRINTF("Set mode\n");
     if (lock == 3)
         dev[port].data.analog_btn = 3;
     else
@@ -1110,14 +1119,14 @@ int _start(int argc, char *argv[])
     bt_adp.hid_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
     if (bt_adp.hid_sema < 0) {
-        DPRINTF("BTSTACK: Failed to allocate semaphore.\n");
+        DPRINTF("Failed to allocate semaphore.\n");
         return MODULE_NO_RESIDENT_END;
     }
 
     ret = UsbRegisterDriver(&bt_driver);
 
     if (ret != USB_RC_OK) {
-        DPRINTF("BTSTACK: Error registering USB devices: %02X\n", ret);
+        DPRINTF("Error registering USB devices: %02X\n", ret);
         return MODULE_NO_RESIDENT_END;
     }
 

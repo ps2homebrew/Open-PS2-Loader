@@ -14,7 +14,7 @@
 #include "include/cheatman.h"
 #include "include/system.h"
 #include "include/guigame.h"
-#include "include/ds34common.h"
+#include "include/pademu_common.h"
 
 #ifdef PADEMU
 #include <libds34bt.h>

@@ -1,5 +1,5 @@
-#ifndef _DS34COMMON_H_
-#define _DS34COMMON_H_
+#ifndef _PADEMU_COMMON_
+#define _PADEMU_COMMON_
 #include <stdint.h>
 
 #define USB_CLASS_WIRELESS_CONTROLLER 0xE0

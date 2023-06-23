@@ -170,6 +170,7 @@ char gDefaultBGMPath[128];
 int gCheatSource;
 int gGSMSource;
 int gPadEmuSource;
+int gPadEmuModules;
 int gFadeDelay;
 int toggleSfx;
 int showCfgPopup;

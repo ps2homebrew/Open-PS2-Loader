@@ -438,7 +438,8 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
         case 0x42: // read data
             if (in[1] == 0x42) {
                 if (pad[port].vibration) { // disable/enable vibration
-                    PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
+                    pad[port].dev->pad_set_rumble(in[pad[port].lrum], in[pad[port].rrum], pad[port].dev->id);
+                    //PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
                 }
             }
 
@@ -476,7 +477,8 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
         case 0x45: // query model and mode
             mips_memcpy(&out[3], &pademu_data[1], 6);
             out[5] = pad[port].mode;
-            out[3] = PAD_GET_MODEL(port);
+            /// TODO: Check if the next line is needed
+            // out[3] = PAD_GET_MODEL(port);
             break;
 
         case 0x46: // query act

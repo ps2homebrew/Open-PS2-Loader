@@ -3,7 +3,7 @@
 #include "stdbool.h"
 #include "types.h"
 
-#include "ds34common.h"
+#include "pademu_common.h"
 
 enum PadMacroAxes {
     PadMacroAxisLX = 0,

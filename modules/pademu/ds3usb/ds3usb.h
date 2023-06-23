@@ -4,7 +4,7 @@
 #include "irx.h"
 #include "../pademu.h"
 
-//#include <ds34common.h>
+#include <../../../include/pademu_common.h>
 
 #define DS3       0
 #define DS4       1

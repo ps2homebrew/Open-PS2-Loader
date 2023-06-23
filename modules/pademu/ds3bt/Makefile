@@ -3,8 +3,6 @@ IOP_BIN = ds3bt.irx
 IOP_OBJS = ds3bt.o imports.o
 IOP_OBJS_DIR = obj.ds3bt/
 
-IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJS_DIR)%)
-
 IOP_CFLAGS += -Wall -fno-builtin -DUSE_SMSUTILS
 IOP_LDFLAGS += -s
 
@@ -19,4 +17,4 @@ OBJ_DIR:
 	mkdir -p $(IOP_OBJS_DIR)
 
 include $(PS2SDK)/Defs.make
-include ../Rules.make
+include $(PS2SDK)/samples/Makefile.iopglobal

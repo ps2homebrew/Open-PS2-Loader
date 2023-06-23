@@ -37,6 +37,7 @@ int EnableCheatOp;
 int EnablePadEmuOp;
 int PadEmuSettings;
 int PadMacroSettings;
+int PadEmuModules;
 #endif
 int EnableDebug;
 int *gCheatList; // Store hooks/codes addr+val pairs

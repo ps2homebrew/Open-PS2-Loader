@@ -108,7 +108,7 @@ int usb_connect(int devId)
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && xboxonedev[pad].outEndp < 0) {
                 xboxonedev[pad].outEndp = UsbOpenEndpointAligned(devId, endpoint);
                 xboxonedev[pad].endout = endpoint;
-                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", xboxonepad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", xboxonedev[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 

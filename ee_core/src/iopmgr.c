@@ -7,6 +7,13 @@
   Some parts of the code are taken from HD Project by Polo
 */
 
+#define PADEMU_MODULES_ID_DS3USB (1 << 0)
+#define PADEMU_MODULES_ID_DS3BT (1 << 1)
+#define PADEMU_MODULES_ID_DS4USB (1 << 2)
+#define PADEMU_MODULES_ID_DS4BT (1 << 3)
+#define PADEMU_MODULES_ID_XBOX360USB (1 << 4)
+#define PADEMU_MODULES_ID_XBOXONEUSB (1 << 5)
+#define PADEMU_MODULES_ID_HIDUSB (1 << 6)
 #include <iopcontrol.h>
 
 #include "ee_core.h"
@@ -190,39 +197,37 @@ int New_Reset_Iop(const char *arg, int arglen)
         memcpy(args_for_pademu, &PadEmuSettings, 4);
         memcpy(args_for_pademu + 4, &PadMacroSettings, 4);
         LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, sizeof(args_for_pademu), args_for_pademu);
-        LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, 4, (char *)&PadEmuSettings);
-        if (PadEmuModules & (1 << 0)) {
-            LoadOPLModule(OPL_MODULE_ID_DS3USB, 0, sizeof(args_for_pademu), args_for_pademu);
+        if (PadEmuModules & PADEMU_MODULES_ID_DS3USB) {
+            LoadOPLModule(OPL_MODULE_ID_DS3USB, 0, 0, NULL);
         }
-        if (PadEmuModules & (1 << 1)) {
-            if (!btstack_loaded) {
-                LoadOPLModule(OPL_MODULE_ID_BTSTACK, 0, sizeof(args_for_pademu), args_for_pademu);
-                btstack_loaded = 1;
-            }
-            LoadOPLModule(OPL_MODULE_ID_DS3BT, 0, sizeof(args_for_pademu), args_for_pademu);
-        }
-        if (PadEmuModules & (1 << 2)) {
-            LoadOPLModule(OPL_MODULE_ID_DS4USB, 0, sizeof(args_for_pademu), args_for_pademu);
-        }
-        if (PadEmuModules & (1 << 3)) {
+        if (PadEmuModules & PADEMU_MODULES_ID_DS3BT) {
             if (!btstack_loaded) {
                 LoadOPLModule(OPL_MODULE_ID_BTSTACK, 0, 0, NULL);
                 btstack_loaded = 1;
             }
-            LoadOPLModule(OPL_MODULE_ID_DS4BT, 0, sizeof(args_for_pademu), args_for_pademu);
+            LoadOPLModule(OPL_MODULE_ID_DS3BT, 0, 0, NULL);
         }
-        if (PadEmuModules & (1 << 4)) {
-            LoadOPLModule(OPL_MODULE_ID_XBOX360USB, 0, sizeof(args_for_pademu), args_for_pademu);
+        if (PadEmuModules & PADEMU_MODULES_ID_DS4USB) {
+            LoadOPLModule(OPL_MODULE_ID_DS4USB, 0, 0, NULL);
         }
-        if (PadEmuModules & (1 << 5)) {
-            LoadOPLModule(OPL_MODULE_ID_XBOXONEUSB, 0, sizeof(args_for_pademu), args_for_pademu);
+        if (PadEmuModules & PADEMU_MODULES_ID_DS4BT) {
+            if (!btstack_loaded) {
+                LoadOPLModule(OPL_MODULE_ID_BTSTACK, 0, 0, NULL);
+                btstack_loaded = 1;
+            }
+            LoadOPLModule(OPL_MODULE_ID_DS4BT, 0, 0, NULL);
         }
-        if (PadEmuModules & (1 << 6)) {
-            LoadOPLModule(OPL_MODULE_ID_HIDUSB, 0, sizeof(args_for_pademu), args_for_pademu);
+        if (PadEmuModules & PADEMU_MODULES_ID_XBOX360USB) {
+            LoadOPLModule(OPL_MODULE_ID_XBOX360USB, 0, 0, NULL);
+        }
+        if (PadEmuModules & PADEMU_MODULES_ID_XBOXONEUSB) {
+            LoadOPLModule(OPL_MODULE_ID_XBOXONEUSB, 0, 0, NULL);
+        }
+        if (PadEmuModules & PADEMU_MODULES_ID_HIDUSB) {
+            LoadOPLModule(OPL_MODULE_ID_HIDUSB, 0, 0, NULL);
         }
     }
 #endif
-
     DPRINTF("Exiting services...\n");
     SifExitIopHeap();
     LoadFileExit();

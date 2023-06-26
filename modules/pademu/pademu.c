@@ -124,7 +124,7 @@ int _start(int argc, char *argv[])
     }
 
     if (RegisterLibraryEntries(&_exp_pademu) != 0) {
-        DPRINTF("RegisterLibraryEntries Failed\n")
+        DPRINTF("RegisterLibraryEntries Failed\n");
         return MODULE_NO_RESIDENT_END;
     }
 

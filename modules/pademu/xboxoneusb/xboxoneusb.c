@@ -108,7 +108,7 @@ int usb_connect(int devId)
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && xboxonedev[pad].outEndp < 0) {
                 xboxonedev[pad].outEndp = UsbOpenEndpointAligned(devId, endpoint);
                 xboxonedev[pad].endout = endpoint;
-                DPRINTF("DS34USB: register Output endpoint id =%i addr=%02X packetSize=%i\n", xboxonepad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", xboxonepad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 
@@ -306,7 +306,7 @@ int xboxoneusb_get_data(u8 *dst, int size, int port)
     } else {
         UsbCloseEndpoint(xboxonedev[port].interruptEndp);
         xboxonedev[port].interruptEndp = UsbOpenEndpointAligned(xboxonedev[port].usb_id, xboxonedev[port].endin);
-        DPRINTF("XBOXONEUSB_get_data usb transfer error %d\n", ret);
+        DPRINTF("%s: usb transfer error %d\n", __FUNCTION__, ret);
     }
 
     mips_memcpy(dst, xboxonedev[port].data, size);

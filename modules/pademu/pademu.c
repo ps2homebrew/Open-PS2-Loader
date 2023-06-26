@@ -89,6 +89,7 @@ extern struct irx_export_table _exp_pademu;
 
 int _start(int argc, char *argv[])
 {
+    DPRINTF("Start\n");
     union
     {
         struct
@@ -109,7 +110,7 @@ int _start(int argc, char *argv[])
 #ifdef DEBUG
         int x;
         for (x = 0; x < argc; x++)
-            DPRINTF("argv[%d]: %s\n", x, argv[x]);
+            DPRINTF("\targv[%d]: %s\n", x, argv[x]);
 #endif
         mips_memcpy(&PadEmuSettings_local.raw, argv[1], 4);
         pad_enable = PadEmuSettings_local.pad_enable;

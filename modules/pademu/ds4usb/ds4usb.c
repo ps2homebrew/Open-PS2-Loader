@@ -445,6 +445,7 @@ void ds4usb_reset()
 
 int _start(int argc, char *argv[])
 {
+    DPRINTF("Start\n");
     int pad;
 
     for (pad = 0; pad < MAX_PADS; pad++) {

@@ -1106,6 +1106,7 @@ extern struct irx_export_table _exp_btstack;
 
 int _start(int argc, char *argv[])
 {
+    DPRINTF("Start\n");
     int ret;
 
     dev_init();

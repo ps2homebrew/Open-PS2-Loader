@@ -220,6 +220,7 @@ void ds4bt_rumble(bt_paddata_t *data)
 
 int _start(int argc, char *argv[])
 {
+    DPRINTF("Start\n");
     btstack_register(&ds4btdrv);
 
     return MODULE_RESIDENT_END;

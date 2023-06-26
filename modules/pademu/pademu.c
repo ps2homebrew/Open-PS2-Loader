@@ -106,6 +106,11 @@ int _start(int argc, char *argv[])
     pad_enable = 0x03;
 
     if (argc > 1) {
+#ifdef DEBUG
+        int x;
+        for (x = 0; x < argc; x++)
+            DPRINTF("argv[%d]: %s\n", x, argv[x]);
+#endif
         mips_memcpy(&PadEmuSettings_local.raw, argv[1], 4);
         pad_enable = PadEmuSettings_local.pad_enable;
         pad_vibration = PadEmuSettings_local.pad_vibration;
@@ -118,6 +123,7 @@ int _start(int argc, char *argv[])
     }
 
     if (RegisterLibraryEntries(&_exp_pademu) != 0) {
+        DPRINTF("RegisterLibraryEntries Failed\n")
         return MODULE_NO_RESIDENT_END;
     }
 

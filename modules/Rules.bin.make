@@ -12,3 +12,8 @@ rebuild: clean all
 
 run:
 	ps2client -t 1 execiop host:$(IOP_BIN)
+
+ifdef DEBUG
+$(info debug enabled)
+IOP_CFLAGS += -DDEBUG=$(DEBUG)
+endif

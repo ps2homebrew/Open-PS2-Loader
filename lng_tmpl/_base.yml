@@ -661,7 +661,11 @@ gui_strings:
 - label: OSD_SETTINGS_LNG
   string: OSD Language
 - label: ENABLE_LNG
-  string: Change language
+  string: Enable
+- label: OSD_SETTINGS_TVASPECT
+  string: Sreen Size
+- label: FULL_SCREEN
+  string: Full Screen
 - label: BGM
   string: Background Music
 - label: BGM_VOLUME

@@ -203,6 +203,7 @@ char *gHDDPrefix;
 char gExportName[32];
 
 int gOSDLanguageValue;
+int gOSDTVAspectRatio;
 int gOSDLanguageEnable;
 int gOSDLanguageSource;
 

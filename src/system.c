@@ -828,6 +828,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     ConfigParam PARAM;
     GetOsdConfigParam(&PARAM);                                                  //get system configuration
     PARAM.language = (gOSDLanguageEnable) ? gOSDLanguageValue : PARAM.language; //patch what we care about
+    PARAM.screenType = (gOSDTVAspectRatio >= 0 && gOSDTVAspectRatio < 4) ? gOSDTVAspectRatio : PARAM.screenType; 
 #define CONFIGPARAMDATA_ARGUMENT , PARAM.spdifMode, PARAM.screenType, PARAM.videoOutput, PARAM.japLanguage, PARAM.ps1drvConfig, PARAM.version, PARAM.language, PARAM.timezoneOffset, gOSDLanguageEnable
 
     argc = 0;

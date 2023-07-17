@@ -44,7 +44,7 @@ struct cdvdman_settings_hdd
 struct cdvdman_settings_smb
 {
     struct cdvdman_settings_common common;
-    char filename[88];
+    char filename[160];
     union
     {
         struct

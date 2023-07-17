@@ -5,8 +5,13 @@
 
 #include <ds34common.h>
 
-#define DS3 0
-#define DS4 1
+#define DS3       0
+#define DS4       1
+#define GUITAR_GH 2
+#define GUITAR_RB 3
+
+#define MODEL_GUITAR 1
+#define MODEL_PS2    3
 
 #define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
 
@@ -20,7 +25,7 @@ typedef struct _usb_ds34
     int outEndp;
     u8 enabled;
     u8 status;
-    u8 type;      // 0 - ds3, 1 - ds4
+    u8 type;      // 0 - ds3, 1 - ds4, 2 - guitar hero guitar, 3 - rock band guitar
     u8 oldled[4]; // rgb for ds4 and blink
     u8 lrum;
     u8 rrum;
@@ -70,6 +75,7 @@ enum eHID {
 
 int ds34usb_init(u8 pads, u8 options);
 int ds34usb_get_status(int port);
+int ds34usb_get_model(int port);
 void ds34usb_reset();
 int ds34usb_get_data(u8 *dst, int size, int port);
 void ds34usb_set_rumble(u8 lrum, u8 rrum, int port);

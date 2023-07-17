@@ -2,7 +2,7 @@
 #define __SUPPORT_BASE_H
 
 #define UL_GAME_NAME_MAX       32
-#define ISO_GAME_NAME_MAX      64
+#define ISO_GAME_NAME_MAX      160
 #define ISO_GAME_EXTENSION_MAX 4
 #define GAME_STARTUP_MAX       12
 
@@ -37,6 +37,7 @@ typedef struct
     u8 unknown2[10];                // Always zero
 } USBExtreme_game_entry_t;
 
+int isValidIsoName(char *name, int *pNameLen);
 int sbIsSameSize(const char *prefix, int prevSize);
 int sbCreateSemaphore(void);
 int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gamecount);

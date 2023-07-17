@@ -13,13 +13,12 @@
 
 #include "ds34bt.h"
 
-#define PAD_INIT            ds34bt_init
-#define PAD_GET_STATUS      ds34bt_get_status
-#define PAD_RESET           ds34bt_reset
-#define PAD_GET_DATA        ds34bt_get_data
-#define PAD_SET_RUMBLE      ds34bt_set_rumble
-#define PAD_SET_MODE        ds34bt_set_mode
-#define PAD_GET_MODEL(port) 3
+#define PAD_INIT       ds34bt_init
+#define PAD_GET_STATUS ds34bt_get_status
+#define PAD_RESET      ds34bt_reset
+#define PAD_GET_DATA   ds34bt_get_data
+#define PAD_SET_RUMBLE ds34bt_set_rumble
+#define PAD_SET_MODE   ds34bt_set_mode
 
 #elif defined(USB)
 
@@ -29,7 +28,6 @@
 #define PAD_GET_STATUS ds34usb_get_status
 #define PAD_RESET      ds34usb_reset
 #define PAD_GET_DATA   ds34usb_get_data
-#define PAD_GET_MODEL  ds34usb_get_model
 #define PAD_SET_RUMBLE ds34usb_set_rumble
 #define PAD_SET_MODE   ds34usb_set_mode
 
@@ -465,7 +463,6 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
         case 0x45: // query model and mode
             mips_memcpy(&out[3], &pademu_data[1], 6);
             out[5] = pad[port].mode;
-            out[3] = PAD_GET_MODEL(port);
             break;
 
         case 0x46: // query act

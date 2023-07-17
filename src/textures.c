@@ -306,10 +306,10 @@ typedef struct
 
 static png_texture_t pngTexture;
 
-static int texPngEnd(png_structp pngPtr, png_infop infoPtr, void *pFileBuffer, int status)
+static int texPngEnd(png_structp pngPtr, png_infop infoPtr, FILE *file, int status)
 {
-    if (pFileBuffer != NULL)
-        free(pFileBuffer);
+    if (file != NULL)
+        fclose(file);
 
     if (infoPtr != NULL)
         png_destroy_read_struct(&pngPtr, &infoPtr, (png_infopp)NULL);
@@ -465,36 +465,15 @@ static int texPngLoadAll(GSTEXTURE *texture, const char *filePath, int texId)
     png_infop infoPtr = NULL;
     png_voidp readData = NULL;
     png_rw_ptr readFunction = NULL;
-    void *PngFileBufferPtr;
-    void *pFileBuffer = NULL;
+    FILE *file = NULL;
+    void **PngFileBufferPtr;
 
     if (filePath) {
-        int fd = open(filePath, O_RDONLY, 0);
-        if (fd == -1)
+        file = fopen(filePath, "rb");
+        if (file == NULL)
             return ERR_BAD_FILE;
 
-        int fileSize = lseek(fd, 0, SEEK_END);
-        lseek(fd, 0, SEEK_SET);
-
-        pFileBuffer = malloc(fileSize);
-        if (pFileBuffer == NULL) {
-            close(fd);
-            return ERR_BAD_FILE; // There's no out of memory error...
-        }
-
-        int readSize = read(fd, pFileBuffer, fileSize);
-        close(fd);
-        fd = -1;
-
-        if (readSize != fileSize) {
-            LOG("texPngLoadAll: failed to read file %s\n", filePath);
-            free(pFileBuffer);
-            return ERR_BAD_FILE;
-        }
-
-        PngFileBufferPtr = pFileBuffer;
-        readData = &PngFileBufferPtr;
-        readFunction = &texPngReadMemFunction;
+        readFunction = NULL; // Use default reading function.
     } else {
         if (texId == -1)
             return ERR_BAD_FILE;
@@ -508,16 +487,19 @@ static int texPngLoadAll(GSTEXTURE *texture, const char *filePath, int texId)
 
     pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)NULL, NULL, NULL);
     if (!pngPtr)
-        return texPngEnd(pngPtr, infoPtr, pFileBuffer, ERR_READ_STRUCT);
+        return texPngEnd(pngPtr, infoPtr, file, ERR_READ_STRUCT);
 
     infoPtr = png_create_info_struct(pngPtr);
     if (!infoPtr)
-        return texPngEnd(pngPtr, infoPtr, pFileBuffer, ERR_INFO_STRUCT);
+        return texPngEnd(pngPtr, infoPtr, file, ERR_INFO_STRUCT);
 
     if (setjmp(png_jmpbuf(pngPtr)))
-        return texPngEnd(pngPtr, infoPtr, pFileBuffer, ERR_SET_JMP);
+        return texPngEnd(pngPtr, infoPtr, file, ERR_SET_JMP);
 
-    png_set_read_fn(pngPtr, readData, readFunction);
+    if (readFunction != NULL)
+        png_set_read_fn(pngPtr, readData, readFunction);
+    else
+        png_init_io(pngPtr, file);
 
     unsigned int sigRead = 0;
     png_set_sig_bytes(pngPtr, sigRead);
@@ -574,21 +556,21 @@ static int texPngLoadAll(GSTEXTURE *texture, const char *filePath, int texId)
 
                 texPngReadPixels = &texPngReadPixels8;
             } else
-                return texPngEnd(pngPtr, infoPtr, pFileBuffer, ERR_BAD_DEPTH);
+                return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DEPTH);
             break;
         default:
-            return texPngEnd(pngPtr, infoPtr, pFileBuffer, ERR_BAD_DEPTH);
+            return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DEPTH);
     }
 
     if (texSizeValidate(texture->Width, texture->Height, texture->PSM) < 0) {
         texFree(texture);
 
-        return texPngEnd(pngPtr, infoPtr, pFileBuffer, ERR_BAD_DIMENSION);
+        return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     }
 
     texPngReadData(texture, pngPtr, infoPtr, texPngReadPixels);
 
-    return texPngEnd(pngPtr, infoPtr, pFileBuffer, 0);
+    return texPngEnd(pngPtr, infoPtr, file, 0);
 }
 
 static int texPngLoad(GSTEXTURE *texture, const char *filePath)

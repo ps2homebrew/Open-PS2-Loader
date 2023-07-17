@@ -40,60 +40,32 @@ int sceCdGetError(void)
 //-------------------------------------------------------------------------
 int sceCdTrayReq(int mode, u32 *traycnt)
 {
-    DPRINTF("sceCdTrayReq(%d, 0x08%X)\n", mode, traycnt);
+    DPRINTF("sceCdTrayReq(%d, 0x%lX)\n", mode, *traycnt);
 
     if (mode == SCECdTrayCheck) {
         if (traycnt)
             *traycnt = cdvdman_media_changed;
-
-        DPRINTF("sceCdTrayReq TrayCheck result=%d\n", cdvdman_media_changed);
-
-        if (cdvdman_media_changed) {
-            DelayThread(4000);
-        }
 
         cdvdman_media_changed = 0;
 
         return 1;
     }
 
-    // Bit 0 of cdvd status reg is Tray Open.
-    // Use it to determine if we are already closed or opened.
     if (mode == SCECdTrayOpen) {
-        // Tray is already opened, do nothing.
-        if (cdvdman_stat.status & 1) {
-            return 0;
-        }
-
         cdvdman_stat.status = SCECdStatShellOpen;
         cdvdman_stat.disc_type_reg = 0;
 
         DelayThread(11000);
 
-        // So that it reports disc change status.
-        cdvdman_media_changed = 1;
+        cdvdman_stat.err = SCECdErOPENS; /* not sure about this error code */
 
         return 1;
     } else if (mode == SCECdTrayClose) {
-        // Tray is closed, do nothing.
-        if (!(cdvdman_stat.status & 1)) {
-            return 0;
-        }
-
-        // First state is paused after close.
-        cdvdman_stat.status = SCECdStatPause;
-
         DelayThread(25000);
 
-        // If there is a disc(which for OPL always is) then it will start spinning after a while and detect disc type.
-
-        cdvdman_stat.status = SCECdStatSpin;
-
-        /*
-        If the day comes that OPL implements disc swapping, this will be place to reupdate all disc type, LBA start offsets, mediaLsn count and everything else.
-        Until then it will the same disc.
-        */
-        cdvdman_stat.disc_type_reg = cdvdman_settings.common.media & 0xFF;
+        cdvdman_stat.status = SCECdStatPause; /* not sure if the status is right, may be - SCECdStatSpin */
+        cdvdman_stat.err = SCECdErNO;         /* not sure if this error code is suitable here */
+        cdvdman_stat.disc_type_reg = (int)cdvdman_settings.common.media;
 
         cdvdman_media_changed = 1;
 
@@ -106,7 +78,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 //-------------------------------------------------------------------------
 int sceCdApplySCmd(u8 cmd, const void *in, u16 in_size, void *out)
 {
-    DPRINTF("sceCdApplySCmd cmd=%02x\n", cmd & 0xFF);
+    DPRINTF("sceCdApplySCmd\n");
 
     return cdvdman_sendSCmd(cmd & 0xff, in, in_size, out, 16);
 }
@@ -155,7 +127,7 @@ int cdvdman_readID(int mode, u8 *buf)
     if (mode == 0) { // GUID
         u32 *GUID0 = (u32 *)&buf[0];
         u32 *GUID1 = (u32 *)&buf[4];
-        *GUID0 = lbuf[0] | 0x08004600; // Replace the MODEL ID segment with the SCE OUI, to get the console's IEEE1394 EUI-64.
+        *GUID0 = lbuf[0] | 0x08004600; //Replace the MODEL ID segment with the SCE OUI, to get the console's IEEE1394 EUI-64.
         *GUID1 = *(u32 *)&lbuf[4];
     } else { // ModelID
         u32 *ModelID = (u32 *)&buf[0];
@@ -181,7 +153,7 @@ int sceCdReadModelID(unsigned long int *ModelID)
 int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 {
     if (cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL) {
-        // Make layer 1 point to layer 0.
+        //Make layer 1 point to layer 0.
         *layer1_start = 0;
         *on_dual = 1;
     } else {

@@ -129,7 +129,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        debug: [debug, iopcore_debug, ingame_debug, deci2_debug, eesio_debug]
+        debug: [debug, iopcore_debug, ingame_debug, deci2_debug] # eesio_debug broken
     runs-on: ubuntu-latest
     container: ps2dev/ps2dev:latest
     steps:

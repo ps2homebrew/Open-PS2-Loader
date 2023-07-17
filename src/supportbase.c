@@ -57,7 +57,7 @@ int sbCreateSemaphore(void)
 }
 
 // 0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
-int isValidIsoName(char *name, int *pNameLen)
+static int isValidIsoName(char *name, int *pNameLen)
 {
     // Old ISO image naming format: SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
 
@@ -83,9 +83,6 @@ static int GetStartupExecName(const char *path, char *filename, int maxlength)
     int ret;
 
     if ((ret = ps2cnfGetBootFile(path, ps2disc_boot)) == 0) {
-        int length = 0;
-        const char *start;
-
         /* Skip the device name part of the path ("cdrom0:\"). */
         key = ps2disc_boot;
 
@@ -97,29 +94,11 @@ static int GetStartupExecName(const char *path, char *filename, int maxlength)
         }
 
         ++key;
-        while (*key == '\\') {
+        if (*key == '\\')
             key++;
-        }
 
-        start = key;
-
-        while ((*key != ';') && (*key != '\0')) {
-            length++;
-            key++;
-        }
-
-        if (length > maxlength) {
-            length = maxlength;
-        }
-
-        if (length == 0) {
-            LOG("GetStartupExecName: serial len 0 ':' (%s).\n", ps2disc_boot);
-            return -1;
-        }
-
-        strncpy(filename, start, length);
-        filename[length] = '\0';
-        LOG("GetStartupExecName: serial len %d %s \n", length, filename);
+        strncpy(filename, key, maxlength);
+        filename[maxlength] = '\0';
 
         return 0;
     } else {
@@ -324,7 +303,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                     }
                 } else {
                     if (queryISOGameListCache(&cache, &cachedGInfo, dirent->d_name) != 0) {
-                        snprintf(fullpath, sizeof(fullpath), "%s/%s", path, dirent->d_name);
+                        sprintf(fullpath, "%s/%s", path, dirent->d_name);
 
                         if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
                             if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {

@@ -4,7 +4,6 @@ I_sceCdStandby
 I_sceCdRead
 I_sceCdSeek
 I_sceCdGetError
-I_sceCdGetToc
 I_sceCdSearchFile
 I_sceCdSync
 I_sceCdGetDiskType

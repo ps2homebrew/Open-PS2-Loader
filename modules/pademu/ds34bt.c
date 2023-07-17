@@ -1145,7 +1145,6 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
 {
     u8 led_buf[PS4_11_REPORT_LEN + 2];
     u8 size = 2;
-    u8 led_bit, i;
 
     if (ds34pad[pad].type == DS3) {
         led_buf[0] = HID_THDR_SET_REPORT_OUTPUT; // THdr
@@ -1165,7 +1164,7 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
         command[3] = 0xFE;          // lt
         command[4] = lrum;          // lp
         command[9] = led[0] & 0x1F; // LED Conf
-        for (led_bit = 0x10, i = 0; i < 4; i++, led_bit >>= 1) {
+        for (u8 led_bit = 0x10, i = 0; i < 4; i++, led_bit >>= 1) {
             if (led[0] & led_bit) {
                 mips_memcpy(&command[10 + (i * 5)], hid_cmd_payload_led_arguments, sizeof(hid_cmd_payload_led_arguments));
                 if (led[3]) {

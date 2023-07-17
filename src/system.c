@@ -25,7 +25,6 @@
 #include <osd_config.h>
 #include "include/pggsm.h"
 #include "include/cheatman.h"
-#include "include/xparam.h"
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -110,22 +109,18 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
             break;
         }
     }
-    if (i == MAX_MODULES) {
-        LOG("WARNING: REACHED MODULES LIMIT (%d)\n", MAX_MODULES);
+    if (i == MAX_MODULES)
         return -1;
-    }
 
     // check if the module was already loaded
     for (i = 0; i < MAX_MODULES; i++) {
         if (g_sysLoadedModBuffer[i] == buffer) {
-            LOG("MODULE ALREADY LOADED (%d)\n", i);
             return 0;
         }
     }
 
     // load the module
     id = SifExecModuleBuffer(buffer, size, argc, argv, &ret);
-    LOG("\t-- ID=%d, ret=%d\n", id, ret);
     if ((id < 0) || (ret))
         return -2;
 
@@ -144,7 +139,6 @@ void sysInitDev9(void)
     int ret;
 
     if (!dev9Initialized) {
-        LOG("[DEV9]:\n");
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
         dev9Loaded = (ret == 0); // DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
@@ -213,41 +207,30 @@ void sysReset(int modload_mask)
     memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES * 4);
 
     // load modules
-    LOG("[IOMANX]:\n");
     sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
-    LOG("[FILEXIO]:\n");
     sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 
-    LOG("[SIO2MAN]:\n");
     sysLoadModuleBuffer(&sio2man_irx, size_sio2man_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_MC_MODULES) {
-        LOG("[MCMAN]:\n");
         sysLoadModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL);
-        LOG("[MCSERV]:\n");
         sysLoadModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL);
     }
 
-    LOG("[PADMAN]:\n");
     sysLoadModuleBuffer(&padman_irx, size_padman_irx, 0, NULL);
 
-    LOG("[POWEROFF]:\n");
     sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
         bdmLoadModules();
     }
     if (modload_mask & SYS_LOAD_ISOFS_MODULE) {
-        LOG("[ISOFS]:\n");
         sysLoadModuleBuffer(&isofs_irx, size_isofs_irx, 0, NULL);
     }
 
-    LOG("[GENVMC]:\n");
     sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 
-    LOG("[LIBSD]:\n");
     sysLoadModuleBuffer(&libsd_irx, size_libsd_irx, 0, NULL);
-    LOG("[AUDSRV]:\n");
     sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
 
 #ifdef PADEMU
@@ -257,9 +240,7 @@ void sysReset(int modload_mask)
     ds34bt_deinit();
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
-        LOG("[DS34_USB]:\n");
         sysLoadModuleBuffer(&ds34usb_irx, size_ds34usb_irx, 4, (char *)&ds3pads);
-        LOG("[DS34_BT]:\n");
         sysLoadModuleBuffer(&ds34bt_irx, size_ds34bt_irx, 4, (char *)&ds3pads);
 
         ds34usb_init();
@@ -761,7 +742,6 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
     // Disable sound effects via libsd, to prevent some games with improper initialization from inadvertently using digital effect settings from other software.
-    LOG("[CLEAREFFECTS]:\n");
     sysLoadModuleBuffer(&cleareffects_irx, size_cleareffects_irx, 0, NULL);
 
     // Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
@@ -806,8 +786,6 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         if (eph[i].memsz > eph[i].filesz)
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
-
-    ApplyDeckardXParam(filename);
 
     // Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
     if (initKernel((void *)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0) { // Should not happen, but...

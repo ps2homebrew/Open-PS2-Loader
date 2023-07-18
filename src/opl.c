@@ -1715,12 +1715,9 @@ static void init(void)
     while (!padStatus)
         padStatus = startPads();
     readPads();
-    if (!getKeyPressed(KEY_START))
-    {
+    if (!getKeyPressed(KEY_START)) {
         _loadConfig(); // only try to restore config if emergency key is not being pressed
-    }
-    else
-    {
+    } else {
         LOG("--- SKIPPING OPL CONFIG LOADING\n");
         applyConfig(-1, -1);
     }

@@ -126,40 +126,43 @@ static u16 GetTimestamp(void)
 int AddHistoryRecord(const char *name)
 {
     struct HistoryEntry HistoryEntries[MAX_HISTORY_ENTRIES], *NewEntry, OldHistoryEntry;
-    int i, value, LeastUsedRecord, LeastUsedRecordLaunchCount, LeastUsedRecordTimestamp, NewLaunchCount, result, mcType;
+    int i, value, LeastUsedRecord, LeastUsedRecordLaunchCount, LeastUsedRecordTimestamp, NewLaunchCount, result, mcType, format;
     u8 BlankSlotList[MAX_HISTORY_ENTRIES];
     int NumBlankSlots, NumSlotsUsed, IsNewRecord;
     char SystemRegionLetter;
     char path[32];
+    DEBUG_PRINTF("OSDHistory@%s: starts\n", __func__);
 
-    DEBUG_PRINTF("Adding history record: %s\n", name);
+    for (i = 0; i < 2; i++) { // increase number of slots for mt (not sure how multi tap works haven’t looked at docs ie mc0 - mc4 ?)
+        mcGetInfo(i, 0, &mcType, NULL, &format);
+        mcSync(0, NULL, &result);
+        DEBUG_PRINTF("\tslot=%d, mctype=%d, format=%d\n", i, mcType, format);
+        if ((mcType == sceMcTypePS2) && (format == MC_FORMATTED))
+            break;
+    }
 
-    // Don't write history for ps1 cards
-    mcGetInfo(0, 0, &mcType, 0, 0);
-    mcSync(0, NULL, &result);
-    if (mcType == sceMcTypePS1)
+    if ((mcType != sceMcTypePS2) || (format != MC_FORMATTED)) { // don't even waste time if there are no PS2 MC's
+        DEBUG_PRINTF("\tNo PS2 memory cards detected\n");
         return -1;
+    }
+
+    DEBUG_PRINTF("\tAdding history record '%s' for slot %d\n", name, i);
+
 
     // For simplicity, create the data folder immediately if the history file does not exist (unlike the original).
-    sprintf(path, "mc0:/%s", GetSystemDataPath());
+    sprintf(path, "mc%d:/%s", i, GetSystemDataPath());
     if ((result = LoadHistoryFile(path, HistoryEntries)) != 0) {
-        path[2] = '1';
-        if ((result = LoadHistoryFile(path, HistoryEntries)) != 0) {
-            DEBUG_PRINTF("Error: can't load history file.\n");
-
-            SystemRegionLetter = GetSystemFolderLetter();
-
-            path[2] = '0';
-            if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
-                path[2] = '1';
-                if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
-                    DEBUG_PRINTF("Error: Can't create system data folder: %d\n", result);
-                    return result;
-                }
-            }
-
-            memset(HistoryEntries, 0, sizeof(HistoryEntries));
+        DEBUG_PRINTF("\tcan't load history file.\n");
+        SystemRegionLetter = GetSystemFolderLetter();
+        if (SystemRegionLetter == 'R') { // @El_isra: R is the default prefix on OPL and FreeMcBoot code, however, no known ps2 uses this prefix for system folders. So skip creating a folder named like that
+            DEBUG_PRINTF("\n\tERROR: SystemRegionLetter is R\n\n");
+            return -2;
         }
+        if ((result = CreateSystemDataFolder(path, SystemRegionLetter)) != 0) {
+            DEBUG_PRINTF("\tERROR: Can't create system data folder: error=%d, regionletter=%c\n", result, SystemRegionLetter);
+            return result;
+        }
+        memset(HistoryEntries, 0, sizeof(HistoryEntries));
     }
 
     LeastUsedRecord = 0;
@@ -212,11 +215,11 @@ int AddHistoryRecord(const char *name)
         }
     }
     /*
-        i = 0;
-        do { //Original does this. I guess, it is used to ensure that the next random value is truly random?
-            rand();
-            i++;
-        } while (i < (currentMinute * 60 + currentSecond));
+    i = 0;
+    do { // Original does this. I guess, it is used to ensure that the next random value is truly random?
+        rand();
+        i++;
+    } while (i < (currentMinute * 60 + currentSecond));
     */
     if (IsNewRecord) {
         // Count and consolidate a list of blank slots.

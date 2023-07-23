@@ -71,10 +71,11 @@ int cdvdman_fill_toc(u8 *tocBuff)
             u8 min;
             u8 sec;
             u8 frm;
+            
+            memset(tocBuff, 0, 1024);
+            
             tocBuff[0] = 0x41;
             tocBuff[1] = 0x00;
-
-            memset(tocBuff, 0, 1024);
 
             // Number of FirstTrack,
             // Always 1 until PS2CCDA support get's added.
@@ -93,7 +94,7 @@ int cdvdman_fill_toc(u8 *tocBuff)
             tocBuff[28] = itob(sec);
             tocBuff[29] = itob(frm);
 
-            // Later when PS2CCDA is added the tracks need to get filled in toc too.
+            // Later if PS2CCDA is added the tracks need to get filled in toc too.
             break;
 
         case 0x14: // SCECdPS2DVD

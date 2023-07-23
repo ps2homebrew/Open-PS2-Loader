@@ -71,9 +71,9 @@ int cdvdman_fill_toc(u8 *tocBuff)
             u8 min;
             u8 sec;
             u8 frm;
-            
+
             memset(tocBuff, 0, 1024);
-            
+
             tocBuff[0] = 0x41;
             tocBuff[1] = 0x00;
 

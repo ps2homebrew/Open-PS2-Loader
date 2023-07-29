@@ -7,7 +7,7 @@
 
 int oplIGRShutdown(int poff)
 {
-    SifRpcClientData_t _igr_cd;
+    SifRpcClientData_t _igr_cd __attribute__((aligned(64)));
     int r;
     s32 poffData __attribute__((aligned(64)));
 

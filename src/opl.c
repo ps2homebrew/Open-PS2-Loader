@@ -1703,6 +1703,8 @@ static void init(void)
 
     startPads();
 
+    bdmInitSemaphore();
+
     // compatibility update handler
     ioRegisterHandler(IO_COMPAT_UPDATE_DEFFERED, &compatDeferredUpdate);
 

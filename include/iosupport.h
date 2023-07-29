@@ -47,6 +47,7 @@ enum ERROR_CODE {
     // HDD error codes
     ERROR_HDD_IF_NOT_DETECTED = 400,
     ERROR_HDD_NOT_DETECTED,
+    ERROR_HDD_NOT_FORMATTED_APA,
 };
 
 #define NO_EXCEPTION      0x00

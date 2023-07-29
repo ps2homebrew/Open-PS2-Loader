@@ -172,6 +172,53 @@ static int hddCreateOPLPartition(const char *name)
     return result;
 }
 
+// Returns 1 for MBR/GPT, 0 for APA, and -1 if an error occured
+static int hddDetectNonSonyFileSystem()
+{
+    int ret = -1;
+
+    // Allocate memory for storing data for the first two sectors.
+    u8 *pSectorData = (u8 *)malloc(512 * 2);
+    if (pSectorData == NULL) {
+        LOG("hddDetectNonSonyFileSystem: failed to allocate scratch memory\n");
+        return -1;
+    }
+
+    // Trying to load the APA/PFS irx modules when a non-sony formatted HDD is connected (ie: MBR/GPT  w/ exFAT) runs
+    // the risk of corrupting the HDD. To avoid that get the first two sectors and perform some sanity checks. If
+    // we reasonably suspect the disk is not APA formatted bail out from loading the sony fs irx modules.
+    ret = fileXioDevctl("xhdd0:", ATA_DEVCTL_READ_PARTITION_SECTOR, NULL, 0, pSectorData, 512 * 2);
+    if (ret < 0) {
+        LOG("hddDetectNonSonyFileSystem: failed to read data from hdd %d\n", ret);
+        free(pSectorData);
+        return -1;
+    }
+
+    // Check for MBR signature.
+    if (pSectorData[0x1FE] == 0x55 && pSectorData[0x1FF] == 0xAA) {
+        // Found MBR partition type.
+        LOG("hddDetectNonSonyFileSystem: found MBR partition data\n");
+        ret = 1;
+    } else if (memcmp((const char *)&pSectorData[0x200], "EFI PART", 8) == 0) {
+        // Found GPT partition type.
+        LOG("hddDetectNonSonyFileSystem: found GPT partition data\n");
+        ret = 1;
+    } else if (memcmp((const char *)&pSectorData[4], "APA\x00", 4) == 0) {
+        // Found APA partition type.
+        LOG("hddDetectNonSonyFileSystem: found APA partition data\n");
+        ret = 0;
+    } else {
+        // Even though we didn't find evidence of non-APA partition data, if we load the APA irx module
+        // it will write to the drive and potentially corrupt any data that might be there.
+        LOG("hddDetectNonSonyFileSystem: partition data not recognized\n");
+        ret = -1;
+    }
+
+    // Cleanup and return.
+    free(pSectorData);
+    return ret;
+}
+
 void hddLoadModules(void)
 {
     int ret;
@@ -208,6 +255,15 @@ void hddLoadModules(void)
         if (ret < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_IF_NOT_DETECTED);
+            return;
+        }
+
+        // Check if the drive contains MBR/GPT partition data before we load the APA/PFS modules. If the drive is not
+        // APA then loading the APA irx modules can corrupt the drive as it will try to write APA partition data.
+        if (hddDetectNonSonyFileSystem() != 0) {
+            // Drive is MBR/GPT style, or unknown, bail out or risk corrupting the drive.
+            LOG("HDD: HardDisk Drive not formatted (APA).\n");
+            setErrorMessageWithCode(_STR_HDD_NOT_FORMATTED_ERROR, ERROR_HDD_NOT_FORMATTED_APA);
             return;
         }
 

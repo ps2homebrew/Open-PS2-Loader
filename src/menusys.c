@@ -99,8 +99,13 @@ static void menuRenameGame(submenu_list_t **submenu)
                 if (guiShowKeyboard(newName, nameLength)) {
                     guiSwitchScreen(GUI_SCREEN_MAIN);
                     submenuDestroy(submenu);
-                    support->itemRename(selected_item->item->current->item.id, newName);
-                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+
+                    // Only rename the file if the name changed; trying to rename a file with a file name that hasn't changed can cause the file
+                    // to be deleted on certain file systems.
+                    if (strcmp(newName, selected_item->item->current->item.text) != 0) {
+                        support->itemRename(selected_item->item->current->item.id, newName);
+                        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                    }
                 }
             }
         }

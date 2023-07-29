@@ -76,6 +76,7 @@ static submenu_list_t *appMenu;
 static submenu_list_t *appMenuCurrent;
 
 static s32 menuSemaId;
+static s32 menuListSemaId = -1;
 static ee_sema_t menuSema;
 
 static void menuRenameGame(submenu_list_t **submenu)
@@ -287,6 +288,9 @@ void menuInit()
     menuSema.max_count = 1;
     menuSema.option = 0;
     menuSemaId = CreateSema(&menuSema);
+    if (menuListSemaId < 0) {
+        menuListSemaId = sbCreateSemaphore();
+    }
 }
 
 void menuEnd()
@@ -316,6 +320,8 @@ void menuEnd()
     }
 
     DeleteSema(menuSemaId);
+    DeleteSema(menuListSemaId);
+    menuListSemaId = -1;
 }
 
 static menu_list_t *AllocMenuItem(menu_item_t *item)
@@ -335,24 +341,27 @@ void menuAppendItem(menu_item_t *item)
 {
     assert(item);
 
+    WaitSema(menuListSemaId);
+
     if (menu == NULL) {
         menu = AllocMenuItem(item);
         selected_item = menu;
-        return;
+    } else {
+        menu_list_t *cur = menu;
+
+        // traverse till the end
+        while (cur->next)
+            cur = cur->next;
+
+        // create new item
+        menu_list_t *newitem = AllocMenuItem(item);
+
+        // link
+        cur->next = newitem;
+        newitem->prev = cur;
     }
 
-    menu_list_t *cur = menu;
-
-    // traverse till the end
-    while (cur->next)
-        cur = cur->next;
-
-    // create new item
-    menu_list_t *newitem = AllocMenuItem(item);
-
-    // link
-    cur->next = newitem;
-    newitem->prev = cur;
+    SignalSema(menuListSemaId);
 }
 
 void submenuRebuildCache(submenu_list_t *submenu)

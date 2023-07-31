@@ -993,6 +993,12 @@ void menuRenderGameMenu()
     if (!gameMenu)
         return;
 
+    // If we enter the game settings menu and there's no selected item bail out. I'm not entirely sure how we get into
+    // this state but it seems to happen on some consoles when transitioning from the game settings menu back to the game
+    // list menu.
+    if (selected_item->item->current == NULL)
+        return;
+
     // draw the animated menu
     if (!gameMenuCurrent)
         gameMenuCurrent = gameMenu;

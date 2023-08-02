@@ -1554,6 +1554,10 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target)
 {
+    // Only initiate the transition once or else we could get stuck in an infinite loop.
+    if (screenHandlerTarget != NULL) {
+        return;
+    }
     sfxPlay(SFX_TRANSITION);
     transIndex = 0;
     screenHandlerTarget = &screenHandlers[target];

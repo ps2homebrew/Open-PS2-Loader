@@ -499,10 +499,9 @@ void hddLaunchGame(int id, config_set_t *configSet)
     if (*(u32 *)IOBuffer == ZSO_MAGIC) {
         probed_fd = 0;
         probed_lba = game->start_sector + OPL_HDD_MODE_PS2LOGO_OFFSET;
-        ziso_init((ZISO_header *)IOBuffer);
+        ziso_init((ZISO_header *)IOBuffer, *(u32 *)((u8 *)IOBuffer + sizeof(ZISO_header)));
         ziso_read_sector(IOBuffer, 16, 1);
         u32 maxLBA = *(u32 *)(IOBuffer + 80);
-        u32 ziso_total_block = ((ZISO_header *)IOBuffer)->total_bytes / 2048;
         if (maxLBA > 0 && maxLBA < ziso_total_block) {   // dual layer check
             settings->common.layer1_start = maxLBA - 16; // adjust second layer start
         }

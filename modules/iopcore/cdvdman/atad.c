@@ -100,21 +100,19 @@ static const ata_cmd_info_t smart_cmd_table[] =
 #define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
 
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
-typedef struct _ata_cmd_state
+struct
 {
     union
     {
-        void *buf;
-        u8 *buf8;
-        u16 *buf16;
+        void* buf;
+        u8*   buf8;
+        u16*  buf16;
     };
     u16 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
     u8  type;     /* The ata_cmd_info_t type field. */
     u8  dir;      /* DMA direction: 0 - to RAM, 1 - from RAM.  */
-} ata_cmd_state_t;
-_Static_assert(sizeof(ata_cmd_state_t) == 8);
-
-static ata_cmd_state_t atad_cmd_state;
+} static atad_cmd_state;
+_Static_assert(sizeof(atad_cmd_state) == 8);
 
 static int ata_intr_cb(int flag);
 static unsigned int ata_alarm_cb(void *unused);
@@ -403,7 +401,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 }
 
 /* Do a PIO transfer, to or from the device.  */
-static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
+static inline int ata_pio_transfer()
 {
     USE_SPD_REGS;
     SPD_REG8(SPD_R_PIO_DATA) = 0;
@@ -424,28 +422,28 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
     if (!(status & ATA_STAT_DRQ))
         return ATA_RES_ERR_NODATA;
 
-    type = cmd_state->type;
+    type = atad_cmd_state.type;
 
     if (type == 3 || type == 8) {
         /* PIO data out */
-        buf16 = cmd_state->buf16;
+        buf16 = atad_cmd_state.buf16;
         for (i = 0; i < 256; i++) {
             ata_hwport->r_data = *buf16;
-            cmd_state->buf16 = ++buf16;
+            atad_cmd_state.buf16 = ++buf16;
         }
-        if (cmd_state->type == 8) {
-            buf8 = cmd_state->buf8;
+        if (atad_cmd_state.type == 8) {
+            buf8 = atad_cmd_state.buf8;
             for (i = 0; i < 4; i++) {
                 ata_hwport->r_data = *buf8;
-                cmd_state->buf8 = ++buf8;
+                atad_cmd_state.buf8 = ++buf8;
             }
         }
     } else if (type == 2) {
         /* PIO data in  */
-        buf16 = cmd_state->buf16;
+        buf16 = atad_cmd_state.buf16;
         for (i = 0; i < 256; i++) {
             *buf16 = ata_hwport->r_data;
-            cmd_state->buf16 = ++buf16;
+            atad_cmd_state.buf16 = ++buf16;
         }
     }
 
@@ -514,9 +512,8 @@ int ata_io_finish(void)
 {
     USE_SPD_REGS;
     USE_ATA_REGS;
-    ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
-    int i, res = 0, type = cmd_state->type;
+    int i, res = 0, type = atad_cmd_state.type;
     unsigned short int stat;
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
@@ -526,8 +523,10 @@ int ata_io_finish(void)
             return ATA_RES_ERR_TIMEOUT;
         }
     } else if (type == 4) { /* DMA.  */
-        if ((res = ata_dma_complete(cmd_state->buf, cmd_state->blkcount,
-                                    cmd_state->dir)) < 0)
+        if ((res = ata_dma_complete(
+            atad_cmd_state.buf,
+            atad_cmd_state.blkcount,
+            atad_cmd_state.dir)) < 0)
             goto finish;
 
         for (i = 0; i < 100; i++)
@@ -547,8 +546,8 @@ int ata_io_finish(void)
             goto finish;
 
         /* Transfer each PIO data block.  */
-        while (--cmd_state->blkcount != -1) {
-            if ((res = ata_pio_transfer(cmd_state)) < 0)
+        while (--atad_cmd_state.blkcount != -1) {
+            if ((res = ata_pio_transfer()) < 0)
                 goto finish;
             if ((res = ata_wait_busy()) < 0)
                 goto finish;

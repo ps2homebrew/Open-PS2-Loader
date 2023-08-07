@@ -296,10 +296,6 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     /* Check that the device is ready if this the appropiate command.  */
     if (!(ata_hwport->r_control & 0x40)) {
         switch (command) {
-            case ATA_C_DEVICE_RESET:
-            case ATA_C_EXECUTE_DEVICE_DIAGNOSTIC:
-            case ATA_C_INITIALIZE_DEVICE_PARAMETERS:
-            case ATA_C_PACKET:
             case ATA_C_IDENTIFY_PACKET_DEVICE:
                 break;
             default:

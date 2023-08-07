@@ -725,7 +725,31 @@ static char *hddGetPrefix(void)
     return gHDDPrefix;
 }
 
-static item_list_t hddGameList = {
-    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, &hddGetTextId, &hddGetPrefix, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
-    &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, &hddGetIconId};
+static item_list_t hddGameList =
+{
+      HDD_MODE
+    , 0
+    , 0
+    , MODE_FLAG_COMPAT_DMA
+    , MENU_MIN_INACTIVE_FRAMES
+    , HDD_MODE_UPDATE_DELAY
+    , &hddGetTextId
+    , &hddGetPrefix
+    , &hddInit
+    , &hddNeedsUpdate
+    , &hddUpdateGameList
+    , &hddGetGameCount
+    , &hddGetGame
+    , &hddGetGameName
+    , &hddGetGameNameLength
+    , &hddGetGameStartup
+    , &hddDeleteGame
+    , &hddRenameGame
+    , &hddLaunchGame
+    , &hddGetConfig
+    , &hddGetImage
+    , &hddCleanUp
+    , &hddShutdown
+    , &hddCheckVMC
+    , &hddGetIconId
+};

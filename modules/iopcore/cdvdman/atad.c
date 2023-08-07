@@ -92,7 +92,6 @@ static const ata_cmd_info_t ata_cmd_table[] =
     , { ATA_C_WRITE_DMA_EXT         , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_dir | ata_cmd_flag_write_twice }
     , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                                               }
     , { ATA_C_FLUSH_CACHE           , 0x01 | ata_cmd_flag_use_timeout                                               }
-    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                                               }
     , { ATA_C_FLUSH_CACHE_EXT       , 0x01 | ata_cmd_flag_use_timeout                                               }
 };
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))

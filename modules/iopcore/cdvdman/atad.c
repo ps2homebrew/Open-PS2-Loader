@@ -74,24 +74,25 @@ typedef struct _ata_cmd_info
     u8 type;
 } ata_cmd_info_t;
 
-#define ata_cmd_command_mask 0x7f
+#define ata_cmd_command_mask 0x3f
 #define ata_cmd_command_bits(x) ((x) & ata_cmd_command_mask)
 #define ata_cmd_flag_write_twice 0x80
+#define ata_cmd_flag_use_timeout 0x40
 #define ata_cmd_flag_is_set(x, y) ((x) & (y))
 static const ata_cmd_info_t ata_cmd_table[] =
 {
-      { ATA_C_READ_DMA              , 0x04                            }
-    , { ATA_C_IDENTIFY_DEVICE       , 0x02                            }
-    , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02                            }
-    , { ATA_C_SET_FEATURES          , 0x01                            }
-    , { ATA_C_READ_DMA_EXT          , 0x04 | ata_cmd_flag_write_twice }
-    , { ATA_C_WRITE_DMA             , 0x04                            }
-    , { ATA_C_IDLE                  , 0x01                            }
-    , { ATA_C_WRITE_DMA_EXT         , 0x04 | ata_cmd_flag_write_twice }
-    , { ATA_C_STANDBY_IMMEDIATE     , 0x01                            }
-    , { ATA_C_FLUSH_CACHE           , 0x01                            }
-    , { ATA_C_STANDBY_IMMEDIATE     , 0x01                            }
-    , { ATA_C_FLUSH_CACHE_EXT       , 0x01                            }
+      { ATA_C_READ_DMA              , 0x04 | ata_cmd_flag_use_timeout                            }
+    , { ATA_C_IDENTIFY_DEVICE       , 0x02                                                       }
+    , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02                                                       }
+    , { ATA_C_SET_FEATURES          , 0x01 | ata_cmd_flag_use_timeout                            }
+    , { ATA_C_READ_DMA_EXT          , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_write_twice }
+    , { ATA_C_WRITE_DMA             , 0x04 | ata_cmd_flag_use_timeout                            }
+    , { ATA_C_IDLE                  , 0x01 | ata_cmd_flag_use_timeout                            }
+    , { ATA_C_WRITE_DMA_EXT         , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_write_twice }
+    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                            }
+    , { ATA_C_FLUSH_CACHE           , 0x01 | ata_cmd_flag_use_timeout                            }
+    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                            }
+    , { ATA_C_FLUSH_CACHE_EXT       , 0x01 | ata_cmd_flag_use_timeout                            }
 };
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
@@ -283,8 +284,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 {
     USE_ATA_REGS;
     int res;
-    iop_sys_clock_t cmd_timeout;
-    int using_timeout, device = (select >> 4) & 1;
+    int device = (select >> 4) & 1;
 
     ClearEventFlag(ata_evflg, 0);
 
@@ -313,20 +313,12 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         }
     }
 
-    /* Does this command need a timeout?  */
-    using_timeout = 0;
-    switch (ata_cmd_command_bits(type)) { //Non-SONY: ignore the 48-bit LBA flag.
-        case 1:
-        case 6:
-            using_timeout = 1;
-            break;
-        case 4:
-            atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
-            using_timeout = 1;
-            break;
+    if (ata_cmd_command_bits(type) == 4) {
+        atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
     }
 
-    if (using_timeout) {
+    if (ata_cmd_flag_is_set(type, ata_cmd_flag_use_timeout)) {
+        iop_sys_clock_t cmd_timeout;
         cmd_timeout.lo = 0x41eb0000;
         cmd_timeout.hi = 0;
 
@@ -339,7 +331,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         dev9IntrEnable(SPD_INTR_ATA0);
 
     /* Finally!  We send off the ATA command with arguments.  */
-    ata_hwport->r_control = (using_timeout == 0) << 1;
+    ata_hwport->r_control = !ata_cmd_flag_is_set(type, ata_cmd_flag_use_timeout) << 1;
 
     // 48-bit LBA requires writing to the address registers twice, 24 bits of
     // the LBA address is written each time. Writing to registers twice does not

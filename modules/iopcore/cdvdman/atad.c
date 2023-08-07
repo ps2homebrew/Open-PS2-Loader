@@ -356,16 +356,13 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
     USE_SPD_REGS;
     u32 count, nbytes;
     u32 bits;
-    int i, res;
+    int res;
     u16 dma_stat;
 
     while (blkcount) {
-        for (i = 0; i < 20; i++)
+        for (unsigned i = 0; i < 21; ++i)
             if ((dma_stat = SPD_REG16(0x38) & 0x1f))
                 goto next_transfer;
-
-        if (dma_stat)
-            goto next_transfer;
 
         dev9IntrEnable(SPD_INTR_ATA);
         /* Wait for the previous transfer to complete or a timeout.  */

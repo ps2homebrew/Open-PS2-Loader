@@ -74,25 +74,26 @@ typedef struct _ata_cmd_info
     u8 type;
 } ata_cmd_info_t;
 
-#define ata_cmd_command_mask 0x3f
+#define ata_cmd_command_mask 0x1f
 #define ata_cmd_command_bits(x) ((x) & ata_cmd_command_mask)
 #define ata_cmd_flag_write_twice 0x80
 #define ata_cmd_flag_use_timeout 0x40
+#define ata_cmd_flag_dir         0x20
 #define ata_cmd_flag_is_set(x, y) ((x) & (y))
 static const ata_cmd_info_t ata_cmd_table[] =
 {
-      { ATA_C_READ_DMA              , 0x04 | ata_cmd_flag_use_timeout                            }
-    , { ATA_C_IDENTIFY_DEVICE       , 0x02                                                       }
-    , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02                                                       }
-    , { ATA_C_SET_FEATURES          , 0x01 | ata_cmd_flag_use_timeout                            }
-    , { ATA_C_READ_DMA_EXT          , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_write_twice }
-    , { ATA_C_WRITE_DMA             , 0x04 | ata_cmd_flag_use_timeout                            }
-    , { ATA_C_IDLE                  , 0x01 | ata_cmd_flag_use_timeout                            }
-    , { ATA_C_WRITE_DMA_EXT         , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_write_twice }
-    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                            }
-    , { ATA_C_FLUSH_CACHE           , 0x01 | ata_cmd_flag_use_timeout                            }
-    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                            }
-    , { ATA_C_FLUSH_CACHE_EXT       , 0x01 | ata_cmd_flag_use_timeout                            }
+      { ATA_C_READ_DMA              , 0x04 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_IDENTIFY_DEVICE       , 0x02                                                                          }
+    , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02                                                                          }
+    , { ATA_C_SET_FEATURES          , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_READ_DMA_EXT          , 0x04 | ata_cmd_flag_use_timeout                    | ata_cmd_flag_write_twice }
+    , { ATA_C_WRITE_DMA             , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_dir                            }
+    , { ATA_C_IDLE                  , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_WRITE_DMA_EXT         , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_dir | ata_cmd_flag_write_twice }
+    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_FLUSH_CACHE           , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_FLUSH_CACHE_EXT       , 0x01 | ata_cmd_flag_use_timeout                                               }
 };
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
@@ -297,6 +298,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 
     atad_cmd_state.buf = buf;
     atad_cmd_state.blkcount = blkcount;
+    atad_cmd_state.dir = !!ata_cmd_flag_is_set(type, ata_cmd_flag_dir);
 
     /* Check that the device is ready if this the appropiate command.  */
     if (!(ata_hwport->r_control & 0x40)) {
@@ -311,10 +313,6 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
                 M_PRINTF("Error: Device %d is not ready.\n", device);
                 return ATA_RES_ERR_NOTREADY;
         }
-    }
-
-    if (ata_cmd_command_bits(type) == 4) {
-        atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
     }
 
     if (ata_cmd_flag_is_set(type, ata_cmd_flag_use_timeout)) {

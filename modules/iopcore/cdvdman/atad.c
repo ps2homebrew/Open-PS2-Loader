@@ -304,7 +304,6 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     for (i = 0; i < cmd_table_size; i++) {
         if (searchcmd == cmd_table[i].command) {
             type = cmd_table[i].type;
-            break;
         }
     }
 

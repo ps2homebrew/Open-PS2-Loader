@@ -369,9 +369,7 @@ static inline int ata_pio_transfer()
     return 0;
 
     USE_ATA_REGS;
-    u8 *buf8;
     u16 *buf16;
-    int i, type;
     u16 status = ata_hwport->r_status & 0xff;
 
     if (status & ATA_STAT_ERR) {
@@ -383,26 +381,10 @@ static inline int ata_pio_transfer()
     if (!(status & ATA_STAT_DRQ))
         return ATA_RES_ERR_NODATA;
 
-    type = atad_cmd_state.type;
-
-    if (type == 3 || type == 8) {
-        /* PIO data out */
-        buf16 = atad_cmd_state.buf16;
-        for (i = 0; i < 256; i++) {
-            ata_hwport->r_data = *buf16;
-            atad_cmd_state.buf16 = ++buf16;
-        }
-        if (atad_cmd_state.type == 8) {
-            buf8 = atad_cmd_state.buf8;
-            for (i = 0; i < 4; i++) {
-                ata_hwport->r_data = *buf8;
-                atad_cmd_state.buf8 = ++buf8;
-            }
-        }
-    } else if (type == 2) {
+    if (atad_cmd_state.type == 2) {
         /* PIO data in  */
         buf16 = atad_cmd_state.buf16;
-        for (i = 0; i < 256; i++) {
+        for (int i = 0; i < 256; i++) {
             *buf16 = ata_hwport->r_data;
             atad_cmd_state.buf16 = ++buf16;
         }
@@ -477,7 +459,7 @@ int ata_io_finish(void)
     int i, res = 0, type = atad_cmd_state.type;
     unsigned short int stat;
 
-    if (type == 1 || type == 6) { /* Non-data commands.  */
+    if (type == 1) { /* Non-data commands.  */
         WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
         if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
             M_PRINTF("Error: ATA timeout on a non-data command.\n");

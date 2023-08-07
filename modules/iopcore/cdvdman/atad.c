@@ -74,20 +74,22 @@ typedef struct _ata_cmd_info
     u8 type;
 } ata_cmd_info_t;
 
+#define ata_cmd_flag_write_twice 0x80
+#define ata_cmd_flag_is_set(x, y) ((x) & (y))
 static const ata_cmd_info_t ata_cmd_table[] =
 {
-      { ATA_C_READ_DMA              , 0x04 }
-    , { ATA_C_IDENTIFY_DEVICE       , 0x02 }
-    , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02 }
-    , { ATA_C_SET_FEATURES          , 0x01 }
-    , { ATA_C_READ_DMA_EXT          , 0x84 }
-    , { ATA_C_WRITE_DMA             , 0x04 }
-    , { ATA_C_IDLE                  , 0x01 }
-    , { ATA_C_WRITE_DMA_EXT         , 0x84 }
-    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 }
-    , { ATA_C_FLUSH_CACHE           , 0x01 }
-    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 }
-    , { ATA_C_FLUSH_CACHE_EXT       , 0x01 }
+      { ATA_C_READ_DMA              , 0x04                            }
+    , { ATA_C_IDENTIFY_DEVICE       , 0x02                            }
+    , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02                            }
+    , { ATA_C_SET_FEATURES          , 0x01                            }
+    , { ATA_C_READ_DMA_EXT          , 0x04 | ata_cmd_flag_write_twice }
+    , { ATA_C_WRITE_DMA             , 0x04                            }
+    , { ATA_C_IDLE                  , 0x01                            }
+    , { ATA_C_WRITE_DMA_EXT         , 0x04 | ata_cmd_flag_write_twice }
+    , { ATA_C_STANDBY_IMMEDIATE     , 0x01                            }
+    , { ATA_C_FLUSH_CACHE           , 0x01                            }
+    , { ATA_C_STANDBY_IMMEDIATE     , 0x01                            }
+    , { ATA_C_FLUSH_CACHE_EXT       , 0x01                            }
 };
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
@@ -332,11 +334,15 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     /* Finally!  We send off the ATA command with arguments.  */
     ata_hwport->r_control = (using_timeout == 0) << 1;
 
-    if (type & 0x80) { //For the sake of achieving (greatly) improved performance, write the registers twice only if required! This is also required for compatibility with the buggy firmware of certain PSX units.
-        /* 48-bit LBA requires writing to the address registers twice,
-		   24 bits of the LBA address is written each time.
-		   Writing to registers twice does not affect 28-bit LBA since
-		   only the latest data stored in address registers is used.  */
+    // 48-bit LBA requires writing to the address registers twice, 24 bits of
+    // the LBA address is written each time. Writing to registers twice does not
+    // affect 28-bit LBA since only the latest data stored in address registers
+    // is used.
+    //
+    // For the sake of achieving (greatly) improved performance, write the
+    // registers twice only if required! This is also required for compatibility
+    // with the buggy firmware of certain PSX units.
+    if (ata_cmd_flag_is_set(type, ata_cmd_flag_write_twice)) {
         ata_hwport->r_feature = (feature >> 8) & 0xff;
         ata_hwport->r_nsector = (nsector >> 8) & 0xff;
         ata_hwport->r_sector = (sector >> 8) & 0xff;

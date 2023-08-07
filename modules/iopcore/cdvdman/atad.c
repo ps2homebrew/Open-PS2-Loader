@@ -367,30 +367,6 @@ static inline int ata_pio_transfer()
     USE_SPD_REGS;
     SPD_REG8(SPD_R_PIO_DATA) = 0;
     return 0;
-
-    USE_ATA_REGS;
-    u16 *buf16;
-    u16 status = ata_hwport->r_status & 0xff;
-
-    if (status & ATA_STAT_ERR) {
-        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
-        return ATA_RES_ERR_IO;
-    }
-
-    /* DRQ must be set (data request).  */
-    if (!(status & ATA_STAT_DRQ))
-        return ATA_RES_ERR_NODATA;
-
-    if (atad_cmd_state.type == 2) {
-        /* PIO data in  */
-        buf16 = atad_cmd_state.buf16;
-        for (int i = 0; i < 256; i++) {
-            *buf16 = ata_hwport->r_data;
-            atad_cmd_state.buf16 = ++buf16;
-        }
-    }
-
-    return 0;
 }
 
 /* Complete a DMA transfer, to or from the device.  */

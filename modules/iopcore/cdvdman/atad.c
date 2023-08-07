@@ -272,7 +272,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 {
     USE_ATA_REGS;
     iop_sys_clock_t cmd_timeout;
-    int i, res, type;
+    int res, type;
     int using_timeout, device = (select >> 4) & 1;
 
     ClearEventFlag(ata_evflg, 0);
@@ -281,7 +281,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         return res;
 
     type = 0;
-    for (i = 0; i < ATA_CMD_TABLE_SIZE; ++i) {
+    for (int i = 0; i < ATA_CMD_TABLE_SIZE; ++i) {
         if ((u8)command == ata_cmd_table[i].command) {
             type = ata_cmd_table[i].type;
         }

@@ -575,17 +575,8 @@ static void ata_set_dir(int dir)
     #endif // ATA_GAMESTAR_WORKAROUND
 }
 
-static int ata_device_standby_immediate(int device)
-{
-    int res;
-
-    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xFFFF, ATA_C_STANDBY_IMMEDIATE)))
-        res = ata_io_finish();
-
-    return res;
-}
-
 static void ata_shutdown_cb(void)
 {
-    ata_device_standby_immediate(0);
+    if (!ata_io_start(NULL, 1, 0, 0, 0, 0, 0, 0, ATA_C_STANDBY_IMMEDIATE))
+        ata_io_finish();
 }

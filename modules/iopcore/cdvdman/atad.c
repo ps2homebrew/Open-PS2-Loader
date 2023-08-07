@@ -53,7 +53,6 @@ extern int netlog_inited;
 #define VERSION "v1.2"
 
 extern char lba_48bit;
-static u8 ata_gamestar_workaround = 0;
 
 static int ata_evflg = -1;
 
@@ -120,6 +119,7 @@ static unsigned int ata_alarm_cb(void *unused);
 static void ata_set_dir(int dir);
 static void ata_shutdown_cb(void);
 
+#ifndef ATA_GAMESTAR_WORKAROUND
 /* In v1.04, DMA was enabled in ata_set_dir() instead. */
 static void ata_pre_dma_cb(int bcr, int dir)
 {
@@ -134,6 +134,7 @@ static void ata_post_dma_cb(int bcr, int dir)
 
     SPD_REG16(SPD_R_XFR_CTRL) &= ~0x80;
 }
+#endif // ATA_GAMESTAR_WORKAROUND
 
 static int ata_create_event_flag(void)
 {
@@ -159,12 +160,6 @@ int atad_start(void)
     }
 #endif
 
-    /* Some compatible adaptors may malfunction if transfers are not done according to the old ps2atad design.
-       Official adaptors appear to have a 0x0001 set for this register, but not compatibles.
-       While official I/O to this register are 8-bit, some compatibles have a 0x01 for the lower 8-bits,
-       but the upper 8-bits contain some random value. Hence perform a 16-bit read instead. */
-    ata_gamestar_workaround = (SPD_REG16(0x20) != 1);
-
     if ((ata_evflg = ata_create_event_flag()) < 0) {
         M_PRINTF("Couldn't create event flag, exiting.\n");
         res = 1;
@@ -174,10 +169,10 @@ int atad_start(void)
     /* In v1.04, PIO mode 0 was set here. In late versions, it is set in ata_init_devices(). */
     dev9RegisterIntrCb(1, &ata_intr_cb);
     dev9RegisterIntrCb(0, &ata_intr_cb);
-    if (!ata_gamestar_workaround) {
-        dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
-        dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
-    }
+    #ifndef ATA_GAMESTAR_WORKAROUND
+    dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
+    dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
+    #endif // ATA_GAMESTAR_WORKAROUND
     /* Register this at the last position, as it should be the last thing done before shutdown. */
     dev9RegisterShutdownCb(15, &ata_shutdown_cb);
 
@@ -605,16 +600,18 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         }
 
         for (retries = 3; retries > 0; retries--) {
+            #ifdef ATA_GAMESTAR_WORKAROUND
             /* Due to the retry loop, put this call (for the GameStar workaround) here instead of the old location. */
-            if (ata_gamestar_workaround)
-                ata_set_dir(dir);
+            ata_set_dir(dir);
+            #endif // ATA_GAMESTAR_WORKAROUND
 
             if ((res = ata_io_start(buf, len, 0, len, sector, lcyl, hcyl, select, command)) != 0)
                 break;
 
             /* Set up (part of) the transfer here. In v1.04, this was called at the top of the outer loop. */
-            if (!ata_gamestar_workaround)
-                ata_set_dir(dir);
+            #ifndef ATA_GAMESTAR_WORKAROUND
+            ata_set_dir(dir);
+            #endif // ATA_GAMESTAR_WORKAROUND
 
             res = ata_io_finish();
 
@@ -650,7 +647,11 @@ static void ata_set_dir(int dir)
     val = SPD_REG16(SPD_R_IF_CTRL) & 1;
     val |= (dir == ATA_DIR_WRITE) ? 0x4c : 0x4e;
     SPD_REG16(SPD_R_IF_CTRL) = val;
-    SPD_REG16(SPD_R_XFR_CTRL) = dir | (ata_gamestar_workaround ? 0x86 : 0x6); //In v1.04, DMA was enabled here (0x86 instead of 0x6)
+    #ifdef ATA_GAMESTAR_WORKAROUND
+    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x86;
+    #else // ATA_GAMESTAR_WORKAROUND
+    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x06; //In v1.04, DMA was enabled here (0x86 instead of 0x6)
+    #endif // ATA_GAMESTAR_WORKAROUND
 }
 
 static int ata_device_standby_immediate(int device)

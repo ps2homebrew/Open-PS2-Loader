@@ -18,6 +18,7 @@
 #include <io_common.h>   // FIO_MT_RDWR
 
 #include <hdd-ioctl.h>
+#include <speedregs.h>
 
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
 
@@ -55,12 +56,38 @@ static void hddInitModules(void)
     sbCreateFolders(gHDDPrefix, 0);
 }
 
+
+/**
+ * Some compatible adaptors may malfunction if transfers are not done according
+ * to the old ps2atad design. Official adaptors appear to have a 0x0001 set for
+ * this register, but not compatibles. While official I/O to this register are
+ * 8-bit, some compatibles have a 0x01 for the lower 8-bits, but the upper
+ * 8-bits contain some random value. Hence perform a 16-bit read instead.
+ */
+static int hddCheckGameStar(void)
+{
+    int ret = 0;
+    USE_SPD_REGS;
+
+    DIntr();
+    ee_kmode_enter();
+
+    ret = (SPD_REG16(0x20) != 1);
+
+    ee_kmode_exit();
+    EIntr();
+
+    if (ret)
+        LOG("HDDSUPPORT GameStar detected!\n");
+
+    return ret;
+}
+
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
 // The pseudo ATA controller registers are accessed (input/ouput) by writing
 // an id to the main ATA controller
 #define HDPROreg_IO8   (*(volatile unsigned char *)0xBFC00000)
 #define CDVDreg_STATUS (*(volatile unsigned char *)0xBF40200A)
-
 static int hddCheckHDProKit(void)
 {
     int ret = 0;
@@ -459,7 +486,11 @@ void hddLaunchGame(int id, config_set_t *configSet)
     if (hddHDProKitDetected) {
         size_irx = size_hdd_hdpro_cdvdman_irx;
         irx = &hdd_hdpro_cdvdman_irx;
-    } else {
+    }
+    else if(hddCheckGameStar()) {
+        size_irx = size_hdd_gamestar_cdvdman_irx;
+        irx = &hdd_gamestar_cdvdman_irx;
+    }  else {
         size_irx = size_hdd_cdvdman_irx;
         irx = &hdd_cdvdman_irx;
     }

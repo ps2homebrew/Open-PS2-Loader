@@ -42,6 +42,8 @@ IMPORT_BIN2C(genvmc_irx);
 
 IMPORT_BIN2C(hdd_cdvdman_irx);
 
+IMPORT_BIN2C(hdd_gamestar_cdvdman_irx);
+
 IMPORT_BIN2C(hdd_hdpro_cdvdman_irx);
 
 IMPORT_BIN2C(lwnbdsvr_irx);

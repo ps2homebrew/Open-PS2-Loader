@@ -74,6 +74,8 @@ typedef struct _ata_cmd_info
     u8 type;
 } ata_cmd_info_t;
 
+#define ata_cmd_command_mask 0x7f
+#define ata_cmd_command_bits(x) ((x) & ata_cmd_command_mask)
 #define ata_cmd_flag_write_twice 0x80
 #define ata_cmd_flag_is_set(x, y) ((x) & (y))
 static const ata_cmd_info_t ata_cmd_table[] =
@@ -285,7 +287,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         }
     }
 
-    if (!(atad_cmd_state.type = type & 0x7F)) //Non-SONY: ignore the 48-bit LBA flag.
+    if (!(atad_cmd_state.type = ata_cmd_command_bits(type))) //Non-SONY: ignore the 48-bit LBA flag.
         return ATA_RES_ERR_NOTREADY;
 
     atad_cmd_state.buf = buf;
@@ -308,7 +310,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 
     /* Does this command need a timeout?  */
     using_timeout = 0;
-    switch (type & 0x7F) { //Non-SONY: ignore the 48-bit LBA flag.
+    switch (ata_cmd_command_bits(type)) { //Non-SONY: ignore the 48-bit LBA flag.
         case 1:
         case 6:
             using_timeout = 1;
@@ -328,7 +330,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     }
 
     /* Enable the command completion interrupt.  */
-    if ((type & 0x7F) == 1)
+    if (ata_cmd_command_bits(type) == 1)
         dev9IntrEnable(SPD_INTR_ATA0);
 
     /* Finally!  We send off the ATA command with arguments.  */

@@ -92,12 +92,6 @@ static const ata_cmd_info_t ata_cmd_table[] =
 };
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
-static const ata_cmd_info_t smart_cmd_table[] =
-{
-      { ATA_S_SMART_ENABLE_OPERATIONS, 0x01 }
-};
-#define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
-
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
 struct
 {
@@ -275,10 +269,8 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 {
     USE_ATA_REGS;
     iop_sys_clock_t cmd_timeout;
-    const ata_cmd_info_t *cmd_table;
-    int i, res, type, cmd_table_size;
+    int i, res, type;
     int using_timeout, device = (select >> 4) & 1;
-    u8 searchcmd;
 
     ClearEventFlag(ata_evflg, 0);
 
@@ -288,19 +280,13 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     /* For the SCE and SMART commands, we need to search on the subcommand
 	specified in the feature register.  */
     if (command == ATA_C_SMART) {
-        cmd_table = smart_cmd_table;
-        cmd_table_size = SMART_CMD_TABLE_SIZE;
-        searchcmd = (u8)feature;
-    } else {
-        cmd_table = ata_cmd_table;
-        cmd_table_size = ATA_CMD_TABLE_SIZE;
-        searchcmd = (u8)command;
+        return ATA_RES_ERR_NOTREADY;
     }
 
     type = 0;
-    for (i = 0; i < cmd_table_size; i++) {
-        if (searchcmd == cmd_table[i].command) {
-            type = cmd_table[i].type;
+    for (i = 0; i < ATA_CMD_TABLE_SIZE; ++i) {
+        if ((u8)command == ata_cmd_table[i].command) {
+            type = ata_cmd_table[i].type;
         }
     }
 

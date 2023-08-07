@@ -148,7 +148,9 @@ static int ata_create_event_flag(void)
 
 int atad_start(void)
 {
+#ifdef DEV9_DEBUG
     USE_SPD_REGS;
+#endif
     int res = 1;
 
     M_PRINTF(BANNER, VERSION);

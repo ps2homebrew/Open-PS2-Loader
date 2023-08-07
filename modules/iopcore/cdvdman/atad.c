@@ -147,24 +147,19 @@ static int ata_create_event_flag(void)
 
 int atad_start(void)
 {
-#ifdef DEV9_DEBUG
-    USE_SPD_REGS;
-#endif
-    int res = 1;
-
     M_PRINTF(BANNER, VERSION);
 
 #ifdef DEV9_DEBUG
+    USE_SPD_REGS;
     if (!(SPD_REG16(SPD_R_REV_3) & SPD_CAPS_ATA) || !(SPD_REG16(SPD_R_REV_8) & 0x02)) {
         M_PRINTF("HDD is not connected, exiting.\n");
-        goto out;
+        return 1;
     }
 #endif
 
     if ((ata_evflg = ata_create_event_flag()) < 0) {
         M_PRINTF("Couldn't create event flag, exiting.\n");
-        res = 1;
-        goto out;
+        return 1;
     }
 
     /* In v1.04, PIO mode 0 was set here. In late versions, it is set in ata_init_devices(). */
@@ -184,10 +179,8 @@ int atad_start(void)
     smp.attr = SA_THPRI;
     ata_io_sema = CreateSema(&smp);
 
-    res = 0;
     M_PRINTF("Driver loaded.\n");
-out:
-    return res;
+    return 0;
 }
 
 static int ata_intr_cb(int flag)

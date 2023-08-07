@@ -361,14 +361,6 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     return 0;
 }
 
-/* Do a PIO transfer, to or from the device.  */
-static inline int ata_pio_transfer()
-{
-    USE_SPD_REGS;
-    SPD_REG8(SPD_R_PIO_DATA) = 0;
-    return 0;
-}
-
 /* Complete a DMA transfer, to or from the device.  */
 static inline int ata_dma_complete(void *buf, int blkcount, int dir)
 {
@@ -466,8 +458,7 @@ int ata_io_finish(void)
 
         /* Transfer each PIO data block.  */
         while (--atad_cmd_state.blkcount != -1) {
-            if ((res = ata_pio_transfer()) < 0)
-                goto finish;
+            SPD_REG8(SPD_R_PIO_DATA) = 0;
             if ((res = ata_wait_busy()) < 0)
                 goto finish;
         }

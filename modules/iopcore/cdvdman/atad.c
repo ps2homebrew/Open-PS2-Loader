@@ -102,16 +102,17 @@ static const ata_cmd_info_t smart_cmd_table[] =
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
 typedef struct _ata_cmd_state
 {
-    s32 type; /* The ata_cmd_info_t type field. */
     union
     {
         void *buf;
         u8 *buf8;
         u16 *buf16;
     };
-    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    s32 dir;      /* DMA direction: 0 - to RAM, 1 - from RAM.  */
+    u16 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
+    u8  type;     /* The ata_cmd_info_t type field. */
+    u8  dir;      /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
+_Static_assert(sizeof(ata_cmd_state_t) == 8);
 
 static ata_cmd_state_t atad_cmd_state;
 

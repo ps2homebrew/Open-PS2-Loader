@@ -258,6 +258,17 @@ static int ata_device_select(int device)
     return ata_wait_bus_busy();
 }
 
+static unsigned find_ata_cmd(u16 command)
+{
+    unsigned result = 0;
+    for (int i = 0; i < ATA_CMD_TABLE_SIZE; ++i) {
+        if ((u8)command == ata_cmd_table[i].command) {
+            result = ata_cmd_table[i].type;
+        }
+    }
+    return result;
+}
+
 /* Export 6 */
 /*
 	28-bit LBA:
@@ -271,8 +282,8 @@ static int ata_device_select(int device)
 int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
 {
     USE_ATA_REGS;
+    int res;
     iop_sys_clock_t cmd_timeout;
-    int res, type;
     int using_timeout, device = (select >> 4) & 1;
 
     ClearEventFlag(ata_evflg, 0);
@@ -280,13 +291,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     if ((res = ata_device_select(device)) != 0)
         return res;
 
-    type = 0;
-    for (int i = 0; i < ATA_CMD_TABLE_SIZE; ++i) {
-        if ((u8)command == ata_cmd_table[i].command) {
-            type = ata_cmd_table[i].type;
-        }
-    }
-
+    const unsigned type = find_ata_cmd(command);
     if (!(atad_cmd_state.type = ata_cmd_command_bits(type))) //Non-SONY: ignore the 48-bit LBA flag.
         return ATA_RES_ERR_NOTREADY;
 

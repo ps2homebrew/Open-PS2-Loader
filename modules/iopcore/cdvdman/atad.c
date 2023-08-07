@@ -79,7 +79,6 @@ static const ata_cmd_info_t ata_cmd_table[] =
       { ATA_C_READ_DMA              , 0x04 }
     , { ATA_C_IDENTIFY_DEVICE       , 0x02 }
     , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02 }
-    , { ATA_C_SMART                 , 0x07 }
     , { ATA_C_SET_FEATURES          , 0x01 }
     , { ATA_C_READ_DMA_EXT          , 0x84 }
     , { ATA_C_WRITE_DMA             , 0x04 }
@@ -277,12 +276,6 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     if ((res = ata_device_select(device)) != 0)
         return res;
 
-    /* For the SCE and SMART commands, we need to search on the subcommand
-	specified in the feature register.  */
-    if (command == ATA_C_SMART) {
-        return ATA_RES_ERR_NOTREADY;
-    }
-
     type = 0;
     for (i = 0; i < ATA_CMD_TABLE_SIZE; ++i) {
         if ((u8)command == ata_cmd_table[i].command) {
@@ -291,7 +284,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     }
 
     if (!(atad_cmd_state.type = type & 0x7F)) //Non-SONY: ignore the 48-bit LBA flag.
-        return ATA_RES_ERR_CMD;
+        return ATA_RES_ERR_NOTREADY;
 
     atad_cmd_state.buf = buf;
     atad_cmd_state.blkcount = blkcount;

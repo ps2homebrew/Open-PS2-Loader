@@ -217,44 +217,27 @@ int ata_get_error(void)
     return ata_hwport->r_error & 0xff;
 }
 
+/**
+ * In the original ATAD, the busy and bus-busy functions were separate, but similar.
+ */
 #define ATA_WAIT_BUSY    0x80
 #define ATA_WAIT_BUSBUSY 0x88
 
 #define ata_wait_busy()     gen_ata_wait_busy(ATA_WAIT_BUSY)
 #define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
-/* 0x80 for busy, 0x88 for bus busy.
-	In the original ATAD, the busy and bus-busy functions were separate, but similar.  */
-static int gen_ata_wait_busy(int bits)
-{
+static int gen_ata_wait_busy(int bits) {
     USE_ATA_REGS;
-    int i, didx, delay;
 
-    for (i = 0; i < 80; i++) {
-        if (!(ata_hwport->r_control & bits))
+    for(unsigned i = 0; i < 56; ++i) {
+        if(!(ata_hwport->r_control & bits)) {
             return 0;
-
-        didx = i / 10;
-        switch (didx) {
-            case 0:
-                continue;
-            case 1:
-                delay = 100;
-                break;
-            case 2:
-                delay = 1000;
-                break;
-            case 3:
-                delay = 10000;
-                break;
-            case 4:
-                delay = 100000;
-                break;
-            default:
-                delay = 1000000;
         }
 
-        DelayThread(delay);
+        unsigned delay = (i>>3) << (i>>2) << 5;
+        if(delay) {
+            DelayThread(delay);
+        }
     }
 
     M_PRINTF("Timeout while waiting on busy (0x%02x).\n", bits);

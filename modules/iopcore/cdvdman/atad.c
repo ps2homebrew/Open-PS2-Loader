@@ -78,7 +78,7 @@ typedef struct _ata_cmd_info
 #define ata_cmd_command_bits(x) ((x) & ata_cmd_command_mask)
 #define ata_cmd_flag_write_twice 0x80
 #define ata_cmd_flag_use_timeout 0x40
-#define ata_cmd_flag_dir         0x20
+#define ata_cmd_flag_dir         0x20 // DMA direction: read from RAM if set, write to to RAM if unset.
 #define ata_cmd_flag_is_set(x, y) ((x) & (y))
 static const ata_cmd_info_t ata_cmd_table[] =
 {
@@ -107,7 +107,6 @@ struct
     };
     u16 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
     u8  type;     /* The ata_cmd_info_t type field. */
-    u8  dir;      /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } static atad_cmd_state;
 _Static_assert(sizeof(atad_cmd_state) == 8);
 
@@ -285,12 +284,12 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         return res;
 
     const unsigned type = find_ata_cmd(command);
-    if (!(atad_cmd_state.type = ata_cmd_command_bits(type))) //Non-SONY: ignore the 48-bit LBA flag.
+    if (!type)
         return ATA_RES_ERR_NOTREADY;
 
     atad_cmd_state.buf = buf;
     atad_cmd_state.blkcount = blkcount;
-    atad_cmd_state.dir = !!ata_cmd_flag_is_set(type, ata_cmd_flag_dir);
+    atad_cmd_state.type = type;
 
     /* Check that the device is ready if this the appropiate command.  */
     if (!(ata_hwport->r_control & 0x40)) {
@@ -409,21 +408,24 @@ int ata_io_finish(void)
     USE_SPD_REGS;
     USE_ATA_REGS;
     u32 bits;
-    int i, res = 0, type = atad_cmd_state.type;
+    int i;
+    int res = 0;
+    unsigned cmd = ata_cmd_command_bits(atad_cmd_state.type);
+    int dma_dir = !!ata_cmd_flag_is_set(atad_cmd_state.type, ata_cmd_flag_dir);
     unsigned short int stat;
 
-    if (type == 1) { /* Non-data commands.  */
+    if (cmd == 1) { /* Non-data commands.  */
         WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
         if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
             M_PRINTF("Error: ATA timeout on a non-data command.\n");
             res = ATA_RES_ERR_TIMEOUT;
             goto finish;
         }
-    } else if (type == 4) { /* DMA.  */
+    } else if (cmd == 4) { /* DMA.  */
         if ((res = ata_dma_complete(
             atad_cmd_state.buf,
             atad_cmd_state.blkcount,
-            atad_cmd_state.dir)) < 0)
+            dma_dir)) < 0)
             goto finish;
 
         for (i = 0; i < 100; i++)

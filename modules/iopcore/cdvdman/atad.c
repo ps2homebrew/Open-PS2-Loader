@@ -416,7 +416,8 @@ int ata_io_finish(void)
         WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
         if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
             M_PRINTF("Error: ATA timeout on a non-data command.\n");
-            return ATA_RES_ERR_TIMEOUT;
+            res = ATA_RES_ERR_TIMEOUT;
+            goto finish;
         }
     } else if (type == 4) { /* DMA.  */
         if ((res = ata_dma_complete(

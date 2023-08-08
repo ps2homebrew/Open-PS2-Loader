@@ -434,6 +434,7 @@ int ata_io_finish(void)
             if (bits & ATA_EV_TIMEOUT) {
                 M_PRINTF("Error: ATA timeout on DMA completion.\n");
                 res = ATA_RES_ERR_TIMEOUT;
+                goto finish;
             }
         }
     } else { /* PIO transfers.  */
@@ -448,9 +449,6 @@ int ata_io_finish(void)
                 goto finish;
         }
     }
-
-    if (res)
-        goto finish;
 
     /* Wait until the device isn't busy.  */
     if (ata_hwport->r_status & ATA_STAT_BUSY)

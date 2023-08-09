@@ -77,6 +77,7 @@ typedef struct
     int disc_type_reg;
     u32 cdread_lba;
     u32 cdread_sectors;
+    u16 sector_size;
     void *cdread_buf;
 } cdvdman_status_t;
 
@@ -99,8 +100,8 @@ typedef void (*StmCallback_t)(void);
 
 // Internal (common) function prototypes
 extern void SetStm0Callback(StmCallback_t callback);
-extern int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf);
-extern int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf);
+extern int cdvdman_AsyncRead(u32 lsn, u32 sectors, u16 sector_size, void *buf);
+extern int cdvdman_SyncRead(u32 lsn, u32 sectors, u16 sector_size, void *buf);
 extern int cdvdman_sendSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16 out_size);
 extern void cdvdman_cb_event(int reason);
 

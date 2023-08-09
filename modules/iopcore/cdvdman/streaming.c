@@ -20,7 +20,7 @@ static void StmCallback(void)
 {
     int OldState;
 
-    //Only update parameters if the streaming system was reading. Otherwise, this callback might have been triggered by the game reading data (BUG!)
+    // Only update parameters if the streaming system was reading. Otherwise, this callback might have been triggered by the game reading data (BUG!)
     if (cdvdman_stat.StreamingData.StIsReading) {
         CpuSuspendIntr(&OldState);
         cdvdman_stat.StreamingData.Stlsn += cdvdman_stat.StreamingData.StBanksize;
@@ -51,8 +51,8 @@ static int StFillStreamBuffer(void)
     int result, OldState;
     void *ptr;
 
-    /*	SCEI used a similar design, but their implementation uses a bitmap to mark the filled/empty banks instead
-	(which is probably immune to race conditions, but we are interested in saving memory).	*/
+    /* SCEI used a similar design, but their implementation uses a bitmap to mark the filled/empty banks instead
+    (which is probably immune to race conditions, but we are interested in saving memory).	*/
     CpuSuspendIntr(&OldState);
 
     if (cdvdman_stat.StreamingData.StIsReading) {
@@ -63,15 +63,15 @@ static int StFillStreamBuffer(void)
     CancelAlarm(&StmScheduleCb, &cdvdman_stat.StreamingData);
     cdvdman_stat.StreamingData.StIsReading = 1;
 
-    //Determine how much more to read.
+    // Determine how much more to read.
     result = AllocBank(&ptr);
 
     CpuResumeIntr(OldState);
 
     if (result == 0) {
-        //iDPRINTF("Stream fill buffer: Stream lsn 0x%08x - %u sectors:%p\n", cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StBanksize, ptr);
-        if (cdvdman_AsyncRead(cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StBanksize, ptr) == 0) {
-            //Failed to start reading.
+        // iDPRINTF("Stream fill buffer: Stream lsn 0x%08x - %u sectors:%p\n", cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StBanksize, ptr);
+        if (cdvdman_AsyncRead(cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StBanksize, 2048, ptr) == 0) {
+            // Failed to start reading.
             cdvdman_stat.StreamingData.StIsReading = 0;
             result = -1;
         } else {
@@ -79,7 +79,7 @@ static int StFillStreamBuffer(void)
         }
     } else {
         iDPRINTF("Stream fill buffer: Stream full.\n");
-        //Nothing else to read.
+        // Nothing else to read.
         cdvdman_stat.StreamingData.StIsReading = 0;
         result = 1;
     }
@@ -121,7 +121,7 @@ int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
     return 1;
 }
 
-//Must be called from an interrupt-disabled state.
+// Must be called from an interrupt-disabled state.
 static int AllocBank(void **pointer)
 {
     int result;
@@ -156,7 +156,7 @@ static int ReadSectorsEE(int maxcount, void *buffer)
     CpuSuspendIntr(&OldState);
     rdptr = cdvdman_stat.StreamingData.StReadPtr;
 
-    //When Wr <= Rd, the buffer is either full or empty. Check StStreamed.
+    // When Wr <= Rd, the buffer is either full or empty. Check StStreamed.
     if (cdvdman_stat.StreamingData.StWritePtr <= rdptr && cdvdman_stat.StreamingData.StStreamed > 0) {
         SectorsToCopy = cdvdman_stat.StreamingData.StBufmax - rdptr;
         if (SectorsToCopy > maxcount)
@@ -174,7 +174,7 @@ static int ReadSectorsEE(int maxcount, void *buffer)
             result += SectorsToCopy;
         }
     }
-    //When Rd < Wr, there are sectors in the buffer.
+    // When Rd < Wr, there are sectors in the buffer.
     if (result < maxcount && rdptr < cdvdman_stat.StreamingData.StWritePtr) {
         SectorsToCopy = cdvdman_stat.StreamingData.StWritePtr - rdptr;
         if (SectorsToCopy > maxcount - result)
@@ -198,12 +198,12 @@ static int ReadSectorsEE(int maxcount, void *buffer)
 
     CpuResumeIntr(OldState);
 
-    if (dmat_count > 0) //Only if there is data to copy
+    if (dmat_count > 0) // Only if there is data to copy
     {
         while (sceSifDmaStat(dmat_id) >= 0) {
         };
 
-        //Finally, update variables.
+        // Finally, update variables.
         CpuSuspendIntr(&OldState);
         cdvdman_stat.StreamingData.StReadPtr = rdptr;
         cdvdman_stat.StreamingData.StStreamed -= result;
@@ -225,7 +225,7 @@ static int ReadSectors(int maxcount, void *buffer)
     ptr = buffer;
     CpuSuspendIntr(&OldState);
 
-    //When Wr <= Rd, the buffer is either full or empty. Check StStreamed.
+    // When Wr <= Rd, the buffer is either full or empty. Check StStreamed.
     if (cdvdman_stat.StreamingData.StWritePtr <= cdvdman_stat.StreamingData.StReadPtr && cdvdman_stat.StreamingData.StStreamed > 0) {
         SectorsToCopy = cdvdman_stat.StreamingData.StBufmax - cdvdman_stat.StreamingData.StReadPtr;
         if (SectorsToCopy > maxcount)
@@ -240,7 +240,7 @@ static int ReadSectors(int maxcount, void *buffer)
             result += SectorsToCopy;
         }
     }
-    //When Rd < Wr, there are sectors in the buffer.
+    // When Rd < Wr, there are sectors in the buffer.
     if (result < maxcount && cdvdman_stat.StreamingData.StReadPtr < cdvdman_stat.StreamingData.StWritePtr) {
         SectorsToCopy = cdvdman_stat.StreamingData.StWritePtr - cdvdman_stat.StreamingData.StReadPtr;
         if (SectorsToCopy > maxcount - result)
@@ -303,7 +303,7 @@ int sceCdStStop(void)
 
         CpuSuspendIntr(&OldState);
 
-        //Stop.
+        // Stop.
         SetStm0Callback(NULL);
         cdvdman_stat.StreamingData.StStreamed = 0;
         cdvdman_stat.StreamingData.StStat = 0;
@@ -329,7 +329,7 @@ int sceCdStPause(void)
         CancelAlarm(&StmScheduleCb, &cdvdman_stat.StreamingData);
 
         CpuSuspendIntr(&OldState);
-        //Pause.
+        // Pause.
         SetStm0Callback(NULL);
         cdvdman_stat.StreamingData.StIsReading = 0;
         CpuResumeIntr(OldState);
@@ -352,7 +352,7 @@ int sceCdStResume(void)
     cdvdman_stat.status = SCECdStatPause;
     if (cdvdman_stat.StreamingData.StStat) {
         CpuSuspendIntr(&OldState);
-        //Resume
+        // Resume
         SetStm0Callback(&StmCallback);
         CpuResumeIntr(OldState);
 
@@ -402,7 +402,7 @@ int sceCdStRead(u32 sectors, u32 *buffer, u32 mode, u32 *error)
                 DPRINTF("StRead: buffer underrun. %u/%lu read.\n", result, sectors);
 
             result += SectorsRead;
-            //if(mode == STMNBLK) break;
+            // if(mode == STMNBLK) break;
             if (mode == 0)
                 break;
         }

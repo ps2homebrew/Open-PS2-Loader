@@ -28,12 +28,24 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, sceCdRMode *mode)
 {
     int result;
 
-    DPRINTF("sceCdRead lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
+    u16 sector_size = 2048;
+
+    // Is is NULL in our emulated cdvdman routines so check if valid.
+    if (mode) {
+        // 0 is 2048
+        if (mode->datapattern == SCECdSecS2328)
+            sector_size = 2328;
+
+        if (mode->datapattern == SCECdSecS2340)
+            sector_size = 2340;
+    }
+
+    DPRINTF("sceCdRead lsn=%d sectors=%d sector_size=%d buf=%08x\n", (int)lsn, (int)sectors, (int)sector_size, (int)buf);
 
     if ((!(cdvdman_settings.common.flags & IOPCORE_COMPAT_ALT_READ)) || QueryIntrContext()) {
-        result = cdvdman_AsyncRead(lsn, sectors, buf);
+        result = cdvdman_AsyncRead(lsn, sectors, sector_size, buf);
     } else {
-        result = cdvdman_SyncRead(lsn, sectors, buf);
+        result = cdvdman_SyncRead(lsn, sectors, sector_size, buf);
     }
 
     return result;

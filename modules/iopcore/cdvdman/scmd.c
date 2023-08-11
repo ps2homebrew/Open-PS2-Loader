@@ -66,7 +66,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
         }
 
         cdvdman_stat.status = SCECdStatShellOpen;
-        cdvdman_stat.disc_type_reg = 0;
+        cdvdman_stat.disc_type_reg = SCECdNODISC;
 
         DelayThread(11000);
 
@@ -93,7 +93,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
         If the day comes that OPL implements disc swapping, this will be place to reupdate all disc type, LBA start offsets, mediaLsn count and everything else.
         Until then it will the same disc.
         */
-        cdvdman_stat.disc_type_reg = cdvdman_settings.common.media & 0xFF;
+        cdvdman_stat.disc_type_reg = cdvdman_settings.common.media;
 
         cdvdman_media_changed = 1;
 
@@ -114,9 +114,9 @@ int sceCdApplySCmd(u8 cmd, const void *in, u16 in_size, void *out)
 //-------------------------------------------------------------------------
 int sceCdStatus(void)
 {
-    DPRINTF("sceCdStatus %d\n", cdvdman_stat.status);
+    DPRINTF("sceCdStatus %d\n", (int)cdvdman_stat.status);
 
-    return cdvdman_stat.status;
+    return (int)cdvdman_stat.status;
 }
 
 //-------------------------------------------------------------------------

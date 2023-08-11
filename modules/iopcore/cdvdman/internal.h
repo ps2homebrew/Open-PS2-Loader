@@ -71,10 +71,10 @@ struct SteamingData
 typedef struct
 {
     int err;
-    int status;
+    u8 status; // SCECdvdDriveState
     struct SteamingData StreamingData;
     int intr_ef;
-    int disc_type_reg;
+    int disc_type_reg; // SCECdvdMediaType
     u32 cdread_lba;
     u32 cdread_sectors;
     u16 sector_size;

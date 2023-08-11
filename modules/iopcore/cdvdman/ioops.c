@@ -398,7 +398,7 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
     DPRINTF("cdrom_dread fh->lsn=%lu\n", fh->lsn);
 
     if ((r = sceCdRead(fh->lsn, 1, cdvdman_fs_buf, NULL)) == 1) {
-        // sceCdSync(0); // TODO: need to verify
+        sceCdSync(0);
 
         do {
             r = 0;

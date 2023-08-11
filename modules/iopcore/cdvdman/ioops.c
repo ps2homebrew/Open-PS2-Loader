@@ -433,6 +433,8 @@ static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 {
     register int r = 0;
 
+    DPRINTF("cdrom_ioctl 0x%X\n", cmd);
+
     WaitSema(cdrom_io_sema);
 
     if (cmd != 0x10000) // Spin Ctrl op
@@ -449,6 +451,7 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
     int result;
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     result = 0;
     switch (cmd) {
@@ -536,6 +539,7 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
             result = cdvdman_stat.intr_ef;
             break;
         default:
+            DPRINTF("cdrom_devctl unknown, cmd=0x%X\n", cmd);
             result = -EIO;
             break;
     }
@@ -553,6 +557,7 @@ static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen,
     // There was a check here on whether the file was opened with mode 8.
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     switch (cmd) {
         case CIOCSTREAMPAUSE:
@@ -565,6 +570,7 @@ static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen,
             r = sceCdStStat();
             break;
         default:
+            DPRINTF("cdrom_ioctl2 unknown, cmd=0x%X\n", cmd);
             r = -EINVAL;
     }
 

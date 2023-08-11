@@ -600,6 +600,7 @@ int sceCdSC(int code, int *param)
             result = 1;
             break;
         default:
+            DPRINTF("sceCdSC unknown, code=0x%X param=0x%X \n", code, *param);
             result = 1; // dummy result
     }
 

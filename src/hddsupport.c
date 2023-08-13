@@ -486,11 +486,10 @@ void hddLaunchGame(int id, config_set_t *configSet)
     if (hddHDProKitDetected) {
         size_irx = size_hdd_hdpro_cdvdman_irx;
         irx = &hdd_hdpro_cdvdman_irx;
-    }
-    else if(hddCheckGameStar()) {
+    } else if (hddCheckGameStar()) {
         size_irx = size_hdd_gamestar_cdvdman_irx;
         irx = &hdd_gamestar_cdvdman_irx;
-    }  else {
+    } else {
         size_irx = size_hdd_cdvdman_irx;
         irx = &hdd_cdvdman_irx;
     }
@@ -756,8 +755,8 @@ static char *hddGetPrefix(void)
     return gHDDPrefix;
 }
 
-static item_list_t hddGameList =
-{
+static item_list_t hddGameList = {
+    // clang-format off
       HDD_MODE
     , 0
     , 0
@@ -783,4 +782,5 @@ static item_list_t hddGameList =
     , &hddShutdown
     , &hddCheckVMC
     , &hddGetIconId
+    // clang-format on
 };

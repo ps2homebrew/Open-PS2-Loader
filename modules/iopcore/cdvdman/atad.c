@@ -32,7 +32,7 @@
 #include <speedregs.h>
 #include <atahw.h>
 
-//#define NETLOG_DEBUG
+// #define NETLOG_DEBUG
 
 #ifdef NETLOG_DEBUG
 // !!! netlog exports functions pointers !!!
@@ -74,14 +74,14 @@ typedef struct _ata_cmd_info
     u8 type;
 } ata_cmd_info_t;
 
-#define ata_cmd_command_mask 0x1f
-#define ata_cmd_command_bits(x) ((x) & ata_cmd_command_mask)
-#define ata_cmd_flag_write_twice 0x80
-#define ata_cmd_flag_use_timeout 0x40
-#define ata_cmd_flag_dir         0x20 // DMA direction: read from RAM if set, write to to RAM if unset.
+#define ata_cmd_command_mask      0x1f
+#define ata_cmd_command_bits(x)   ((x)&ata_cmd_command_mask)
+#define ata_cmd_flag_write_twice  0x80
+#define ata_cmd_flag_use_timeout  0x40
+#define ata_cmd_flag_dir          0x20 // DMA direction: read from RAM if set, write to to RAM if unset.
 #define ata_cmd_flag_is_set(x, y) ((x) & (y))
-static const ata_cmd_info_t ata_cmd_table[] =
-{
+static const ata_cmd_info_t ata_cmd_table[] = {
+    // clang-format off
       { ATA_C_READ_DMA              , 0x04 | ata_cmd_flag_use_timeout                                               }
     , { ATA_C_READ_DMA_EXT          , 0x04 | ata_cmd_flag_use_timeout                    | ata_cmd_flag_write_twice }
     , { ATA_C_FLUSH_CACHE           , 0x01 | ata_cmd_flag_use_timeout                                               }
@@ -93,6 +93,7 @@ static const ata_cmd_info_t ata_cmd_table[] =
     , { ATA_C_SET_FEATURES          , 0x01 | ata_cmd_flag_use_timeout                                               }
     , { ATA_C_IDLE                  , 0x01 | ata_cmd_flag_use_timeout                                               }
     , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                                               }
+    // clang-format on
 };
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
@@ -101,12 +102,12 @@ struct
 {
     union
     {
-        void* buf;
-        u8*   buf8;
-        u16*  buf16;
+        void *buf;
+        u8 *buf8;
+        u16 *buf16;
     };
     u16 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    u8  type;     /* The ata_cmd_info_t type field. */
+    u8 type;      /* The ata_cmd_info_t type field. */
 } static atad_cmd_state;
 _Static_assert(sizeof(atad_cmd_state) == 8);
 
@@ -163,10 +164,10 @@ int atad_start(void)
     /* In v1.04, PIO mode 0 was set here. In late versions, it is set in ata_init_devices(). */
     dev9RegisterIntrCb(1, &ata_intr_cb);
     dev9RegisterIntrCb(0, &ata_intr_cb);
-    #ifndef ATA_GAMESTAR_WORKAROUND
+#ifndef ATA_GAMESTAR_WORKAROUND
     dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
     dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
-    #endif // ATA_GAMESTAR_WORKAROUND
+#endif // ATA_GAMESTAR_WORKAROUND
     /* Register this at the last position, as it should be the last thing done before shutdown. */
     dev9RegisterShutdownCb(15, &ata_shutdown_cb);
 
@@ -213,16 +214,17 @@ int ata_get_error(void)
 #define ata_wait_busy()     gen_ata_wait_busy(ATA_WAIT_BUSY)
 #define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
-static int gen_ata_wait_busy(int bits) {
+static int gen_ata_wait_busy(int bits)
+{
     USE_ATA_REGS;
 
-    for(unsigned i = 0; i < 56; ++i) {
-        if(!(ata_hwport->r_control & bits)) {
+    for (unsigned i = 0; i < 56; ++i) {
+        if (!(ata_hwport->r_control & bits)) {
             return 0;
         }
 
-        unsigned delay = (i>>3) << (i>>2) << 5;
-        if(delay) {
+        unsigned delay = (i >> 3) << (i >> 2) << 5;
+        if (delay) {
             DelayThread(delay);
         }
     }
@@ -246,7 +248,7 @@ static int ata_device_select(int device)
     /* Select the device.  */
     ata_hwport->r_select = (device & 1) << 4;
     (void)(ata_hwport->r_control);
-    (void)(ata_hwport->r_control); //Only done once in v1.04.
+    (void)(ata_hwport->r_control); // Only done once in v1.04.
 
     return ata_wait_bus_busy();
 }
@@ -262,16 +264,20 @@ static unsigned find_ata_cmd(u16 command)
     return result;
 }
 
-/* Export 6 */
-/*
-	28-bit LBA:
-		sector	(7:0)	-> LBA (7:0)
-		lcyl	(7:0)	-> LBA (15:8)
-		hcyl	(7:0)	-> LBA (23:16)
-		device	(3:0)	-> LBA (27:24)
-
-	48-bit LBA just involves writing the upper 24 bits in the format above into each respective register on the first write pass, before writing the lower 24 bits in the 2nd write pass. The LBA bits within the device field are not used in either write pass.
-*/
+/**
+ * Export 6
+ *
+ * 28-bit LBA:
+ *     sector  (7:0) -> LBA ( 7: 0)
+ *     lcyl    (7:0) -> LBA (15: 8)
+ *     hcyl    (7:0) -> LBA (23:16)
+ *     device  (3:0) -> LBA (27:24)
+ *
+ * 48-bit LBA just involves writing the upper 24 bits in the format above into
+ * each respective register on the first write pass, before writing the lower 24
+ * bits in the 2nd write pass. The LBA bits within the device field are not used
+ * in either write pass.
+ */
 int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
 {
     USE_ATA_REGS;
@@ -339,7 +345,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     ata_hwport->r_sector = sector & 0xff;
     ata_hwport->r_lcyl = lcyl & 0xff;
     ata_hwport->r_hcyl = hcyl & 0xff;
-    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff; //In v1.04, LBA was enabled in the ata_device_sector_io function.
+    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff; // In v1.04, LBA was enabled in the ata_device_sector_io function.
     ata_hwport->r_command = command & 0xff;
 
     /* Turn on the LED.  */
@@ -423,9 +429,9 @@ int ata_io_finish(void)
         }
     } else if (cmd == 4) { /* DMA.  */
         if ((res = ata_dma_complete(
-            atad_cmd_state.buf,
-            atad_cmd_state.blkcount,
-            dma_dir)) < 0)
+                 atad_cmd_state.buf,
+                 atad_cmd_state.blkcount,
+                 dma_dir)) < 0)
             goto finish;
 
         for (i = 0; i < 100; i++)
@@ -519,18 +525,18 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         }
 
         for (retries = 3; retries > 0; retries--) {
-            #ifdef ATA_GAMESTAR_WORKAROUND
+#ifdef ATA_GAMESTAR_WORKAROUND
             /* Due to the retry loop, put this call (for the GameStar workaround) here instead of the old location. */
             ata_set_dir(dir);
-            #endif // ATA_GAMESTAR_WORKAROUND
+#endif // ATA_GAMESTAR_WORKAROUND
 
             if ((res = ata_io_start(buf, len, 0, len, sector, lcyl, hcyl, select, command)) != 0)
                 break;
 
+#ifndef ATA_GAMESTAR_WORKAROUND
             /* Set up (part of) the transfer here. In v1.04, this was called at the top of the outer loop. */
-            #ifndef ATA_GAMESTAR_WORKAROUND
             ata_set_dir(dir);
-            #endif // ATA_GAMESTAR_WORKAROUND
+#endif // ATA_GAMESTAR_WORKAROUND
 
             res = ata_io_finish();
 
@@ -566,11 +572,11 @@ static void ata_set_dir(int dir)
     val = SPD_REG16(SPD_R_IF_CTRL) & 1;
     val |= (dir == ATA_DIR_WRITE) ? 0x4c : 0x4e;
     SPD_REG16(SPD_R_IF_CTRL) = val;
-    #ifdef ATA_GAMESTAR_WORKAROUND
+#ifdef ATA_GAMESTAR_WORKAROUND
     SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x86;
-    #else // ATA_GAMESTAR_WORKAROUND
-    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x06; //In v1.04, DMA was enabled here (0x86 instead of 0x6)
-    #endif // ATA_GAMESTAR_WORKAROUND
+#else  // ATA_GAMESTAR_WORKAROUND
+    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x06; // In v1.04, DMA was enabled here (0x86 instead of 0x6)
+#endif // ATA_GAMESTAR_WORKAROUND
 }
 
 static void ata_shutdown_cb(void)

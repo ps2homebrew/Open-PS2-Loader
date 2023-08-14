@@ -830,15 +830,15 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     if (gOSDLanguageEnable) { // only patch if enabled, and only on config fields wich have not chosen "system default"
         if (gOSDLanguageValue >= LANGUAGE_JAPANESE && gOSDLanguageValue <= LANGUAGE_PORTUGUESE) {
             PARAM.language = gOSDLanguageValue;
-            LOG("System Language enforced to %d", gOSDLanguageValue);
+            LOG("System Language enforced to %d\n", gOSDLanguageValue);
         }
         if (gOSDTVAspectRatio >= TV_SCREEN_43 && gOSDTVAspectRatio <= TV_SCREEN_169) {
             PARAM.screenType = gOSDTVAspectRatio;
-            LOG("System screenType enforced to %d", gOSDTVAspectRatio);
+            LOG("System screenType enforced to %d\n", gOSDTVAspectRatio);
         }
         if (gOSDVideOutput == VIDEO_OUTPUT_RGB || gOSDVideOutput == VIDEO_OUTPUT_COMPONENT) {
             PARAM.videoOutput = gOSDVideOutput;
-            LOG("System video output enforced to %d", gOSDVideOutput);
+            LOG("System video output enforced to %d\n", gOSDVideOutput);
         }
     }
 

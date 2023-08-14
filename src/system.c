@@ -827,7 +827,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 #define CONFIGPARAMDATA " %d %d %d %d %d %d %d %d %d"
     ConfigParam PARAM;
     GetOsdConfigParam(&PARAM);
-    if (gOSDLanguageEnable) { // only patch if enabled, and only on config fields wich have a not chosen "system default"
+    if (gOSDLanguageEnable) { // only patch if enabled, and only on config fields wich have not chosen "system default"
         if (gOSDLanguageValue >= LANGUAGE_JAPANESE && gOSDLanguageValue <= LANGUAGE_PORTUGUESE) {
             PARAM.language = gOSDLanguageValue;
             LOG("System Language enforced to %d", gOSDLanguageValue);

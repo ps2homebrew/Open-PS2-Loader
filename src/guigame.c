@@ -1375,8 +1375,7 @@ static int guiGameSaveOSDLanguageGameConfig(config_set_t *configSet, int result)
 {
     if (gOSDLanguageSource == SETTINGS_PERGAME) {
         if ((result = configSetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_SOURCE, gOSDLanguageSource)))
-            if ((result = configSetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_ENABLE, gOSDLanguageEnable)))
-            {
+            if ((result = configSetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_ENABLE, gOSDLanguageEnable))) {
                 result = configSetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_LANGID, gOSDLanguageValue);
                 result = configSetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_TV_ASP, gOSDTVAspectRatio);
                 result = configSetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_VMODE, gOSDVideOutput);
@@ -1410,7 +1409,7 @@ static void guiGameLoadOSDLanguageConfig(config_set_t *configSet, config_set_t *
     configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_ENABLE, &gOSDLanguageEnable);
     configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_LANGID, &gOSDLanguageValue);
     configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_TV_ASP, &gOSDTVAspectRatio);
-    configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_VMODE,  &gOSDVideOutput);
+    configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_VMODE, &gOSDVideOutput);
     // override global with per-game settings if available and selected.
     if (!forceGlobalOSDLanguage) {
         configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_SOURCE, &gOSDLanguageSource);

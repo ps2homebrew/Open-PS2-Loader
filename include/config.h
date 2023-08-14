@@ -44,12 +44,12 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_OSD_SETTINGS_TV_ASP "$OSDAspectRatio"
 #define CONFIG_ITEM_OSD_SETTINGS_VMODE  "$OSDVideoMode"
 // Per-Game GSM keys. -Bat-
-#define CONFIG_ITEM_GSMSOURCE   "$GSMSource"
-#define CONFIG_ITEM_ENABLEGSM   "$EnableGSM"
-#define CONFIG_ITEM_GSMVMODE    "$GSMVMode"
-#define CONFIG_ITEM_GSMXOFFSET  "$GSMXOffset"
-#define CONFIG_ITEM_GSMYOFFSET  "$GSMYOffset"
-#define CONFIG_ITEM_GSMFIELDFIX "$GSMFIELDFix"
+#define CONFIG_ITEM_GSMSOURCE           "$GSMSource"
+#define CONFIG_ITEM_ENABLEGSM           "$EnableGSM"
+#define CONFIG_ITEM_GSMVMODE            "$GSMVMode"
+#define CONFIG_ITEM_GSMXOFFSET          "$GSMXOffset"
+#define CONFIG_ITEM_GSMYOFFSET          "$GSMYOffset"
+#define CONFIG_ITEM_GSMFIELDFIX         "$GSMFIELDFix"
 
 // Per-Game CHEAT keys. -Bat-
 #define CONFIG_ITEM_CHEATSSOURCE "$CheatsSource"

@@ -836,7 +836,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
             PARAM.screenType = gOSDTVAspectRatio;
             LOG("System screenType enforced to %d", gOSDTVAspectRatio);
         }
-        if (gOSDVideOutput == VIDEO_OUTPUT_RGB  || gOSDVideOutput == VIDEO_OUTPUT_COMPONENT) {
+        if (gOSDVideOutput == VIDEO_OUTPUT_RGB || gOSDVideOutput == VIDEO_OUTPUT_COMPONENT) {
             PARAM.videoOutput = gOSDVideOutput;
             LOG("System video output enforced to %d", gOSDVideOutput);
         }

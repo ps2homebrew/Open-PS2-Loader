@@ -826,8 +826,22 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 
 #define CONFIGPARAMDATA " %d %d %d %d %d %d %d %d %d"
     ConfigParam PARAM;
-    GetOsdConfigParam(&PARAM);                                                  //get system configuration
-    PARAM.language = (gOSDLanguageEnable) ? gOSDLanguageValue : PARAM.language; //patch what we care about
+    GetOsdConfigParam(&PARAM);
+    if (gOSDLanguageEnable) { // only patch if enabled, and only on config fields wich have not chosen "system default"
+        if (gOSDLanguageValue >= LANGUAGE_JAPANESE && gOSDLanguageValue <= LANGUAGE_PORTUGUESE) {
+            PARAM.language = gOSDLanguageValue;
+            LOG("System Language enforced to %d\n", gOSDLanguageValue);
+        }
+        if (gOSDTVAspectRatio >= TV_SCREEN_43 && gOSDTVAspectRatio <= TV_SCREEN_169) {
+            PARAM.screenType = gOSDTVAspectRatio;
+            LOG("System screenType enforced to %d\n", gOSDTVAspectRatio);
+        }
+        if (gOSDVideOutput == VIDEO_OUTPUT_RGB || gOSDVideOutput == VIDEO_OUTPUT_COMPONENT) {
+            PARAM.videoOutput = gOSDVideOutput;
+            LOG("System video output enforced to %d\n", gOSDVideOutput);
+        }
+    }
+
 #define CONFIGPARAMDATA_ARGUMENT , PARAM.spdifMode, PARAM.screenType, PARAM.videoOutput, PARAM.japLanguage, PARAM.ps1drvConfig, PARAM.version, PARAM.language, PARAM.timezoneOffset, gOSDLanguageEnable
 
     argc = 0;

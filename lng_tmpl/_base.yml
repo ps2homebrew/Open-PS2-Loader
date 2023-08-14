@@ -657,15 +657,21 @@ gui_strings:
 - label: LANGUAGE_SIMPL_CHINESE
   string: SIMPLIFIED CHINESE
 - label: OSD_SETTINGS
-  string: OSD settings
+  string: OSD Settings
 - label: OSD_SETTINGS_LNG
   string: OSD Language
+- label: HINT_OSD_SETTINGS_LNG
+  string: Force a custom language configuration
 - label: ENABLE_LNG
   string: Enable
 - label: OSD_SETTINGS_TVASPECT
-  string: Sreen Size
+  string: Screen Size
 - label: FULL_SCREEN
   string: Full Screen
+- label: OSD_SETTINGS_VMODE
+  string: Video Mode
+- label: SYSTEM_DEFAULT
+  string: System Default
 - label: BGM
   string: Background Music
 - label: BGM_VOLUME

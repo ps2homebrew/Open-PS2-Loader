@@ -42,6 +42,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_OSD_SETTINGS_SOURCE "$CustomLanguageSource"
 #define CONFIG_ITEM_OSD_SETTINGS_ENABLE "$OSDSettingsEnable"
 #define CONFIG_ITEM_OSD_SETTINGS_TV_ASP "$OSDAspectRatio"
+#define CONFIG_ITEM_OSD_SETTINGS_VMODE  "$OSDVideoMode"
 // Per-Game GSM keys. -Bat-
 #define CONFIG_ITEM_GSMSOURCE   "$GSMSource"
 #define CONFIG_ITEM_ENABLEGSM   "$EnableGSM"

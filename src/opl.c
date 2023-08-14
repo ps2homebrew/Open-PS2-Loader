@@ -204,6 +204,7 @@ char gExportName[32];
 
 int gOSDLanguageValue;
 int gOSDTVAspectRatio;
+int gOSDVideOutput;
 int gOSDLanguageEnable;
 int gOSDLanguageSource;
 

@@ -183,6 +183,14 @@ void hddLoadModules(void)
                            "\0"
                            "20";
 
+	static char pfsarg[] = "\0"
+                           "-o" // max open
+                           "\0"
+                           "10" // Default value: 2
+                           "\0"
+                           "-n" // Number of buffers
+                           "\0"
+                           "40"; // Default value: 8 | Max value: 127
     LOG("HDDSUPPORT LoadModules\n");
 
     if (!hddModulesLoaded) {
@@ -227,7 +235,7 @@ void hddLoadModules(void)
         }
 
         LOG("[PS2FS]:\n");
-        ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
+        ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, sizeof(pfsarg), pfsarg);
         if (ret < 0) {
             LOG("HDD: HardDisk Drive not formatted (PFS).\n");
             setErrorMessageWithCode(_STR_HDD_NOT_FORMATTED_ERROR, ERROR_HDD_MODULE_PFS_FAILURE);

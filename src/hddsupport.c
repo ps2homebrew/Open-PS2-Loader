@@ -183,7 +183,7 @@ void hddLoadModules(void)
                            "\0"
                            "20";
 
-	static char pfsarg[] = "\0"
+    static char pfsarg[] = "\0"
                            "-o" // max open
                            "\0"
                            "10" // Default value: 2

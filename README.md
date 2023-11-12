@@ -123,24 +123,23 @@ that contains the preferred partition name (for example `__common`).
   <summary> <b> NBD Server </b> </summary>
 <p>
 
-A [NBD](https://en.wikipedia.org/wiki/Network_block_device) server replaced HDL server.
-NBD is [formally documented](https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md)
-and developed as a collaborative open standard.
-The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD),
-go there to contribute.
-The main advantage of using NBD is that the client will simulate a similar
-interface to the OS as if the device was plugged directly into your machine.
-All your favorite software that worked with the device directly connected to your
-machine, will work with the device accessible through the network.
+OPL now uses an [NBD](https://en.wikipedia.org/wiki/Network_block_device) server to share the internal Hard Drive, instead of HDL server.
+NBD is [formally documented](https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md) and developed as a collaborative open standard.
+The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD), go there to contribute on the NBD code itself.
+The main advantage of using NBD is that the client will expose the drive to your operating system in a similar way as a directly attached drive, meaning many more utilities can see and work with the drive.
+All your favorite software that worked with the device directly connected to your machine, will work with the device accessible through the network.
 
-Currently, only export for HDD is supported by the server.
-You can use hdl-dump, pfs-shell, or even directly edit disk in some hex editor.
-Example, how to install HDL game to the HDD:
-Connect with your choosen client, then `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO`
-and when you're done, disconnect the client.
+OPL currently only supports exporting the PS2's drive.
 
-So you need a NBD client.
-Here we list some known compatible clients and how to use them.
+You can use `hdl-dump`, `pfs-shell`, or even directly edit the disk in a hex editor.
+For example, to use `hdl_dump` to install a game to the HDD:
+Connect with your choosen client (OS specific), run `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO` and then disconnect the client.
+
+For OPL 1.1.0 (current stable) the NBD server is has some bugs, so ensure you have the latest version (go to the [Releases](https://github.com/ps2homebrew/Open-PS2-Loader/releases) section and grab the one at the top)
+
+Of course, OPL will need to be configured with an IP address (either static or DHCP).
+
+Once OPL is on the network, open the menu and select "Start NBD server". Once it's ready, it should update the screen to say "NBD Server running...". Now you can connect with any of the following NBD clients.
 
 ### nbd-client
 

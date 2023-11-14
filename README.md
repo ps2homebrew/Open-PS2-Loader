@@ -137,16 +137,16 @@ You can use `hdl-dump`, `pfs-shell`, or even directly edit the disk in a hex edi
 
 For example, to use `hdl_dump` to install a game to the HDD:
 
-* Connect with your choosen client (OS specific)
-* Run `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO`
-* Disconnect the client.
+  * Connect with your choosen client (OS specific)
+  * Run `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO`
+  * Disconnect the client.
 
 To use the NBD server in OPL:
 
-* Grab the latest beta version (OPL 1.1.0 (current stable) has some bugs in the NBD server) - go to the [Releases](https://github.com/ps2homebrew/Open-PS2-Loader/releases) section and grab the one at the top.
-* Ensure OPL is configured with an IP address (either static or DHCP).
-* Open the menu and select "Start NBD server". Once it's ready, it should update the screen to say "NBD Server running..."
-* Now you can connect with any of the following NBD clients.
+  * Grab the latest beta version (OPL 1.1.0 (current stable) has some bugs in the NBD server) - go to the [Releases](https://github.com/ps2homebrew/Open-PS2-Loader/releases) section and grab the one at the top.
+  * Ensure OPL is configured with an IP address (either static or DHCP).
+  * Open the menu and select "Start NBD server". Once it's ready, it should update the screen to say "NBD Server running..."
+  * Now you can connect with any of the following NBD clients.
 
 ### nbd-client
 

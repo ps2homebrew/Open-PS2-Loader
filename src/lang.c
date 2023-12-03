@@ -99,9 +99,9 @@ char *lngGetValue(void)
     return guiLangNames[guiLangID];
 }
 
-static int lngReadEntry(int index, const char *path, const char *separator, const char *name, unsigned int mode)
+static int lngReadEntry(int index, const char *path, const char *separator, const char *name, unsigned char d_type)
 {
-    if (!S_ISDIR(mode)) {
+    if (d_type != DT_DIR) {
         if (strstr(name, ".lng") || strstr(name, ".LNG")) {
 
             language_t *currLang = &languages[nLanguages + index];

@@ -209,10 +209,9 @@ void *readFile(char *path, int align, int *size)
 }
 
 int listDir(char *path, const char *separator, int maxElem,
-            int (*readEntry)(int index, const char *path, const char *separator, const char *name, unsigned int mode))
+            int (*readEntry)(int index, const char *path, const char *separator, const char *name, unsigned char d_type))
 {
     int index = 0;
-    struct stat st;
     char filename[128];
 
     if (checkFile(path, O_RDONLY)) {
@@ -221,8 +220,7 @@ int listDir(char *path, const char *separator, int maxElem,
         if (dir != NULL) {
             while (index < maxElem && (dirent = readdir(dir)) != NULL) {
                 snprintf(filename, 128, "%s/%s", path, dirent->d_name);
-                stat(filename, &st);
-                index = readEntry(index, path, separator, dirent->d_name, st.st_mode);
+                index = readEntry(index, path, separator, dirent->d_name, dirent->d_type);
             }
 
             closedir(dir);
@@ -589,7 +587,6 @@ int sysDeleteFolder(const char *folder)
     char *path;
     struct dirent *dirent;
     DIR *dir;
-    struct stat st;
     struct DirentToDelete *head, *start;
 
     result = 0;
@@ -602,9 +599,8 @@ int sysDeleteFolder(const char *folder)
 
             path = malloc(strlen(folder) + strlen(dirent->d_name) + 2);
             sprintf(path, "%s/%s", folder, dirent->d_name);
-            stat(path, &st);
 
-            if (S_ISDIR(st.st_mode)) {
+            if (dirent->d_type == DT_DIR) {
                 /* Recursive, delete all subfolders */
                 result = sysDeleteFolder(path);
                 free(path);

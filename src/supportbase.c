@@ -289,7 +289,6 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
     char fullpath[256], startup[GAME_STARTUP_MAX];
     struct dirent *dirent;
     DIR *dir;
-    struct stat statbuf;
 
     cache.games = NULL;
     cache.count = 0;
@@ -302,8 +301,6 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
 
                 if (NameLen > ISO_GAME_NAME_MAX)
                     continue; // Skip files that cannot be supported properly.
-
-                snprintf(fullpath, sizeof(fullpath), "%s/%s", path, dirent->d_name);
 
                 if (format == GAME_FORMAT_OLD_ISO) {
                     struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
@@ -327,6 +324,8 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                     }
                 } else {
                     if (queryISOGameListCache(&cache, &cachedGInfo, dirent->d_name) != 0) {
+                        snprintf(fullpath, sizeof(fullpath), "%s/%s", path, dirent->d_name);
+
                         if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
                             if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {
                                 struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
@@ -379,12 +378,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                 game->parts = 1;
                 game->media = type;
                 game->format = format;
-
-                if (stat(fullpath, &statbuf) == 0) {
-                    game->sizeMB = statbuf.st_size >> 20;
-                } else {
-                    game->sizeMB = 0;
-                }
+                game->sizeMB = dirent->d_stat.st_size >> 20;
 
                 count++;
             }

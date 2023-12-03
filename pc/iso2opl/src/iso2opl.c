@@ -462,7 +462,6 @@ void scan_dir(int isBigEndian)
     char *name;
     char fullname[512];
     char newname[512];
-    struct stat buf;
 
     DIR *rep = opendir(".");
     if (rep != NULL) {
@@ -470,7 +469,7 @@ void scan_dir(int isBigEndian)
             name = ent->d_name;
             size = strlen(name);
             sprintf(fullname, "./%s", name);
-            if (!stat(fullname, &buf) && !S_ISDIR(buf.st_mode)) {
+            if (ent->d_type != DT_DIR) {
                 if (strstr(name, ".iso")) {
                     if ((size >= 17) && (name[4] == '_') && (name[8] == '.') && (name[11] == '.')) {
                         printf("%s seems to be correctly named\n", fullname);

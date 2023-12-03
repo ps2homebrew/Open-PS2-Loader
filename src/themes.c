@@ -1055,9 +1055,9 @@ static void thmFree(theme_t *theme)
     }
 }
 
-static int thmReadEntry(int index, const char *path, const char *separator, const char *name, unsigned int mode)
+static int thmReadEntry(int index, const char *path, const char *separator, const char *name, unsigned char d_type)
 {
-    if (S_ISDIR(mode) && strstr(name, "thm_")) {
+    if (d_type == DT_DIR && strstr(name, "thm_")) {
         theme_file_t *currTheme = &themes[nThemes + index];
 
         int length = strlen(name) - 4 + 1;

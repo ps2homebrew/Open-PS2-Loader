@@ -606,7 +606,6 @@ int pko_read_dir(int fd, void *buf)
     memcpy(dirent->stat.atime, dirrly->atime, 8);
     memcpy(dirent->stat.mtime, dirrly->mtime, 8);
     strncpy(dirent->name, dirrly->name, 256);
-    dirent->unknown = 0;
 
     return ntohl(dirrly->retval);
 }

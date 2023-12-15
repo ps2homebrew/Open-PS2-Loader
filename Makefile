@@ -203,6 +203,10 @@ EE_OBJS += $(FRONTEND_OBJS) $(GFX_OBJS) $(AUDIO_OBJS) $(MISC_OBJS) $(EECORE_OBJS
 EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 EE_DEPS = $($(filter %.o,$(EE_OBJS)):%.o=%.d)
 
+# To help linking getting rid off unused functions and data
+EE_CFLAGS += -fdata-sections -ffunction-sections -flto
+EE_LDFLAGS += -fdata-sections -ffunction-sections -flto -Wl,--gc-sections
+
 .SILENT:
 
 .PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages

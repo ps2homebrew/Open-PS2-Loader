@@ -204,8 +204,8 @@ EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 EE_DEPS = $($(filter %.o,$(EE_OBJS)):%.o=%.d)
 
 # To help linking getting rid off unused functions and data
-EE_CFLAGS += -fdata-sections -ffunction-sections -flto
-EE_LDFLAGS += -fdata-sections -ffunction-sections -flto -Wl,--gc-sections
+EE_CFLAGS += -fdata-sections -ffunction-sections
+EE_LDFLAGS += -fdata-sections -ffunction-sections -Wl,--gc-sections
 
 .SILENT:
 

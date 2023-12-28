@@ -9,6 +9,8 @@
 #include "include/ioman.h"
 #include "include/system.h"
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <malloc.h>
 #include <rom0_info.h>
 
@@ -456,7 +458,8 @@ int InitConsoleRegionData(void)
     char romver[16];
 
     if ((result = ConsoleRegion) < 0) {
-        GetRomName(romver);
+        _io_driver driver = {open, close, (int (*)(int, void *, int))read, O_RDONLY};
+        GetRomNameWithIODriver(romver, &driver);
 
         switch (romver[4]) {
             case 'C':

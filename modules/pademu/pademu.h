@@ -36,8 +36,10 @@ typedef struct
 
     u32 port_ctrl1[4];
     u32 port_ctrl2[4];
-
-    u32 stat70;
+    u32 port_ctrl3[4];
+    u32 port_ctrl4[4];
+   
+u32 stat70;
 
     u32 regdata[16];
 

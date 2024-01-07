@@ -32,4 +32,4 @@ void mips_memset(void *, int, unsigned);
 #define mips_memcpy memcpy
 #endif
 
-#endif /* __MCEMU_UTILS_H */
+#endif

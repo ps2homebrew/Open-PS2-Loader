@@ -6,6 +6,19 @@
   Review OpenUsbLd README & LICENSE files for further details.
 */
 
+#include <ioman.h>
+#include <intrman.h>
+#include <loadcore.h>
+#include <sifcmd.h>
+#include <sifman.h>
+#include <stdio.h>
+#include <sysclib.h>
+#include <sysmem.h>
+#include <thbase.h>
+#include <thsemap.h>
+#include <dmacman.h>
+#include <xloadcore.h>
+
 #include "pademu.h"
 
 /* prototype for LOADCORE's function */

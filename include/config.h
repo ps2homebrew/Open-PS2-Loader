@@ -59,6 +59,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_PADEMUSOURCE     "$PADEMUSource"
 #define CONFIG_ITEM_ENABLEPADEMU     "$EnablePadEmu"
 #define CONFIG_ITEM_PADEMUSETTINGS   "$PadEmuSettings"
+#define CONFIG_ITEM_PADEMUMODULES    "$PadEmuModules"
 #define CONFIG_ITEM_PADMACROSETTINGS "$PadMacroSettings"
 #define CONFIG_ITEM_PADMACROSOURCE   "$PadMacroSource"
 

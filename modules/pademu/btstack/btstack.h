@@ -1,16 +1,13 @@
-#ifndef _DS34BT_H_
-#define _DS34BT_H_
+#ifndef _BTSTACK_H_
+#define _BTSTACK_H_
 
-#include "irx.h"
-
-#include <ds34common.h>
-
-#define DS3 0
-#define DS4 1
+#define USB_CLASS_WIRELESS_CONTROLLER 0xE0
+#define USB_SUBCLASS_RF_CONTROLLER 0x01
+#define USB_PROTOCOL_BLUETOOTH_PROG 0x01
 
 #define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
 
-#define PENDING    1
+#define PENDING 1
 #define SUCCESSFUL 0
 
 typedef struct
@@ -21,8 +18,30 @@ typedef struct
     int interruptEndp;
     int inEndp;
     int outEndp;
-    u8 status;
-} bt_device;
+} bt_adapter_t;
+
+typedef struct
+{
+    int id;
+    u8 fix;
+    u8 lrum;
+    u8 rrum;
+    u8 update_rum;
+    u8 analog_btn;
+    u8 data[18];
+    u8 led[4];
+    u8 btn_delay;
+} bt_paddata_t;
+
+typedef struct
+{
+    u16 control_dcid;
+    u16 interrupt_dcid;
+    int (*pad_connect)(bt_paddata_t *data, u8 *str, int size);
+    void (*pad_init)(bt_paddata_t *data, int id);
+    void (*pad_read_report)(bt_paddata_t *data, u8 *in, int bytes);
+    void (*pad_rumble)(bt_paddata_t *data);
+} bt_paddrv_t;
 
 typedef struct
 {
@@ -30,40 +49,25 @@ typedef struct
     u16 control_scid;   // Channel endpoint on command destination
     u16 interrupt_scid; // Channel endpoint on interrupt destination
     u8 bdaddr[6];
-    u8 enabled;
+    bt_paddata_t data;
+    bt_paddrv_t *pad;
+    pad_device_t dev;
     u8 status;
-    u8 isfake;
-    u8 type;      // 0 - ds3, 1 - ds4
-    u8 oldled[4]; // rgb for ds4 and blink
-    u8 lrum;
-    u8 rrum;
-    u8 update_rum;
-    union
-    {
-        struct ds2report ds2;
-        u8 data[18];
-    };
-    u8 analog_btn;
-    u8 btn_delay;
-} ds34bt_pad_t;
+} bt_dev_t;
 
-enum eDS34BTStatus {
-    DS34BT_STATE_USB_DISCONNECTED = 0x00,
-    DS34BT_STATE_USB_AUTHORIZED = 0x01,
-    DS34BT_STATE_USB_CONFIGURED = 0x02,
-    DS34BT_STATE_CONNECTED = 0x04,
-    DS34BT_STATE_RUNNING = 0x08,
-    DS34BT_STATE_DISCONNECTING = 0x10,
-    DS34BT_STATE_DISCONNECT_REQUEST = 0x20,
+enum eBTDEVStatus {
+    BTDEV_STATE_USB_DISCONNECTED = 0x00,
+    BTDEV_STATE_USB_AUTHORIZED = 0x01,
+    BTDEV_STATE_USB_CONFIGURED = 0x02,
+    BTDEV_STATE_CONNECTED = 0x04,
+    BTDEV_STATE_RUNNING = 0x08,
+    BTDEV_STATE_DISCONNECTING = 0x10,
+    BTDEV_STATE_DISCONNECT_REQUEST = 0x20,
 };
 
-#define pad_status_clear(flag, pad) ds34pad[pad].status &= ~flag
-#define pad_status_set(flag, pad)   ds34pad[pad].status |= flag
-#define pad_status_check(flag, pad) (ds34pad[pad].status & flag)
-
-#define hci_event_flag_clear(flag) hci_event_flag &= ~flag
-#define hci_event_flag_set(flag)   hci_event_flag |= flag
-#define hci_event_flag_check(flag) (hci_event_flag & flag)
+#define btdev_status_clear(flag, pad) dev[pad].status &= ~flag
+#define btdev_status_set(flag, pad) dev[pad].status |= flag
+#define btdev_status_check(flag, pad) (dev[pad].status & flag)
 
 enum eHCI {
     // {{{
@@ -114,7 +118,7 @@ enum eHCI {
     HCI_EVENT_LINK_KEY_REQUEST = 0x17,
     HCI_EVENT_CHANGED_CONNECTION_TYPE = 0x1D,
     HCI_EVENT_PAGE_SR_CHANGED = 0x20,
-    HCI_EVENT_MAX_SLOT_CHANGE = 0x1B, // Max Slots Change event
+    HCI_EVENT_MAX_SLOT_CHANGE = 0x1B, //Max Slots Change event
 
     /* HCI event flags for hci_event_flag */
     HCI_FLAG_COMMAND_COMPLETE = 0x01,
@@ -175,66 +179,44 @@ enum eL2CAP {
     L2CAP_CMD_DISCONNECT_RESPONSE = 0x07,
 
     /*  HCI ACL Data Packet
-     *
-     *  buf[0]          buf[1]          buf[2]          buf[3]
-     *  0      4        8    11 12      16              24             31 MSB
-     *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
-     *  |        HCI Handle     |PB |BC |      Data Total Length        |    HCI ACL Data Packet
-     *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
-     *
-     *   buf[4]         buf[5]          buf[6]          buf[7]
-     *  0               8               16                             31 MSB
-     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
-     *  |         Length                |        Channel ID             |    Basic L2CAP header
-     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
-     *
-     *  buf[8]          buf[9]          buf[10]         buf[11]
-     *  0               8               16                             31 MSB
-     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
-     *  |     Code      |  Identifier   |         Length                |    Control frame (C-frame)
-     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.    (signaling packet format)
-     */
+ *
+ *  buf[0]          buf[1]          buf[2]          buf[3]
+ *  0      4        8    11 12      16              24             31 MSB
+ *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+ *  |        HCI Handle     |PB |BC |      Data Total Length        |    HCI ACL Data Packet
+ *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+ *
+ *   buf[4]         buf[5]          buf[6]          buf[7]
+ *  0               8               16                             31 MSB
+ *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+ *  |         Length                |        Channel ID             |    Basic L2CAP header
+ *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+ *
+ *  buf[8]          buf[9]          buf[10]         buf[11]
+ *  0               8               16                             31 MSB
+ *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+ *  |     Code      |  Identifier   |         Length                |    Control frame (C-frame)
+ *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.    (signaling packet format)
+ */
     // }}}
 };
 
 #define l2cap_handle_ok(handle) (((u16)(l2cap_buf[0] | (l2cap_buf[1] << 8)) & 0x0FFF) == (u16)(handle & 0x0FFF))
-#define l2cap_control_channel   ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == 0x0001) // Channel ID for ACL-U
-#define l2cap_interrupt_channel ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == interrupt_dcid)
-#define l2cap_command_channel   ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == control_dcid)
+#define l2cap_control_channel ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == 0x0001) // Channel ID for ACL-U
+#define l2cap_interrupt_channel ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == dev[pad].pad->interrupt_dcid)
+#define l2cap_command_channel ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == dev[pad].pad->control_dcid)
 
-enum eHID {
-    // {{{
-    /* HID event flag */
-    HID_FLAG_STATUS_REPORTED = 0x01,
-    HID_FLAG_BUTTONS_CHANGED = 0x02,
-    HID_FLAG_EXTENSION = 0x04,
-    HID_FLAG_COMMAND_SUCCESS = 0x08,
+#define btstack_IMPORTS_start DECLARE_IMPORT_TABLE(btstack, 1, 1)
 
-    /* Bluetooth HID Transaction Header (THdr) */
-    HID_THDR_GET_REPORT_FEATURE = 0x43,
-    HID_THDR_SET_REPORT_OUTPUT = 0x52,
-    HID_THDR_SET_REPORT_FEATURE = 0x53,
-    HID_THDR_DATA_INPUT = 0xa1,
+void btstack_register(bt_paddrv_t *pad);
+#define I_btstack_register DECLARE_IMPORT(4, btstack_register)
 
-    /* Defines of various parameters for PS3 Game controller reports */
-    PS3_F4_REPORT_ID = 0xF4,
-    PS3_F4_REPORT_LEN = 0x04,
+void btstack_unregister(bt_paddrv_t *pad);
+#define I_btstack_unregister DECLARE_IMPORT(5, btstack_unregister)
 
-    PS3_01_REPORT_ID = 0x01,
-    PS3_01_REPORT_LEN = 0x30,
+int btstack_hid_command(bt_paddrv_t *pad, u8 *data, u8 length, int id);
+#define I_btstack_hid_command DECLARE_IMPORT(6, btstack_hid_command)
 
-    PS4_02_REPORT_ID = 0x02,
-    PS4_11_REPORT_ID = 0x11,
-    PS4_11_REPORT_LEN = 0x4D,
-
-    // }}}
-};
-
-int ds34bt_init(u8 pads, u8 options);
-int ds34bt_get_status(int port);
-void ds34bt_reset();
-int ds34bt_get_data(u8 *dst, int size, int port);
-void ds34bt_set_rumble(u8 lrum, u8 rrum, int port);
-void ds34bt_set_mode(int mode, int lock, int port);
+#define btstack_IMPORTS_end END_IMPORT_TABLE
 
 #endif

@@ -1,0 +1,12 @@
+
+DECLARE_EXPORT_TABLE(btstack, 1, 1)
+	DECLARE_EXPORT(_start)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(btstack_exit)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(btstack_register)
+	DECLARE_EXPORT(btstack_unregister)
+	DECLARE_EXPORT(btstack_hid_command)
+END_EXPORT_TABLE
+
+void _retonly() {}

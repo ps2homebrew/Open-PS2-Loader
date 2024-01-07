@@ -5,6 +5,8 @@ DECLARE_EXPORT_TABLE(pademu, 1, 1)
 	DECLARE_EXPORT(_exit)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(pademu_hookSio2man)
+	DECLARE_EXPORT(pademu_connect)
+	DECLARE_EXPORT(pademu_disconnect)
 END_EXPORT_TABLE
 
 void _retonly() {}

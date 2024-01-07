@@ -6,39 +6,34 @@
    Review OpenUsbLd README & LICENSE files for further details.
 */
 
+#include <ioman.h>
+#include <intrman.h>
+#include <loadcore.h>
+#include <sifcmd.h>
+#include <sifman.h>
+#include <stdio.h>
+#include <sysclib.h>
+#include <sysmem.h>
+#include <thbase.h>
+#include <thsemap.h>
+#include <dmacman.h>
+#include <xloadcore.h>
+
 #include "pademu.h"
 #include "padmacro.h"
 
-#ifdef BT
 
-#include "ds34bt.h"
 
-#define PAD_INIT            ds34bt_init
-#define PAD_GET_STATUS      ds34bt_get_status
-#define PAD_RESET           ds34bt_reset
-#define PAD_GET_DATA        ds34bt_get_data
-#define PAD_SET_RUMBLE      ds34bt_set_rumble
-#define PAD_SET_MODE        ds34bt_set_mode
-#define PAD_GET_MODEL(port) 3
-
-#elif defined(USB)
-
-#include "ds34usb.h"
-
-#define PAD_INIT       ds34usb_init
-#define PAD_GET_STATUS ds34usb_get_status
-#define PAD_RESET      ds34usb_reset
-#define PAD_GET_DATA   ds34usb_get_data
-#define PAD_GET_MODEL  ds34usb_get_model
-#define PAD_SET_RUMBLE ds34usb_set_rumble
-#define PAD_SET_MODE   ds34usb_set_mode
-
+#define MODNAME "pademu"
+IRX_ID(MODNAME, 1, 1);
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
 #else
-#error "must define mode"
+#define DPRINTF(args...)
 #endif
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+
 
 typedef struct
 {
@@ -52,24 +47,19 @@ typedef struct
     u8 lrum;
     u8 rrum;
     u8 mask[4];
+    pad_device_t *dev;
 } pad_status_t;
 
 #define DIGITAL_MODE 0x41
 #define ANALOG_MODE  0x73
 #define ANALOGP_MODE 0x79
 #define CONFIG_MODE  0xF3
-
 #define MAX_PORTS 4
-
-#define PAD_STATE_RUNNING 0x08
-
-IRX_ID("pademu", 1, 1);
 
 PtrRegisterLibraryEntires pRegisterLibraryEntires; /* Pointer to RegisterLibraryEntires routine */
 Sio2McProc pSio2man25, pSio2man51;                 /* Pointers to SIO2MAN routines */
 pad_status_t pad[MAX_PORTS];
 
-static u8 pad_inited = 0;
 static u8 pad_enable = 0;
 static u8 pad_options = 0;
 
@@ -92,10 +82,14 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size);
 
 void pademu_mtap(sio2_transfer_data_t *td);
 
+void pademu_connect(pad_device_t *dev);
+void pademu_disconnect(pad_device_t *dev);
+
 extern struct irx_export_table _exp_pademu;
 
 int _start(int argc, char *argv[])
 {
+    DPRINTF("Start\n");
     union
     {
         struct
@@ -113,6 +107,11 @@ int _start(int argc, char *argv[])
     pad_enable = 0x03;
 
     if (argc > 1) {
+#ifdef DEBUG
+        int x;
+        for (x = 0; x < argc; x++)
+            DPRINTF("\targv[%d]: %s\n", x, argv[x]);
+#endif
         mips_memcpy(&PadEmuSettings_local.raw, argv[1], 4);
         pad_enable = PadEmuSettings_local.pad_enable;
         pad_vibration = PadEmuSettings_local.pad_vibration;
@@ -125,6 +124,7 @@ int _start(int argc, char *argv[])
     }
 
     if (RegisterLibraryEntries(&_exp_pademu) != 0) {
+        DPRINTF("RegisterLibraryEntries Failed\n");
         return MODULE_NO_RESIDENT_END;
     }
 
@@ -147,7 +147,6 @@ int _start(int argc, char *argv[])
 
 void _exit(int mode)
 {
-    PAD_RESET();
 }
 
 int install_sio2hook()
@@ -178,6 +177,7 @@ int install_sio2hook()
 
 void InstallSio2manHook(void *exp, int ver)
 {
+    DPRINTF("Install sio2man hooks \n");
     /* hooking SIO2MAN entry #25 (used by MCMAN and old PADMAN) */
     pSio2man25 = HookExportEntry(exp, 25, hookSio2man25);
     /* hooking SIO2MAN entry #51 (used by MC2_* modules and PADMAN) */
@@ -300,6 +300,33 @@ void pademu_setup(u8 ports, u8 vib)
 
         pad[i].lrum = 2;
         pad[i].rrum = 2;
+
+        pad[i].dev = NULL;
+    }
+}
+
+void pademu_connect(pad_device_t *dev)
+{
+    int i;
+    for (i = 0; i < MAX_PORTS; i++) {
+        if (pad[i].enabled && pad[i].dev == NULL) {
+            pad[i].dev = dev;
+            pad[i].dev->id = i;
+            DPRINTF("Device connected\n");
+            break;
+        }
+    }
+}
+
+void pademu_disconnect(pad_device_t *dev)
+{
+    int i;
+    for (i = 0; i < MAX_PORTS; i++) {
+        if (pad[i].dev == dev) {
+            pad[i].dev = NULL;
+            DPRINTF("Device disconnected\n");
+            break;
+        }
     }
 }
 
@@ -323,10 +350,6 @@ void pademu(sio2_transfer_data_t *td)
 
     td->stat6c = 0x1100; //?
     td->stat70 = 0x0F;   //?
-
-    if (!pad_inited) {
-        pad_inited = PAD_INIT(pad_enable, pad_options);
-    }
 
     if (port2 == 1) {
         // find next cmd
@@ -389,9 +412,11 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 {
     u8 i;
 
+    //DPRINTF("sio cmd %02x port %d\n", in[1], port);
+
     mips_memset(out, 0x00, out_size);
 
-    if (!(PAD_GET_STATUS(port) & PAD_STATE_RUNNING)) {
+    if (pad[port].dev == NULL) {
         pad[port].lrum = 2;
         pad[port].rrum = 2;
         return;
@@ -427,11 +452,12 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
         case 0x42: // read data
             if (in[1] == 0x42) {
                 if (pad[port].vibration) { // disable/enable vibration
-                    PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
+                    pad[port].dev->pad_set_rumble(in[pad[port].lrum], in[pad[port].rrum], pad[port].dev->id);
+                    //PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
                 }
             }
 
-            i = PAD_GET_DATA(&out[3], out_size - 3, port);
+            i = pad[port].dev->pad_get_data(&out[3], out_size - 3, pad[port].dev->id);
 
             if (pad[port].mode_lock == 0) { // mode unlocked
                 if (pad[port].mode != i) {
@@ -459,13 +485,14 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
             } else {
                 pad[port].mode_id = DIGITAL_MODE;
             }
-            PAD_SET_MODE(pad[port].mode, pad[port].mode_lock, port);
+            pad[port].dev->pad_set_mode(pad[port].mode, pad[port].mode_lock, pad[port].dev->id);
             break;
 
         case 0x45: // query model and mode
             mips_memcpy(&out[3], &pademu_data[1], 6);
             out[5] = pad[port].mode;
-            out[3] = PAD_GET_MODEL(port);
+            /// TODO: Check if the next line is needed
+            // out[3] = PAD_GET_MODEL(port);
             break;
 
         case 0x46: // query act

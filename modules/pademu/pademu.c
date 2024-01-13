@@ -315,7 +315,7 @@ u8 pademu_data[6][6] =
 void pademu(sio2_transfer_data_t *td)
 {
     int port;
-    u8 port1, port2, cmd_size;
+    u8 port1, port2, port3, port4 cmd_size;
     u8 *in, *out;
 
     port1 = td->regdata[0] & 0x03;

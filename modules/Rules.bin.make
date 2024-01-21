@@ -1,6 +1,4 @@
 BIN2C = $(PS2SDK)/bin/bin2c
-BIN2S = $(PS2SDK)/bin/bin2s
-BIN2O = $(PS2SDK)/bin/bin2o
 IOP_SRC_DIR = ./
 
 all: $(IOP_BIN)

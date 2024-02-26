@@ -103,7 +103,8 @@ static inline void cdvd_readee(void *buf)
 { // Read Disc data to EE mem buffer
     u8 curlsn_buf[16];
     u32 nbytes, nsectors, sectors_to_read, size_64b, size_64bb, bytesent, temp;
-    int sector_size, flag_64b, fsverror;
+    u16 sector_size;
+    int flag_64b, fsverror;
     void *fsvRbuf = (void *)cdvdfsv_buf;
     void *eeaddr_64b, *eeaddr2_64b;
     cdvdfsv_readee_t readee;
@@ -114,13 +115,13 @@ static inline void cdvd_readee(void *buf)
         return;
     }
 
-    sector_size = 2328;
+    sector_size = 2048;
 
-    if ((r->mode.datapattern & 0xff) != 1) {
+    if (r->mode.datapattern == SCECdSecS2328)
+        sector_size = 2328;
+    if (r->mode.datapattern == SCECdSecS2340)
         sector_size = 2340;
-        if ((r->mode.datapattern & 0xff) != 2)
-            sector_size = 2048;
-    }
+
 
     r->eeaddr1 = (void *)((u32)r->eeaddr1 & 0x1fffffff);
     r->eeaddr2 = (void *)((u32)r->eeaddr2 & 0x1fffffff);
@@ -393,7 +394,14 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
             cdvd_readee(buf);
             break;
         case CD_NCMD_GETTOC:
-            *(int *)buf = sceCdGetToc((u8 *)(*(u32 *)buf));
+            u32 eeaddr = *(u32 *)buf;
+            DPRINTF("cbrpc_cdvdNcmds GetToc eeaddr=%08x\n", (int)eeaddr);
+            char toc[2064];
+            memset(toc, 0, 2064);
+            int result = sceCdGetToc((u8 *)toc);
+            *(int *)buf = result;
+            if (result)
+                sysmemSendEE(toc, (void *)eeaddr, 2064);
             break;
         case CD_NCMD_SEEK:
             *(int *)buf = sceCdSeek(*(u32 *)buf);

@@ -1383,6 +1383,9 @@ static void guiDrawOverlays()
 
     if (prevtime != 0) {
         clock_t diff = curtime - prevtime;
+        if (diff == 0)
+            diff = 1;
+
         // Raw FPS value with 2 decimal places
         float rawfps = ((100 * CLOCKS_PER_SEC) / diff) / 100.0f;
 
@@ -1551,6 +1554,10 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target)
 {
+    // Only initiate the transition once or else we could get stuck in an infinite loop.
+    if (screenHandlerTarget != NULL) {
+        return;
+    }
     sfxPlay(SFX_TRANSITION);
     transIndex = 0;
     screenHandlerTarget = &screenHandlers[target];

@@ -203,6 +203,8 @@ char *gHDDPrefix;
 char gExportName[32];
 
 int gOSDLanguageValue;
+int gOSDTVAspectRatio;
+int gOSDVideOutput;
 int gOSDLanguageEnable;
 int gOSDLanguageSource;
 
@@ -476,7 +478,6 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
 {
     struct dirent *pdirent;
     DIR *pdir;
-    struct stat st;
     int i, count, ret;
     item_list_t *listSupport;
     config_set_t *appConfig;
@@ -497,9 +498,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
                         continue;
 
                     snprintf(dir, sizeof(dir), "%s/%s", appsPath, pdirent->d_name);
-                    if (stat(dir, &st) < 0)
-                        continue;
-                    if (!S_ISDIR(st.st_mode))
+                    if (pdirent->d_type != DT_DIR)
                         continue;
 
                     snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
@@ -1691,6 +1690,7 @@ static void init(void)
     setDefaults();
 
     padInit(0);
+    int padStatus = 0;
     configInit(NULL);
 
     rmInit();
@@ -1711,8 +1711,16 @@ static void init(void)
 
     gSelectButton = (InitConsoleRegionData() == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
 
-    // try to restore config
-    _loadConfig();
+    while (!padStatus)
+        padStatus = startPads();
+    readPads();
+    if (!getKeyPressed(KEY_START)) {
+        _loadConfig(); // only try to restore config if emergency key is not being pressed
+    } else {
+        LOG("--- SKIPPING OPL CONFIG LOADING\n");
+        applyConfig(-1, -1);
+    }
+
 
     // queue deffered init of sound effects, which will take place after the preceding initialization steps within the queue are complete.
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);

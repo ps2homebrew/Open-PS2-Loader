@@ -151,6 +151,8 @@ extern int gGSMSource;
 extern int gPadEmuSource;
 
 extern int gOSDLanguageValue;
+extern int gOSDTVAspectRatio;
+extern int gOSDVideOutput;
 extern int gOSDLanguageEnable;
 extern int gOSDLanguageSource;
 

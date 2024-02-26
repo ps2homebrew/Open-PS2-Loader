@@ -10,21 +10,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: |
-        apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
       uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Compile -> make clean release
       run: make --trace clean release
@@ -60,20 +53,14 @@ jobs:
         igs: [IGS=0, IGS=1]
         t10k: [DTL_T10000=0, DTL_T10000=1]
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
       uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Get version
       run: |
@@ -95,21 +82,14 @@ jobs:
 
   build-lang:
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: |
-        apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
       uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Compile -> make download_lng languages
       run: make --trace download_lng languages
@@ -131,20 +111,14 @@ jobs:
       matrix:
         debug: [debug, iopcore_debug, ingame_debug, deci2_debug, eesio_debug]
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
       uses: actions/checkout@v3
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Get version
       run: |

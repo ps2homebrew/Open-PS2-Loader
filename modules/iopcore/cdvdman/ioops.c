@@ -121,12 +121,11 @@ static int cdvdman_open(iop_file_t *f, const char *filename, int mode)
     sceCdlFILE cdfile;
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     cdvdman_init();
 
     if (f->unit < 2) {
-        sceCdDiskReady(0);
-
         fh = cdvdman_getfilefreeslot();
         if (fh) {
             r = sceCdLayerSearchFile(&cdfile, filename, f->unit);
@@ -230,6 +229,8 @@ static int cdrom_open(iop_file_t *f, const char *filename, int mode)
     int result;
     char path_buffer[128]; // Original buffer size in the SCE CDVDMAN module.
 
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
+
     DPRINTF("cdrom_open %s mode=%d layer %d\n", filename, mode, f->unit);
 
     strncpy(path_buffer, filename, sizeof(path_buffer));
@@ -247,6 +248,7 @@ static int cdrom_close(iop_file_t *f)
     FHANDLE *fh = (FHANDLE *)f->privdata;
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     DPRINTF("cdrom_close\n");
 
@@ -266,13 +268,12 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
     int rpos;
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     DPRINTF("cdrom_read size=%db (%ds) file_position=%d\n", size, size / 2048, fh->position);
 
     if ((fh->position + size) > fh->filesize)
         size = fh->filesize - fh->position;
-
-    sceCdDiskReady(0);
 
     rpos = 0;
     if (size > 0) {
@@ -334,6 +335,7 @@ static int cdrom_lseek(iop_file_t *f, int offset, int where)
     FHANDLE *fh = (FHANDLE *)f->privdata;
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     DPRINTF("cdrom_lseek offset=%d where=%d\n", offset, where);
 
@@ -366,11 +368,11 @@ static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
     char path_buffer[128]; // Original buffer size in the SCE CDVDMAN module.
 
     DPRINTF("cdrom_getstat %s layer %d\n", filename, f->unit);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     strncpy(path_buffer, filename, sizeof(path_buffer));
     cdrom_purifyPath(path_buffer); // Unlike the SCE original, purify the path right away.
 
-    sceCdDiskReady(0);
     return sceCdLayerSearchFile((sceCdlFILE *)&stat->attr, path_buffer, f->unit) - 1;
 }
 
@@ -391,10 +393,10 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
     struct dirTocEntry *tocEntryPointer;
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     DPRINTF("cdrom_dread fh->lsn=%lu\n", fh->lsn);
 
-    sceCdDiskReady(0);
     if ((r = sceCdRead(fh->lsn, 1, cdvdman_fs_buf, NULL)) == 1) {
         sceCdSync(0);
 
@@ -431,6 +433,8 @@ static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 {
     register int r = 0;
 
+    DPRINTF("cdrom_ioctl 0x%X\n", cmd);
+
     WaitSema(cdrom_io_sema);
 
     if (cmd != 0x10000) // Spin Ctrl op
@@ -447,6 +451,7 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
     int result;
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     result = 0;
     switch (cmd) {
@@ -534,6 +539,7 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
             result = cdvdman_stat.intr_ef;
             break;
         default:
+            DPRINTF("cdrom_devctl unknown, cmd=0x%X\n", cmd);
             result = -EIO;
             break;
     }
@@ -551,6 +557,7 @@ static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen,
     // There was a check here on whether the file was opened with mode 8.
 
     WaitSema(cdrom_io_sema);
+    WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
     switch (cmd) {
         case CIOCSTREAMPAUSE:
@@ -563,6 +570,7 @@ static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen,
             r = sceCdStStat();
             break;
         default:
+            DPRINTF("cdrom_ioctl2 unknown, cmd=0x%X\n", cmd);
             r = -EINVAL;
     }
 

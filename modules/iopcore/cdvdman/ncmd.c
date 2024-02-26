@@ -28,12 +28,24 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, sceCdRMode *mode)
 {
     int result;
 
-    DPRINTF("sceCdRead lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
+    u16 sector_size = 2048;
+
+    // Is is NULL in our emulated cdvdman routines so check if valid.
+    if (mode) {
+        // 0 is 2048
+        if (mode->datapattern == SCECdSecS2328)
+            sector_size = 2328;
+
+        if (mode->datapattern == SCECdSecS2340)
+            sector_size = 2340;
+    }
+
+    DPRINTF("sceCdRead lsn=%d sectors=%d sector_size=%d buf=%08x\n", (int)lsn, (int)sectors, (int)sector_size, (int)buf);
 
     if ((!(cdvdman_settings.common.flags & IOPCORE_COMPAT_ALT_READ)) || QueryIntrContext()) {
-        result = cdvdman_AsyncRead(lsn, sectors, buf);
+        result = cdvdman_AsyncRead(lsn, sectors, sector_size, buf);
     } else {
-        result = cdvdman_SyncRead(lsn, sectors, buf);
+        result = cdvdman_SyncRead(lsn, sectors, sector_size, buf);
     }
 
     return result;
@@ -54,6 +66,30 @@ void lba_to_msf(s32 lba, u8 *m, u8 *s, u8 *f)
     *f = lba % 75;
 }
 
+//-------------------------------------------------------------------------
+typedef struct
+{
+    u8 ctrl_adr;
+    u8 track_no;
+    u8 point;
+    u8 min;
+    u8 sec;
+    u8 frm;
+    u8 zero; // always zero
+    u8 abs_min;
+    u8 abs_sec;
+    u8 abs_frm;
+} __attribute__((packed)) toc_point_t;
+
+typedef struct
+{
+    toc_point_t a0;
+    toc_point_t a1;
+    toc_point_t a2;
+    toc_point_t track[99];
+    u32 filler;
+} __attribute__((packed)) toc_t;
+
 int cdvdman_fill_toc(u8 *tocBuff)
 {
 
@@ -66,57 +102,81 @@ int cdvdman_fill_toc(u8 *tocBuff)
     }
 
     switch (discType) {
-        case 0x12: // SCECdPS2CD
-        case 0x13: // SCECdPS2CDDA
-            u8 min;
-            u8 sec;
-            u8 frm;
-            tocBuff[0] = 0x41;
-            tocBuff[1] = 0x00;
+        case SCECdPS2CD:
+        case SCECdPS2CDDA:
+            toc_t *t = (toc_t *)tocBuff;
+            u8 min, sec, frm;
 
-            memset(tocBuff, 0, 1024);
+            memset(tocBuff, 0, sizeof(toc_t));
 
-            // Number of FirstTrack,
-            // Always 1 until PS2CCDA support get's added.
-            tocBuff[2] = 0xA0;
-            tocBuff[7] = itob(1);
+            // source: http://www.13thmonkey.org/documentation/SCSI/mmc2r11a.pdf, p. 17
+            // also table 308, p.230
+            // control field = 4 - Data track, recorded uninterrupted, digital copy prohibited
+            // ADR = 1 (Mode-1 Q)
+            t->a0.ctrl_adr = 0x41;
+            t->a0.track_no = 0x00; // always 0 for lead-in
 
-            // Number of LastTrack
-            // Always 1 until PS2CCDA support get's added.
-            tocBuff[12] = 0xA1;
-            tocBuff[17] = itob(1);
+            // Number of First Track
+            t->a0.point = 0xA0;
+            t->a0.min = t->a0.sec = t->a0.frm = 0;
+            t->a0.abs_min = 1; // Number of First Track
+            t->a0.abs_sec = 0; // 0 - CD-DA or CD-ROM
+            t->a0.abs_frm = 0;
 
-            // DiskLength
+            // Number of Last Track
+            t->a1.ctrl_adr = 0; // ?? should be 0x41
+            t->a1.track_no = 0;
+            t->a1.point = 0xA1;
+            t->a1.min = t->a1.sec = t->a1.frm = 0;
+            t->a1.abs_min = 1; // Number of Last Track, always 1 until PS2CCDA support get's added.
+            t->a1.abs_sec = 0;
+            t->a1.abs_frm = 0;
+
+            // Disk Length
+            t->a2.ctrl_adr = 0; // ?? should be 0x41
+            t->a2.track_no = 0;
+            t->a2.point = 0xA2;
+            t->a2.min = t->a2.sec = t->a2.frm = 0;
             lba_to_msf(mediaLsnCount, &min, &sec, &frm);
-            tocBuff[22] = 0xA2;
-            tocBuff[27] = itob(min);
-            tocBuff[28] = itob(sec);
-            tocBuff[29] = itob(frm);
+            t->a2.abs_min = itob(min);
+            t->a2.abs_sec = itob(sec);
+            t->a2.abs_frm = itob(frm);
 
-            // Later when PS2CCDA is added the tracks need to get filled in toc too.
+            // ?? do we need to show here also first data track ??
+            // t->track[0].point = 0x01;
+
+            // Later if PS2CCDA is added the tracks need to get filled in toc too.
             break;
 
-        case 0x14: // SCECdPS2DVD
-        case 0xFE: // SCECdDVDV
+        case SCECdPS2DVD:
+        case SCECdDVDV:
             // Toc for single layer DVD.
             memset(tocBuff, 0, 2048);
 
+            u8 dual = 0;
+            if ((!(cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)) || (cdvdman_settings.common.layer1_start > 0))
+                dual = 1;
+
             // Write only what we need, memset has cleared the above buffers.
             //  Single Layer - Values are fixed.
-            tocBuff[0] = 0x04;
+            tocBuff[0] = dual ? 0x24 : 0x04;
             tocBuff[1] = 0x02;
             tocBuff[2] = 0xF2;
-            tocBuff[4] = 0x86;
-            tocBuff[5] = 0x72;
+            tocBuff[3] = 0x00;
+
+            tocBuff[4] = dual ? 0x41 : 0x86;
+            tocBuff[5] = dual ? 0x95 : 0x72;
 
             // These values are fixed on all discs, except position 14 which is the OTP/PTP flags which are 0 in single layer.
 
             tocBuff[12] = 0x01;
             tocBuff[13] = 0x02;
-            tocBuff[14] = 0x01;
+            tocBuff[14] = dual ? 0x21 : 0x01; // OTP/PTP flag
+            tocBuff[15] = 0x00;
+
             tocBuff[17] = 0x03;
 
-            u32 maxlsn = mediaLsnCount + (0x30000 - 1);
+            u32 maxlsn = (cdvdman_settings.common.layer1_start ? cdvdman_settings.common.layer1_start : mediaLsnCount) + (0x30000 - 1);
             tocBuff[20] = (maxlsn >> 24) & 0xFF;
             tocBuff[21] = (maxlsn >> 16) & 0xff;
             tocBuff[22] = (maxlsn >> 8) & 0xff;
@@ -124,38 +184,8 @@ int cdvdman_fill_toc(u8 *tocBuff)
             break;
 
         default:
-            // Check if we are DVD9 game and fill toc for it.
-
-            if (!(cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)) {
-                memset(tocBuff, 0, 2048);
-
-                // Dual sided - Values are fixed.
-                tocBuff[0] = 0x24;
-                tocBuff[1] = 0x02;
-                tocBuff[2] = 0xF2;
-                tocBuff[4] = 0x41;
-                tocBuff[5] = 0x95;
-
-                // These values are fixed on all discs, except position 14 which is the OTP/PTP flags.
-                tocBuff[12] = 0x01;
-                tocBuff[13] = 0x02;
-                tocBuff[14] = 0x21; // PTP
-                tocBuff[15] = 0x10;
-
-                // Values are fixed.
-                tocBuff[17] = 0x03;
-
-                u32 l1s = mediaLsnCount + 0x30000 - 1;
-                tocBuff[20] = (l1s >> 24);
-                tocBuff[21] = (l1s >> 16) & 0xff;
-                tocBuff[22] = (l1s >> 8) & 0xff;
-                tocBuff[23] = (l1s >> 0) & 0xff;
-
-                return 1;
-            }
-
             // Not known type.
-            DPRINTF("cdvdman_fill_toc unimplemented for  discType=%02X\n", discType);
+            DPRINTF("cdvdman_fill_toc unimplemented for discType=%02X\n", discType);
             return 0;
     }
 

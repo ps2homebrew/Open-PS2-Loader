@@ -149,6 +149,7 @@ static const patchlist_t patch_list[] = {
     {"SLPS_732.22", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000000, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-J) (PlayStation 2 The Best)
     {"SLUS_211.71", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000001, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-U/C)
     {"SLES_534.80", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000002, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-PAL)
+    {"SLPS_254.78", ALL_MODE, {0x00365BC0, 0x1040FFFD, 0x1440FFFD}},               // Kidou Senshi Gundam Ichinen Sensou sceSifSyncIop() != 0 to == 0 return check fix.
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminator
 };
 

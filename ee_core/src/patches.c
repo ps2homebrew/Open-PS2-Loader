@@ -12,6 +12,7 @@
 #include "util.h"
 #include "modules.h"
 #include "modmgr.h"
+#include "coreconfig.h"
 
 #define ALL_MODE -1
 #define BDM_MODE -2
@@ -325,6 +326,7 @@ void RnC3_AlwaysAllocMem(void);
 
 static void RnC3_UYA_patches(void *address)
 {
+    USE_LOCAL_EECORE_CONFIG;
     unsigned int word1, word2;
 
     /*  Preserve the pointer to the allocated IOP RAM.
@@ -359,7 +361,7 @@ static void RnC3_UYA_patches(void *address)
             For retail units, there are 2 libcdvd modules. Therefore the pointer should be left-shifted by 2.    */
 
     word1 = JAL((unsigned int)&RnC3_AlwaysAllocMem);
-    switch (GameMode) {
+    switch (config->GameMode) {
         default:
 #ifdef _DTL_T10000
             word2 = 0x00021903; // sra $v1, $v0, 4    For DTL-T10000.
@@ -707,7 +709,9 @@ static void UltProPinballPatch(const char *path)
 }
 
 static void EutechnyxWakeupTIDPatch(u32 addr)
-{ // Eutechnyx games have the main thread ID hardcoded for a call to WakeupThread().
+{
+    USE_LOCAL_EECORE_CONFIG;
+    // Eutechnyx games have the main thread ID hardcoded for a call to WakeupThread().
     // addiu $a0, $zero, 1
     // This breaks when the thread IDs change after IGR is used.
 
@@ -715,7 +719,7 @@ static void EutechnyxWakeupTIDPatch(u32 addr)
     MTV Pimp My Ride uses same serial for v1.00 and v2.00 of USA release.
     We need to tell which offsets to use.
     */
-    if (_strcmp(GameID, "SLUS_215.80") == 0) {
+    if (_strcmp(config->GameID, "SLUS_215.80") == 0) {
         // Check version v1.00 by default.
         if (*(vu16 *)addr == 1) {
             *(vu16 *)addr = (u16)GetThreadId();
@@ -733,7 +737,7 @@ static void EutechnyxWakeupTIDPatch(u32 addr)
     Same problem with SRS: Street Racing Syndicate
     The patch already exists but it was for v1.03 of the game so if it was trying to boot v2.00 then it would be wrong patched. This handles both cases correctly.
     */
-    if (_strcmp(GameID, "SLUS_205.82") == 0) {
+    if (_strcmp(config->GameID, "SLUS_205.82") == 0) {
         // Check version v1.03 by default.
         if (*(vu16 *)addr == 1) {
             *(vu16 *)addr = (u16)GetThreadId();
@@ -899,21 +903,21 @@ static void HarvestMoonAWLPatch(int region)
 
 void apply_patches(const char *path)
 {
+    USE_LOCAL_EECORE_CONFIG;
     const patchlist_t *p;
     int mode;
     // Some patches hack into specific ELF files
     // make sure the filename and gameid match for those patches
     // This prevents games with multiple ELF's from being corrupted by the patch
-    int file_eq_gameid = !_strncmp(&path[8], GameID, 11); // starting after 'cdrom0:\'
-
-    if ((GameMode == HDD_MODE) || (GameMode == ETH_MODE))
-        mode = GameMode;
+    int file_eq_gameid = !_strncmp(&path[8], config->GameID, 11); // starting after 'cdrom0:\'
+    if ((config->GameMode == HDD_MODE) || (config->GameMode == ETH_MODE))
+        mode = config->GameMode;
     else
         mode = BDM_MODE;
 
     // if there are patches matching game name/mode then fill the patch table
     for (p = patch_list; p->game; p++) {
-        if ((!_strcmp(GameID, p->game)) && ((p->mode == ALL_MODE) || (mode == p->mode))) {
+        if ((!_strcmp(config->GameID, p->game)) && ((p->mode == ALL_MODE) || (mode == p->mode))) {
             switch (p->patch.addr) {
                 case PATCH_GENERIC_NIS:
                     NIS_generic_patches();

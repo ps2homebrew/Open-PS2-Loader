@@ -158,7 +158,7 @@ static const patchlist_t patch_list[] = {
 #define FNADDR(jal)    (((jal)&0x03ffffff) << 2)
 #define NIBBLE2CHAR(n) ((n) <= 9 ? '0' + (n) : 'a' + (n))
 
-static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);
+static int (*cdReadPtr)(u32 lsn, u32 nsectors, void *buf, int *mode);
 static unsigned int g_delay_cycles;
 static int g_mode; // Patch may use this for anything.
 
@@ -233,7 +233,7 @@ static int delayed_cdRead(u32 lsn, u32 nsectors, void *buf, int *mode)
     int r;
     unsigned int count;
 
-    r = cdRead(lsn, nsectors, buf, mode);
+    r = cdReadPtr(lsn, nsectors, buf, mode);
     count = g_delay_cycles;
     while (count--)
         asm("nop\nnop\nnop\nnop");
@@ -246,8 +246,8 @@ static void generic_delayed_cdRead_patches(u32 patch_addr, u32 delay_cycles)
     // set configureable delay cycles
     g_delay_cycles = delay_cycles;
 
-    // get original cdRead() pointer
-    cdRead = (void *)FNADDR(_lw(patch_addr));
+    // get original cdReadPtr() pointer
+    cdReadPtr = (void *)FNADDR(_lw(patch_addr));
 
     // overwrite with a JAL to our delayed_cdRead function
     _sw(JAL((u32)delayed_cdRead), patch_addr);

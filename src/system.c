@@ -734,6 +734,41 @@ static int initKernel(void *eeload, void *modStorageEnd, void **eeloadCopy, void
     return ((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
 }
 
+#ifdef __DEBUG
+void sysPrintEECoreConfig(struct EECoreConfig_t *config)
+{
+    LOG("EECoreConfig Values = 0x%08X\n", (u32)config);
+
+    LOG("Game Mode Desc = %s\n", config->GameModeDesc);
+    LOG("EnableDebug = %d\n", config->EnableDebug);
+
+    LOG("Exit Path = (%s)\n", config->ExitPath);
+    LOG("HDD Spindown = %d\n", config->HDDSpindown);
+
+    LOG("IP=%s NM=%s GW=%s mode: %d\n", config->g_ps2_ip, config->g_ps2_netmask, config->g_ps2_gateway, config->g_ps2_ETHOpMode);
+
+    LOG("PS2RD Cheat Engine = %s\n", config->gCheatList == NULL ? "Disabled" : "Enabled");
+
+    LOG("EnforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
+
+    LOG("GSM = %s\n", config->EnableGSMOp == 0 ? "Disabled" : "Enabled");
+
+    LOG("PADEMU = %s\n", config->EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
+
+    LOG("enforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
+
+    LOG("eeloadCopy = 0x%08X\n", config->eeloadCopy);
+    LOG("initUserMemory = 0x%08X\n", config->initUserMemory);
+
+    LOG("ModStorageStart = 0x%08X\n", config->ModStorageStart);
+    LOG("ModStorageEnd = 0x%08X\n", config->ModStorageEnd);
+
+    LOG("GameID = %s\n", config->GameID);
+
+    LOG("Compat Mask = 0x%02x\n", config->_CompatMask);
+}
+#endif
+
 void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
 {
     unsigned int modules, ModuleStorageSize;
@@ -878,9 +913,13 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 
     // PS2LOGO Caller, based on l_oliveira & SP193 tips
     // Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
-    if (EnablePS2Logo) {
-        argv[argc] = "rom0:PS2LOGO";
-        argc++;
+    if (EnablePS2Logo) { // Not all roms have PS2LOGO
+        int fd = 0;
+        if ((fd = open("rom0:PS2LOGO", O_RDONLY)) >= 0) {
+            close(fd);
+            argv[argc] = "rom0:PS2LOGO";
+            argc++;
+        }
     }
 
     snprintf(ElfPath, sizeof(ElfPath), "cdrom0:\\%s;1", filename);
@@ -888,13 +927,13 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argc++;
 
 #ifdef __DEBUG
-    LOG("Starting ee_core with following arguments:\n");
+    LOG("Starting ee_core with following argv arguments:\n");
     for (i = 0; i < argc; i++) {
         LOG("[%d] %s\n", i, argv[i]);
     }
 #endif
 
-    LOG("Leaving OPL GUI, starting eecore...\n");
+    LOG("Leaving OPL GUI, starting eecore = 0x%08X \n", (u32)eh->entry);
 
     // Let's go.
     fileXioExit();

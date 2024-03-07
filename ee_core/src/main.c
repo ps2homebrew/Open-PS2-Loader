@@ -13,35 +13,15 @@
 #include "syshook.h"
 #include "gsm_api.h"
 #include "cheat_api.h"
-
-void *ModStorageStart, *ModStorageEnd;
-void *eeloadCopy, *initUserMemory;
+#include "coreconfig.h"
 
 int isInit = 0;
 
 // Global data
 char g_ipconfig[IPCONFIG_MAX_LEN];
 int g_ipconfig_len;
-char g_ps2_ip[16];
-char g_ps2_netmask[16];
-char g_ps2_gateway[16];
-unsigned char g_ps2_ETHOpMode;
 u32 g_compat_mask;
-char GameID[16];
-int GameMode;
-char ExitPath[32];
-int HDDSpindown;
-int EnableGSMOp;
-int EnableCheatOp;
-#ifdef PADEMU
-int EnablePadEmuOp;
-int PadEmuSettings;
-int PadMacroSettings;
-#endif
 int EnableDebug;
-int *gCheatList; // Store hooks/codes addr+val pairs
-
-int enforceLanguage;
 
 // This function is defined as weak in ps2sdkc, so how
 // we are not using time zone, so we can safe some KB
@@ -50,123 +30,81 @@ void _ps2sdk_timezone_update() {}
 DISABLE_PATCHED_FUNCTIONS();      // Disable the patched functionalities
 DISABLE_EXTRA_TIMERS_FUNCTIONS(); // Disable the extra functionalities for timers
 
+struct EECoreConfig_t g_ee_core_config = {.magic[0] = EE_CORE_MAGIC_0, .magic[1] = EE_CORE_MAGIC_1};
+
 static int eecoreInit(int argc, char **argv)
 {
-    int i = 0;
-    char *p;
+    USE_LOCAL_EECORE_CONFIG;
 
     SifInitRpc(0);
 
     DINIT();
     DPRINTF("OPL EE core start!\n");
 
-    p = _strtok(argv[i], " ");
-    if (!_strncmp(argv[i], "BDM_ILK_MODE", 12))
-        GameMode = BDM_ILK_MODE;
-    else if (!_strncmp(argv[i], "BDM_M4S_MODE", 12))
-        GameMode = BDM_M4S_MODE;
-    else if (!_strncmp(p, "BDM_USB_MODE", 12))
-        GameMode = BDM_USB_MODE;
-    else if (!_strncmp(p, "ETH_MODE", 8))
-        GameMode = ETH_MODE;
-    else if (!_strncmp(p, "HDD_MODE", 8))
-        GameMode = HDD_MODE;
-    DPRINTF("Game Mode = %d\n", GameMode);
+    if (!_strncmp(config->GameModeDesc, "BDM_ILK_MODE", 12))
+        config->GameMode = BDM_ILK_MODE;
+    else if (!_strncmp(config->GameModeDesc, "BDM_M4S_MODE", 12))
+        config->GameMode = BDM_M4S_MODE;
+    else if (!_strncmp(config->GameModeDesc, "BDM_USB_MODE", 12))
+        config->GameMode = BDM_USB_MODE;
+    else if (!_strncmp(config->GameModeDesc, "ETH_MODE", 8))
+        config->GameMode = ETH_MODE;
+    else if (!_strncmp(config->GameModeDesc, "HDD_MODE", 8))
+        config->GameMode = HDD_MODE;
+    DPRINTF("Game Mode = %d %s\n", config->GameMode, config->GameModeDesc);
 
-    p = _strtok(NULL, " ");
-    EnableDebug = 0;
-    if (!_strncmp(p, "1", 1)) {
-        EnableDebug = 1;
-        DPRINTF("Debug Colors enabled\n");
-    }
+    EnableDebug = config->EnableDebug;
+    DPRINTF("EnableDebug = %d\n", config->EnableDebug);
 
-    p = _strtok(NULL, " ");
-    if (!_strncmp(p, "Browser", 7))
-        ExitPath[0] = '\0';
-    else
-        _strcpy(ExitPath, p);
-    DPRINTF("Exit Path = (%s)\n", ExitPath);
+    if (!_strncmp(config->ExitPath, "Browser", 7))
+        config->ExitPath[0] = '\0';
 
-    p = _strtok(NULL, " ");
-    HDDSpindown = _strtoui(p);
-    DPRINTF("HDD Spindown = %d\n", HDDSpindown);
+    DPRINTF("Exit Path = (%s)\n", config->ExitPath);
+    DPRINTF("HDD Spindown = %d\n", config->HDDSpindown);
 
-    _strcpy(g_ps2_ip, _strtok(NULL, " "));
-    _strcpy(g_ps2_netmask, _strtok(NULL, " "));
-    _strcpy(g_ps2_gateway, _strtok(NULL, " "));
-    g_ps2_ETHOpMode = _strtoui(_strtok(NULL, " "));
-    DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
+    DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", config->g_ps2_ip, config->g_ps2_netmask, config->g_ps2_gateway, config->g_ps2_ETHOpMode);
 
-    EnableCheatOp = (gCheatList = (void *)_strtoui(_strtok(NULL, " "))) != NULL;
-    DPRINTF("PS2RD Cheat Engine = %s\n", EnableCheatOp == 0 ? "Disabled" : "Enabled");
+    DPRINTF("PS2RD Cheat Engine = %s\n", config->gCheatList == NULL ? "Disabled" : "Enabled");
 
-    EnableGSMOp = _strtoi(_strtok(NULL, " "));
-    DPRINTF("GSM = %s\n", EnableGSMOp == 0 ? "Disabled" : "Enabled");
+    DPRINTF("GSM = %s\n", config->EnableGSMOp == 0 ? "Disabled" : "Enabled");
 
 #ifdef PADEMU
-    EnablePadEmuOp = _strtoi(_strtok(NULL, " "));
-    DPRINTF("PADEMU = %s\n", EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
-
-    PadEmuSettings = _strtoi(_strtok(NULL, " "));
-
-    PadMacroSettings = _strtoi(_strtok(NULL, " "));
+    DPRINTF("PADEMU = %s\n", config->EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
 #endif
-    CustomOSDConfigParam.spdifMode = _strtoi(_strtok(NULL, " "));
-    CustomOSDConfigParam.screenType = _strtoi(_strtok(NULL, " "));
-    CustomOSDConfigParam.videoOutput = _strtoi(_strtok(NULL, " "));
-    CustomOSDConfigParam.japLanguage = _strtoi(_strtok(NULL, " "));
-    CustomOSDConfigParam.ps1drvConfig = _strtoi(_strtok(NULL, " "));
-    CustomOSDConfigParam.version = _strtoi(_strtok(NULL, " "));
-    CustomOSDConfigParam.language = _strtoi(_strtok(NULL, " "));
-    CustomOSDConfigParam.timezoneOffset = _strtoi(_strtok(NULL, " "));
-    enforceLanguage = _strtoi(_strtok(NULL, " "));
 
-    i++;
+    DPRINTF("enforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
 
-    eeloadCopy = (void *)_strtoui(_strtok(argv[i], " "));
-    initUserMemory = (void *)_strtoui(_strtok(NULL, " "));
-    i++;
+    DPRINTF("eeloadCopy = 0x%08X\n", config->eeloadCopy);
+    DPRINTF("initUserMemory = 0x%08X\n", config->initUserMemory);
 
-    ModStorageStart = (void *)_strtoui(_strtok(argv[i], " "));
-    ModStorageEnd = (void *)_strtoui(_strtok(NULL, " "));
-    i++;
+    DPRINTF("ModStorageStart = 0x%08X\n", config->ModStorageStart);
+    DPRINTF("ModStorageEnd = 0x%08X\n", config->ModStorageEnd);
 
-    strncpy(GameID, argv[i], sizeof(GameID) - 1);
-    GameID[sizeof(GameID) - 1] = '\0';
-    i++;
+    DPRINTF("GameID = %s\n", config->GameID);
 
-    // bitmask of the compat. settings
-    g_compat_mask = _strtoui(argv[i]);
+    // g_compat_mask is used on ASM directly.
+    g_compat_mask = config->_CompatMask;
     DPRINTF("Compat Mask = 0x%02x\n", g_compat_mask);
 
-    i++;
-
-    if (EnableCheatOp) {
+    if (config->gCheatList) {
         EnableCheats();
     }
 
-    if (EnableGSMOp) {
-        s16 interlace, mode, ffmd;
-        u32 dx_offset, dy_offset;
-        u64 display, syncv, smode2;
-        int k576P_fix, kGsDxDyOffsetSupported, FIELD_fix;
-
-        interlace = _strtoi(_strtok(argv[i], " "));
-        mode = _strtoi(_strtok(NULL, " "));
-        ffmd = _strtoi(_strtok(NULL, " "));
-        display = _strtoul(_strtok(NULL, " "));
-        syncv = _strtoul(_strtok(NULL, " "));
-        smode2 = _strtoui(_strtok(NULL, " "));
-        dx_offset = _strtoui(_strtok(NULL, " "));
-        dy_offset = _strtoui(_strtok(NULL, " "));
-        k576P_fix = _strtoui(_strtok(NULL, " "));
-        kGsDxDyOffsetSupported = _strtoui(_strtok(NULL, " "));
-        FIELD_fix = _strtoui(_strtok(NULL, " "));
-
-        UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset, k576P_fix, kGsDxDyOffsetSupported, FIELD_fix);
+    if (config->EnableGSMOp) {
+        UpdateGSMParams(
+            config->GsmConfig.interlace,
+            config->GsmConfig.mode,
+            config->GsmConfig.ffmd,
+            config->GsmConfig.display,
+            config->GsmConfig.syncv,
+            config->GsmConfig.smode2,
+            config->GsmConfig.dx_offset,
+            config->GsmConfig.dy_offset,
+            config->GsmConfig.k576P_fix,
+            config->GsmConfig.kGsDxDyOffsetSupported,
+            config->GsmConfig.FIELD_fix);
         EnableGSM();
     }
-    i++;
 
     set_ipconfig();
 
@@ -174,12 +112,12 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("Installing Kernel Hooks...\n");
     Install_Kernel_Hooks();
 
-    if (EnableDebug)
+    if (config->EnableDebug)
         GS_BGCOLOUR = 0xff0000; // Blue
 
     SifExitRpc();
 
-    return i;
+    return 0;
 }
 
 int main(int argc, char **argv)

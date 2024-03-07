@@ -17,6 +17,7 @@
 #include "include/system.h"
 #include "include/ioman.h"
 #include "include/renderman.h"
+#include "../ee_core/include/coreconfig.h"
 
 #include "include/pggsm.h"
 
@@ -61,7 +62,7 @@ int GetGSMEnabled(void)
     return gEnableGSM;
 }
 
-void PrepareGSM(char *cmdline)
+void PrepareGSM(char *cmdline, struct GsmConfig_t *config)
 {
     /* Preparing GSM */
     LOG("Preparing GSM...\n");
@@ -138,15 +139,31 @@ void PrepareGSM(char *cmdline)
 
     FIELD_fix = gGSMFIELDFix != 0 ? 1 : 0;
 
-    sprintf(cmdline, "%hhu %hhu %hhu %llu %llu %hu %u %u %d %d %d", predef_vmode[gGSMVMode].interlace,
-            predef_vmode[gGSMVMode].mode,
-            predef_vmode[gGSMVMode].ffmd,
-            predef_vmode[gGSMVMode].display,
-            predef_vmode[gGSMVMode].syncv,
-            ((predef_vmode[gGSMVMode].ffmd) << 1) | (predef_vmode[gGSMVMode].interlace),
-            (u32)gGSMXOffset,
-            (u32)gGSMYOffset,
-            k576p_fix,
-            kGsDxDyOffsetSupported,
-            FIELD_fix);
+    if (cmdline) {
+        sprintf(cmdline, "%hhu %hhu %hhu %llu %llu %hu %u %u %d %d %d", predef_vmode[gGSMVMode].interlace,
+                predef_vmode[gGSMVMode].mode,
+                predef_vmode[gGSMVMode].ffmd,
+                predef_vmode[gGSMVMode].display,
+                predef_vmode[gGSMVMode].syncv,
+                ((predef_vmode[gGSMVMode].ffmd) << 1) | (predef_vmode[gGSMVMode].interlace),
+                (u32)gGSMXOffset,
+                (u32)gGSMYOffset,
+                k576p_fix,
+                kGsDxDyOffsetSupported,
+                FIELD_fix);
+    }
+
+    if (config) {
+        config->interlace = predef_vmode[gGSMVMode].interlace;
+        config->mode = predef_vmode[gGSMVMode].mode;
+        config->ffmd = predef_vmode[gGSMVMode].ffmd;
+        config->display = predef_vmode[gGSMVMode].display;
+        config->syncv = predef_vmode[gGSMVMode].syncv;
+        config->smode2 = ((predef_vmode[gGSMVMode].ffmd) << 1) | (predef_vmode[gGSMVMode].interlace);
+        config->dx_offset = (u32)gGSMXOffset;
+        config->dy_offset = (u32)gGSMYOffset;
+        config->k576P_fix = k576p_fix;
+        config->kGsDxDyOffsetSupported = kGsDxDyOffsetSupported;
+        config->FIELD_fix = FIELD_fix;
+    }
 }

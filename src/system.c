@@ -22,6 +22,7 @@
 #include "include/renderman.h"
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
+#include "../ee_core/include/coreconfig.h"
 #include <osd_config.h>
 #include "include/pggsm.h"
 #include "include/cheatman.h"
@@ -780,12 +781,9 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     void *pdata;
     int argc, i;
     char ElfPath[32];
-    char *argv[7 + GSM_ARGS];
-    char ModStorageConfig[32];
-    char KernelConfig[32];
-    char config_str[256];
-    char gsm_config_str[256];
+    char *argv[4];
     void *eeloadCopy, *initUserMemory;
+    struct GsmConfig_t gsm_config;
 
     ethGetNetConfig(local_ip_address, local_netmask, local_gateway);
 #if (!defined(__DEBUG) && !defined(_DTL_T10000))
@@ -822,25 +820,11 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     ModuleStorageSize = (sendIrxKernelRAM(filename, mode_str, modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
 
     ModuleStorageEnd = (void *)((u8 *)ModuleStorage + ModuleStorageSize);
-    sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorageEnd);
 
     // NB: LOADER.ELF is embedded
     boot_elf = (u8 *)&eecore_elf;
     eh = (elf_header_t *)boot_elf;
     eph = (elf_pheader_t *)(boot_elf + eh->phoff);
-
-    // Scan through the ELF's program headers and copy them into RAM, then
-    // zero out any non-loaded regions.
-    for (i = 0; i < eh->phnum; i++) {
-        if (eph[i].type != ELF_PT_LOAD)
-            continue;
-
-        pdata = (void *)((u8 *)boot_elf + eph[i].offset);
-        memcpy(eph[i].vaddr, pdata, eph[i].filesz);
-
-        if (eph[i].memsz > eph[i].filesz)
-            memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
-    }
 
     ApplyDeckardXParam(filename);
 
@@ -849,17 +833,6 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         LOG("Error - kernel is unsupported.\n");
         asm volatile("break\n");
     }
-    sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);
-
-#ifdef PADEMU
-#define PADEMU_SPECIFIER " %d %u %u"
-#define PADEMU_ARGUMENT  , gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8), (unsigned int)(gPadMacroSettings)
-#else
-#define PADEMU_SPECIFIER
-#define PADEMU_ARGUMENT
-#endif
-
-#define CONFIGPARAMDATA " %d %d %d %d %d %d %d %d %d"
     ConfigParam PARAM;
     GetOsdConfigParam(&PARAM);
     if (gOSDLanguageEnable) { // only patch if enabled, and only on config fields wich have not chosen "system default"
@@ -877,39 +850,109 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         }
     }
 
-#define CONFIGPARAMDATA_ARGUMENT , PARAM.spdifMode, PARAM.screenType, PARAM.videoOutput, PARAM.japLanguage, PARAM.ps1drvConfig, PARAM.version, PARAM.language, PARAM.timezoneOffset, gOSDLanguageEnable
+    struct EECoreConfig_t *config = NULL;
+    u32 *core_ptr = (u32 *)&eecore_elf;
+
+    for (i = 0; i < size_eecore_elf / 4; i++) {
+        if (core_ptr[0] == EE_CORE_MAGIC_0 && core_ptr[1] == EE_CORE_MAGIC_1) {
+            config = (struct EECoreConfig_t *)core_ptr;
+            break;
+        }
+        core_ptr++;
+    }
+
+    if (config == NULL) { // Should not happen, but...
+        LOG("Error - EE core config MAGIC not found!\n");
+        asm volatile("break\n");
+    }
+
+    memset(config, 0, sizeof(struct EECoreConfig_t));
+
+    config->magic[0] = EE_CORE_MAGIC_0;
+    config->magic[1] = EE_CORE_MAGIC_1;
+
+    strncpy(config->ExitPath, gExitPath, CORE_EXIT_PATH_MAX_LEN);
+    strncpy(config->GameModeDesc, mode_str, CORE_GAME_MODE_DESC_MAX_LEN);
+
+    config->EnableDebug = gEnableDebug;
+    config->HDDSpindown = gHDDSpindown;
+    config->gCheatList = GetCheatsEnabled() ? (unsigned int *)GetCheatsList() : NULL;
+    config->g_ps2_ETHOpMode = gETHOpMode;
+
+    sprintf(config->g_ps2_ip, "%u.%u.%u.%u", local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3]);
+    sprintf(config->g_ps2_netmask, "%u.%u.%u.%u", local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3]);
+    sprintf(config->g_ps2_gateway, "%u.%u.%u.%u", local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3]);
+
+    // GSM now.
+    config->EnableGSMOp = GetGSMEnabled();
+    if (config->EnableGSMOp) {
+        PrepareGSM(NULL, &gsm_config);
+        config->GsmConfig.interlace = gsm_config.interlace;
+        config->GsmConfig.mode = gsm_config.mode;
+        config->GsmConfig.ffmd = gsm_config.ffmd;
+        config->GsmConfig.display = gsm_config.display;
+        config->GsmConfig.syncv = gsm_config.syncv;
+        config->GsmConfig.smode2 = gsm_config.smode2;
+        config->GsmConfig.dx_offset = gsm_config.dx_offset;
+        config->GsmConfig.dy_offset = gsm_config.dy_offset;
+        config->GsmConfig.k576P_fix = gsm_config.k576P_fix;
+        config->GsmConfig.kGsDxDyOffsetSupported = gsm_config.kGsDxDyOffsetSupported;
+        config->GsmConfig.FIELD_fix = gsm_config.FIELD_fix;
+    }
+
+#ifdef PADEMU
+    config->EnablePadEmuOp = gEnablePadEmu;
+    config->PadEmuSettings = (unsigned int)(gPadEmuSettings >> 8);
+    config->PadMacroSettings = (unsigned int)(gPadMacroSettings);
+#endif
+
+    config->CustomOSDConfigParam.spdifMode = PARAM.spdifMode;
+    config->CustomOSDConfigParam.screenType = PARAM.screenType;
+    config->CustomOSDConfigParam.videoOutput = PARAM.videoOutput;
+    config->CustomOSDConfigParam.japLanguage = PARAM.japLanguage;
+    config->CustomOSDConfigParam.ps1drvConfig = PARAM.ps1drvConfig;
+    config->CustomOSDConfigParam.version = PARAM.version;
+    config->CustomOSDConfigParam.language = PARAM.language;
+    config->CustomOSDConfigParam.timezoneOffset = PARAM.timezoneOffset;
+
+    config->enforceLanguage = gOSDLanguageEnable;
+
+    config->eeloadCopy = eeloadCopy;
+    config->initUserMemory = initUserMemory;
+
+    config->ModStorageStart = ModuleStorage;
+    config->ModStorageEnd = ModuleStorageEnd;
+
+    strncpy(config->GameID, filename, CORE_GAME_ID_MAX_LEN);
+
+    config->_CompatMask = compatflags;
+
+#ifdef __DEBUG
+
+    sysPrintEECoreConfig(config);
+
+#endif
+    // Scan through the ELF's program headers and copy them into RAM, then
+    // zero out any non-loaded regions.
+
+    FlushCache(0);
+    FlushCache(2);
+
+    for (i = 0; i < eh->phnum; i++) {
+        if (eph[i].type != ELF_PT_LOAD)
+            continue;
+
+        pdata = (void *)((u8 *)boot_elf + eph[i].offset);
+        memcpy(eph[i].vaddr, pdata, eph[i].filesz);
+        LOG("EECORE PH COPY: %d 0x%08X 0x%08X 0x%08X\n", i, (u32)eph[i].vaddr, (u32)pdata, eph[i].filesz);
+
+        if (eph[i].memsz > eph[i].filesz) {
+            LOG("EECORE PH CLEAR: %d 0x%08X 0x%08X\n", i, (u32)((u32)eph[i].vaddr + eph[i].filesz), eph[i].memsz - eph[i].filesz);
+            memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
+        }
+    }
 
     argc = 0;
-    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER CONFIGPARAMDATA,
-            mode_str, gEnableDebug, gExitPath, gHDDSpindown,
-            local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
-            local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
-            local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],
-            gETHOpMode,
-            GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0,
-            GetGSMEnabled() PADEMU_ARGUMENT
-                CONFIGPARAMDATA_ARGUMENT);
-
-    argv[argc] = config_str;
-    argc++;
-
-    argv[argc] = KernelConfig;
-    argc++;
-
-    argv[argc] = ModStorageConfig;
-    argc++;
-
-    argv[argc] = (char *)filename;
-    argc++;
-
-    char cmask[10];
-    snprintf(cmask, 10, "%u", compatflags);
-    argv[argc] = cmask;
-    argc++;
-
-    PrepareGSM(gsm_config_str);
-    argv[argc] = gsm_config_str;
-    argc++;
 
     // PS2LOGO Caller, based on l_oliveira & SP193 tips
     // Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.

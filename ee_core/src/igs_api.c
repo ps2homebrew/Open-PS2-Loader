@@ -776,8 +776,8 @@ int InGameScreenshot(void)
 
     // Load modules.
     LoadFileInit();
-    LoadModule("rom0:SIO2MAN", 0, NULL);
-    LoadModule("rom0:MCMAN", 0, NULL);
+    LoadModule("rom0:SIO2MAN", 0, NULL, 0);
+    LoadModule("rom0:MCMAN", 0, NULL, 0);
 
     // Save IGS Bitmap File first, since it's the bigger file)
     intffmd = GET_SMODE2_INTFFMD(smode2);

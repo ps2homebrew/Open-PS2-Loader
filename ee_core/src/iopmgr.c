@@ -32,11 +32,11 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
         command[arglen] = '\0'; /* In a normal IOP reset process, the IOP reset command line will be NULL-terminated properly somewhere.
                         Since we're now taking things into our own hands, NULL terminate it here.
                         Some games like SOCOM3 will use a command line that isn't NULL terminated, resulting in things like "cdrom0:\RUN\IRX\DNAS300.IMGG;1" */
-        _strcpy(&command[arglen + 1], "img0:");
-        CommandLen = arglen + 6;
+        _strcpy(&command[arglen + 1], "host0:");
+        CommandLen = arglen + 7;
     } else {
-        _strcpy(command, "img0:");
-        CommandLen = 5;
+        _strcpy(command, "host0:");
+        CommandLen = 6;
     }
 
     GetOPLModInfo(OPL_MODULE_ID_IOPRP, &IOPRP_img, &size_IOPRP_img);
@@ -61,20 +61,15 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     *(void **)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpimg])) = pIOP_buffer;
     *(u32 *)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpsiz])) = size_IOPRP_img;
 
+    LoadModule("rom0:SYSCLIB", 0, NULL, 0);
     LoadMemModule(0, imgdrv_irx, size_imgdrv_irx, 0, NULL);
-
-    DIntr();
-    ee_kmode_enter();
-    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
-    ee_kmode_exit();
-    EIntr();
-
-    LoadOPLModule(OPL_MODULE_ID_UDNL, SIF_RPC_M_NOWAIT, CommandLen, command);
+    LoadModule("rom0:UDNL", CommandLen, command, 1);
 
     DIntr();
     ee_kmode_enter();
     Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT);
     Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_CMDINIT);
+    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
     Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
     Old_SifSetReg(SIF_SYSREG_SUBADDR, (int)NULL);
     ee_kmode_exit();

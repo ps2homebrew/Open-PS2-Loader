@@ -77,8 +77,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o bdmevent.o \
 		iremsndpatch.o apemodpatch.o f2techioppatch.o cleareffects.o resetspu.o \
 		libsd.o audsrv.o
 
-EECORE_OBJS = ee_core.o ioprp.o util.o \
-		udnl.o imgdrv.o eesync.o \
+EECORE_OBJS = ee_core.o ioprp.o util.o imgdrv.o eesync.o \
 		bdm_cdvdman.o IOPRP_img.o smb_cdvdman.o \
 		hdd_cdvdman.o hdd_hdpro_cdvdman.o cdvdfsv.o \
 		ingame_smstcpip.o smap_ingame.o smbman.o smbinit.o
@@ -131,9 +130,6 @@ endif
 ifeq ($(DTL_T10000),1)
   EE_CFLAGS += -D_DTL_T10000
   EECORE_EXTRA_FLAGS += DTL_T10000=1
-  UDNL_OUT = $(PS2SDK)/iop/irx/udnl-t300.irx
-else
-  UDNL_OUT = $(PS2SDK)/iop/irx/udnl.irx
 endif
 
 ifeq ($(IGS),1)
@@ -362,9 +358,6 @@ ee_core/ee_core.elf: ee_core
 
 $(EE_ASM_DIR)ee_core.c: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ eecore_elf
-
-$(EE_ASM_DIR)udnl.c: $(UDNL_OUT) | $(EE_ASM_DIR)
-	$(BIN2C) $(UDNL_OUT) $@ udnl_irx
 
 modules/iopcore/imgdrv/imgdrv.irx: modules/iopcore/imgdrv
 	$(MAKE) -C $<

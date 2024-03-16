@@ -28,6 +28,7 @@ static char bdmDriver[5];
 
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
+static s32 bdmLoadModuleLock = -1;
 
 // forward declaration
 static item_list_t bdmGameList;
@@ -83,6 +84,8 @@ static void bdmEventHandler(void *packet, void *opt)
 
 static void bdmLoadBlockDeviceModules(void)
 {
+    WaitSema(bdmLoadModuleLock);
+
     if (gEnableILK && !iLinkModLoaded) {
         // Load iLink Block Device drivers
         LOG("[ILINKMAN]:\n");
@@ -100,6 +103,8 @@ static void bdmLoadBlockDeviceModules(void)
 
         mx4sioModLoaded = 1;
     }
+
+    SignalSema(bdmLoadModuleLock);
 }
 
 void bdmLoadModules(void)
@@ -550,3 +555,11 @@ static item_list_t bdmGameList = {
     BDM_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, BDM_MODE_UPDATE_DELAY, &bdmGetTextId, &bdmGetPrefix, &bdmInit, &bdmNeedsUpdate,
     &bdmUpdateGameList, &bdmGetGameCount, &bdmGetGame, &bdmGetGameName, &bdmGetGameNameLength, &bdmGetGameStartup, &bdmDeleteGame, &bdmRenameGame,
     &bdmLaunchGame, &bdmGetConfig, &bdmGetImage, &bdmCleanUp, &bdmShutdown, &bdmCheckVMC, &bdmGetIconId};
+
+void bdmInitSemaphore()
+{
+    // Create a semaphore so only one thread can load IOP modules at a time.
+    if (bdmLoadModuleLock < 0) {
+        bdmLoadModuleLock = sbCreateSemaphore();
+    }
+}

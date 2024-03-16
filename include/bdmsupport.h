@@ -24,4 +24,6 @@ void bdmLoadModules(void);
 void bdmLaunchGame(int id, config_set_t *configSet);
 void bdmSetPrefix(void);
 
+void bdmInitSemaphore();
+
 #endif

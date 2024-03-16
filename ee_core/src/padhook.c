@@ -82,16 +82,16 @@ static void t_loadElf(void)
         GS_BGCOLOUR = 0xFF8000; // Blue sky
 
     // Load basic modules
-    LoadModule("rom0:SIO2MAN", 0, NULL);
-    LoadModule("rom0:MCMAN", 0, NULL);
+    LoadModule("rom0:SIO2MAN", 0, NULL, 0);
+    LoadModule("rom0:MCMAN", 0, NULL, 0);
 
     if (config->ExitPath[1] == 'a') { // ie mass:
-        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL);
+        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL, 0);
         if (ret >= 0)
-            LoadModule("mc0:SYS-CONF/USBHDFSD.IRX", 0, NULL);
+            LoadModule("mc0:SYS-CONF/USBHDFSD.IRX", 0, NULL, 0);
         else {
-            LoadModule("mc1:SYS-CONF/USBD.IRX", 0, NULL);
-            LoadModule("mc1:SYS-CONF/USBHDFSD.IRX", 0, NULL);
+            LoadModule("mc1:SYS-CONF/USBD.IRX", 0, NULL, 0);
+            LoadModule("mc1:SYS-CONF/USBHDFSD.IRX", 0, NULL, 0);
         }
         delay(5); // Wait for device to be detected.
     }

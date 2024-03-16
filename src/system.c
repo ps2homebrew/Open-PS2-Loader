@@ -56,6 +56,7 @@ extern unsigned int size_eesync_irx;
 
 #define MAX_MODULES 64
 static void *g_sysLoadedModBuffer[MAX_MODULES];
+static s32 sysLoadModuleLock = -1;
 
 #define ELF_MAGIC   0x464c457f
 #define ELF_PT_LOAD 1
@@ -104,6 +105,8 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 
     int i, id, ret, index = 0;
 
+    WaitSema(sysLoadModuleLock);
+
     // check we have not reached MAX_MODULES
     for (i = 0; i < MAX_MODULES; i++) {
         if (g_sysLoadedModBuffer[i] == NULL) {
@@ -113,27 +116,34 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
     }
     if (i == MAX_MODULES) {
         LOG("WARNING: REACHED MODULES LIMIT (%d)\n", MAX_MODULES);
-        return -1;
+        ret = -1;
+        goto exit;
     }
 
     // check if the module was already loaded
     for (i = 0; i < MAX_MODULES; i++) {
         if (g_sysLoadedModBuffer[i] == buffer) {
             LOG("MODULE ALREADY LOADED (%d)\n", i);
-            return 0;
+            ret = 0;
+            goto exit;
         }
     }
 
     // load the module
     id = SifExecModuleBuffer(buffer, size, argc, argv, &ret);
     LOG("\t-- ID=%d, ret=%d\n", id, ret);
-    if ((id < 0) || (ret))
-        return -2;
+    if ((id < 0) || (ret)) {
+        ret = -2;
+        goto exit;
+    }
 
     // add the module to the list
     g_sysLoadedModBuffer[index] = buffer;
 
-    return 0;
+    ret = 0;
+exit:
+    SignalSema(sysLoadModuleLock);
+    return ret;
 }
 
 #define OPL_SIF_CMD_BUFF_SIZE 1
@@ -209,6 +219,10 @@ void sysReset(int modload_mask)
     // apply sbv patches
     sbv_patch_enable_lmb();
     sbv_patch_disable_prefix_check();
+
+    if (sysLoadModuleLock < 0) {
+        sysLoadModuleLock = sbCreateSemaphore();
+    }
 
     // clears modules list
     memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES * 4);

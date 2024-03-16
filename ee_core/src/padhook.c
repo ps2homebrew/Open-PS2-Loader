@@ -86,7 +86,7 @@ static void t_loadElf(void)
     LoadModule("rom0:MCMAN", 0, NULL, 0);
 
     if (config->ExitPath[1] == 'a') { // ie mass:
-        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL);
+        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL, 0);
         if (ret >= 0)
             LoadModule("mc0:SYS-CONF/USBHDFSD.IRX", 0, NULL, 0);
         else {

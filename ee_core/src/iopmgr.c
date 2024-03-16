@@ -15,6 +15,7 @@
 #include "modmgr.h"
 #include "util.h"
 #include "syshook.h"
+#include "coreconfig.h"
 
 extern int _iop_reboot_count;
 static int imgdrv_offset_ioprpimg = 0;
@@ -22,6 +23,7 @@ static int imgdrv_offset_ioprpsiz = 0;
 
 static void ResetIopSpecial(const char *args, unsigned int arglen)
 {
+    USE_LOCAL_EECORE_CONFIG;
     int i;
     void *pIOP_buffer, *IOPRP_img, *imgdrv_irx;
     unsigned int length_rounded, CommandLen, size_IOPRP_img, size_imgdrv_irx;
@@ -103,15 +105,15 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 #endif
 
 #ifdef PADEMU
-#define PADEMU_ARG || EnablePadEmuOp
+#define PADEMU_ARG || config->EnablePadEmuOp
 #else
 #define PADEMU_ARG
 #endif
-    if (GameMode == BDM_USB_MODE PADEMU_ARG) {
+    if (config->GameMode == BDM_USB_MODE PADEMU_ARG) {
         LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=2,3");
     }
 
-    switch (GameMode) {
+    switch (config->GameMode) {
         case BDM_USB_MODE:
             LoadOPLModule(OPL_MODULE_ID_USBMASSBD, 0, 0, NULL);
             break;
@@ -139,6 +141,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 /*----------------------------------------------------------------*/
 int New_Reset_Iop(const char *arg, int arglen)
 {
+    USE_LOCAL_EECORE_CONFIG;
     DPRINTF("New_Reset_Iop start!\n");
     if (EnableDebug)
         GS_BGCOLOUR = 0xFF00FF; // Purple
@@ -172,17 +175,17 @@ int New_Reset_Iop(const char *arg, int arglen)
 
     if (iop_reboot_count >= 2) {
 #ifdef PADEMU
-        PadEmuSettings |= (LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL) > 0) << 24;
+        config->PadEmuSettings |= (LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL) > 0) << 24;
 #else
         LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL);
 #endif
     }
 
 #ifdef PADEMU
-    if (iop_reboot_count >= 2 && EnablePadEmuOp) {
+    if (iop_reboot_count >= 2 && config->EnablePadEmuOp) {
         char args_for_pademu[8];
-        memcpy(args_for_pademu, &PadEmuSettings, 4);
-        memcpy(args_for_pademu + 4, &PadMacroSettings, 4);
+        memcpy(args_for_pademu, &config->PadEmuSettings, 4);
+        memcpy(args_for_pademu + 4, &config->PadMacroSettings, 4);
         LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, sizeof(args_for_pademu), args_for_pademu);
     }
 #endif

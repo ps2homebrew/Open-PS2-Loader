@@ -34,6 +34,7 @@
 #endif
 #include "cheat_api.h"
 #include "cd_igr_rpc.h"
+#include "coreconfig.h"
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
 static int (*scePadPortOpen)(int port, int slot, void *addr);
@@ -60,6 +61,7 @@ extern void *_end;
 // Load home ELF
 static void t_loadElf(void)
 {
+    USE_LOCAL_EECORE_CONFIG;
     int ret;
     char *argv[2];
     t_ExecData elf;
@@ -83,8 +85,8 @@ static void t_loadElf(void)
     LoadModule("rom0:SIO2MAN", 0, NULL, 0);
     LoadModule("rom0:MCMAN", 0, NULL, 0);
 
-    if (ExitPath[1] == 'a') { // ie mass:
-        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL, 0);
+    if (config->ExitPath[1] == 'a') { // ie mass:
+        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL);
         if (ret >= 0)
             LoadModule("mc0:SYS-CONF/USBHDFSD.IRX", 0, NULL, 0);
         else {
@@ -95,7 +97,7 @@ static void t_loadElf(void)
     }
 
     // Load exit ELF
-    argv[0] = ExitPath;
+    argv[0] = config->ExitPath;
     argv[1] = NULL;
 
     // Wipe everything, even the module storage.
@@ -134,6 +136,7 @@ static void t_loadElf(void)
 // In Game Reset Thread
 static void IGR_Thread(void *arg)
 {
+    USE_LOCAL_EECORE_CONFIG;
     u32 Cop0_Perf;
 
     // Place our IGR thread in WAIT state
@@ -151,7 +154,7 @@ static void IGR_Thread(void *arg)
     // If Pad Combo is Start + Select then Return to Home, else if Pad Combo is UP then take IGS
     if ((Pad_Data.combo_type == IGR_COMBO_START_SELECT)
 #ifdef IGS
-        || ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
+        || ((Pad_Data.combo_type == IGR_COMBO_UP) && (config->EnableGSMOp))
 #endif
     ) {
 
@@ -192,14 +195,14 @@ static void IGR_Thread(void *arg)
                 " sync.p;");
         }
 
-        if (EnableGSMOp) {
+        if (config->EnableGSMOp) {
             if (EnableDebug)
                 GS_BGCOLOUR = 0x00FF00; // Green
             DPRINTF("Stopping GSM...\n");
             DisableGSM();
         }
 
-        if (EnableCheatOp) {
+        if (config->gCheatList) {
             if (EnableDebug)
                 GS_BGCOLOUR = 0xFF0000; // Blue
             DPRINTF("Stopping PS2RD Cheat Engine...\n");
@@ -229,7 +232,7 @@ static void IGR_Thread(void *arg)
         LoadOPLModule(OPL_MODULE_ID_RESETSPU, 0, 0, NULL);
 
 #ifdef IGS
-        if ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
+        if ((Pad_Data.combo_type == IGR_COMBO_UP) && (config->EnableGSMOp))
             InGameScreenshot();
 #endif
 
@@ -253,8 +256,9 @@ static void IGR_Thread(void *arg)
 
 void IGR_Exit(s32 exit_code)
 {
+    USE_LOCAL_EECORE_CONFIG;
     // Execute home loader
-    if (ExitPath[0] != '\0')
+    if (config->ExitPath[0] != '\0')
         ExecPS2(t_loadElf, &_gp, 0, NULL);
 
     // Return to PS2 Browser
@@ -264,6 +268,7 @@ void IGR_Exit(s32 exit_code)
 // IGR VBLANK_END interrupt handler install to monitor combo trick in pad data aera
 static int IGR_Intc_Handler(int cause)
 {
+    USE_LOCAL_EECORE_CONFIG;
     int i;
     u8 pad_pos_state, pad_pos_frame, pad_pos_combo1, pad_pos_combo2;
 
@@ -295,7 +300,7 @@ static int IGR_Intc_Handler(int cause)
                 if ((pad_pos_combo2 == IGR_COMBO_START_SELECT) || // Start + Select combo, so reset
                     (pad_pos_combo2 == IGR_COMBO_R3_L3)           // R3 + L3 combo, so poweroff
 #ifdef IGS
-                    || ((pad_pos_combo2 == IGR_COMBO_UP) && (EnableGSMOp)) // UP combo, so take IGS
+                    || ((pad_pos_combo2 == IGR_COMBO_UP) && (config->EnableGSMOp)) // UP combo, so take IGS
 #endif
                 )
 

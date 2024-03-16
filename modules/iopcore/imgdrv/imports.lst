@@ -1,6 +1,6 @@
 ioman_IMPORTS_start
 I_AddDrv
-/*I_DelDrv*/
+I_DelDrv
 ioman_IMPORTS_end
 
 sysclib_IMPORTS_start

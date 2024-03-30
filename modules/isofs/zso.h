@@ -8,9 +8,9 @@
 
 #define ZSO_MAGIC 0x4F53495A // ZISO
 
-// no game should request more than 256 sectors per read
+// no game should request more than 256 sectors per read (512KB of data)
 // should allow us to decompress all data with only 2 IO calls at most.
-#define ZISO_IDX_MAX_ENTRIES 512
+#define ZISO_IDX_MAX_ENTRIES 257
 
 #define MIN(x, y) ((x < y) ? x : y)
 

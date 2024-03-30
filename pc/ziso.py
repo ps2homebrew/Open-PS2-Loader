@@ -324,7 +324,7 @@ def compress_zso(fname_in, fname_out, level, bsize):
 
 
 def parse_args():
-    global MP, COMPRESS_THREHOLD, DEFAULT_PADDING, DEFAULT_ALIGN, DEFAULT_BLOCK_SIZE
+    global MP, COMPRESS_THREHOLD, DEFAULT_PADDING, DEFAULT_ALIGN
 
     if len(sys.argv) < 2:
         usage()
@@ -363,8 +363,8 @@ def parse_args():
         print("You have to specify input/output filename: %s", err)
         sys.exit(-1)
 
-    if bsize < 2048 or bsize > 8192 or bsize%2048 != 0:
-        print("Error, invalid block size.")
+    if bsize%2048 != 0:
+        print("Error, invalid block size. Must be multiple of 2048.")
         sys.exit(-1)
 
     return level, bsize, fname_in, fname_out

@@ -32,7 +32,7 @@
 #include <speedregs.h>
 #include <atahw.h>
 
-//#define NETLOG_DEBUG
+// #define NETLOG_DEBUG
 
 #ifdef NETLOG_DEBUG
 // !!! netlog exports functions pointers !!!
@@ -53,7 +53,6 @@ extern int netlog_inited;
 #define VERSION "v1.2"
 
 extern char lba_48bit;
-static u8 ata_gamestar_workaround = 0;
 
 static int ata_evflg = -1;
 
@@ -75,29 +74,42 @@ typedef struct _ata_cmd_info
     u8 type;
 } ata_cmd_info_t;
 
+#define ata_cmd_command_mask      0x1f
+#define ata_cmd_command_bits(x)   ((x)&ata_cmd_command_mask)
+#define ata_cmd_flag_write_twice  0x80
+#define ata_cmd_flag_use_timeout  0x40
+#define ata_cmd_flag_dir          0x20 // DMA direction: read from RAM if set, write to to RAM if unset.
+#define ata_cmd_flag_is_set(x, y) ((x) & (y))
 static const ata_cmd_info_t ata_cmd_table[] = {
-    {ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}, {ATA_C_STANDBY_IMMEDIATE, 0x1}, {ATA_C_FLUSH_CACHE, 0x01}, {ATA_C_STANDBY_IMMEDIATE, 1}, {ATA_C_FLUSH_CACHE_EXT, 0x01}};
+    // clang-format off
+      { ATA_C_READ_DMA              , 0x04 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_READ_DMA_EXT          , 0x04 | ata_cmd_flag_use_timeout                    | ata_cmd_flag_write_twice }
+    , { ATA_C_FLUSH_CACHE           , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_FLUSH_CACHE_EXT       , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_WRITE_DMA             , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_dir                            }
+    , { ATA_C_WRITE_DMA_EXT         , 0x04 | ata_cmd_flag_use_timeout | ata_cmd_flag_dir | ata_cmd_flag_write_twice }
+    , { ATA_C_IDENTIFY_DEVICE       , 0x02                                                                          }
+    , { ATA_C_IDENTIFY_PACKET_DEVICE, 0x02                                                                          }
+    , { ATA_C_SET_FEATURES          , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_IDLE                  , 0x01 | ata_cmd_flag_use_timeout                                               }
+    , { ATA_C_STANDBY_IMMEDIATE     , 0x01 | ata_cmd_flag_use_timeout                                               }
+    // clang-format on
+};
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
-static const ata_cmd_info_t smart_cmd_table[] = {
-    {ATA_S_SMART_ENABLE_OPERATIONS, 0x01}};
-#define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
-
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
-typedef struct _ata_cmd_state
+struct
 {
-    s32 type; /* The ata_cmd_info_t type field. */
     union
     {
         void *buf;
         u8 *buf8;
         u16 *buf16;
     };
-    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    s32 dir;      /* DMA direction: 0 - to RAM, 1 - from RAM.  */
-} ata_cmd_state_t;
-
-static ata_cmd_state_t atad_cmd_state;
+    u16 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
+    u8 type;      /* The ata_cmd_info_t type field. */
+} static atad_cmd_state;
+_Static_assert(sizeof(atad_cmd_state) == 8);
 
 static int ata_intr_cb(int flag);
 static unsigned int ata_alarm_cb(void *unused);
@@ -105,6 +117,7 @@ static unsigned int ata_alarm_cb(void *unused);
 static void ata_set_dir(int dir);
 static void ata_shutdown_cb(void);
 
+#ifndef ATA_GAMESTAR_WORKAROUND
 /* In v1.04, DMA was enabled in ata_set_dir() instead. */
 static void ata_pre_dma_cb(int bcr, int dir)
 {
@@ -119,6 +132,7 @@ static void ata_post_dma_cb(int bcr, int dir)
 
     SPD_REG16(SPD_R_XFR_CTRL) &= ~0x80;
 }
+#endif // ATA_GAMESTAR_WORKAROUND
 
 static int ata_create_event_flag(void)
 {
@@ -132,37 +146,28 @@ static int ata_create_event_flag(void)
 
 int atad_start(void)
 {
-    USE_SPD_REGS;
-    int res = 1;
-
     M_PRINTF(BANNER, VERSION);
 
 #ifdef DEV9_DEBUG
+    USE_SPD_REGS;
     if (!(SPD_REG16(SPD_R_REV_3) & SPD_CAPS_ATA) || !(SPD_REG16(SPD_R_REV_8) & 0x02)) {
         M_PRINTF("HDD is not connected, exiting.\n");
-        goto out;
+        return 1;
     }
 #endif
 
-    /* Some compatible adaptors may malfunction if transfers are not done according to the old ps2atad design.
-       Official adaptors appear to have a 0x0001 set for this register, but not compatibles.
-       While official I/O to this register are 8-bit, some compatibles have a 0x01 for the lower 8-bits,
-       but the upper 8-bits contain some random value. Hence perform a 16-bit read instead. */
-    ata_gamestar_workaround = (SPD_REG16(0x20) != 1);
-
     if ((ata_evflg = ata_create_event_flag()) < 0) {
         M_PRINTF("Couldn't create event flag, exiting.\n");
-        res = 1;
-        goto out;
+        return 1;
     }
 
     /* In v1.04, PIO mode 0 was set here. In late versions, it is set in ata_init_devices(). */
     dev9RegisterIntrCb(1, &ata_intr_cb);
     dev9RegisterIntrCb(0, &ata_intr_cb);
-    if (!ata_gamestar_workaround) {
-        dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
-        dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
-    }
+#ifndef ATA_GAMESTAR_WORKAROUND
+    dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
+    dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
+#endif // ATA_GAMESTAR_WORKAROUND
     /* Register this at the last position, as it should be the last thing done before shutdown. */
     dev9RegisterShutdownCb(15, &ata_shutdown_cb);
 
@@ -173,10 +178,8 @@ int atad_start(void)
     smp.attr = SA_THPRI;
     ata_io_sema = CreateSema(&smp);
 
-    res = 0;
     M_PRINTF("Driver loaded.\n");
-out:
-    return res;
+    return 0;
 }
 
 static int ata_intr_cb(int flag)
@@ -202,44 +205,28 @@ int ata_get_error(void)
     return ata_hwport->r_error & 0xff;
 }
 
+/**
+ * In the original ATAD, the busy and bus-busy functions were separate, but similar.
+ */
 #define ATA_WAIT_BUSY    0x80
 #define ATA_WAIT_BUSBUSY 0x88
 
 #define ata_wait_busy()     gen_ata_wait_busy(ATA_WAIT_BUSY)
 #define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
-/* 0x80 for busy, 0x88 for bus busy.
-	In the original ATAD, the busy and bus-busy functions were separate, but similar.  */
 static int gen_ata_wait_busy(int bits)
 {
     USE_ATA_REGS;
-    int i, didx, delay;
 
-    for (i = 0; i < 80; i++) {
-        if (!(ata_hwport->r_control & bits))
+    for (unsigned i = 0; i < 56; ++i) {
+        if (!(ata_hwport->r_control & bits)) {
             return 0;
-
-        didx = i / 10;
-        switch (didx) {
-            case 0:
-                continue;
-            case 1:
-                delay = 100;
-                break;
-            case 2:
-                delay = 1000;
-                break;
-            case 3:
-                delay = 10000;
-                break;
-            case 4:
-                delay = 100000;
-                break;
-            default:
-                delay = 1000000;
         }
 
-        DelayThread(delay);
+        unsigned delay = (i >> 3) << (i >> 2) << 5;
+        if (delay) {
+            DelayThread(delay);
+        }
     }
 
     M_PRINTF("Timeout while waiting on busy (0x%02x).\n", bits);
@@ -261,68 +248,58 @@ static int ata_device_select(int device)
     /* Select the device.  */
     ata_hwport->r_select = (device & 1) << 4;
     (void)(ata_hwport->r_control);
-    (void)(ata_hwport->r_control); //Only done once in v1.04.
+    (void)(ata_hwport->r_control); // Only done once in v1.04.
 
     return ata_wait_bus_busy();
 }
 
-/* Export 6 */
-/*
-	28-bit LBA:
-		sector	(7:0)	-> LBA (7:0)
-		lcyl	(7:0)	-> LBA (15:8)
-		hcyl	(7:0)	-> LBA (23:16)
-		device	(3:0)	-> LBA (27:24)
+static unsigned find_ata_cmd(u16 command)
+{
+    unsigned result = 0;
+    for (int i = 0; i < ATA_CMD_TABLE_SIZE; ++i) {
+        if ((u8)command == ata_cmd_table[i].command) {
+            result = ata_cmd_table[i].type;
+        }
+    }
+    return result;
+}
 
-	48-bit LBA just involves writing the upper 24 bits in the format above into each respective register on the first write pass, before writing the lower 24 bits in the 2nd write pass. The LBA bits within the device field are not used in either write pass.
-*/
+/**
+ * Export 6
+ *
+ * 28-bit LBA:
+ *     sector  (7:0) -> LBA ( 7: 0)
+ *     lcyl    (7:0) -> LBA (15: 8)
+ *     hcyl    (7:0) -> LBA (23:16)
+ *     device  (3:0) -> LBA (27:24)
+ *
+ * 48-bit LBA just involves writing the upper 24 bits in the format above into
+ * each respective register on the first write pass, before writing the lower 24
+ * bits in the 2nd write pass. The LBA bits within the device field are not used
+ * in either write pass.
+ */
 int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
 {
     USE_ATA_REGS;
-    iop_sys_clock_t cmd_timeout;
-    const ata_cmd_info_t *cmd_table;
-    int i, res, type, cmd_table_size;
-    int using_timeout, device = (select >> 4) & 1;
-    u8 searchcmd;
+    int res;
+    int device = (select >> 4) & 1;
 
     ClearEventFlag(ata_evflg, 0);
 
     if ((res = ata_device_select(device)) != 0)
         return res;
 
-    /* For the SCE and SMART commands, we need to search on the subcommand
-	specified in the feature register.  */
-    if (command == ATA_C_SMART) {
-        cmd_table = smart_cmd_table;
-        cmd_table_size = SMART_CMD_TABLE_SIZE;
-        searchcmd = (u8)feature;
-    } else {
-        cmd_table = ata_cmd_table;
-        cmd_table_size = ATA_CMD_TABLE_SIZE;
-        searchcmd = (u8)command;
-    }
-
-    type = 0;
-    for (i = 0; i < cmd_table_size; i++) {
-        if (searchcmd == cmd_table[i].command) {
-            type = cmd_table[i].type;
-            break;
-        }
-    }
-
-    if (!(atad_cmd_state.type = type & 0x7F)) //Non-SONY: ignore the 48-bit LBA flag.
-        return ATA_RES_ERR_CMD;
+    const unsigned type = find_ata_cmd(command);
+    if (!type)
+        return ATA_RES_ERR_NOTREADY;
 
     atad_cmd_state.buf = buf;
     atad_cmd_state.blkcount = blkcount;
+    atad_cmd_state.type = type;
 
     /* Check that the device is ready if this the appropiate command.  */
     if (!(ata_hwport->r_control & 0x40)) {
         switch (command) {
-            case ATA_C_DEVICE_RESET:
-            case ATA_C_EXECUTE_DEVICE_DIAGNOSTIC:
-            case ATA_C_INITIALIZE_DEVICE_PARAMETERS:
-            case ATA_C_PACKET:
             case ATA_C_IDENTIFY_PACKET_DEVICE:
                 break;
             default:
@@ -331,20 +308,8 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         }
     }
 
-    /* Does this command need a timeout?  */
-    using_timeout = 0;
-    switch (type & 0x7F) { //Non-SONY: ignore the 48-bit LBA flag.
-        case 1:
-        case 6:
-            using_timeout = 1;
-            break;
-        case 4:
-            atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
-            using_timeout = 1;
-            break;
-    }
-
-    if (using_timeout) {
+    if (ata_cmd_flag_is_set(type, ata_cmd_flag_use_timeout)) {
+        iop_sys_clock_t cmd_timeout;
         cmd_timeout.lo = 0x41eb0000;
         cmd_timeout.hi = 0;
 
@@ -353,17 +318,21 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     }
 
     /* Enable the command completion interrupt.  */
-    if ((type & 0x7F) == 1)
+    if (ata_cmd_command_bits(type) == 1)
         dev9IntrEnable(SPD_INTR_ATA0);
 
     /* Finally!  We send off the ATA command with arguments.  */
-    ata_hwport->r_control = (using_timeout == 0) << 1;
+    ata_hwport->r_control = !ata_cmd_flag_is_set(type, ata_cmd_flag_use_timeout) << 1;
 
-    if (type & 0x80) { //For the sake of achieving (greatly) improved performance, write the registers twice only if required! This is also required for compatibility with the buggy firmware of certain PSX units.
-        /* 48-bit LBA requires writing to the address registers twice,
-		   24 bits of the LBA address is written each time.
-		   Writing to registers twice does not affect 28-bit LBA since
-		   only the latest data stored in address registers is used.  */
+    // 48-bit LBA requires writing to the address registers twice, 24 bits of
+    // the LBA address is written each time. Writing to registers twice does not
+    // affect 28-bit LBA since only the latest data stored in address registers
+    // is used.
+    //
+    // For the sake of achieving (greatly) improved performance, write the
+    // registers twice only if required! This is also required for compatibility
+    // with the buggy firmware of certain PSX units.
+    if (ata_cmd_flag_is_set(type, ata_cmd_flag_write_twice)) {
         ata_hwport->r_feature = (feature >> 8) & 0xff;
         ata_hwport->r_nsector = (nsector >> 8) & 0xff;
         ata_hwport->r_sector = (sector >> 8) & 0xff;
@@ -376,61 +345,11 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     ata_hwport->r_sector = sector & 0xff;
     ata_hwport->r_lcyl = lcyl & 0xff;
     ata_hwport->r_hcyl = hcyl & 0xff;
-    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff; //In v1.04, LBA was enabled in the ata_device_sector_io function.
+    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff; // In v1.04, LBA was enabled in the ata_device_sector_io function.
     ata_hwport->r_command = command & 0xff;
 
     /* Turn on the LED.  */
     dev9LEDCtl(1);
-
-    return 0;
-}
-
-/* Do a PIO transfer, to or from the device.  */
-static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
-{
-    USE_SPD_REGS;
-    SPD_REG8(SPD_R_PIO_DATA) = 0;
-    return 0;
-
-    USE_ATA_REGS;
-    u8 *buf8;
-    u16 *buf16;
-    int i, type;
-    u16 status = ata_hwport->r_status & 0xff;
-
-    if (status & ATA_STAT_ERR) {
-        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
-        return ATA_RES_ERR_IO;
-    }
-
-    /* DRQ must be set (data request).  */
-    if (!(status & ATA_STAT_DRQ))
-        return ATA_RES_ERR_NODATA;
-
-    type = cmd_state->type;
-
-    if (type == 3 || type == 8) {
-        /* PIO data out */
-        buf16 = cmd_state->buf16;
-        for (i = 0; i < 256; i++) {
-            ata_hwport->r_data = *buf16;
-            cmd_state->buf16 = ++buf16;
-        }
-        if (cmd_state->type == 8) {
-            buf8 = cmd_state->buf8;
-            for (i = 0; i < 4; i++) {
-                ata_hwport->r_data = *buf8;
-                cmd_state->buf8 = ++buf8;
-            }
-        }
-    } else if (type == 2) {
-        /* PIO data in  */
-        buf16 = cmd_state->buf16;
-        for (i = 0; i < 256; i++) {
-            *buf16 = ata_hwport->r_data;
-            cmd_state->buf16 = ++buf16;
-        }
-    }
 
     return 0;
 }
@@ -442,16 +361,13 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
     USE_SPD_REGS;
     u32 count, nbytes;
     u32 bits;
-    int i, res;
+    int res;
     u16 dma_stat;
 
     while (blkcount) {
-        for (i = 0; i < 20; i++)
+        for (unsigned i = 0; i < 21; ++i)
             if ((dma_stat = SPD_REG16(0x38) & 0x1f))
                 goto next_transfer;
-
-        if (dma_stat)
-            goto next_transfer;
 
         dev9IntrEnable(SPD_INTR_ATA);
         /* Wait for the previous transfer to complete or a timeout.  */
@@ -497,20 +413,25 @@ int ata_io_finish(void)
 {
     USE_SPD_REGS;
     USE_ATA_REGS;
-    ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
-    int i, res = 0, type = cmd_state->type;
+    int i;
+    int res = 0;
+    unsigned cmd = ata_cmd_command_bits(atad_cmd_state.type);
+    int dma_dir = !!ata_cmd_flag_is_set(atad_cmd_state.type, ata_cmd_flag_dir);
     unsigned short int stat;
 
-    if (type == 1 || type == 6) { /* Non-data commands.  */
+    if (cmd == 1) { /* Non-data commands.  */
         WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
         if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
             M_PRINTF("Error: ATA timeout on a non-data command.\n");
-            return ATA_RES_ERR_TIMEOUT;
+            res = ATA_RES_ERR_TIMEOUT;
+            goto finish;
         }
-    } else if (type == 4) { /* DMA.  */
-        if ((res = ata_dma_complete(cmd_state->buf, cmd_state->blkcount,
-                                    cmd_state->dir)) < 0)
+    } else if (cmd == 4) { /* DMA.  */
+        if ((res = ata_dma_complete(
+                 atad_cmd_state.buf,
+                 atad_cmd_state.blkcount,
+                 dma_dir)) < 0)
             goto finish;
 
         for (i = 0; i < 100; i++)
@@ -522,6 +443,7 @@ int ata_io_finish(void)
             if (bits & ATA_EV_TIMEOUT) {
                 M_PRINTF("Error: ATA timeout on DMA completion.\n");
                 res = ATA_RES_ERR_TIMEOUT;
+                goto finish;
             }
         }
     } else { /* PIO transfers.  */
@@ -530,16 +452,12 @@ int ata_io_finish(void)
             goto finish;
 
         /* Transfer each PIO data block.  */
-        while (--cmd_state->blkcount != -1) {
-            if ((res = ata_pio_transfer(cmd_state)) < 0)
-                goto finish;
+        while (--atad_cmd_state.blkcount != -1) {
+            SPD_REG8(SPD_R_PIO_DATA) = 0;
             if ((res = ata_wait_busy()) < 0)
                 goto finish;
         }
     }
-
-    if (res)
-        goto finish;
 
     /* Wait until the device isn't busy.  */
     if (ata_hwport->r_status & ATA_STAT_BUSY)
@@ -607,16 +525,18 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         }
 
         for (retries = 3; retries > 0; retries--) {
+#ifdef ATA_GAMESTAR_WORKAROUND
             /* Due to the retry loop, put this call (for the GameStar workaround) here instead of the old location. */
-            if (ata_gamestar_workaround)
-                ata_set_dir(dir);
+            ata_set_dir(dir);
+#endif // ATA_GAMESTAR_WORKAROUND
 
             if ((res = ata_io_start(buf, len, 0, len, sector, lcyl, hcyl, select, command)) != 0)
                 break;
 
+#ifndef ATA_GAMESTAR_WORKAROUND
             /* Set up (part of) the transfer here. In v1.04, this was called at the top of the outer loop. */
-            if (!ata_gamestar_workaround)
-                ata_set_dir(dir);
+            ata_set_dir(dir);
+#endif // ATA_GAMESTAR_WORKAROUND
 
             res = ata_io_finish();
 
@@ -652,21 +572,15 @@ static void ata_set_dir(int dir)
     val = SPD_REG16(SPD_R_IF_CTRL) & 1;
     val |= (dir == ATA_DIR_WRITE) ? 0x4c : 0x4e;
     SPD_REG16(SPD_R_IF_CTRL) = val;
-    SPD_REG16(SPD_R_XFR_CTRL) = dir | (ata_gamestar_workaround ? 0x86 : 0x6); //In v1.04, DMA was enabled here (0x86 instead of 0x6)
-}
-
-static int ata_device_standby_immediate(int device)
-{
-    int res;
-
-    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xFFFF, ATA_C_STANDBY_IMMEDIATE)))
-        res = ata_io_finish();
-
-    return res;
+#ifdef ATA_GAMESTAR_WORKAROUND
+    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x86;
+#else  // ATA_GAMESTAR_WORKAROUND
+    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x06; // In v1.04, DMA was enabled here (0x86 instead of 0x6)
+#endif // ATA_GAMESTAR_WORKAROUND
 }
 
 static void ata_shutdown_cb(void)
 {
-    if (atad_devinfo.exists)
-        ata_device_standby_immediate(0);
+    if (!ata_io_start(NULL, 1, 0, 0, 0, 0, 0, 0, ATA_C_STANDBY_IMMEDIATE))
+        ata_io_finish();
 }

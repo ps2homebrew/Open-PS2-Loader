@@ -57,7 +57,7 @@ Font by iamnotxyzzy:
 - [Font by iamnotxyzzy](https://fontstruct.com/fontstructions/show/1495632)
 
 Code Base by PS2Devs:
-- [PS2Devs GitHub](https://github.com/ps2homebrew)
+- [ps2homebrew](https://github.com/ps2homebrew)/[Open-PS2-Loader](https://github.com/ps2homebrew/Open-PS2-Loader)
 
 And lastly, a big thankyou **F**or **O**ur **O**riginal **L**oyal **S**upporters who supported us all the way through!
 

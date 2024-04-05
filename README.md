@@ -5,13 +5,16 @@ X2P is an Xbox emulator for the PlayStation 2. It was developed in secrecy, with
 
 The emulator is entirely written in Assembler—around 120,000 lines—to ensure efficiency surpassing that of C implementations. However, it's important to note that it only operates on DECKARD models, thanks to their faster PPC (replacing the IOP) and a sufficiently large L-cache to handle the Xbox's additional RAM compared to the PS2's capabilities. Full-speed emulation is technically unfeasible, particularly for demanding games like Conker or Oddworld SW. Nevertheless, many games run well, including the first Halo, while some, such as GTA SA, only boot to a black screen.
 
-## Secret behind X2P:
-This project is an April Fools prank **and does no work** as a real emulator. The **Introduction** given above **is entirely fake!!**  The code is however based on OPL-v1.2.0-2081 and still unctions as normal OPL does. There are some exceptions in the GUI but functionally the ELF is still OPL.
+## Secrets behind X2P:
+This project is an April Fools prank **and does NOT work** as a real emulator. The **Introduction** given above **is entirely FAKE!!**  The code is however based on OPL-v1.2.0-2081 and still functions as normal OPL does. There are some exceptions but functionally the ELF is still OPL.
 
-## How To:
-
-1. Use a USB drive (other media are not supported by X2P) and create a single partition using the exFAT file system. FAT32 is an option, but be aware that games which exceed 4GiB would need to be split.
-2. Add DVD game images to "mass:/XISO/" and CD ones to "mass:/XVHD".
+### Differences:
+X2P ELF has some differences as compared to OPL, those are:
+1. Only USB and other BDM devices (MX4SIO & iLink) are usable.
+2. DVD games are loaded from ```massX:/XISO``` and CD ones from ```massX:/XVHD``` (XVHD because it was supposed to have a XBOX HDD image to sell the prank and CD folder was useless for our purpose anyways).
+3. Many settings have been removed from the GUI, hence cannot be enabled.
+4. Config also is NEVER loaded at boot time.
+   
 
 ## Special Thanks:
 

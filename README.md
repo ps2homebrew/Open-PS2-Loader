@@ -66,4 +66,4 @@ And lastly, a big thankyou **F**or **O**ur **O**riginal **L**oyal **S**upporters
 Did you know there's an awesome easter hidden in the [release](https://github.com/koraxial/Xbox-2-PlayStation-Emulator-AlFa/releases/tag/17022) ELF?
 Maybe a file in the source has clues? 😉
 
-[Original OPL Readme](OPL_README.md)
+[Original OPL Readme (from v1.2.0-2081)](OPL_README.md)

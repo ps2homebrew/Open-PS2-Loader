@@ -179,7 +179,7 @@ static int bdmNeedsUpdate(void)
         closedir(dir);
     }
 
-    sprintf(path, "%sCD", bdmPrefix);
+    sprintf(path, "%sXVHD", bdmPrefix);
     if (stat(path, &st) != 0)
         st.st_mtime = 0;
     if (bdmModifiedCDPrev != st.st_mtime) {
@@ -187,7 +187,7 @@ static int bdmNeedsUpdate(void)
         result = 1;
     }
 
-    sprintf(path, "%sDVD", bdmPrefix);
+    sprintf(path, "%sXISO", bdmPrefix);
     if (stat(path, &st) != 0)
         st.st_mtime = 0;
     if (bdmModifiedDVDPrev != st.st_mtime) {

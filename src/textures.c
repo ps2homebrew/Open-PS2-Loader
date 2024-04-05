@@ -13,7 +13,7 @@ extern void *load4_png;
 extern void *load5_png;
 extern void *load6_png;
 extern void *load7_png;
-extern void *usb_png; // Leave BDM Icon as usb.png to maintain theme compat
+extern void *usb_png; //  BDM Icon as usb.png to maintain theme compat
 extern void *usb_bd_png;
 extern void *ilk_bd_png;
 extern void *m4s_bd_png;

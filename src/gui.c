@@ -608,17 +608,17 @@ void guiShowUIConfig(void)
 
     // clang-format off
     const char *vmodeNames[] = {_l(_STR_AUTO)
-        , "PAL 640x512i @50Hz 24bit"
-        , "NTSC 640x448i @60Hz 24bit"
-        , "EDTV 640x448p @60Hz 24bit"
-        , "EDTV 640x512p @50Hz 24bit"
-        , "VGA 640x480p @60Hz 24bit"
-        , "PAL 704x576i @50Hz 24bit (HIRES)"
-        , "NTSC 704x480i @60Hz 24bit (HIRES)"
-        , "EDTV 704x480p @60Hz 24bit (HIRES)"
-        , "EDTV 704x576p @50Hz 24bit (HIRES)"
-        , "HDTV 1280x720p @60Hz 16bit (HIRES)"
-        , "HDTV 1920x1080i @60Hz 16bit (HIRES)"
+        , "PAL 640x512i @50Hz "
+        , "NTSC 640x448i @60Hz "
+        , "EDTV 640x448p @60Hz "
+        , "EDTV 640x512p @50Hz "
+        , "VGA 640x480p @60Hz "
+        , "PAL 704x576i @50Hz "
+        , "NTSC 704x480i @60Hz "
+        , "EDTV 704x480p @60Hz "
+        , "EDTV 704x576p @50Hz "
+        , "HDTV 1280x720p @60Hz "
+        , "HDTV 1920x1080i @60Hz "
         , NULL};
     // clang-format on
     int previousVMode;

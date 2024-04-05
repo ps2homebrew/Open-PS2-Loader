@@ -419,11 +419,11 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
     struct game_list_t *dlist_head = NULL;
 
     // count iso games in "cd" directory
-    snprintf(path, sizeof(path), "%sCD", prefix);
+    snprintf(path, sizeof(path), "%sXVHD", prefix);
     count = scanForISO(path, SCECdPS2CD, &dlist_head);
 
     // count iso games in "dvd" directory
-    snprintf(path, sizeof(path), "%sDVD", prefix);
+    snprintf(path, sizeof(path), "%sXISO", prefix);
     if ((result = scanForISO(path, SCECdPS2DVD, &dlist_head)) >= 0) {
         count = count < 0 ? result : count + result;
     }
@@ -734,10 +734,10 @@ static void sbCreatePath_name(const base_game_info_t *game, char *path, const ch
             snprintf(path, 256, "%sul.%08X.%s.%02x", prefix, USBA_crc32(game_name), game->startup, part);
             break;
         case GAME_FORMAT_ISO:
-            snprintf(path, 256, "%s%s%s%s%s", prefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", sep, game_name, game->extension);
+            snprintf(path, 256, "%s%s%s%s%s", prefix, (game->media == SCECdPS2CD) ? "XVHD" : "XISO", sep, game_name, game->extension);
             break;
         case GAME_FORMAT_OLD_ISO:
-            snprintf(path, 256, "%s%s%s%s.%s%s", prefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", sep, game->startup, game_name, game->extension);
+            snprintf(path, 256, "%s%s%s%s.%s%s", prefix, (game->media == SCECdPS2CD) ? "XVHD" : "XISO", sep, game->startup, game_name, game->extension);
             break;
     }
 }
@@ -814,7 +814,7 @@ static void sbCreateFoldersFromList(const char *path, const char **folders)
 void sbCreateFolders(const char *path, int createDiscImgFolders)
 {
     const char *basicFolders[] = {"CFG", "THM", "LNG", "ART", "VMC", "CHT", "APPS", NULL};
-    const char *discImgFolders[] = {"CD", "DVD", NULL};
+    const char *discImgFolders[] = {"XVHD", "XISO", NULL};
 
     sbCreateFoldersFromList(path, basicFolders);
 

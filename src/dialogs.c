@@ -167,31 +167,6 @@ struct UIItem diaConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SETTINGS}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEBUG}}},
-    {UI_SPACER},
-    {UI_BOOL, CFG_DEBUG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_PS2LOGO}}},
-    {UI_SPACER},
-    {UI_BOOL, CFG_PS2LOGO, 1, 1, _STR_HINT_PS2LOGO, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_CACHE_HDD_GAME_LIST}}},
-    {UI_SPACER},
-    {UI_BOOL, CFG_HDDGAMELISTCACHE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_EXITTO}}},
-    {UI_SPACER},
-    {UI_STRING, CFG_EXITTO, 1, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLE_WRITE}}},
-    {UI_SPACER},
-    {UI_BOOL, CFG_ENWRITEOP, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_LASTPLAYED}}},
     {UI_SPACER},
     {UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
@@ -206,16 +181,6 @@ struct UIItem diaConfig[] = {
     {UI_STRING, CFG_BDMPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ETH_PREFIX}}},
-    {UI_SPACER},
-    {UI_STRING, CFG_ETHPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDD_SPINDOWN}}},
-    {UI_SPACER},
-    {UI_INT, CFG_HDDSPINDOWN, 1, 1, _STR_HINT_SPINDOWN, 0, 0, {.intvalue = {20, 20, 0, 20}}},
-    {UI_SPLITTER},
-
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BDMMODE}}},
     {UI_SPACER},
     {UI_ENUM, CFG_BDMMODE, 1, 1, _STR_HINT_BDM_START, 0, 0, {.intvalue = {0, 0}}},
@@ -223,37 +188,15 @@ struct UIItem diaConfig[] = {
     {UI_BUTTON, BLOCKDEVICE_BUTTON, 1, 1, _STR_HINT_BLOCK_DEVICES, 0, 0, {.label = {NULL, _STR_BLOCKDEVICE_SETTINGS}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDDMODE}}},
-    {UI_SPACER},
-    {UI_ENUM, CFG_HDDMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ETHMODE}}},
-    {UI_SPACER},
-    {UI_ENUM, CFG_ETHMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_APPMODE}}},
-    {UI_SPACER},
-    {UI_ENUM, CFG_APPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEFDEVICE}}},
-    {UI_SPACER},
-    {UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"BDM Cache", -1}}},
     {UI_SPACER},
     {UI_INT, CFG_BDMCACHE, 1, 1, -1, 0, 0, {.intvalue = {16, 8, 0, 32, NULL}}},
     {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"HDD Cache", -1}}},
+
+    {UI_SPLITTER},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"BIOS+FW Path:", -1}}},
     {UI_SPACER},
-    {UI_INT, CFG_HDDCACHE, 1, 1, -1, 0, 0, {.intvalue = {8, 0, 0, 32, NULL}}},
-    {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"SMB Cache", -1}}},
-    {UI_SPACER},
-    {UI_INT, CFG_SMBCACHE, 1, 1, -1, 0, 0, {.intvalue = {16, 4, 0, 32, NULL}}},
+    {UI_STRING, NETCFG_SHARE_NAME, 1, 1, _STR_HINT_SHARENAME, 0, 0, {.stringvalue = {"mass:/XBIOS/", "mass:/XBIOS/", NULL}}},
     {UI_BREAK},
 
     // buttons
@@ -268,56 +211,10 @@ struct UIItem diaUIConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GFX_SETTINGS}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_THEME}}},
+    /*UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_THEME}}},
     {UI_SPACER},
     {UI_ENUM, UICFG_THEME, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_LANGUAGE}}},
-    {UI_SPACER},
-    {UI_ENUM, UICFG_LANG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_AUTOSORT}}},
-    {UI_SPACER},
-    {UI_BOOL, UICFG_AUTOSORT, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_AUTOREFRESH}}},
-    {UI_SPACER},
-    {UI_BOOL, UICFG_AUTOREFRESH, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_COVERART}}},
-    {UI_SPACER},
-    {UI_BOOL, UICFG_COVERART, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLE_NOTIFICATIONS}}},
-    {UI_SPACER},
-    {UI_BOOL, UICFG_NOTIFICATIONS, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_SPLITTER},
-
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_TXTCOLOR}}},
-    {UI_SPACER},
-    {UI_COLOUR, UICFG_TXTCOL, 1, 1, -1, -10, 17, {.colourvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_SELCOLOR}}},
-    {UI_SPACER},
-    {UI_COLOUR, UICFG_SELCOL, 1, 1, -1, -10, 17, {.colourvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_UICOLOR}}},
-    {UI_SPACER},
-    {UI_COLOUR, UICFG_UICOL, 1, 1, -1, -10, 17, {.colourvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_BGCOLOR}}},
-    {UI_SPACER},
-    {UI_COLOUR, UICFG_BGCOL, 1, 1, -1, -10, 17, {.colourvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_BUTTON, UICFG_RESETCOL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_RESETCOLOR}}},
-    {UI_SPLITTER},
+    {UI_BREAK}, */
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_VMODE}}},
     {UI_SPACER},
@@ -339,11 +236,6 @@ struct UIItem diaUIConfig[] = {
     {UI_INT, UICFG_OVERSCAN, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_WIDE_SCREEN}}},
-    {UI_SPACER},
-    {UI_BOOL, UICFG_WIDESCREEN, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},
@@ -353,35 +245,25 @@ struct UIItem diaUIConfig[] = {
 
 // Per-Game Modes Menu
 struct UIItem diaCompatConfig[] = {
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_COMPAT_SETTINGS}}},
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {"Per-XGame Patches ", -1}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"DISPLAY_FIX", -1}}},
     {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE, 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}},
+    {UI_BOOL, COMPAT_MODE_BASE, 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}},
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"AUDIO_FIX", -1}}},
     {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}},
+    {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}},
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"HDD_LAT_FIX", -1}}},
     {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 3, 1, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}},
+    {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}},
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE5}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 4, 1, 1, _STR_HINT_MODE5, -10, 0, {.intvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
-
+    {UI_SPACER},
+    {UI_BREAK},
     {UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
     {UI_SPLITTER},
 
@@ -411,7 +293,7 @@ struct UIItem diaCompatConfig[] = {
 
 // Per-Game VMC Menu
 struct UIItem diaVMCConfig[] = {
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SCREEN}}},
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {"XBox VMC", -1}}},
     {UI_SPLITTER},
 
     // VMC
@@ -437,7 +319,7 @@ struct UIItem diaVMCConfig[] = {
 
 // Per-Game Game Settings > VMC Menu
 struct UIItem diaVMC[] = {
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_VMC_SCREEN}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"XBox VMC", -1}}},
     {UI_SPLITTER},
 
     {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_NAME}}},
@@ -517,7 +399,7 @@ struct UIItem diaGSConfig[] = {
 
 // Per Game Settings > Cheat Menu --Bat--
 struct UIItem diaCheatConfig[] = {
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"XCheats (Might break games)", -1}}},
     {UI_SPLITTER},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SETTINGS_SOURCE}}},
@@ -845,67 +727,61 @@ struct UIItem diaPadMacroConfig[] = {
 
 // About Menu
 struct UIItem diaAbout[] = {
-    {UI_LABEL, ABOUT_TITLE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Xbox 2 Playstation (X2P) v0.5.4-alpha-17022-REV5", -1}}},
     {UI_SPLITTER},
 
     // Coders
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DEVS}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"X2P Core and GUI", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - belek666 - crazyc - dlanor - doctorxyz", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"no.1reb - Noiruto - Torpi - 0amlAF", -1}}},
+
+    //OPL Front End Credits & Special Thanks
+    {UI_SPLITTER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"OPL Front End Credits & Special Thanks", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"hominem.te.esse - ifcaro - izdubar - jimmikaelkael - KrahJohlito", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - belek666 - crazyc - dlanor", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Maximus32 - misfire - Polo35 - reprep - SP193 - volca", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse - ifcaro - izdubar", -1}}},
+    {UI_BREAK},
+
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"jimmikaelkael - KrahJohlito - Maximus32", -1}}},
+    {UI_BREAK},
+
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"misfire - Polo35 - reprep - SP193 - volca ", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
     {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"... and the anonymous ...", -1}}},
-    {UI_BREAK},
 
-    {UI_BREAK},
-
-    // Quality Assurance
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {NULL, _STR_QANDA}}},
-    {UI_BREAK},
-
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"algol - Berion - El_Patas - EP - gledson999 - jolek - lee4", -1}}},
-    {UI_BREAK},
-
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"LocalH - RandQalan - ShaolinAssassin - yoshi314 - zero35", -1}}},
-    {UI_BREAK},
-
-    {UI_BREAK},
-
-    // Network update
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {NULL, _STR_NET_UPDATE}}},
-    {UI_BREAK},
-
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"icyson55", -1}}},
-    {UI_BREAK},
+    {UI_SPLITTER},
 
     // Build Options
     {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BUILD_DETAILS}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Build Options", -1}}},
+    {UI_BREAK},
     {UI_SPACER},
-    {UI_LABEL, ABOUT_BUILD_DETAILS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"XCORE 0.5.4 - BDM - GSM 0.40 - XVMC - PADEMU", -1}}},
     {UI_BREAK},
 
     // Support details
     {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_FORUM_DETAILS}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"PS2Scene Discord:", -1}}},
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"psx-place.com", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"discord.gg/GgaMEqg9k8", -1}}},
     {UI_BREAK},
-
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"This emulator is our thanks For Our Original", -1}}},
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Loyal Supporters.", -1}}},
+    {UI_BREAK},
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},
@@ -990,10 +866,11 @@ struct UIItem diaAudioConfig[] = {
     {UI_INT, CFG_BGM_VOLUME, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEF_BGM_PATH}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Default Music:", -1}}},
     {UI_SPACER},
-    {UI_STRING, CFG_DEFAULT_BGM_PATH, 1, 1, _STR_DEF_BGM_PATH_HINT, 0, 0, {.stringvalue = {"", "", NULL}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Infinite Waves by LogicMoon", -1}}},
     {UI_BREAK},
+
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},

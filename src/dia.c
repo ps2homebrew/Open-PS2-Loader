@@ -134,7 +134,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
         rmEndFrame();
 
         if (getKey(KEY_LEFT)) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
             if (selchar > -1) {
                 if (selchar % KEYB_WIDTH)
                     selchar--;
@@ -147,7 +147,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 selcommand = -1;
             }
         } else if (getKey(KEY_RIGHT)) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
             if (selchar > -1) {
                 if ((selchar + 1) % KEYB_WIDTH)
                     selchar++;
@@ -160,13 +160,13 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 selcommand = -1;
             }
         } else if (getKey(KEY_UP)) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
             if (selchar > -1)
                 selchar = (selchar + KEYB_ITEMS - KEYB_WIDTH) % KEYB_ITEMS;
             else
                 selcommand = (selcommand + KEYB_HEIGHT - 1) % KEYB_HEIGHT;
         } else if (getKey(KEY_DOWN)) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
             if (selchar > -1)
                 selchar = (selchar + KEYB_WIDTH) % KEYB_ITEMS;
             else
@@ -326,22 +326,22 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
         if (getKey(KEY_LEFT)) {
             if (col[selc] > 0) {
                 col[selc]--;
-                sfxPlay(SFX_CURSOR);
+                //sfxPlay(SFX_CURSOR);
             }
         } else if (getKey(KEY_RIGHT)) {
             if (col[selc] < 255) {
                 col[selc]++;
-                sfxPlay(SFX_CURSOR);
+                //sfxPlay(SFX_CURSOR);
             }
         } else if (getKey(KEY_UP)) {
             if (selc > 0) {
                 selc--;
-                sfxPlay(SFX_CURSOR);
+               // sfxPlay(SFX_CURSOR);
             }
         } else if (getKey(KEY_DOWN)) {
             if (selc < 2) {
                 selc++;
-                sfxPlay(SFX_CURSOR);
+                //sfxPlay(SFX_CURSOR);
             }
         } else if (getKeyOn(gSelectButton)) {
             sfxPlay(SFX_CONFIRM);
@@ -666,14 +666,14 @@ static int diaHandleInput(struct UIItem *item, int *modified)
 
         // up and down
         if (getKey(KEY_UP)) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
             if (item->intvalue.current < item->intvalue.max) {
                 item->intvalue.current++;
             } else {
                 item->intvalue.current = item->intvalue.min; // was "= 0;"
             }
         } else if (getKey(KEY_DOWN)) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
             if (item->intvalue.current > item->intvalue.min) {
                 item->intvalue.current--;
             } else {
@@ -706,10 +706,10 @@ static int diaHandleInput(struct UIItem *item, int *modified)
 
         if (getKey(KEY_UP) && (item->intvalue.current > 0)) {
             item->intvalue.current--;
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
         } else if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[item->intvalue.current + 1] != NULL)) {
             item->intvalue.current++;
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
         }
 
         else {
@@ -924,7 +924,7 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
 
             if (newf != cur) {
                 // Navigation change detected
-                sfxPlay(SFX_CURSOR);
+                //sfxPlay(SFX_CURSOR);
                 cur = newf;
             }
 

@@ -543,7 +543,7 @@ config_set_t *oplGetLegacyAppsConfig(void)
     config_set_t *appConfig;
     char appsPath[128];
 
-    snprintf(appsPath, sizeof(appsPath), "mc?:OPL/conf_apps.cfg");
+    snprintf(appsPath, sizeof(appsPath), "mc?:OPL/conf_xapps.cfg");
     fd = openFile(appsPath, O_RDONLY);
     if (fd >= 0) {
         appConfig = configAlloc(CONFIG_APPS, NULL, appsPath);
@@ -555,7 +555,7 @@ config_set_t *oplGetLegacyAppsConfig(void)
         listSupport = list_support[i].support;
         if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetPrefix != NULL)) {
             char *prefix = listSupport->itemGetPrefix();
-            snprintf(appsPath, sizeof(appsPath), "%sconf_apps.cfg", prefix);
+            snprintf(appsPath, sizeof(appsPath), "%sconf_xapps.cfg", prefix);
 
             fd = openFile(appsPath, O_RDONLY);
             if (fd >= 0) {
@@ -735,7 +735,7 @@ static int checkLoadConfigBDM(int types)
     int value;
 
     // check USB
-    if (bdmFindPartition(path, "conf_opl.cfg", 0)) {
+    if (bdmFindPartition(path, "conf_x2p.cfg", 0)) {
         configEnd();
         configInit(path);
         value = configReadMulti(types);
@@ -754,7 +754,7 @@ static int checkLoadConfigHDD(int types)
 
     hddLoadModules();
 
-    snprintf(path, sizeof(path), "%sconf_opl.cfg", gHDDPrefix);
+    snprintf(path, sizeof(path), "%sconf_x2p.cfg", gHDDPrefix);
     value = open(path, O_RDONLY);
     if (value >= 0) {
         close(value);
@@ -940,7 +940,7 @@ static int trySaveConfigBDM(int types)
     char path[64];
 
     // check USB
-    if (bdmFindPartition(path, "conf_opl.cfg", 1)) {
+    if (bdmFindPartition(path, "conf_x2p.cfg", 1)) {
         configSetMove(path);
         return configWriteMulti(types);
     }
@@ -1571,21 +1571,21 @@ void deinit(int exception, int modeSelected)
 
 void setDefaultColors(void)
 {
-    gDefaultBgColor[0] = 0x28;
-    gDefaultBgColor[1] = 0xC5;
+    gDefaultBgColor[0] = 0x20;
+    gDefaultBgColor[1] = 0x0A;
     gDefaultBgColor[2] = 0xF9;
 
-    gDefaultTextColor[0] = 0xFF;
-    gDefaultTextColor[1] = 0xFF;
-    gDefaultTextColor[2] = 0xFF;
+    gDefaultTextColor[0] = 0xDA;
+    gDefaultTextColor[1] = 0xE8;
+    gDefaultTextColor[2] = 0xAA;
 
-    gDefaultSelTextColor[0] = 0x00;
-    gDefaultSelTextColor[1] = 0xAE;
-    gDefaultSelTextColor[2] = 0xFF;
+    gDefaultSelTextColor[0] = 0xF5;
+    gDefaultSelTextColor[1] = 0xF5;
+    gDefaultSelTextColor[2] = 0xDC;
 
-    gDefaultUITextColor[0] = 0x58;
-    gDefaultUITextColor[1] = 0x68;
-    gDefaultUITextColor[2] = 0xB4;
+    gDefaultUITextColor[0] = 0xDA;
+    gDefaultUITextColor[1] = 0xA5;
+    gDefaultUITextColor[2] = 0x20;
 }
 
 static void setDefaults(void)
@@ -1650,17 +1650,17 @@ static void setDefaults(void)
     gBDMPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
     gEnableNotifications = 0;
-    gEnableArt = 0;
+    gEnableArt = 1;
     gWideScreen = 0;
-    gEnableSFX = 0;
-    gEnableBootSND = 0;
-    gEnableBGM = 0;
+    gEnableSFX = 1;
+    gEnableBootSND = 1;
+    gEnableBGM = 1;
     gSFXVolume = 80;
     gBootSndVolume = 80;
     gBGMVolume = 70;
     gDefaultBGMPath[0] = '\0';
 
-    gBDMStartMode = START_MODE_DISABLED;
+    gBDMStartMode = START_MODE_AUTO;
     gHDDStartMode = START_MODE_DISABLED;
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
@@ -1716,10 +1716,12 @@ static void init(void)
     while (!padStatus)
         padStatus = startPads();
     readPads();
-    if (!getKeyPressed(KEY_START)) {
-        _loadConfig(); // only try to restore config if emergency key is not being pressed
+    if (getKeyPressed(KEY_RIGHT) && getKeyPressed(KEY_UP)) {
+          LOG("--- DETECTED COMBO, REV5.1, IGNORING CFG\n");
+       applyConfig(-1, -1); // _loadConfig(); // only try to restore config if secret combo is being pressed. 
+       // Disabled for ELF in XEB_PLUS/APPS/X2P as it blackscreens xRick and possibly other games, enabled for ELF in ROOT (REV5).
     } else {
-        LOG("--- SKIPPING OPL CONFIG LOADING\n");
+        LOG("--- OPL CONFIG SKIPPING\n");
         applyConfig(-1, -1);
     }
 
@@ -1865,9 +1867,9 @@ static void autoLaunchBDMGame(char *argv[])
 
     snprintf(gAutoLaunchBDMGame->startup, sizeof(gAutoLaunchBDMGame->startup), argv[2]);
 
-    if (strcasecmp("DVD", argv[3]) == 0)
+    if (strcasecmp("XISO", argv[3]) == 0)
         gAutoLaunchBDMGame->media = SCECdPS2DVD;
-    else if (strcasecmp("CD", argv[3]) == 0)
+    else if (strcasecmp("XVHD", argv[3]) == 0)
         gAutoLaunchBDMGame->media = SCECdPS2CD;
 
     gAutoLaunchBDMGame->format = format;
@@ -1904,7 +1906,7 @@ int main(int argc, char *argv[])
         /* argv[0] boot path
            argv[1] game->startup
            argv[2] str to u32 game->start_sector
-           argv[3] opl partition read from hdd0:__common/OPL/conf_hdd.cfg
+           argv[3] opl partition read from hdd0:__common/OPL/conf_xhdd.cfg
            argv[4] "mini" */
         if (!strcmp(argv[4], "mini"))
             autoLaunchHDDGame(argv);

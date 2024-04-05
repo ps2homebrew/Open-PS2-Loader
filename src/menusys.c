@@ -24,28 +24,19 @@ enum MENU_IDs {
     MENU_GFX_SETTINGS,
     MENU_AUDIO_SETTINGS,
     MENU_CONTROLLER_SETTINGS,
-    MENU_OSD_LANGUAGE_SETTINGS,
-    MENU_PARENTAL_LOCK,
-    MENU_NET_CONFIG,
-    MENU_NET_UPDATE,
-    MENU_START_NBD,
     MENU_ABOUT,
-    MENU_SAVE_CHANGES,
     MENU_EXIT,
     MENU_POWER_OFF
 };
 
 enum GAME_MENU_IDs {
     GAME_COMPAT_SETTINGS = 0,
-    GAME_CHEAT_SETTINGS,
     GAME_GSM_SETTINGS,
     GAME_VMC_SETTINGS,
 #ifdef PADEMU
     GAME_PADEMU_SETTINGS,
     GAME_PADMACRO_SETTINGS,
 #endif
-    GAME_OSD_LANGUAGE_SETTINGS,
-    GAME_SAVE_CHANGES,
     GAME_TEST_CHANGES,
     GAME_REMOVE_CHANGES,
     GAME_RENAME_GAME,
@@ -216,13 +207,7 @@ static void menuInitMainMenu(void)
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_AUDIO_SETTINGS, _STR_AUDIO_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_CONTROLLER_SETTINGS, _STR_CONTROLLER_SETTINGS);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_OSD_LANGUAGE_SETTINGS, _STR_OSD_SETTINGS);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_START_NBD, _STR_STARTNBD);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_POWER_OFF, _STR_POWEROFF);
 
@@ -241,15 +226,12 @@ void menuInitGameMenu(void)
 
     // initialize the menu
     submenuAppendItem(&gameMenu, -1, NULL, GAME_COMPAT_SETTINGS, _STR_COMPAT_SETTINGS);
-    submenuAppendItem(&gameMenu, -1, NULL, GAME_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_GSM_SETTINGS, _STR_GSCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_VMC_SETTINGS, _STR_VMC_SCREEN);
 #ifdef PADEMU
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADEMU_SETTINGS, _STR_PADEMUCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADMACRO_SETTINGS, _STR_PADMACROCONFIG);
 #endif
-    submenuAppendItem(&gameMenu, -1, NULL, GAME_OSD_LANGUAGE_SETTINGS, _STR_OSD_SETTINGS);
-    submenuAppendItem(&gameMenu, -1, NULL, GAME_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_TEST_CHANGES, _STR_TEST);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_REMOVE_CHANGES, _STR_REMOVE_ALL_SETTINGS);
     if (gEnableWrite) {
@@ -587,7 +569,7 @@ static void menuNextH()
     if (selected_item->next != NULL) {
         selected_item = selected_item->next;
         itemConfigId = -1;
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
     }
 }
 
@@ -596,7 +578,7 @@ static void menuPrevH()
     if (selected_item->prev != NULL) {
         selected_item = selected_item->prev;
         itemConfigId = -1;
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
     }
 }
 
@@ -605,7 +587,7 @@ static void menuFirstPage()
     submenu_list_t *cur = selected_item->item->current;
     if (cur) {
         if (cur->prev) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
         }
 
         selected_item->item->current = selected_item->item->submenu;
@@ -618,7 +600,7 @@ static void menuLastPage()
     submenu_list_t *cur = selected_item->item->current;
     if (cur) {
         if (cur->next) {
-            sfxPlay(SFX_CURSOR);
+            //sfxPlay(SFX_CURSOR);
         }
         while (cur->next)
             cur = cur->next; // go to end
@@ -639,7 +621,7 @@ static void menuNextV()
 
     if (cur && cur->next) {
         selected_item->item->current = cur->next;
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
 
         // if the current item is beyond the page start, move the page start one page down
         cur = selected_item->item->pagestart;
@@ -662,7 +644,7 @@ static void menuPrevV()
 
     if (cur && cur->prev) {
         selected_item->item->current = cur->prev;
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
 
         // if the current item is on the page start, move the page start one page up
         if (selected_item->item->pagestart == cur) {
@@ -681,7 +663,7 @@ static void menuNextPage()
 
     if (cur && cur->next) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
 
         while (--itms && cur->next)
             cur = cur->next;
@@ -699,7 +681,7 @@ static void menuPrevPage()
 
     if (cur && cur->prev) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
 
         while (--itms && cur->prev)
             cur = cur->prev;
@@ -817,7 +799,7 @@ void menuHandleInputMenu()
         mainMenuCurrent = mainMenu;
 
     if (getKey(KEY_UP)) {
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
         if (mainMenuCurrent->prev)
             mainMenuCurrent = mainMenuCurrent->prev;
         else // rewind to the last item
@@ -826,7 +808,7 @@ void menuHandleInputMenu()
     }
 
     if (getKey(KEY_DOWN)) {
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
         if (mainMenuCurrent->next)
             mainMenuCurrent = mainMenuCurrent->next;
         else
@@ -851,33 +833,8 @@ void menuHandleInputMenu()
         } else if (id == MENU_CONTROLLER_SETTINGS) {
             if (menuCheckParentalLock() == 0)
                 guiShowControllerConfig();
-        } else if (id == MENU_OSD_LANGUAGE_SETTINGS) {
-            if (menuCheckParentalLock() == 0)
-                guiGameShowOSDLanguageConfig(1);
-        } else if (id == MENU_PARENTAL_LOCK) {
-            if (menuCheckParentalLock() == 0)
-                guiShowParentalLockConfig();
-        } else if (id == MENU_NET_CONFIG) {
-            if (menuCheckParentalLock() == 0)
-                guiShowNetConfig();
-        } else if (id == MENU_NET_UPDATE) {
-            if (menuCheckParentalLock() == 0)
-                guiShowNetCompatUpdate();
-        } else if (id == MENU_START_NBD) {
-            if (menuCheckParentalLock() == 0)
-                handleLwnbdSrv();
         } else if (id == MENU_ABOUT) {
             guiShowAbout();
-        } else if (id == MENU_SAVE_CHANGES) {
-            if (menuCheckParentalLock() == 0) {
-                guiGameSaveOSDLanguageGlobalConfig(configGetByType(CONFIG_GAME));
-#ifdef PADEMU
-                guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
-                guiGameSavePadMacroGlobalConfig(configGetByType(CONFIG_GAME));
-#endif
-                saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
-                menuSetParentalLockCheckState(1); // Re-enable parental lock check.
-            }
         } else if (id == MENU_EXIT) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_EXIT), 1, NULL))
                 sysExecExit();
@@ -1043,8 +1000,7 @@ void menuRenderGameMenu()
         // render, advance
         fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
         y += spacing;
-        if (cp == (GAME_SAVE_CHANGES - 1) || cp == (GAME_REMOVE_CHANGES - 1))
-            y += spacing / 2;
+        
     }
 
     // hints
@@ -1060,7 +1016,7 @@ void menuHandleInputGameMenu()
         gameMenuCurrent = gameMenu;
 
     if (getKey(KEY_UP)) {
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
         if (gameMenuCurrent->prev)
             gameMenuCurrent = gameMenuCurrent->prev;
         else // rewind to the last item
@@ -1069,7 +1025,7 @@ void menuHandleInputGameMenu()
     }
 
     if (getKey(KEY_DOWN)) {
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
         if (gameMenuCurrent->next)
             gameMenuCurrent = gameMenuCurrent->next;
         else
@@ -1084,8 +1040,6 @@ void menuHandleInputGameMenu()
 
         if (menuID == GAME_COMPAT_SETTINGS) {
             guiGameShowCompatConfig(selected_item->item->current->item.id, selected_item->item->userdata, itemConfig);
-        } else if (menuID == GAME_CHEAT_SETTINGS) {
-            guiGameShowCheatConfig();
         } else if (menuID == GAME_GSM_SETTINGS) {
             guiGameShowGSConfig();
         } else if (menuID == GAME_VMC_SETTINGS) {
@@ -1096,15 +1050,6 @@ void menuHandleInputGameMenu()
         } else if (menuID == GAME_PADMACRO_SETTINGS) {
             guiGameShowPadMacroConfig(0);
 #endif
-        } else if (menuID == GAME_OSD_LANGUAGE_SETTINGS) {
-            guiGameShowOSDLanguageConfig(0);
-        } else if (menuID == GAME_SAVE_CHANGES) {
-            if (guiGameSaveConfig(itemConfig, selected_item->item->userdata))
-                configSetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_USER);
-            menuSaveConfig();
-            saveConfig(CONFIG_GAME, 0);
-            guiMsgBox(_l(_STR_GAME_SETTINGS_SAVED), 0, NULL);
-            guiGameLoadConfig(selected_item->item->userdata, gameMenuLoadConfig(NULL));
         } else if (menuID == GAME_TEST_CHANGES) {
             guiGameTestSettings(selected_item->item->current->item.id, selected_item->item->userdata, itemConfig);
         } else if (menuID == GAME_REMOVE_CHANGES) {
@@ -1168,7 +1113,7 @@ void menuHandleInputAppMenu()
         appMenuCurrent = appMenu;
 
     if (getKey(KEY_UP)) {
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
         if (appMenuCurrent->prev)
             appMenuCurrent = appMenuCurrent->prev;
         else // rewind to the last item
@@ -1177,7 +1122,7 @@ void menuHandleInputAppMenu()
     }
 
     if (getKey(KEY_DOWN)) {
-        sfxPlay(SFX_CURSOR);
+        //sfxPlay(SFX_CURSOR);
         if (appMenuCurrent->next)
             appMenuCurrent = appMenuCurrent->next;
         else

@@ -25,18 +25,19 @@ For this reason, we searched for homebrew applications available on both platfor
 -----
 
 ## Theme:
-The theme used, **X2P - Xbox to Playstation**, is Designed by Berion and Made by [Ripto](https://github.com/knowahitall) and can be downloaded from the [Releases Page](https://github.com/koraxial/Xbox-2-PlayStation-Emulator-AlFa/releases/tag/THM-v1.0.0).
+The theme used, **X2P - Xbox to Playstation**, is Designed by Berion and Made by [Ripto](https://github.com/knowahitall) and can be downloaded from the [Releases Page](https://github.com/koraxial/Xbox-2-PlayStation-Emulator-AlFa/releases/tag/THM-v1.0.0) and/or the [Releases Thread](https://www.psx-place.com/threads/opl-theme-x2p-april-fools-xbox-opl-theme-multi-pack-supports-all-opl-forks.43435/)
 
 -----
 
 ## Links:
 ### Downloads:
-- [Releases Page]( https://github.com/koraxial/Xbox-2-PlayStation-Emulator-AlFa/releases/tag/17022)
+- [Releases Page]( https://github.com/koraxial/Xbox-2-PlayStation-Emulator-AlFa/releases/)
 - [Internet Archive](https://web.archive.org/web/20240401135103/https://cdn.discordapp.com/attachments/799243822743289866/1224268410708295721/X2P.7z?ex=661cdfce&is=660a6ace&hm=3f213340eb1dc629ac282262210a821e737d93f425362fab764ceda424a84173&)
 
 ### Video showcases:
 - [Video by HardLevel](https://youtu.be/KPsUgV0-FTU)
 - [Video by korax](https://youtu.be/jvNvM48Oi48?si=u4i8o4hk7K-KBNAU)
+- [Theme Video by Ripto](https://youtu.be/rf9oTtMZo9M)
 
 -----
 
@@ -58,8 +59,9 @@ Font by iamnotxyzzy:
 
 Code Base by PS2Devs:
 - [ps2homebrew](https://github.com/ps2homebrew)/[Open-PS2-Loader](https://github.com/ps2homebrew/Open-PS2-Loader)
+- [ps2dev](https://github.com/ps2dev/)
 
-And lastly, a big thankyou **F**or **O**ur **O**riginal **L**oyal **S**upporters who supported us all the way through!
+And lastly, a big thank you **F**or **O**ur **O**riginal **L**oyal **S**upporters who supported us all the way through!
 
 -----
 
@@ -67,3 +69,7 @@ Did you know there's an awesome easter hidden in the [release](https://github.co
 Maybe a file in the source has clues? 😉
 
 [Original OPL Readme (from v1.2.0-2081)](OPL_README.md)
+
+2024
+berion _korax_ ripto
+[Join us on Discord at "PS2 Scene"](https://discord.gg/TS7aBGsWhN)

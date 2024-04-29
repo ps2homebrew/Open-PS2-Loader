@@ -25,7 +25,8 @@ For this reason, we searched for homebrew applications available on both platfor
 -----
 
 ## Theme:
-The theme used, **X2P - Xbox to Playstation**, is Designed by Berion and Made by [Ripto](https://github.com/knowahitall) and can be downloaded from the [Releases Page](https://github.com/koraxial/Xbox-2-PlayStation-Emulator-AlFa/releases/tag/THM-v1.0.0) and/or the [Releases Thread](https://www.psx-place.com/threads/opl-theme-x2p-april-fools-xbox-opl-theme-multi-pack-supports-all-opl-forks.43435/)
+The theme used, **X2P - Xbox to Playstation**, is available in two colors (Green and Blue) and is Designed by Berion and Made by [Ripto](https://github.com/knowahitall).  
+It can be downloaded from the [Releases Page](https://github.com/koraxial/Xbox-2-PlayStation-Emulator-AlFa/releases/tag/THM-v1.0.0) and/or the [Releases Thread](https://www.psx-place.com/threads/opl-theme-x2p-april-fools-xbox-opl-theme-multi-pack-supports-all-opl-forks.43435/).
 
 -----
 
@@ -70,6 +71,6 @@ Maybe a file in the source has clues? 😉
 
 [Original OPL Readme (from v1.2.0-2081)](OPL_README.md)
 
-2024
-berion _korax_ ripto
+☢ 2024  
+berion korax ripto  
 [Join us on Discord at "PS2 Scene"](https://discord.gg/TS7aBGsWhN)

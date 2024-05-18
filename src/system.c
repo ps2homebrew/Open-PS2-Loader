@@ -45,8 +45,8 @@ typedef struct
     int VMC_card_slot;
 } createVMCparam_t;
 
-extern void *eecore_elf;
-extern int size_eecore_elf;
+extern unsigned char eecore_elf[];
+extern unsigned int size_eecore_elf;
 
 extern unsigned char IOPRP_img[];
 extern unsigned int size_IOPRP_img;

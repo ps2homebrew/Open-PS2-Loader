@@ -89,7 +89,7 @@ static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, in
             return dev9type;
         case DDIOC_OFF:
             //Do not let the DEV9 interface to be switched off by other software.
-            //dev9Shutdown();
+            //Dev9CardStop();
             return 0;
         default:
             return 0;
@@ -161,7 +161,7 @@ int dev9d_init(void)
 }
 
 /* Export 4 */
-void dev9RegisterIntrCb(int intr, dev9_intr_cb_t cb)
+void SpdRegisterIntrHandler(int intr, dev9_intr_cb_t cb)
 {
 #ifdef HDD_DRIVER
     //Don't let anything else change the HDD interrupt handlers.
@@ -221,7 +221,7 @@ static void dev9_set_stat(int stat)
 }
 
 /* Export 6 */
-void dev9Shutdown(void)
+void Dev9CardStop(void)
 {
     int idx;
     USE_DEV9_REGS;
@@ -244,7 +244,7 @@ void dev9Shutdown(void)
 }
 
 /* Export 7 */
-void dev9IntrEnable(int mask)
+void SpdIntrEnable(int mask)
 {
     USE_SPD_REGS;
     int flags;
@@ -255,7 +255,7 @@ void dev9IntrEnable(int mask)
 }
 
 /* Export 8 */
-void dev9IntrDisable(int mask)
+void SpdIntrDisable(int mask)
 {
     USE_SPD_REGS;
     int flags;
@@ -266,7 +266,7 @@ void dev9IntrDisable(int mask)
 }
 
 /* Export 5 */
-int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
+int SpdDmaTransfer(int ctrl, void *buf, int bcr, int dir)
 {
     USE_SPD_REGS;
     volatile iop_dmac_chan_t *dev9_chan = (iop_dmac_chan_t *)DEV9_DMAC_BASE;
@@ -383,7 +383,7 @@ out:
 }
 
 /* Export 9 */
-int dev9GetEEPROM(u16 *buf)
+int SpdGetEthernetID(u16 *buf)
 {
     int i;
 
@@ -400,14 +400,14 @@ int dev9GetEEPROM(u16 *buf)
 }
 
 /* Export 10 */
-void dev9LEDCtl(int ctl)
+void SpdSetLED(int ctl)
 {
     USE_SPD_REGS;
     SPD_REG8(SPD_R_PIO_DATA) = (ctl == 0);
 }
 
 /* Export 11 */
-int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb)
+int Dev9RegisterPowerOffHandler(int idx, dev9_shutdown_cb_t cb)
 {
     if (idx < 16) {
         dev9_shutdown_cbs[idx] = cb;
@@ -436,7 +436,7 @@ static int dev9_init(void)
     dev9_set_stat(0x103);
 
     /* Disable all device interrupts.  */
-    dev9IntrDisable(0xffff);
+    SpdIntrDisable(0xffff);
 
     /* Register interrupt dispatch callback handler. */
     p_dev9_intr_cb = (void *)dev9_intr_dispatch;
@@ -453,7 +453,7 @@ static int dev9_init(void)
     /* Read in the MAC address.  */
     read_eeprom_data();
     /* Turn the LED off.  */
-    dev9LEDCtl(0);
+    SpdSetLED(0);
     return 0;
 }
 

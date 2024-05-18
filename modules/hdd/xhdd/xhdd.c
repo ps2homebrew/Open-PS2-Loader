@@ -32,7 +32,7 @@ static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsi
 
     switch (cmd) {
         case ATA_DEVCTL_IS_48BIT:
-            return ((devinfo = ata_get_devinfo(fd->unit)) != NULL ? devinfo->lba48 : -1);
+            return ((devinfo = sceAtaInit(fd->unit)) != NULL ? devinfo->lba48 : -1);
         case ATA_DEVCTL_SET_TRANSFER_MODE:
             if (!isHDPro)
                 return ata_device_set_transfer_mode(fd->unit, ((hddAtaSetMode_t *)arg)->type, ((hddAtaSetMode_t *)arg)->mode);

@@ -52,12 +52,12 @@ void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsign
 /* ATAD Transfer Imports */
 #ifdef HDD_DRIVER
 
-/* These are used with the dir parameter of ata_device_dma_transfer().  */
+/* These are used with the dir parameter of sceAtaDmaTransfer().  */
 #define ATA_DIR_READ  0
 #define ATA_DIR_WRITE 1
 
-int ata_device_sector_io(unsigned int unit, void *buf, unsigned int lba, unsigned int sectors, int dir);
-#define I_ata_device_sector_io DECLARE_IMPORT(6, ata_device_sector_io)
+int sceAtaDmaTransfer(unsigned int unit, void *buf, unsigned int lba, unsigned int sectors, int dir);
+#define I_sceAtaDmaTransfer DECLARE_IMPORT(6, sceAtaDmaTransfer)
 
 #endif
 

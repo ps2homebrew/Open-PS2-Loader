@@ -307,8 +307,8 @@ void menuEnd()
         menu_list_t *td = cur;
         cur = cur->next;
 
-        if (&td->item)
-            submenuDestroy(&td->item->submenu);
+        if (td->item)
+            submenuDestroy(&(td->item->submenu));
 
         menuRemoveHints(td->item);
 

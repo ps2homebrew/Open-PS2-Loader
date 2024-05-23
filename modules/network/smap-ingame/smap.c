@@ -431,7 +431,7 @@ int SMAPStart(void)
     if (!SmapDriverData.SmapIsInitialized) {
         emac3_regbase = SmapDriverData.emac3_regbase;
 
-        dev9IntrEnable(DEV9_SMAP_INTR_MASK2);
+        SpdIntrEnable(DEV9_SMAP_INTR_MASK2);
 
         // Initialize the PHY, only if there's no valid link status. It should have already been previously initialized successfully by the previous instance of SMAP.
         result = (!(_smap_read_phy(emac3_regbase, SMAP_DsPHYTER_BMSR) & SMAP_PHY_BMSR_LINK)) ? InitPHY(&SmapDriverData) : 0;
@@ -470,7 +470,7 @@ void SMAPStop(void)
     if (SmapDriverData.SmapIsInitialized) {
         emac3_regbase = SmapDriverData.emac3_regbase;
 
-        dev9IntrDisable(DEV9_SMAP_INTR_MASK2);
+        SpdIntrDisable(DEV9_SMAP_INTR_MASK2);
         SMAP_EMAC3_SET32(SMAP_R_EMAC3_MODE0, 0);
         SmapDriverData.NetDevStopFlag = 0;
         SmapDriverData.SmapIsInitialized = 0;
@@ -568,7 +568,7 @@ int smap_init(int argc, char *argv[])
     if (SPD_REG16(SPD_R_REV_1) < 0x11)
         return -6; // Minimum: revision 17, ES2.
 
-    dev9IntrDisable(DEV9_SMAP_ALL_INTR_MASK);
+    SpdIntrDisable(DEV9_SMAP_ALL_INTR_MASK);
 
     /* Reset FIFOs. */
     SMAP_REG8(SMAP_R_TXFIFO_CTRL) = SMAP_TXFIFO_RESET;
@@ -611,7 +611,7 @@ int smap_init(int argc, char *argv[])
 
     /* Retrieve the MAC address and verify it's integrity. */
     bzero(eeprom_data, 8);
-    if ((result = dev9GetEEPROM(eeprom_data)) < 0) {
+    if ((result = SpdGetEthernetID(eeprom_data)) < 0) {
         return (result == -1 ? -7 : -4);
     }
 
@@ -647,8 +647,8 @@ int smap_init(int argc, char *argv[])
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_RX_WATERMARK, 16 << SMAP_E3_RX_LO_WATER_BITSFT | 128 << SMAP_E3_RX_HI_WATER_BITSFT);
 
     // Unlike the SONY original, register the interrupt handler for only RXEND and EMAC3.
-    dev9RegisterIntrCb(5, &Dev9IntrCb); /* RXEND */
-    dev9RegisterIntrCb(6, &Dev9IntrCb); /* EMAC3 */
+    SpdRegisterIntrHandler(5, &Dev9IntrCb); /* RXEND */
+    SpdRegisterIntrHandler(6, &Dev9IntrCb); /* EMAC3 */
 
     dev9RegisterPreDmaCb(1, &Dev9PreDmaCbHandler);
     dev9RegisterPostDmaCb(1, &Dev9PostDmaCbHandler);

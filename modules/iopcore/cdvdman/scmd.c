@@ -172,13 +172,13 @@ int sceCdReadGUID(u64 *GUID)
 }
 
 //--------------------------------------------------------------
-int sceCdReadModelID(unsigned long int *ModelID)
+int sceCdReadModelID(unsigned int *ModelID)
 {
     return cdvdman_readID(1, (u8 *)ModelID);
 }
 
 //-------------------------------------------------------------------------
-int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
+int sceCdReadDvdDualInfo(int *on_dual, unsigned int *layer1_start)
 {
     if (cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL) {
         // Make layer 1 point to layer 0.

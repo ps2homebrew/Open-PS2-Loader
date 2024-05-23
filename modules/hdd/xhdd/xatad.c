@@ -56,15 +56,15 @@ int ata_device_set_transfer_mode(int device, int type, int mode)
 {
     int res;
 
-    res = ata_io_start(NULL, 1, 3, (type | mode) & 0xff, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES);
+    res = sceAtaExecCmd(NULL, 1, 3, (type | mode) & 0xff, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES);
     if (res)
         return res;
 
-    res = ata_io_finish();
+    res = sceAtaWaitResult();
     if (res)
         return res;
 
-    // Note: PIO is not supported by ata_device_sector_io.
+    // Note: PIO is not supported by sceAtaDmaTransfer.
     switch (type) {
         case ATA_XFER_MODE_MDMA:
             ata_multiword_dma_mode(mode);

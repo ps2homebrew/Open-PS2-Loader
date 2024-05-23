@@ -23,7 +23,7 @@ I_bdm_readSector
 I_bdm_writeSector
 #endif
 #ifdef HDD_DRIVER
-I_ata_device_sector_io
+I_sceAtaDmaTransfer
 #endif
 #ifdef SMB_DRIVER
 I_smb_OpenAndX

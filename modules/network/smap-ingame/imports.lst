@@ -35,11 +35,11 @@ ps2ip_IMPORTS_start
 ps2ip_IMPORTS_end
 
 dev9_IMPORTS_start
-I_dev9IntrEnable
-I_dev9IntrDisable
-I_dev9RegisterIntrCb
+I_SpdIntrEnable
+I_SpdIntrDisable
+I_SpdRegisterIntrHandler
 I_dev9RegisterPreDmaCb
 I_dev9RegisterPostDmaCb
-I_dev9DmaTransfer
-I_dev9GetEEPROM
+I_SpdDmaTransfer
+I_SpdGetEthernetID
 dev9_IMPORTS_end

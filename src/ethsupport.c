@@ -651,13 +651,13 @@ static void ethLaunchGame(int id, config_set_t *configSet)
 
     switch (game->format) {
         case GAME_FORMAT_OLD_ISO:
-            sprintf(settings->filename, "%s.%s%s", game->startup, game->name, game->extension);
+            snprintf(settings->filename, sizeof(settings->filename), "%s.%s%s", game->startup, game->name, game->extension);
             break;
         case GAME_FORMAT_ISO:
-            sprintf(settings->filename, "%s%s", game->name, game->extension);
+            snprintf(settings->filename, sizeof(settings->filename), "%s%s", game->name, game->extension);
             break;
         default: // USBExtreme format.
-            sprintf(settings->filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
+            snprintf(settings->filename, sizeof(settings->filename), "ul.%08X.%s", USBA_crc32(game->name), game->startup);
             settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
     }
 

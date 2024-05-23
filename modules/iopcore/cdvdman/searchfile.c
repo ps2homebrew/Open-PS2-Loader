@@ -133,7 +133,7 @@ lbl_startlocate:
                     if (!(cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)) {
                         int on_dual;
                         u32 layer1_start;
-                        sceCdReadDvdDualInfo(&on_dual, &layer1_start);
+                        sceCdReadDvdDualInfo(&on_dual, (unsigned int *)&layer1_start);
 
                         if (layer)
                             tocLBA += layer1_start;
@@ -189,7 +189,7 @@ static int cdvdman_findfile(sceCdlFILE *pcdfile, const char *name, int layer)
 
     lsn = tocEntryPointer->fileLBA;
     if (layer) {
-        sceCdReadDvdDualInfo((int *)&pcdfile->lsn, &pcdfile->size);
+        sceCdReadDvdDualInfo((int *)&pcdfile->lsn, (unsigned int *)&pcdfile->size);
         lsn += pcdfile->size;
     }
 
@@ -245,7 +245,7 @@ void cdvdman_searchfile_init(void)
     if (!(cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)) {
         int on_dual;
         u32 layer1_start;
-        sceCdReadDvdDualInfo(&on_dual, &layer1_start);
+        sceCdReadDvdDualInfo(&on_dual, (unsigned int *)&layer1_start);
         if (on_dual) {
             u32 lsn0 = mediaLsnCount;
             // So that CdRead below can read more than first layer.

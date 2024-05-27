@@ -435,7 +435,10 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
 
     startup = appGetBoot(device, sizeof(device), value);
 
-    return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
+    if (!strcmp(folder, "ART"))
+        return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
+    else
+        return oplGetAppImage(device, folder, isRelative, value, suffix, resultTex, psm);
 }
 
 static int appGetTextId(void)

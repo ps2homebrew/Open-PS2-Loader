@@ -927,8 +927,6 @@ static int guiGameSavePadMacroGameConfig(config_set_t *configSet, int result)
 void guiGameSavePadEmuGlobalConfig(config_set_t *configGame)
 {
     if (gPadEmuSource == SETTINGS_GLOBAL) {
-        diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
-
         configSetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
         configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
     }

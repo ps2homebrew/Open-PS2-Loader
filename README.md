@@ -1,3 +1,5 @@
+# OPL Build with Retro GEM Game ID support for PS2 games (launched from OPL, HDD-OSD or PSBBN), PS1 games (via Popstarter) and homebrew apps Coming soon...
+
 # Open PS2 Loader
 
 Copyright 2013, Ifcaro & jimmikaelkael

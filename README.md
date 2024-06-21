@@ -1,4 +1,24 @@
-# OPL Build with Retro GEM Game ID support for PS2 games (launched from OPL, HDD-OSD or PSBBN), PS1 games (via Popstarter) and homebrew apps. Coming soon...
+# OPL Build with Full Retro GEM Game ID Support for PS2 Games, PS1 Games, and Homebrew Apps
+
+## Features
+
+### PS2 Games:
+- Game ID support for PS2 games launched from OPL via HDD, MASS, and SMB.
+- Added Game ID support for the "Auto Loading" feature used by [OPL-Launcher](https://github.com/ps2homebrew/OPL-Launcher). Games launched directly from the HDD-OSD or PSBBN now support Game ID.
+
+### PS1 Games:
+- Full Game ID support added for PS1 games launched from the "Apps" tab. All PS1 games must be named in the standard format with the Game ID as a prefix, e.g., "SCUS_941.94.Gran Turismo.VCD".
+
+### Homebrew Apps:
+- Full Game ID support for homebrew apps. The Game ID will be set to the first 11 characters of the ELF file.
+
+## Companion App
+
+Please check out my companion app, [Retro GEM GameId Resetter](https://github.com/CosmicScale/Retro-GEM-GameId-Resetter). With this app, when you quit a game (For PS2 games: L1 + L2 + R1 + R2 + SELECT + START; For PS1 games: L1 + R1 + SELECT + START) and return to the OSD, the Game ID is reset, and the Retro GEM settings are returned to global.
+
+## Credits
+
+Modified by CosmicScale. Uses code based on the AppCakeLtd gameid-with-gem fork of [Open-PS2-Loader](https://github.com/AppCakeLtd/Open-PS2-Loader/tree/gameid-with-gem).
 
 # Open PS2 Loader
 

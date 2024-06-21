@@ -59,6 +59,10 @@ extern int guiFrameId;
 #define GUI_SCREEN_GAME_MENU 3
 #define GUI_SCREEN_APP_MENU  4
 
+extern char g_GameId[32];  // Declare the global variable
+
+void guiSetGameId(const char* GameId);
+
 void guiSwitchScreen(int target);
 
 void guiReloadScreenExtents();

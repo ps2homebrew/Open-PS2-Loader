@@ -9,13 +9,34 @@
 #include "include/lang.h"
 #include "include/pad.h"
 #include "include/sound.h"
-
+#include <string.h>
 #define MENU_POS_V     50
 #define HINT_HEIGHT    32
 #define DECORATOR_SIZE 20
 
 extern const char conf_theme_OPL_cfg;
 extern u16 size_conf_theme_OPL_cfg;
+
+// Function to adjust the item ID
+const char* adjustItemId(const char* itemId) {
+    static char adjustedItemId[12]; // Static buffer to hold the adjusted ID (11 characters + null terminator)
+    const char *originalItemId = itemId;
+
+    // Check if the itemId starts with "XX." or "SB."
+    if (strncmp(itemId, "XX.", 3) == 0 || strncmp(itemId, "SB.", 3) == 0) {
+        originalItemId = itemId + 3;  // Skip the first 3 characters
+    }
+
+    // Apply additional rules to shorten the itemId to 11 characters
+    if (originalItemId[0] == 'S' && originalItemId[4] == '_' && originalItemId[8] == '.') {
+        strncpy(adjustedItemId, originalItemId, 11); // Copy the first 11 characters
+        adjustedItemId[11] = '\0'; // Ensure null-termination
+    } else {
+        return originalItemId; // Return the original itemId if rules do not apply
+    }
+
+    return adjustedItemId;
+}
 
 theme_t *gTheme;
 
@@ -830,8 +851,14 @@ static void initItemsList(const char *themePath, config_set_t *themeConfig, them
 static void drawItemText(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
     if (item) {
-        item_list_t *support = menu->item->userdata;
-        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, support->itemGetStartup(item->item.id), elem->color);
+        item_list_t *support = menu->item->userdata; // Retain this line
+        
+        // Get the item ID and adjust it
+        const char* itemId = support->itemGetStartup(item->item.id);
+        const char* adjustedItemId = adjustItemId(itemId);
+
+        // Render the adjusted item ID
+        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, adjustedItemId, elem->color);
     }
 }
 

@@ -35,6 +35,16 @@
 #include "include/sound.h"
 #include "include/xparam.h"
 
+#include <stdio.h>
+#include <gsKit.h>
+#include <dmaKit.h>
+#include <gsToolkit.h>
+#include <unistd.h>
+#include <string.h>
+
+// Declare the GSGLOBAL pointer as extern
+extern GSGLOBAL *gsGlobal;
+
 // FIXME: We should not need this function.
 //        Use newlib's 'stat' to get GMT time.
 #define NEWLIB_PORT_AWARE
@@ -256,6 +266,12 @@ static void itemExecSelect(struct menu_item *curMenu)
     if (support) {
         if (support->enabled) {
             if (curMenu->current) {
+                char *gameid = support->itemGetStartup(curMenu->current->item.id);
+
+                guiSetGameId(gameid);
+                guiRenderTextScreen(g_GameId);
+                sleep(1);
+
                 config_set_t *configSet = menuLoadConfig();
                 support->itemLaunch(curMenu->current->item.id, configSet);
             }
@@ -1758,6 +1774,99 @@ static void deferredAudioInit(void)
 // --------------------- Auto Loading -----------------------
 // ----------------------------------------------------------
 
+// Declare screen dimensions
+int screenWidth = 640;
+int screenHeight = 448;
+
+// Function to calculate CRC
+static uint8_t gameid_calc_crc(uint8_t *data, int len) {
+    uint8_t crc = 0x00;
+    for (int i = 0; i < len; i++) {
+        crc += data[i];
+    }
+    crc = 0x100 - crc;
+    return crc;
+}
+
+// Function to draw game ID using GSKit
+void gameid_draw_auto(const char* game_id) {
+    static uint8_t data[64] = { 0 };
+    int gidlen = strlen(game_id);
+    if (gidlen > 11) {
+        gidlen = 11;  // Ensure the length does not exceed 11 characters
+    }
+
+    int dpos = 0;
+
+    data[dpos++] = 0xA5;  // detect word
+    data[dpos++] = 0x00;  // address offset;
+    dpos++;
+    data[dpos++] = gidlen;
+
+    memcpy(&data[dpos], game_id, gidlen);
+    dpos += gidlen;
+
+    data[dpos++] = 0x00;
+    data[dpos++] = 0xD5;  // end word
+    data[dpos++] = 0x00;  // padding
+
+    int data_len = dpos;
+
+    data[2] = gameid_calc_crc(&data[3], data_len - 3);
+
+    int xstart = (screenWidth / 2) - (data_len * 8);
+    int ystart = screenHeight - (((screenHeight / 8) * 2) + 20);
+    int height = 2;
+
+    for (int i = 0; i < data_len; i++) {
+        for (int ii = 7; ii >= 0; ii--) {
+
+            gsKit_prim_sprite(gsGlobal, xstart + (i * 16 + ((7 - ii) * 2)), ystart, 
+                              xstart + (i * 16 + ((7 - ii) * 2)) + 1, ystart + height, 
+                              1, 
+                              GS_SETREG_RGBA(0xFF, 0x00, 0xFF, 0x80));
+
+            if ((data[i] >> ii) & 1) {
+                gsKit_prim_sprite(gsGlobal, xstart + (i * 16 + ((7 - ii) * 2) + 1), ystart, 
+                                  xstart + (i * 16 + ((7 - ii) * 2) + 1) + 1, ystart + height, 
+                                  1, 
+                                  GS_SETREG_RGBA(0x00, 0xFF, 0xFF, 0x80));
+            } else {
+                gsKit_prim_sprite(gsGlobal, xstart + (i * 16 + ((7 - ii) * 2) + 1), ystart, 
+                                  xstart + (i * 16 + ((7 - ii) * 2) + 1) + 1, ystart + height, 
+                                  1, 
+                                  GS_SETREG_RGBA(0xFF, 0xFF, 0x00, 0x80));
+            }
+        }
+    }
+}
+
+// Function to initialize graphics and display the game ID on the screen
+void displayGameID(const char *game_id) {
+    // Initialize GS Global and set up the video mode
+    gsGlobal = gsKit_init_global();
+    gsGlobal->Mode = GS_MODE_DTV_480P;  // Set to 480p mode
+    gsGlobal->Width = 640;  // Width of the screen
+    gsGlobal->Height = 448;  // Height of the screen
+    gsGlobal->Interlace = GS_NONINTERLACED;  // Non-interlaced mode for progressive scan
+    gsGlobal->Field = GS_FRAME;  // Frame mode
+    gsGlobal->PSM = GS_PSM_CT24;  // Pixel storage format (24-bit color)
+    gsGlobal->PSMZ = GS_PSMZ_32;  // Z buffer format (32-bit depth)
+    gsGlobal->DoubleBuffering = GS_SETTING_OFF;  // Disable double buffering
+    gsGlobal->ZBuffering = GS_SETTING_OFF;  // Disable Z buffering
+
+    gsKit_vram_clear(gsGlobal);  // Clear VRAM
+    gsKit_init_screen(gsGlobal);  // Initialize the screen
+
+    // Draw the game ID on the screen using rectangles
+    gameid_draw_auto(game_id);
+
+    // Execute the GS queue
+    gsKit_queue_exec(gsGlobal);
+    // Sync and flip the buffer
+    gsKit_sync_flip(gsGlobal);
+}
+
 static void miniInit(int mode)
 {
     int ret;
@@ -1835,6 +1944,8 @@ static void autoLaunchHDDGame(char *argv[])
     configSet = configAlloc(0, NULL, path);
     configRead(configSet);
 
+    // Display GameId before launching the game
+    displayGameID(gAutoLaunchGame->startup);
     hddLaunchGame(-1, configSet);
 }
 
@@ -1880,6 +1991,9 @@ static void autoLaunchBDMGame(char *argv[])
 
     configSet = configAlloc(0, NULL, path);
     configRead(configSet);
+
+    // Display GameId before launching the game
+    displayGameID(gAutoLaunchGame->startup);
 
     bdmLaunchGame(-1, configSet);
 }

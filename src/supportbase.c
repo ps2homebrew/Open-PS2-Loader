@@ -668,6 +668,12 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         settings->fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
     }
 #endif
+    // sanitise the settings
+    gOSDLanguageSource = 0;
+    gOSDLanguageEnable = 0;
+    gOSDLanguageValue = 0;
+    gOSDTVAspectRatio = 0;
+    gOSDVideOutput = 0;
 
     if (configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_SOURCE, &gOSDLanguageSource)) {
         configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_ENABLE, &gOSDLanguageEnable);

@@ -927,8 +927,6 @@ static int guiGameSavePadMacroGameConfig(config_set_t *configSet, int result)
 void guiGameSavePadEmuGlobalConfig(config_set_t *configGame)
 {
     if (gPadEmuSource == SETTINGS_GLOBAL) {
-        diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
-
         configSetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
         configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
     }
@@ -1405,6 +1403,8 @@ static void guiGameLoadOSDLanguageConfig(config_set_t *configSet, config_set_t *
     gOSDLanguageValue = 0;
     gOSDLanguageEnable = 0;
     gOSDLanguageSource = 0;
+    gOSDTVAspectRatio = 0;
+    gOSDVideOutput = 0;
 
     configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_ENABLE, &gOSDLanguageEnable);
     configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_LANGID, &gOSDLanguageValue);
@@ -1428,6 +1428,8 @@ static void guiGameLoadOSDLanguageConfig(config_set_t *configSet, config_set_t *
     diaSetInt(diaOSDConfig, OSD_LANGUAGE_SOURCE, gOSDLanguageSource);
     diaSetInt(diaOSDConfig, OSD_LANGUAGE_ENABLE, gOSDLanguageEnable);
     diaSetInt(diaOSDConfig, OSD_LANGUAGE_VALUE, gOSDLanguageValue);
+    diaSetInt(diaOSDConfig, OSD_TVASPECT_VALUE, gOSDTVAspectRatio);
+    diaSetInt(diaOSDConfig, OSD_VMODE_VALUE, gOSDVideOutput);
 }
 //OSD Language
 

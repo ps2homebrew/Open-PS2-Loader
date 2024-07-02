@@ -133,7 +133,7 @@ int AddHistoryRecord(const char *name)
     char path[32];
     DEBUG_PRINTF("OSDHistory@%s: starts\n", __func__);
 
-    for (i = 1; i >= 0; i--) { // increase number of slots for mt (not sure how multi tap works haven’t looked at docs ie mc0 - mc4 ?)
+    for (i = 0; i < 2; i++) { // increase number of slots for mt (not sure how multi tap works haven’t looked at docs ie mc0 - mc4 ?)
         mcGetInfo(i, 0, &mcType, NULL, &format);
         mcSync(0, NULL, &result);
         DEBUG_PRINTF("\tslot=%d, mctype=%d, format=%d\n", i, mcType, format);

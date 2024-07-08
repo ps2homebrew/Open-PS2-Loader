@@ -84,6 +84,8 @@ IMPORT_BIN2C(padman_irx);
 
 IMPORT_BIN2C(poweroff_irx);
 
+IMPORT_BIN2C(ppctty_irx);
+
 IMPORT_BIN2C(ps2atad_irx);
 
 IMPORT_BIN2C(ps2dev9_irx);

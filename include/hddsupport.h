@@ -62,6 +62,6 @@ int hddDeleteHDLGame(hdl_game_info_t *ginfo);
 void hddInit();
 item_list_t *hddGetObject(int initOnly);
 void hddLoadModules(void);
-void hddLaunchGame(int id, config_set_t *configSet);
+void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet);
 
 #endif

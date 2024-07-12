@@ -505,7 +505,7 @@ static GSTEXTURE *getGameImageTexture(image_cache_t *cache, void *support, struc
 {
     if (gEnableArt) {
         item_list_t *list = (item_list_t *)support;
-        char *startup = list->itemGetStartup(item->id);
+        char *startup = list->itemGetStartup(list, item->id);
         return cacheGetTexture(cache, list, &item->cache_id[cache->userId], &item->cache_uid[cache->userId], startup);
     }
 
@@ -737,12 +737,30 @@ static void drawMenuIcon(struct menu_list *menu, struct submenu_list *item, conf
         rmDrawPixmap(menuIconTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
 }
 
+static int findMenuNext(struct menu_list *menu)
+{
+    struct menu_list *next = menu->next;
+    while (next != NULL && next->item->visible == 0)
+        next = next->next;
+
+    return next == NULL ? 0 : next->item->visible;
+}
+
+static int findMenuPrev(struct menu_list *menu)
+{
+    struct menu_list *prev = menu->prev;
+    while (prev != NULL && prev->item->visible == 0)
+        prev = prev->prev;
+
+    return prev == NULL ? 0 : prev->item->visible;
+}
+
 static void drawMenuText(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
     GSTEXTURE *leftIconTex = NULL, *rightIconTex = NULL;
-    if (menu->prev != NULL)
+    if (findMenuPrev(menu) != 0)
         leftIconTex = thmGetTexture(LEFT_ICON);
-    if (menu->next != NULL)
+    if (findMenuNext(menu) != 0)
         rightIconTex = thmGetTexture(RIGHT_ICON);
 
     if (elem->aligned) {
@@ -831,7 +849,7 @@ static void drawItemText(struct menu_list *menu, struct submenu_list *item, conf
 {
     if (item) {
         item_list_t *support = menu->item->userdata;
-        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, support->itemGetStartup(item->item.id), elem->color);
+        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, support->itemGetStartup(support, item->item.id), elem->color);
     }
 }
 

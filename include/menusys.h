@@ -51,6 +51,9 @@ typedef struct menu_item
     /// item description in localised form (used if value is not negative)
     int text_id;
 
+    // Indicates if the menu item should be drawn or not.
+    int visible;
+
     void *userdata;
 
     /// submenu, selection and page start (only used in static mode)

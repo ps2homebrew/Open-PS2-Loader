@@ -195,11 +195,11 @@ static int bdmNeedsUpdate(item_list_t *itemList)
         return 0;
 
     // If a device was added or removed play the appropriate UI sound.
-    // TODO: New sound effects for these would be nice.
-    if (result == -1)
-        sfxPlay(SFX_CANCEL);
-    else if (result == 1)
-        sfxPlay(SFX_CONFIRM);
+    if (result == -1) {
+        sfxPlay(SFX_BD_DISCONNECT);
+        return result;
+    } else if (result == 1)
+        sfxPlay(SFX_BD_CONNECT);
 
     sprintf(path, "%sCD", pDeviceData->bdmPrefix);
     if (stat(path, &st) != 0)

@@ -554,10 +554,17 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount].info = size_tifinet_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
         irxptr_tab[modcount++].ptr = (void *)&tifinet_ingame_irx;
     }
-#else
+#elif defined(TTY_UDP)
     if (modules & CORE_IRX_DEBUG) {
         irxptr_tab[modcount].info = size_udptty_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDPTTY);
         irxptr_tab[modcount++].ptr = (void *)&udptty_ingame_irx;
+        irxptr_tab[modcount].info = size_ioptrap_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPTRAP);
+        irxptr_tab[modcount++].ptr = (void *)&ioptrap_irx;
+    }
+#elif defined(TTY_PPC_UART)
+    if (modules & CORE_IRX_DEBUG) {
+        irxptr_tab[modcount].info = size_ppctty_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PPCTTY);
+        irxptr_tab[modcount++].ptr = (void *)&ppctty_irx;
         irxptr_tab[modcount].info = size_ioptrap_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPTRAP);
         irxptr_tab[modcount++].ptr = (void *)&ioptrap_irx;
     }

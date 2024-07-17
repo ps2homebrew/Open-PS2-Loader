@@ -98,8 +98,11 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 #ifdef __DECI2_DEBUG
     LoadOPLModule(OPL_MODULE_ID_DRVTIF, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_TIFINET, 0, 0, NULL);
-#else
+#elif defined(TTY_UDP)
     LoadOPLModule(OPL_MODULE_ID_UDPTTY, 0, 0, NULL);
+    LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
+#elif defined(TTY_PPC_UART)
+    LoadOPLModule(OPL_MODULE_ID_PPCTTY, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
 #endif
 #endif

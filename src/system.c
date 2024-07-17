@@ -379,7 +379,7 @@ void sysExecExit(void)
 {
     // Deinitialize without shutting down active devices.
     deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
-    Exit(0);
+    exit(0);
 }
 
 // Module bits

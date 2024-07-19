@@ -10,21 +10,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: |
-        apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Compile -> make clean release
       run: make --trace clean release
@@ -34,7 +27,7 @@ jobs:
 
     - name: Upload release artifact ELF
       if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: OPNPS2LD
         path: |
@@ -42,7 +35,7 @@ jobs:
 
     - name: Upload release artifact info
       if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: INFO
         path: |
@@ -60,20 +53,14 @@ jobs:
         igs: [IGS=0, IGS=1]
         t10k: [DTL_T10000=0, DTL_T10000=1]
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Get version
       run: |
@@ -88,28 +75,32 @@ jobs:
       run: sh ./make_changelog.sh
 
     - name: Upload variants artifact ELF
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: OPNPS2LD-VARIANTS
+        name: OPNPS2LD-VARIANTS ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }}
         path: OPNPS2LD*.ELF
+
+  merge-variants:
+    runs-on: ubuntu-latest
+    needs: build-variants
+    steps:
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: OPNPS2LD-VARIANTS
+          pattern: OPNPS2LD-VARIANTS*
+          delete-merged: true
 
   build-lang:
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: |
-        apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Compile -> make download_lng languages
       run: make --trace download_lng languages
@@ -119,7 +110,7 @@ jobs:
 
     - name: Upload release artifact
       if: ${{ success() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: OPNPS2LD-LANGS
         path: |
@@ -129,22 +120,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        debug: [debug, iopcore_debug, ingame_debug, deci2_debug] # eesio_debug broken
+        debug: [debug, iopcore_debug, ingame_debug, deci2_debug, eesio_debug]
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
+    container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
-    - name: Install dependencies
-      run: apk add build-base git zip gawk python3 py3-pip bash
-
     - name: git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
-
-    - name: Install Python packages
-      run: pip3 install -r requirements.txt
 
     - name: Get version
       run: |
@@ -156,10 +141,21 @@ jobs:
         mv opl.elf opl-${{ matrix.debug }}.elf
 
     - name: Upload variants artifact ELF
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: opl-debug-${{ env.OPL_VERSION }}
+        name: opl-${{ matrix.debug }}-${{ env.OPL_VERSION }}
         path: opl-*.elf
+
+  merge-debug:
+    runs-on: ubuntu-latest
+    needs: build-debug
+    steps:
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: OPNPS2LD-DEBUG
+          pattern: opl-*
+          delete-merged: true
 
   release:
     needs: [build, build-variants, build-debug, build-lang]
@@ -170,7 +166,7 @@ jobs:
       PASSWORD: ${{ secrets.PASSWORD }}
     steps:
     - name: git checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - run: git fetch --prune --unshallow
 
@@ -179,7 +175,7 @@ jobs:
         echo "OPL_VERSION=$(make oplversion)" >> $GITHUB_ENV
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
 
     - name: Prepare artifacts for release
       run: |
@@ -196,7 +192,7 @@ jobs:
 
     - name: Create prerelease
       if: github.ref == 'refs/heads/master'
-      uses: marvinpinto/action-automatic-releases@latest
+      uses: mathieucarbou/marvinpinto-action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: true
@@ -212,7 +208,7 @@ jobs:
 
     - name: Create release
       if: startsWith(github.ref, 'refs/tags/v')
-      uses: marvinpinto/action-automatic-releases@latest
+      uses: mathieucarbou/marvinpinto-action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: "${{ contains(github.ref, '-rc') }}"

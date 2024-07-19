@@ -25,6 +25,7 @@
 #include "include/igs_api.h"
 #define NEWLIB_PORT_AWARE
 #include "fileio.h"
+#include "coreconfig.h"
 
 static void FastDelay(int count)
 {
@@ -388,6 +389,7 @@ static void ConvertColors16(u16 *buffer, u32 dimensions)
 
 static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 image_size, u8 Number)
 {
+    USE_LOCAL_EECORE_CONFIG;
 
     delay(1);
     GS_BGCOLOUR = 0x0099FF; // Orange
@@ -414,7 +416,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
 
     // Sequential number, inherited from Bitmap File
     _strcpy(PathFilenameExtension, "mc1:/");
-    _strcat(PathFilenameExtension, GameID);
+    _strcat(PathFilenameExtension, config->GameID);
     _strcat(PathFilenameExtension, "_GS(");
     u8todecstr(Number, u8text, 3);
     _strcat(PathFilenameExtension, u8text);
@@ -427,7 +429,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
 
     _strcpy(text, "PS2 IGS (InGame Screenshot)\n---------------------------\n");
     _strcat(text, "\n\nGame ID=");
-    _strcat(text, GameID);
+    _strcat(text, config->GameID);
     _strcat(text, "\nResolution=");
     u16todecstr(width, u16text, 5);
     _strcat(text, u16text);
@@ -572,6 +574,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
 
 static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 intffmd)
 {
+    USE_LOCAL_EECORE_CONFIG;
 
     delay(1);
     GS_BGCOLOUR = 0x990066; // Purple Violet
@@ -612,7 +615,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
             BlinkColour(6, 0x0000FF, 1); // Red
         Number++;
         _strcpy(PathFilenameExtension, "mc1:/");
-        _strcat(PathFilenameExtension, GameID);
+        _strcat(PathFilenameExtension, config->GameID);
         _strcat(PathFilenameExtension, "_GS(");
         u8todecstr(Number, u8text, 3);
         _strcat(PathFilenameExtension, u8text);
@@ -776,8 +779,8 @@ int InGameScreenshot(void)
 
     // Load modules.
     LoadFileInit();
-    LoadModule("rom0:SIO2MAN", 0, NULL);
-    LoadModule("rom0:MCMAN", 0, NULL);
+    LoadModule("rom0:SIO2MAN", 0, NULL, 0);
+    LoadModule("rom0:MCMAN", 0, NULL, 0);
 
     // Save IGS Bitmap File first, since it's the bigger file)
     intffmd = GET_SMODE2_INTFFMD(smode2);

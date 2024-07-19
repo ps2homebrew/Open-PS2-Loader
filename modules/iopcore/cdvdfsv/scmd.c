@@ -109,7 +109,7 @@ static inline void rpcSCmd_cdreadModelID(void *buf)
 
     cdvdSCmd_res_t *r = (cdvdSCmd_res_t *)buf;
 
-    r->result = sceCdReadModelID(&r->param1);
+    r->result = sceCdReadModelID((unsigned int *)&r->param1);
 }
 
 //-------------------------------------------------------------------------
@@ -118,7 +118,7 @@ static inline void rpcSCmd_cdreaddvddualinfo(void *buf)
 
     cdvdSCmd_res_t *r = (cdvdSCmd_res_t *)buf;
 
-    r->result = sceCdReadDvdDualInfo((int *)&r->param1, &r->param2);
+    r->result = sceCdReadDvdDualInfo((int *)&r->param1, (unsigned int *)&r->param2);
 }
 
 //-------------------------------------------------------------------------
@@ -172,6 +172,7 @@ static void *cbrpc_cdvdScmds(int fno, void *buf, int size)
             rpcSCmd_cdreaddvddualinfo(buf);
             break;
         default:
+            DPRINTF("cbrpc_cdvdScmds unknown rpc fno=%x buf=%x size=%x\n", fno, (int)buf, size);
             *(int *)buf = 0;
             break;
     }

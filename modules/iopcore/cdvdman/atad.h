@@ -17,7 +17,7 @@
 #include <types.h>
 #include <irx.h>
 
-/* These are used with the dir parameter of ata_device_sector_io().  */
+/* These are used with the dir parameter of sceAtaDmaTransfer().  */
 #define ATA_DIR_READ  0
 #define ATA_DIR_WRITE 1
 
@@ -48,12 +48,12 @@ typedef struct _ata_devinfo
 #define ATA_RES_ERR_ICRC     -510
 
 int atad_start(void);
-ata_devinfo_t *ata_get_devinfo(int device);
-int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command);
-int ata_io_finish(void);
-int ata_get_error(void);
-int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir);
-int ata_device_flush_cache(int device);
+ata_devinfo_t *sceAtaInit(int device);
+int sceAtaExecCmd(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command);
+int sceAtaWaitResult(void);
+int sceAtaGetError(void);
+int sceAtaDmaTransfer(int device, void *buf, u32 lba, u32 nsectors, int dir);
+int sceAtaFlushCache(int device);
 
 // APA Partition
 #define APA_MAGIC       0x00415041 // 'APA\0'

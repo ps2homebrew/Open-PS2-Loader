@@ -4,6 +4,7 @@
 #include "include/fntsys.h"
 #include "include/ioman.h"
 #include "include/themes.h"
+#include "include/sound.h"
 
 static int guiLangID = 0;
 static char **lang_strs = internalEnglish;
@@ -98,9 +99,9 @@ char *lngGetValue(void)
     return guiLangNames[guiLangID];
 }
 
-static int lngReadEntry(int index, const char *path, const char *separator, const char *name, unsigned int mode)
+static int lngReadEntry(int index, const char *path, const char *separator, const char *name, unsigned char d_type)
 {
-    if (!S_ISDIR(mode)) {
+    if (d_type != DT_DIR) {
         if (strstr(name, ".lng") || strstr(name, ".LNG")) {
 
             language_t *currLang = &languages[nLanguages + index];
@@ -192,11 +193,13 @@ int lngSetGuiValue(int langID)
 {
     if (langID != -1) {
         if (guiLangID != langID) {
+            bgmMute();
             if (langID != 0) {
                 language_t *currLang = &languages[langID - 1];
                 if (lngLoadFromFile(currLang->filePath, currLang->name)) {
                     guiLangID = langID;
                     thmSetGuiValue(thmGetGuiValue(), 1);
+                    bgmUnMute();
                     return 1;
                 }
             }
@@ -205,6 +208,7 @@ int lngSetGuiValue(int langID)
             // lang switched back to internalEnglish, reload default font
             fntLoadDefault(NULL);
             thmSetGuiValue(thmGetGuiValue(), 1);
+            bgmUnMute();
         }
     }
     return 0;

@@ -108,7 +108,7 @@ static const ata_cmd_info_t smart_cmd_table[] = {
     {ATA_S_SMART_ENABLE_OPERATIONS, 0x01}};
 #define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
 
-/* This is the state info tracked between ata_io_start() and ata_io_finish().  */
+/* This is the state info tracked between sceAtaExecCmd() and sceAtaWaitResult().  */
 typedef struct _ata_cmd_state
 {
     s32 type; /* The ata_cmd_info_t type field. */
@@ -197,7 +197,7 @@ out:
 }
 
 /* Export 8 */
-int ata_get_error()
+int sceAtaGetError()
 {
     return hdpro_io_read(ATAreg_ERROR_RD) & 0xff;
 }
@@ -392,7 +392,7 @@ static int ata_device_select(int device)
 }
 
 /* Export 6 */
-int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
+int sceAtaExecCmd(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
 {
     iop_sys_clock_t cmd_timeout;
     const ata_cmd_info_t *cmd_table;
@@ -492,7 +492,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     hdpro_io_write(ATAreg_LCYL_WR, lcyl & 0xff);
     hdpro_io_write(ATAreg_HCYL_WR, hcyl & 0xff);
 
-    hdpro_io_write(ATAreg_SELECT_WR, (select | ATA_SEL_LBA) & 0xff); //In v1.04, LBA was enabled in the ata_device_sector_io function.
+    hdpro_io_write(ATAreg_SELECT_WR, (select | ATA_SEL_LBA) & 0xff); //In v1.04, LBA was enabled in the sceAtaDmaTransfer function.
     hdpro_io_write(ATAreg_COMMAND_WR, command & 0xff);
 
     return 0;
@@ -508,7 +508,7 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
     u16 status = hdpro_io_read(ATAreg_STATUS_RD);
 
     if (status & ATA_STAT_ERR) {
-        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
+        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, sceAtaGetError());
         return ATA_RES_ERR_IO;
     }
 
@@ -583,7 +583,7 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 }
 
 /* Export 7 */
-int ata_io_finish(void)
+int sceAtaWaitResult(void)
 {
     ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
@@ -641,7 +641,7 @@ int ata_io_finish(void)
     if (hdpro_io_read(ATAreg_STATUS_RD) & ATA_STAT_BUSY)
         res = ata_wait_busy();
     if ((stat = hdpro_io_read(ATAreg_STATUS_RD)) & ATA_STAT_ERR) {
-        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", stat, ata_get_error());
+        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", stat, sceAtaGetError());
         res = ATA_RES_ERR_IO;
     }
 
@@ -653,15 +653,15 @@ finish:
 }
 
 /* Export 17 */
-int ata_device_flush_cache(int device)
+int sceAtaFlushCache(int device)
 {
     int res;
 
     if (!hdpro_io_start())
         return -1;
 
-    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
-        res = ata_io_finish();
+    if (!(res = sceAtaExecCmd(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
+        res = sceAtaWaitResult();
 
     if (!hdpro_io_finish())
         return -2;
@@ -670,7 +670,7 @@ int ata_device_flush_cache(int device)
 }
 
 /* Export 9 */
-int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
+int sceAtaDmaTransfer(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
     int res = 0;
     unsigned int nbytes;
@@ -704,10 +704,10 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         }
 
         //Unlike ATAD, retry indefinitely until the I/O operation succeeds.
-        if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
-                                hcyl, select, command)) != 0)
+        if ((res = sceAtaExecCmd(buf, len, 0, len, sector, lcyl,
+                                 hcyl, select, command)) != 0)
             continue;
-        if ((res = ata_io_finish()) != 0)
+        if ((res = sceAtaWaitResult()) != 0)
             continue;
 
         nbytes = len * 512;
@@ -725,7 +725,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 }
 
 /* Export 4 */
-ata_devinfo_t *ata_get_devinfo(int device)
+ata_devinfo_t *sceAtaInit(int device)
 {
     return &atad_devinfo;
 }
@@ -738,8 +738,8 @@ int ata_device_set_write_cache(int device, int enable)
     if (!hdpro_io_start())
         return -1;
 
-    if ((res = ata_io_start(NULL, 1, enable ? 0x02 : 0x82, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES)) == 0)
-        res = ata_io_finish();
+    if ((res = sceAtaExecCmd(NULL, 1, enable ? 0x02 : 0x82, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES)) == 0)
+        res = sceAtaWaitResult();
 
     if (!hdpro_io_finish())
         return -2;

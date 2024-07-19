@@ -83,7 +83,7 @@ static const ata_cmd_info_t smart_cmd_table[] = {
     {ATA_S_SMART_ENABLE_OPERATIONS, 0x01}};
 #define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
 
-/* This is the state info tracked between ata_io_start() and ata_io_finish().  */
+/* This is the state info tracked between sceAtaExecCmd() and sceAtaWaitResult().  */
 typedef struct _ata_cmd_state
 {
     s32 type; /* The ata_cmd_info_t type field. */
@@ -157,14 +157,14 @@ int atad_start(void)
     }
 
     /* In v1.04, PIO mode 0 was set here. In late versions, it is set in ata_init_devices(). */
-    dev9RegisterIntrCb(1, &ata_intr_cb);
-    dev9RegisterIntrCb(0, &ata_intr_cb);
+    SpdRegisterIntrHandler(1, &ata_intr_cb);
+    SpdRegisterIntrHandler(0, &ata_intr_cb);
     if (!ata_gamestar_workaround) {
         dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
         dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
     }
     /* Register this at the last position, as it should be the last thing done before shutdown. */
-    dev9RegisterShutdownCb(15, &ata_shutdown_cb);
+    Dev9RegisterPowerOffHandler(15, &ata_shutdown_cb);
 
     iop_sema_t smp;
     smp.initial = 1;
@@ -182,7 +182,7 @@ out:
 static int ata_intr_cb(int flag)
 {
     if (flag != 1) { /* New card, invalidate device info.  */
-        dev9IntrDisable(SPD_INTR_ATA);
+        SpdIntrDisable(SPD_INTR_ATA);
         iSetEventFlag(ata_evflg, ATA_EV_COMPLETE);
     }
 
@@ -196,7 +196,7 @@ static unsigned int ata_alarm_cb(void *unused)
 }
 
 /* Export 8 */
-int ata_get_error(void)
+int sceAtaGetError(void)
 {
     USE_ATA_REGS;
     return ata_hwport->r_error & 0xff;
@@ -276,7 +276,7 @@ static int ata_device_select(int device)
 
 	48-bit LBA just involves writing the upper 24 bits in the format above into each respective register on the first write pass, before writing the lower 24 bits in the 2nd write pass. The LBA bits within the device field are not used in either write pass.
 */
-int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
+int sceAtaExecCmd(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
 {
     USE_ATA_REGS;
     iop_sys_clock_t cmd_timeout;
@@ -354,7 +354,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 
     /* Enable the command completion interrupt.  */
     if ((type & 0x7F) == 1)
-        dev9IntrEnable(SPD_INTR_ATA0);
+        SpdIntrEnable(SPD_INTR_ATA0);
 
     /* Finally!  We send off the ATA command with arguments.  */
     ata_hwport->r_control = (using_timeout == 0) << 1;
@@ -376,11 +376,11 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     ata_hwport->r_sector = sector & 0xff;
     ata_hwport->r_lcyl = lcyl & 0xff;
     ata_hwport->r_hcyl = hcyl & 0xff;
-    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff; //In v1.04, LBA was enabled in the ata_device_sector_io function.
+    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff; //In v1.04, LBA was enabled in the sceAtaDmaTransfer function.
     ata_hwport->r_command = command & 0xff;
 
     /* Turn on the LED.  */
-    dev9LEDCtl(1);
+    SpdSetLED(1);
 
     return 0;
 }
@@ -399,7 +399,7 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
     u16 status = ata_hwport->r_status & 0xff;
 
     if (status & ATA_STAT_ERR) {
-        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
+        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, sceAtaGetError());
         return ATA_RES_ERR_IO;
     }
 
@@ -453,7 +453,7 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
         if (dma_stat)
             goto next_transfer;
 
-        dev9IntrEnable(SPD_INTR_ATA);
+        SpdIntrEnable(SPD_INTR_ATA);
         /* Wait for the previous transfer to complete or a timeout.  */
         WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
 
@@ -465,12 +465,12 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
         if (!(SPD_REG16(SPD_R_INTR_STAT) & 0x02)) {
             if (ata_hwport->r_control & 0x01) {
                 M_PRINTF("Error: Command error while doing DMA.\n");
-                M_PRINTF("Error: Command error status 0x%02x, error 0x%02x.\n", ata_hwport->r_status, ata_get_error());
+                M_PRINTF("Error: Command error status 0x%02x, error 0x%02x.\n", ata_hwport->r_status, sceAtaGetError());
 #ifdef NETLOG_DEBUG
-                pNetlogSend("Error: Command error status 0x%02x, error 0x%02x.\n", ata_hwport->r_status, ata_get_error());
+                pNetlogSend("Error: Command error status 0x%02x, error 0x%02x.\n", ata_hwport->r_status, sceAtaGetError());
 #endif
                 /* In v1.04, there was no check for ICRC. */
-                return ((ata_get_error() & ATA_ERR_ICRC) ? ATA_RES_ERR_ICRC : ATA_RES_ERR_IO);
+                return ((sceAtaGetError() & ATA_ERR_ICRC) ? ATA_RES_ERR_ICRC : ATA_RES_ERR_IO);
             } else {
                 M_PRINTF("Warning: Got command interrupt, but not an error.\n");
                 continue;
@@ -482,7 +482,7 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
     next_transfer:
         count = (blkcount < dma_stat) ? blkcount : dma_stat;
         nbytes = count * 512;
-        if ((res = dev9DmaTransfer(0, buf, (nbytes << 9) | 32, dir)) < 0)
+        if ((res = SpdDmaTransfer(0, buf, (nbytes << 9) | 32, dir)) < 0)
             return res;
 
         buf = (void *)((u8 *)buf + nbytes);
@@ -493,7 +493,7 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
 }
 
 /* Export 7 */
-int ata_io_finish(void)
+int sceAtaWaitResult(void)
 {
     USE_SPD_REGS;
     USE_ATA_REGS;
@@ -517,7 +517,7 @@ int ata_io_finish(void)
             if ((stat = SPD_REG16(SPD_R_INTR_STAT) & 0x01))
                 break;
         if (!stat) {
-            dev9IntrEnable(SPD_INTR_ATA0);
+            SpdIntrEnable(SPD_INTR_ATA0);
             WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
             if (bits & ATA_EV_TIMEOUT) {
                 M_PRINTF("Error: ATA timeout on DMA completion.\n");
@@ -545,16 +545,16 @@ int ata_io_finish(void)
     if (ata_hwport->r_status & ATA_STAT_BUSY)
         res = ata_wait_busy();
     if ((stat = ata_hwport->r_status) & ATA_STAT_ERR) {
-        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", stat, ata_get_error());
+        M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", stat, sceAtaGetError());
         /* In v1.04, there was no check for ICRC. */
-        res = (ata_get_error() & ATA_ERR_ICRC) ? ATA_RES_ERR_ICRC : ATA_RES_ERR_IO;
+        res = (sceAtaGetError() & ATA_ERR_ICRC) ? ATA_RES_ERR_ICRC : ATA_RES_ERR_IO;
     }
 
 finish:
     /* The command has completed (with an error or not), so clean things up.  */
     CancelAlarm(&ata_alarm_cb, NULL);
     /* Turn off the LED.  */
-    dev9LEDCtl(0);
+    SpdSetLED(0);
 
     if (res)
         M_PRINTF("error: ATA failed, %d\n", res);
@@ -563,19 +563,19 @@ finish:
 }
 
 /* Export 17 */
-int ata_device_flush_cache(int device)
+int sceAtaFlushCache(int device)
 {
     int res;
 
-    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
-        res = ata_io_finish();
+    if (!(res = sceAtaExecCmd(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
+        res = sceAtaWaitResult();
 
     return res;
 }
 
 /* Export 9 */
 /* Note: this can only support DMA modes, due to the commands issued. */
-int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
+int sceAtaDmaTransfer(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
     USE_SPD_REGS;
     int res = 0, retries;
@@ -611,14 +611,14 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             if (ata_gamestar_workaround)
                 ata_set_dir(dir);
 
-            if ((res = ata_io_start(buf, len, 0, len, sector, lcyl, hcyl, select, command)) != 0)
+            if ((res = sceAtaExecCmd(buf, len, 0, len, sector, lcyl, hcyl, select, command)) != 0)
                 break;
 
             /* Set up (part of) the transfer here. In v1.04, this was called at the top of the outer loop. */
             if (!ata_gamestar_workaround)
                 ata_set_dir(dir);
 
-            res = ata_io_finish();
+            res = sceAtaWaitResult();
 
             /* In v1.04, this was not done. Neither was there a mechanism to retry if a non-permanent error occurs. */
             SPD_REG16(SPD_R_IF_CTRL) &= ~SPD_IF_DMA_ENABLE;
@@ -638,7 +638,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 }
 
 /* Export 4 */
-ata_devinfo_t *ata_get_devinfo(int device)
+ata_devinfo_t *sceAtaInit(int device)
 {
     return &atad_devinfo;
 }
@@ -659,8 +659,8 @@ static int ata_device_standby_immediate(int device)
 {
     int res;
 
-    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xFFFF, ATA_C_STANDBY_IMMEDIATE)))
-        res = ata_io_finish();
+    if (!(res = sceAtaExecCmd(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xFFFF, ATA_C_STANDBY_IMMEDIATE)))
+        res = sceAtaWaitResult();
 
     return res;
 }

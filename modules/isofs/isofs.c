@@ -540,7 +540,7 @@ int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
 
             layer_info->maxLBA = *(u32 *)&cdvdman_buf[0x50];
             layer_info->rootDirtocLBA = tocEntryPointer->fileLBA;
-            layer_info->rootDirtocLength = tocEntryPointer->length;
+            layer_info->rootDirtocLength = tocEntryPointer->fileSize;
 
             result = 0;
         } else {

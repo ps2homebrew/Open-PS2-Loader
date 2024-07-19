@@ -57,7 +57,7 @@ int sbCreateSemaphore(void)
 }
 
 // 0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
-static int isValidIsoName(char *name, int *pNameLen)
+int isValidIsoName(char *name, int *pNameLen)
 {
     // Old ISO image naming format: SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
 
@@ -83,6 +83,9 @@ static int GetStartupExecName(const char *path, char *filename, int maxlength)
     int ret;
 
     if ((ret = ps2cnfGetBootFile(path, ps2disc_boot)) == 0) {
+        int length = 0;
+        const char *start;
+
         /* Skip the device name part of the path ("cdrom0:\"). */
         key = ps2disc_boot;
 
@@ -94,11 +97,29 @@ static int GetStartupExecName(const char *path, char *filename, int maxlength)
         }
 
         ++key;
-        if (*key == '\\')
+        while (*key == '\\') {
             key++;
+        }
 
-        strncpy(filename, key, maxlength);
-        filename[maxlength] = '\0';
+        start = key;
+
+        while ((*key != ';') && (*key != '\0')) {
+            length++;
+            key++;
+        }
+
+        if (length > maxlength) {
+            length = maxlength;
+        }
+
+        if (length == 0) {
+            LOG("GetStartupExecName: serial len 0 ':' (%s).\n", ps2disc_boot);
+            return -1;
+        }
+
+        strncpy(filename, start, length);
+        filename[length] = '\0';
+        LOG("GetStartupExecName: serial len %d %s \n", length, filename);
 
         return 0;
     } else {
@@ -268,6 +289,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
     char fullpath[256], startup[GAME_STARTUP_MAX];
     struct dirent *dirent;
     DIR *dir;
+    struct stat statbuf;
 
     cache.games = NULL;
     cache.count = 0;
@@ -280,6 +302,8 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
 
                 if (NameLen > ISO_GAME_NAME_MAX)
                     continue; // Skip files that cannot be supported properly.
+
+                snprintf(fullpath, sizeof(fullpath), "%s/%s", path, dirent->d_name);
 
                 if (format == GAME_FORMAT_OLD_ISO) {
                     struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
@@ -303,8 +327,6 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                     }
                 } else {
                     if (queryISOGameListCache(&cache, &cachedGInfo, dirent->d_name) != 0) {
-                        sprintf(fullpath, "%s/%s", path, dirent->d_name);
-
                         if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
                             if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {
                                 struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
@@ -357,7 +379,12 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                 game->parts = 1;
                 game->media = type;
                 game->format = format;
-                game->sizeMB = dirent->d_stat.st_size >> 20;
+
+                if (stat(fullpath, &statbuf) == 0) {
+                    game->sizeMB = statbuf.st_size >> 20;
+                } else {
+                    game->sizeMB = 0;
+                }
 
                 count++;
             }
@@ -641,13 +668,23 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         settings->fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
     }
 #endif
+    // sanitise the settings
+    gOSDLanguageSource = 0;
+    gOSDLanguageEnable = 0;
+    gOSDLanguageValue = 0;
+    gOSDTVAspectRatio = 0;
+    gOSDVideOutput = 0;
 
-    if (configGetInt(configSet, CONFIG_ITEM_OSDLNG_SOURCE, &gOSDLanguageSource)) {
-        configGetInt(configSet, CONFIG_ITEM_OSDLNG_ENABLE, &gOSDLanguageEnable);
-        configGetInt(configSet, CONFIG_ITEM_OSDLNG, &gOSDLanguageValue);
+    if (configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_SOURCE, &gOSDLanguageSource)) {
+        configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_ENABLE, &gOSDLanguageEnable);
+        configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_LANGID, &gOSDLanguageValue);
+        configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_TV_ASP, &gOSDTVAspectRatio);
+        configGetInt(configSet, CONFIG_ITEM_OSD_SETTINGS_VMODE, &gOSDVideOutput);
     } else {
-        configGetInt(configGame, CONFIG_ITEM_OSDLNG_ENABLE, &gOSDLanguageEnable);
-        configGetInt(configGame, CONFIG_ITEM_OSDLNG, &gOSDLanguageValue);
+        configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_ENABLE, &gOSDLanguageEnable);
+        configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_LANGID, &gOSDLanguageValue);
+        configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_TV_ASP, &gOSDTVAspectRatio);
+        configGetInt(configGame, CONFIG_ITEM_OSD_SETTINGS_VMODE, &gOSDVideOutput);
     }
 
     *patchindex = i;

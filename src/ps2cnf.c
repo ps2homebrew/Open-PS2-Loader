@@ -13,17 +13,16 @@
 
 #define CNF_LEN_MAX 1024
 
-static const char *CNFGetToken(const char *cnf, const char *key)
+static const char *CNFGetToken(const char *cnf, const char *end, const char *key)
 {
-    for (; isspace((int)*cnf); cnf++) {
+    for (; isspace((int)*cnf) && cnf < end; cnf++) {
     }
 
-    for (; *key != '\0'; key++, cnf++) {
-        // End of file
-        if (*cnf == '\0')
+    int key_length = strlen(key);
+    for (int i = 0; i < key_length; i++, cnf++) {
+        if (cnf >= end || *cnf == '\0')
             return (const char *)-1;
-
-        if (*cnf != *key)
+        else if (*cnf != key[i])
             return NULL; // Non-match
     }
 
@@ -32,9 +31,9 @@ static const char *CNFGetToken(const char *cnf, const char *key)
 
 static const char *CNFAdvanceLine(const char *start, const char *end)
 {
-    for (; start <= end; start++) {
+    for (; start < end; start++) {
         if (*start == '\n')
-            return start;
+            return start + 1 < end ? start + 1 : NULL;
     }
 
     return NULL;
@@ -99,7 +98,7 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
 
     // Parse SYSTEM.CNF
     cnf_start = system_cnf;
-    while ((pChar = CNFGetToken(cnf_start, "BOOT2")) == NULL) {
+    while ((pChar = CNFGetToken(cnf_start, cnf_end, "BOOT2")) == NULL) {
         cnf_start = CNFAdvanceLine(cnf_start, cnf_end);
         if (cnf_start == NULL)
             return -1;
@@ -109,7 +108,7 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
         return -1;
     }
 
-    if ((pChar = CNFGetToken(pChar, "=")) == (const char *)-1) { // Unexpected EOF
+    if ((pChar = CNFGetToken(pChar, cnf_end, "=")) == (const char *)-1) { // Unexpected EOF
         return -1;
     }
 

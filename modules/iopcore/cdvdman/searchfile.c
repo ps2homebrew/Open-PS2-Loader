@@ -10,6 +10,9 @@ static void cdvdman_trimspaces(char *str);
 static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer);
 static int cdvdman_findfile(sceCdlFILE *pcd_file, const char *name, int layer);
 
+// The max lsn/sectors available based on value retrieved from iso. Used for out of bounds checking. Only check if value non zero.
+u32 mediaLsnCount;
+
 typedef struct
 {
     u32 rootDirtocLBA;
@@ -40,11 +43,11 @@ static void cdvdman_trimspaces(char *str)
 static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer)
 {
     char cdvdman_dirname[32]; /* Like below, but follow the original SCE limitation of 32-characters.
-						Some games specify filenames like "\\FILEFILE.EXT;1", which result in a length longer than just 14.
-						SCE does not perform bounds-checking on this buffer.	*/
+                        Some games specify filenames like "\\FILEFILE.EXT;1", which result in a length longer than just 14.
+                        SCE does not perform bounds-checking on this buffer.	*/
     char cdvdman_curdir[15];  /* Maximum 14 characters: the filename (8) + '.' + extension (3) + ';' + '1'.
-						Unlike the SCE original which used a 32-character buffer,
-						we'll assume that ISO9660 disc images are all _strictly_ compliant with ISO9660 level 1.	*/
+                        Unlike the SCE original which used a 32-character buffer,
+                        we'll assume that ISO9660 disc images are all _strictly_ compliant with ISO9660 level 1.	*/
     char *p = (char *)name;
     char *slash;
     int r, len, filename_len;
@@ -130,7 +133,7 @@ lbl_startlocate:
                     if (!(cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)) {
                         int on_dual;
                         u32 layer1_start;
-                        sceCdReadDvdDualInfo(&on_dual, &layer1_start);
+                        sceCdReadDvdDualInfo(&on_dual, (unsigned int *)&layer1_start);
 
                         if (layer)
                             tocLBA += layer1_start;
@@ -161,7 +164,7 @@ static int cdvdman_findfile(sceCdlFILE *pcdfile, const char *name, int layer)
 
     if (cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)
         layer = 0;
-    pLayerInfo = (layer != 0) ? &layer_info[1] : &layer_info[0]; //SCE CDVDMAN simply treats a non-zero value as a signal for the 2nd layer.
+    pLayerInfo = (layer != 0) ? &layer_info[1] : &layer_info[0]; // SCE CDVDMAN simply treats a non-zero value as a signal for the 2nd layer.
 
     WaitSema(cdvdman_searchfilesema);
 
@@ -186,7 +189,7 @@ static int cdvdman_findfile(sceCdlFILE *pcdfile, const char *name, int layer)
 
     lsn = tocEntryPointer->fileLBA;
     if (layer) {
-        sceCdReadDvdDualInfo((int *)&pcdfile->lsn, &pcdfile->size);
+        sceCdReadDvdDualInfo((int *)&pcdfile->lsn, (unsigned int *)&pcdfile->size);
         lsn += pcdfile->size;
     }
 
@@ -232,19 +235,32 @@ void cdvdman_searchfile_init(void)
 
     struct dirTocEntry *tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
     layer_info[0].rootDirtocLBA = tocEntryPointer->fileLBA;
-    layer_info[0].rootDirtocLength = tocEntryPointer->length;
+    layer_info[0].rootDirtocLength = tocEntryPointer->fileSize;
+
+    // PVD Volume Space Size field
+    mediaLsnCount = *(u32 *)&cdvdman_buf[0x50];
+    DPRINTF("cdvdman_searchfile_init mediaLsnCount=%d\n", mediaLsnCount);
 
     // DVD DL support
     if (!(cdvdman_settings.common.flags & IOPCORE_COMPAT_EMU_DVDDL)) {
         int on_dual;
         u32 layer1_start;
-        sceCdReadDvdDualInfo(&on_dual, &layer1_start);
+        sceCdReadDvdDualInfo(&on_dual, (unsigned int *)&layer1_start);
         if (on_dual) {
+            u32 lsn0 = mediaLsnCount;
+            // So that CdRead below can read more than first layer.
+            mediaLsnCount = 0;
             sceCdRead(layer1_start + 16, 1, cdvdman_buf, NULL);
             sceCdSync(0);
             tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
             layer_info[1].rootDirtocLBA = layer1_start + tocEntryPointer->fileLBA;
-            layer_info[1].rootDirtocLength = tocEntryPointer->length;
+            layer_info[1].rootDirtocLength = tocEntryPointer->fileSize;
+
+            u32 lsn1 = *(u32 *)&cdvdman_buf[0x50];
+            DPRINTF("cdvdman_searchfile_init DVD9 L0 mediaLsnCount=%d \n", lsn0);
+            DPRINTF("cdvdman_searchfile_init DVD9 L1 mediaLsnCount=%d \n", lsn1);
+            mediaLsnCount = lsn0 + lsn1 - 16;
+            DPRINTF("cdvdman_searchfile_init DVD9 mediaLsnCount=%d\n", mediaLsnCount);
         }
     }
 }

@@ -39,6 +39,7 @@
 #include "config.h"
 
 #include "include/hddsupport.h"
+#include "include/supportbase.h"
 
 // Last Played Auto Start
 #include <time.h>
@@ -77,6 +78,9 @@ void menuDeferredUpdate(void *data);
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged);
 void handleLwnbdSrv();
 void deinit(int exception, int modeSelected);
+
+// Shutdown minimal services initiated for auto loading.
+void miniDeinit(config_set_t *configSet);
 
 extern char *gBaseMCDir;
 
@@ -136,14 +140,19 @@ extern int gHDDGameListCache;
 
 extern int gEnableSFX;
 extern int gEnableBootSND;
+extern int gEnableBGM;
 extern int gSFXVolume;
 extern int gBootSndVolume;
+extern int gBGMVolume;
+extern char gDefaultBGMPath[128];
 
 extern int gCheatSource;
 extern int gGSMSource;
 extern int gPadEmuSource;
 
 extern int gOSDLanguageValue;
+extern int gOSDTVAspectRatio;
+extern int gOSDVideOutput;
 extern int gOSDLanguageEnable;
 extern int gOSDLanguageSource;
 
@@ -167,7 +176,7 @@ extern int gPadMacroSettings;
 // 0,1,2 scrolling speed
 extern int gScrollSpeed;
 // Exit path
-extern char gExitPath[32];
+extern char gExitPath[256];
 // Enable Debug Colors
 extern int gEnableDebug;
 
@@ -196,6 +205,7 @@ extern unsigned char gDefaultSelTextColor[3];
 extern unsigned char gDefaultUITextColor[3];
 
 extern hdl_game_info_t *gAutoLaunchGame;
+extern base_game_info_t *gAutoLaunchBDMGame;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 

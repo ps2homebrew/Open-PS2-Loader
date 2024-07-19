@@ -15,6 +15,7 @@
 #include "modmgr.h"
 #include "util.h"
 #include "syshook.h"
+#include "coreconfig.h"
 
 extern int _iop_reboot_count;
 static int imgdrv_offset_ioprpimg = 0;
@@ -22,6 +23,7 @@ static int imgdrv_offset_ioprpsiz = 0;
 
 static void ResetIopSpecial(const char *args, unsigned int arglen)
 {
+    USE_LOCAL_EECORE_CONFIG;
     int i;
     void *pIOP_buffer, *IOPRP_img, *imgdrv_irx;
     unsigned int length_rounded, CommandLen, size_IOPRP_img, size_imgdrv_irx;
@@ -32,11 +34,11 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
         command[arglen] = '\0'; /* In a normal IOP reset process, the IOP reset command line will be NULL-terminated properly somewhere.
                         Since we're now taking things into our own hands, NULL terminate it here.
                         Some games like SOCOM3 will use a command line that isn't NULL terminated, resulting in things like "cdrom0:\RUN\IRX\DNAS300.IMGG;1" */
-        _strcpy(&command[arglen + 1], "img0:");
-        CommandLen = arglen + 6;
+        _strcpy(&command[arglen + 1], "host0:");
+        CommandLen = arglen + 7;
     } else {
-        _strcpy(command, "img0:");
-        CommandLen = 5;
+        _strcpy(command, "host0:");
+        CommandLen = 6;
     }
 
     GetOPLModInfo(OPL_MODULE_ID_IOPRP, &IOPRP_img, &size_IOPRP_img);
@@ -61,20 +63,15 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     *(void **)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpimg])) = pIOP_buffer;
     *(u32 *)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpsiz])) = size_IOPRP_img;
 
+    LoadModule("rom0:SYSCLIB", 0, NULL, 0);
     LoadMemModule(0, imgdrv_irx, size_imgdrv_irx, 0, NULL);
-
-    DIntr();
-    ee_kmode_enter();
-    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
-    ee_kmode_exit();
-    EIntr();
-
-    LoadOPLModule(OPL_MODULE_ID_UDNL, SIF_RPC_M_NOWAIT, CommandLen, command);
+    LoadModule("rom0:UDNL", CommandLen, command, 1);
 
     DIntr();
     ee_kmode_enter();
     Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT);
     Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_CMDINIT);
+    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
     Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
     Old_SifSetReg(SIF_SYSREG_SUBADDR, (int)NULL);
     ee_kmode_exit();
@@ -108,15 +105,15 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 #endif
 
 #ifdef PADEMU
-#define PADEMU_ARG || EnablePadEmuOp
+#define PADEMU_ARG || config->EnablePadEmuOp
 #else
 #define PADEMU_ARG
 #endif
-    if (GameMode == BDM_USB_MODE PADEMU_ARG) {
+    if (config->GameMode == BDM_USB_MODE PADEMU_ARG) {
         LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=2,3");
     }
 
-    switch (GameMode) {
+    switch (config->GameMode) {
         case BDM_USB_MODE:
             LoadOPLModule(OPL_MODULE_ID_USBMASSBD, 0, 0, NULL);
             break;
@@ -144,6 +141,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 /*----------------------------------------------------------------*/
 int New_Reset_Iop(const char *arg, int arglen)
 {
+    USE_LOCAL_EECORE_CONFIG;
     DPRINTF("New_Reset_Iop start!\n");
     if (EnableDebug)
         GS_BGCOLOUR = 0xFF00FF; // Purple
@@ -177,17 +175,17 @@ int New_Reset_Iop(const char *arg, int arglen)
 
     if (iop_reboot_count >= 2) {
 #ifdef PADEMU
-        PadEmuSettings |= (LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL) > 0) << 24;
+        config->PadEmuSettings |= (LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL) > 0) << 24;
 #else
         LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL);
 #endif
     }
 
 #ifdef PADEMU
-    if (iop_reboot_count >= 2 && EnablePadEmuOp) {
+    if (iop_reboot_count >= 2 && config->EnablePadEmuOp) {
         char args_for_pademu[8];
-        memcpy(args_for_pademu, &PadEmuSettings, 4);
-        memcpy(args_for_pademu + 4, &PadMacroSettings, 4);
+        memcpy(args_for_pademu, &config->PadEmuSettings, 4);
+        memcpy(args_for_pademu + 4, &config->PadMacroSettings, 4);
         LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, sizeof(args_for_pademu), args_for_pademu);
     }
 #endif

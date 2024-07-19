@@ -22,9 +22,11 @@
 #include "include/renderman.h"
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
+#include "../ee_core/include/coreconfig.h"
 #include <osd_config.h>
 #include "include/pggsm.h"
 #include "include/cheatman.h"
+#include "include/xparam.h"
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -43,8 +45,8 @@ typedef struct
     int VMC_card_slot;
 } createVMCparam_t;
 
-extern void *eecore_elf;
-extern int size_eecore_elf;
+extern unsigned char eecore_elf[];
+extern unsigned int size_eecore_elf;
 
 extern unsigned char IOPRP_img[];
 extern unsigned int size_IOPRP_img;
@@ -54,6 +56,7 @@ extern unsigned int size_eesync_irx;
 
 #define MAX_MODULES 64
 static void *g_sysLoadedModBuffer[MAX_MODULES];
+static s32 sysLoadModuleLock = -1;
 
 #define ELF_MAGIC   0x464c457f
 #define ELF_PT_LOAD 1
@@ -102,6 +105,8 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 
     int i, id, ret, index = 0;
 
+    WaitSema(sysLoadModuleLock);
+
     // check we have not reached MAX_MODULES
     for (i = 0; i < MAX_MODULES; i++) {
         if (g_sysLoadedModBuffer[i] == NULL) {
@@ -109,25 +114,36 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
             break;
         }
     }
-    if (i == MAX_MODULES)
-        return -1;
+    if (i == MAX_MODULES) {
+        LOG("WARNING: REACHED MODULES LIMIT (%d)\n", MAX_MODULES);
+        ret = -1;
+        goto exit;
+    }
 
     // check if the module was already loaded
     for (i = 0; i < MAX_MODULES; i++) {
         if (g_sysLoadedModBuffer[i] == buffer) {
-            return 0;
+            LOG("MODULE ALREADY LOADED (%d)\n", i);
+            ret = 0;
+            goto exit;
         }
     }
 
     // load the module
     id = SifExecModuleBuffer(buffer, size, argc, argv, &ret);
-    if ((id < 0) || (ret))
-        return -2;
+    LOG("\t-- ID=%d, ret=%d\n", id, ret);
+    if ((id < 0) || (ret)) {
+        ret = -2;
+        goto exit;
+    }
 
     // add the module to the list
     g_sysLoadedModBuffer[index] = buffer;
 
-    return 0;
+    ret = 0;
+exit:
+    SignalSema(sysLoadModuleLock);
+    return ret;
 }
 
 #define OPL_SIF_CMD_BUFF_SIZE 1
@@ -139,6 +155,7 @@ void sysInitDev9(void)
     int ret;
 
     if (!dev9Initialized) {
+        LOG("[DEV9]:\n");
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
         dev9Loaded = (ret == 0); // DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
@@ -203,34 +220,49 @@ void sysReset(int modload_mask)
     sbv_patch_enable_lmb();
     sbv_patch_disable_prefix_check();
 
+    if (sysLoadModuleLock < 0) {
+        sysLoadModuleLock = sbCreateSemaphore();
+    }
+
     // clears modules list
     memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES * 4);
 
     // load modules
+    LOG("[IOMANX]:\n");
     sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
+    LOG("[FILEXIO]:\n");
     sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 
+    LOG("[SIO2MAN]:\n");
     sysLoadModuleBuffer(&sio2man_irx, size_sio2man_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_MC_MODULES) {
+        LOG("[MCMAN]:\n");
         sysLoadModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL);
+        LOG("[MCSERV]:\n");
         sysLoadModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL);
     }
 
+    LOG("[PADMAN]:\n");
     sysLoadModuleBuffer(&padman_irx, size_padman_irx, 0, NULL);
 
+    LOG("[POWEROFF]:\n");
     sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
         bdmLoadModules();
     }
     if (modload_mask & SYS_LOAD_ISOFS_MODULE) {
+        LOG("[ISOFS]:\n");
         sysLoadModuleBuffer(&isofs_irx, size_isofs_irx, 0, NULL);
     }
 
+    LOG("[GENVMC]:\n");
     sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 
+    LOG("[LIBSD]:\n");
     sysLoadModuleBuffer(&libsd_irx, size_libsd_irx, 0, NULL);
+    LOG("[AUDSRV]:\n");
     sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
 
 #ifdef PADEMU
@@ -240,7 +272,9 @@ void sysReset(int modload_mask)
     ds34bt_deinit();
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
+        LOG("[DS34_USB]:\n");
         sysLoadModuleBuffer(&ds34usb_irx, size_ds34usb_irx, 4, (char *)&ds3pads);
+        LOG("[DS34_BT]:\n");
         sysLoadModuleBuffer(&ds34bt_irx, size_ds34bt_irx, 4, (char *)&ds3pads);
 
         ds34usb_init();
@@ -345,7 +379,7 @@ void sysExecExit(void)
 {
     // Deinitialize without shutting down active devices.
     deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
-    Exit(0);
+    exit(0);
 }
 
 // Module bits
@@ -454,8 +488,6 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
     modcount = 0;
     // Basic modules
-    irxptr_tab[modcount].info = size_udnl_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDNL);
-    irxptr_tab[modcount++].ptr = (void *)&udnl_irx;
     irxptr_tab[modcount].info = size_ioprp_image | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPRP);
     irxptr_tab[modcount++].ptr = ioprp_image;
     irxptr_tab[modcount].info = size_imgdrv_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IMGDRV);
@@ -536,20 +568,6 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
     irxtable->modules = irxptr_tab;
     irxtable->count = modcount;
-
-#ifdef __DECI2_DEBUG
-    // For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
-    // total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
-    irxptr = (void *)0x00033000;
-    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, (void *)((u8 *)irxptr + GET_OPL_MOD_SIZE(irxptr_tab[0].info)));
-    DI();
-    ee_kmode_enter();
-    memcpy((void *)(0x80000000 | (unsigned int)irxptr), irxptr_tab[0].ptr, GET_OPL_MOD_SIZE(irxptr_tab[0].info));
-    ee_kmode_exit();
-    EI();
-
-    irxptr_tab[0].ptr = irxptr; // UDNL is the first module.
-#endif
 
     total_size = (sizeof(irxtab_t) + sizeof(irxptr_t) * modcount + 0xF) & ~0xF;
     irxptr = (void *)((((unsigned int)irxptr_tab + sizeof(irxptr_t) * modcount) + 0xF) & ~0xF);
@@ -715,6 +733,41 @@ static int initKernel(void *eeload, void *modStorageEnd, void **eeloadCopy, void
     return ((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
 }
 
+#ifdef __DEBUG
+void sysPrintEECoreConfig(struct EECoreConfig_t *config)
+{
+    LOG("EECoreConfig Values = 0x%08X\n", (u32)config);
+
+    LOG("Game Mode Desc = %s\n", config->GameModeDesc);
+    LOG("EnableDebug = %d\n", config->EnableDebug);
+
+    LOG("Exit Path = (%s)\n", config->ExitPath);
+    LOG("HDD Spindown = %d\n", config->HDDSpindown);
+
+    LOG("IP=%s NM=%s GW=%s mode: %d\n", config->g_ps2_ip, config->g_ps2_netmask, config->g_ps2_gateway, config->g_ps2_ETHOpMode);
+
+    LOG("PS2RD Cheat Engine = %s\n", config->gCheatList == NULL ? "Disabled" : "Enabled");
+
+    LOG("EnforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
+
+    LOG("GSM = %s\n", config->EnableGSMOp == 0 ? "Disabled" : "Enabled");
+
+    LOG("PADEMU = %s\n", config->EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
+
+    LOG("enforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
+
+    LOG("eeloadCopy = 0x%08X\n", config->eeloadCopy);
+    LOG("initUserMemory = 0x%08X\n", config->initUserMemory);
+
+    LOG("ModStorageStart = 0x%08X\n", config->ModStorageStart);
+    LOG("ModStorageEnd = 0x%08X\n", config->ModStorageEnd);
+
+    LOG("GameID = %s\n", config->GameID);
+
+    LOG("Compat Mask = 0x%02x\n", config->_CompatMask);
+}
+#endif
+
 void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
 {
     unsigned int modules, ModuleStorageSize;
@@ -726,12 +779,9 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     void *pdata;
     int argc, i;
     char ElfPath[32];
-    char *argv[7 + GSM_ARGS];
-    char ModStorageConfig[32];
-    char KernelConfig[32];
-    char config_str[256];
-    char gsm_config_str[256];
+    char *argv[4];
     void *eeloadCopy, *initUserMemory;
+    struct GsmConfig_t gsm_config;
 
     ethGetNetConfig(local_ip_address, local_netmask, local_gateway);
 #if (!defined(__DEBUG) && !defined(_DTL_T10000))
@@ -742,6 +792,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
     // Disable sound effects via libsd, to prevent some games with improper initialization from inadvertently using digital effect settings from other software.
+    LOG("[CLEAREFFECTS]:\n");
     sysLoadModuleBuffer(&cleareffects_irx, size_cleareffects_irx, 0, NULL);
 
     // Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
@@ -767,84 +818,149 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     ModuleStorageSize = (sendIrxKernelRAM(filename, mode_str, modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
 
     ModuleStorageEnd = (void *)((u8 *)ModuleStorage + ModuleStorageSize);
-    sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorageEnd);
 
     // NB: LOADER.ELF is embedded
     boot_elf = (u8 *)&eecore_elf;
     eh = (elf_header_t *)boot_elf;
     eph = (elf_pheader_t *)(boot_elf + eh->phoff);
 
-    // Scan through the ELF's program headers and copy them into RAM, then
-    // zero out any non-loaded regions.
-    for (i = 0; i < eh->phnum; i++) {
-        if (eph[i].type != ELF_PT_LOAD)
-            continue;
-
-        pdata = (void *)((u8 *)boot_elf + eph[i].offset);
-        memcpy(eph[i].vaddr, pdata, eph[i].filesz);
-
-        if (eph[i].memsz > eph[i].filesz)
-            memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
-    }
+    ApplyDeckardXParam(filename);
 
     // Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
     if (initKernel((void *)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0) { // Should not happen, but...
         LOG("Error - kernel is unsupported.\n");
         asm volatile("break\n");
     }
-    sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);
+    ConfigParam PARAM;
+    GetOsdConfigParam(&PARAM);
+    if (gOSDLanguageEnable) { // only patch if enabled, and only on config fields wich have not chosen "system default"
+        if (gOSDLanguageValue >= LANGUAGE_JAPANESE && gOSDLanguageValue <= LANGUAGE_PORTUGUESE) {
+            PARAM.language = gOSDLanguageValue;
+            LOG("System Language enforced to %d\n", gOSDLanguageValue);
+        }
+        if (gOSDTVAspectRatio >= TV_SCREEN_43 && gOSDTVAspectRatio <= TV_SCREEN_169) {
+            PARAM.screenType = gOSDTVAspectRatio;
+            LOG("System screenType enforced to %d\n", gOSDTVAspectRatio);
+        }
+        if (gOSDVideOutput == VIDEO_OUTPUT_RGB || gOSDVideOutput == VIDEO_OUTPUT_COMPONENT) {
+            PARAM.videoOutput = gOSDVideOutput;
+            LOG("System video output enforced to %d\n", gOSDVideOutput);
+        }
+    }
+
+    struct EECoreConfig_t *config = NULL;
+    u32 *core_ptr = (u32 *)&eecore_elf;
+
+    for (i = 0; i < size_eecore_elf / 4; i++) {
+        if (core_ptr[0] == EE_CORE_MAGIC_0 && core_ptr[1] == EE_CORE_MAGIC_1) {
+            config = (struct EECoreConfig_t *)core_ptr;
+            break;
+        }
+        core_ptr++;
+    }
+
+    if (config == NULL) { // Should not happen, but...
+        LOG("Error - EE core config MAGIC not found!\n");
+        asm volatile("break\n");
+    }
+
+    memset(config, 0, sizeof(struct EECoreConfig_t));
+
+    config->magic[0] = EE_CORE_MAGIC_0;
+    config->magic[1] = EE_CORE_MAGIC_1;
+
+    strncpy(config->ExitPath, gExitPath, CORE_EXIT_PATH_MAX_LEN);
+    strncpy(config->GameModeDesc, mode_str, CORE_GAME_MODE_DESC_MAX_LEN);
+
+    config->EnableDebug = gEnableDebug;
+    config->HDDSpindown = gHDDSpindown;
+    config->gCheatList = GetCheatsEnabled() ? (unsigned int *)GetCheatsList() : NULL;
+    config->g_ps2_ETHOpMode = gETHOpMode;
+
+    sprintf(config->g_ps2_ip, "%u.%u.%u.%u", local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3]);
+    sprintf(config->g_ps2_netmask, "%u.%u.%u.%u", local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3]);
+    sprintf(config->g_ps2_gateway, "%u.%u.%u.%u", local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3]);
+
+    // GSM now.
+    config->EnableGSMOp = GetGSMEnabled();
+    if (config->EnableGSMOp) {
+        PrepareGSM(NULL, &gsm_config);
+        config->GsmConfig.interlace = gsm_config.interlace;
+        config->GsmConfig.mode = gsm_config.mode;
+        config->GsmConfig.ffmd = gsm_config.ffmd;
+        config->GsmConfig.display = gsm_config.display;
+        config->GsmConfig.syncv = gsm_config.syncv;
+        config->GsmConfig.smode2 = gsm_config.smode2;
+        config->GsmConfig.dx_offset = gsm_config.dx_offset;
+        config->GsmConfig.dy_offset = gsm_config.dy_offset;
+        config->GsmConfig.k576P_fix = gsm_config.k576P_fix;
+        config->GsmConfig.kGsDxDyOffsetSupported = gsm_config.kGsDxDyOffsetSupported;
+        config->GsmConfig.FIELD_fix = gsm_config.FIELD_fix;
+    }
 
 #ifdef PADEMU
-#define PADEMU_SPECIFIER " %d %u %u"
-#define PADEMU_ARGUMENT  , gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8), (unsigned int)(gPadMacroSettings)
-#else
-#define PADEMU_SPECIFIER
-#define PADEMU_ARGUMENT
+    config->EnablePadEmuOp = gEnablePadEmu;
+    config->PadEmuSettings = (unsigned int)(gPadEmuSettings >> 8);
+    config->PadMacroSettings = (unsigned int)(gPadMacroSettings);
 #endif
 
-#define CONFIGPARAMDATA " %d %d %d %d %d %d %d %d %d"
-    ConfigParam PARAM;
-    GetOsdConfigParam(&PARAM);                                                  //get system configuration
-    PARAM.language = (gOSDLanguageEnable) ? gOSDLanguageValue : PARAM.language; //patch what we care about
-#define CONFIGPARAMDATA_ARGUMENT , PARAM.spdifMode, PARAM.screenType, PARAM.videoOutput, PARAM.japLanguage, PARAM.ps1drvConfig, PARAM.version, PARAM.language, PARAM.timezoneOffset, gOSDLanguageEnable
+    config->CustomOSDConfigParam.spdifMode = PARAM.spdifMode;
+    config->CustomOSDConfigParam.screenType = PARAM.screenType;
+    config->CustomOSDConfigParam.videoOutput = PARAM.videoOutput;
+    config->CustomOSDConfigParam.japLanguage = PARAM.japLanguage;
+    config->CustomOSDConfigParam.ps1drvConfig = PARAM.ps1drvConfig;
+    config->CustomOSDConfigParam.version = PARAM.version;
+    config->CustomOSDConfigParam.language = PARAM.language;
+    config->CustomOSDConfigParam.timezoneOffset = PARAM.timezoneOffset;
+
+    config->enforceLanguage = gOSDLanguageEnable;
+
+    config->eeloadCopy = eeloadCopy;
+    config->initUserMemory = initUserMemory;
+
+    config->ModStorageStart = ModuleStorage;
+    config->ModStorageEnd = ModuleStorageEnd;
+
+    strncpy(config->GameID, filename, CORE_GAME_ID_MAX_LEN);
+
+    config->_CompatMask = compatflags;
+
+#ifdef __DEBUG
+
+    sysPrintEECoreConfig(config);
+
+#endif
+    // Scan through the ELF's program headers and copy them into RAM, then
+    // zero out any non-loaded regions.
+
+    FlushCache(0);
+    FlushCache(2);
+
+    for (i = 0; i < eh->phnum; i++) {
+        if (eph[i].type != ELF_PT_LOAD)
+            continue;
+
+        pdata = (void *)((u8 *)boot_elf + eph[i].offset);
+        memcpy(eph[i].vaddr, pdata, eph[i].filesz);
+        LOG("EECORE PH COPY: %d 0x%08X 0x%08X 0x%08X\n", i, (u32)eph[i].vaddr, (u32)pdata, eph[i].filesz);
+
+        if (eph[i].memsz > eph[i].filesz) {
+            LOG("EECORE PH CLEAR: %d 0x%08X 0x%08X\n", i, (u32)((u32)eph[i].vaddr + eph[i].filesz), eph[i].memsz - eph[i].filesz);
+            memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
+        }
+    }
 
     argc = 0;
-    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER CONFIGPARAMDATA,
-            mode_str, gEnableDebug, gExitPath, gHDDSpindown,
-            local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
-            local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
-            local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],
-            gETHOpMode,
-            GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0,
-            GetGSMEnabled() PADEMU_ARGUMENT
-                CONFIGPARAMDATA_ARGUMENT);
-
-    argv[argc] = config_str;
-    argc++;
-
-    argv[argc] = KernelConfig;
-    argc++;
-
-    argv[argc] = ModStorageConfig;
-    argc++;
-
-    argv[argc] = (char *)filename;
-    argc++;
-
-    char cmask[10];
-    snprintf(cmask, 10, "%u", compatflags);
-    argv[argc] = cmask;
-    argc++;
-
-    PrepareGSM(gsm_config_str);
-    argv[argc] = gsm_config_str;
-    argc++;
 
     // PS2LOGO Caller, based on l_oliveira & SP193 tips
     // Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
-    if (EnablePS2Logo) {
-        argv[argc] = "rom0:PS2LOGO";
-        argc++;
+    if (EnablePS2Logo) { // Not all roms have PS2LOGO
+        int fd = 0;
+        if ((fd = open("rom0:PS2LOGO", O_RDONLY)) >= 0) {
+            close(fd);
+            argv[argc] = "rom0:PS2LOGO";
+            argc++;
+        }
     }
 
     snprintf(ElfPath, sizeof(ElfPath), "cdrom0:\\%s;1", filename);
@@ -852,13 +968,13 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argc++;
 
 #ifdef __DEBUG
-    LOG("Starting ee_core with following arguments:\n");
+    LOG("Starting ee_core with following argv arguments:\n");
     for (i = 0; i < argc; i++) {
         LOG("[%d] %s\n", i, argv[i]);
     }
 #endif
 
-    LOG("Leaving OPL GUI, starting eecore...\n");
+    LOG("Leaving OPL GUI, starting eecore = 0x%08X \n", (u32)eh->entry);
 
     // Let's go.
     fileXioExit();

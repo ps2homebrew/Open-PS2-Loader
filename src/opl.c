@@ -32,8 +32,8 @@
 #include "include/appsupport.h"
 
 #include "include/cheatman.h"
-
 #include "include/sound.h"
+#include "include/xparam.h"
 
 // FIXME: We should not need this function.
 //        Use newlib's 'stat' to get GMT time.
@@ -48,8 +48,8 @@ int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 #endif
 
 #ifdef __EESIO_DEBUG
-#include <sio.h>
-#define LOG_INIT() sio_init(38400, 0, 0, 0, 0)
+#include "SIOCookie.h"
+#define LOG_INIT() ee_sio_start(38400, 0, 0, 0, 0, 1)
 #define LOG_ENABLE() \
     do {             \
     } while (0)
@@ -162,8 +162,11 @@ int gSelectButton;
 int gHDDGameListCache;
 int gEnableSFX;
 int gEnableBootSND;
+int gEnableBGM;
 int gSFXVolume;
 int gBootSndVolume;
+int gBGMVolume;
+char gDefaultBGMPath[128];
 int gCheatSource;
 int gGSMSource;
 int gPadEmuSource;
@@ -177,7 +180,7 @@ int gPadMacroSource;
 int gPadMacroSettings;
 #endif
 int gScrollSpeed;
-char gExitPath[32];
+char gExitPath[256];
 int gEnableDebug;
 int gPS2Logo;
 int gDefaultDevice;
@@ -194,11 +197,14 @@ unsigned char gDefaultTextColor[3];
 unsigned char gDefaultSelTextColor[3];
 unsigned char gDefaultUITextColor[3];
 hdl_game_info_t *gAutoLaunchGame;
+base_game_info_t *gAutoLaunchBDMGame;
 char gOPLPart[128];
 char *gHDDPrefix;
 char gExportName[32];
 
 int gOSDLanguageValue;
+int gOSDTVAspectRatio;
+int gOSDVideOutput;
 int gOSDLanguageEnable;
 int gOSDLanguageSource;
 
@@ -472,7 +478,6 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
 {
     struct dirent *pdirent;
     DIR *pdir;
-    struct stat st;
     int i, count, ret;
     item_list_t *listSupport;
     config_set_t *appConfig;
@@ -493,9 +498,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
                         continue;
 
                     snprintf(dir, sizeof(dir), "%s/%s", appsPath, pdirent->d_name);
-                    if (stat(dir, &st) < 0)
-                        continue;
-                    if (!S_ISDIR(st.st_mode))
+                    if (pdirent->d_type != DT_DIR)
                         continue;
 
                     snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
@@ -881,8 +884,11 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
+            configGetInt(configOPL, CONFIG_OPL_BGM, &gEnableBGM);
             configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, &gBootSndVolume);
+            configGetInt(configOPL, CONFIG_OPL_BGM_VOLUME, &gBGMVolume);
+            configGetStrCopy(configOPL, CONFIG_OPL_DEFAULT_BGM_PATH, gDefaultBGMPath, sizeof(gDefaultBGMPath));
         }
     }
 
@@ -1037,8 +1043,11 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
+        configSetInt(configOPL, CONFIG_OPL_BGM, gEnableBGM);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, gBootSndVolume);
+        configSetInt(configOPL, CONFIG_OPL_BGM_VOLUME, gBGMVolume);
+        configSetStr(configOPL, CONFIG_OPL_DEFAULT_BGM_PATH, gDefaultBGMPath);
 
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
@@ -1090,6 +1099,7 @@ void applyConfig(int themeID, int langID)
 
     int changed = rmSetMode(0);
     if (changed) {
+        bgmMute();
         // reinit the graphics...
         thmReloadScreenExtents();
         guiReloadScreenExtents();
@@ -1107,6 +1117,8 @@ void applyConfig(int themeID, int langID)
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);
     moduleUpdateMenu(APP_MODE, changed, langChanged);
+
+    bgmUnMute();
 
 #ifdef __DEBUG
     debugApplyConfig();
@@ -1402,12 +1414,20 @@ int oplUpdateGameCompatSingle(int id, item_list_t *support, config_set_t *config
 // ----------------------------------------------------------
 // -------------------- NBD SRV Support ---------------------
 // ----------------------------------------------------------
+
+
 static int loadLwnbdSvr(void)
 {
     int ret, padStatus;
+    struct lwnbd_config
+    {
+        char defaultexport[32];
+        uint8_t readonly;
+    };
+    struct lwnbd_config config;
 
     // deint audio lib while nbd server is running
-    sfxEnd();
+    audioEnd();
 
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
@@ -1421,11 +1441,21 @@ static int loadLwnbdSvr(void)
     unloadPads();
     // sysReset(0); // usefull ? printf doesn't work with it.
 
+    /* compat stuff for user not providing name export (useless when there was only one export) */
+    ret = strlen(gExportName);
+    if (ret == 0)
+        strcpy(config.defaultexport, "hdd0");
+    else
+        strcpy(config.defaultexport, gExportName);
+
+    config.readonly = !gEnableWrite;
+
+    // see gETHStartMode, gNetworkStartup ? this is slow, so if we don't have to do it (like debug build).
     ret = ethLoadInitModules();
     if (ret == 0) {
-        ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+        ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL); /* gHDDStartMode ? */
         if (ret >= 0) {
-            ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 4, (char *)&gExportName);
+            ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, sizeof(config), (char *)&config);
             if (ret >= 0)
                 ret = 0;
         }
@@ -1466,8 +1496,10 @@ static void unloadLwnbdSvr(void)
     // init all supports again
     initAllSupport(1);
 
-    // deferred reinit of audio lib to avoid crashing if devices aren't ready
-    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
+    audioInit();
+    sfxInit(0);
+    if (gEnableBGM)
+        bgmStart();
 }
 
 void handleLwnbdSrv()
@@ -1476,8 +1508,7 @@ void handleLwnbdSrv()
     // prepare for lwnbd, display screen with info
     guiRenderTextScreen(_l(_STR_STARTINGNBD));
     if (loadLwnbdSvr() == 0) {
-        snprintf(temp, sizeof(temp), "%s IP: %d.%d.%d.%d %s", _l(_STR_RUNNINGNBD),
-                 ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], ps2_ip_use_dhcp ? "DHCP" : "");
+        snprintf(temp, sizeof(temp), "%s", _l(_STR_RUNNINGNBD));
         guiMsgBox(temp, 0, NULL);
     } else
         guiMsgBox(_l(_STR_STARTFAILNBD), 0, NULL);
@@ -1528,7 +1559,7 @@ void deinit(int exception, int modeSelected)
 
     deinitAllSupport(exception, modeSelected);
 
-    sfxEnd();
+    audioEnd();
     ioEnd();
     guiEnd();
     menuEnd();
@@ -1565,6 +1596,7 @@ static void setDefaults(void)
     clearIOModuleT(&list_support[APP_MODE]);
 
     gAutoLaunchGame = NULL;
+    gAutoLaunchBDMGame = NULL;
     gOPLPart[0] = '\0';
     gHDDPrefix = "pfs0:";
     gBaseMCDir = "mc?:OPL";
@@ -1622,8 +1654,11 @@ static void setDefaults(void)
     gWideScreen = 0;
     gEnableSFX = 0;
     gEnableBootSND = 0;
+    gEnableBGM = 0;
     gSFXVolume = 80;
     gBootSndVolume = 80;
+    gBGMVolume = 70;
+    gDefaultBGMPath[0] = '\0';
 
     gBDMStartMode = START_MODE_DISABLED;
     gHDDStartMode = START_MODE_DISABLED;
@@ -1655,6 +1690,7 @@ static void init(void)
     setDefaults();
 
     padInit(0);
+    int padStatus = 0;
     configInit(NULL);
 
     rmInit();
@@ -1666,6 +1702,8 @@ static void init(void)
 
     startPads();
 
+    bdmInitSemaphore();
+
     // compatibility update handler
     ioRegisterHandler(IO_COMPAT_UPDATE_DEFFERED, &compatDeferredUpdate);
 
@@ -1675,8 +1713,16 @@ static void init(void)
 
     gSelectButton = (InitConsoleRegionData() == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
 
-    // try to restore config
-    _loadConfig();
+    while (!padStatus)
+        padStatus = startPads();
+    readPads();
+    if (!getKeyPressed(KEY_START)) {
+        _loadConfig(); // only try to restore config if emergency key is not being pressed
+    } else {
+        LOG("--- SKIPPING OPL CONFIG LOADING\n");
+        applyConfig(-1, -1);
+    }
+
 
     // queue deffered init of sound effects, which will take place after the preceding initialization steps within the queue are complete.
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
@@ -1700,6 +1746,7 @@ static void deferredAudioInit(void)
 {
     int ret;
 
+    audioInit();
     ret = sfxInit(1);
     if (ret < 0)
         LOG("sfxInit: failed to initialize - %d.\n", ret);
@@ -1707,54 +1754,134 @@ static void deferredAudioInit(void)
         LOG("sfxInit: %d samples loaded.\n", ret);
 }
 
-static void autoLaunchHDDGame(char *argv[])
+// ----------------------------------------------------------
+// --------------------- Auto Loading -----------------------
+// ----------------------------------------------------------
+
+static void miniInit(int mode)
 {
     int ret;
-    char path[256];
-    config_set_t *configSet;
 
     setDefaults();
-
-    gAutoLaunchGame = malloc(sizeof(hdl_game_info_t));
-    if (gAutoLaunchGame == NULL) {
-        PREINIT_LOG("Failed to allocate memory. Loading GUI\n");
-        return;
-    }
-
-    memset(gAutoLaunchGame, 0, sizeof(hdl_game_info_t));
-
-    snprintf(gAutoLaunchGame->startup, sizeof(gAutoLaunchGame->startup), argv[1]);
-    gAutoLaunchGame->start_sector = strtoul(argv[2], NULL, 0);
-    snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:%s", argv[3]);
-
     configInit(NULL);
 
     ioInit();
     LOG_ENABLE();
 
-    hddLoadModules();
+    if (mode == BDM_MODE) {
+        // Force load iLink & mx4sio modules.. we aren't using the gui so this is fine.
+        gEnableILK = 1; // iLink will break pcsx2 however.
+        gEnableMX4SIO = 1;
+        bdmLoadModules();
+        delay(3); // Wait for the device to be detected.
+    } else if (mode == HDD_MODE)
+        hddLoadModules();
+
     InitConsoleRegionData();
 
     ret = configReadMulti(CONFIG_ALL);
     if (CONFIG_ALL & CONFIG_OPL) {
-        if (!(ret & CONFIG_OPL))
-            ret = checkLoadConfigHDD(CONFIG_ALL);
+        if (!(ret & CONFIG_OPL)) {
+            if (mode == BDM_MODE)
+                ret = checkLoadConfigBDM(CONFIG_ALL);
+            else if (mode == HDD_MODE)
+                ret = checkLoadConfigHDD(CONFIG_ALL);
+        }
 
         if (ret & CONFIG_OPL) {
             config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
-            configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
-            configGetInt(configOPL, CONFIG_OPL_HDD_CACHE, &hddCacheSize);
+            if (mode == BDM_MODE) {
+                configGetStrCopy(configOPL, CONFIG_OPL_BDM_PREFIX, gBDMPrefix, sizeof(gBDMPrefix));
+                configGetInt(configOPL, CONFIG_OPL_BDM_CACHE, &bdmCacheSize);
+            } else if (mode == HDD_MODE) {
+                configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
+                configGetInt(configOPL, CONFIG_OPL_HDD_CACHE, &hddCacheSize);
+            }
         }
     }
+}
+
+void miniDeinit(config_set_t *configSet)
+{
+    ioBlockOps(1);
+#ifdef PADEMU
+    ds34usb_reset();
+    ds34bt_reset();
+#endif
+    configFree(configSet);
+
+    ioEnd();
+    configEnd();
+}
+
+static void autoLaunchHDDGame(char *argv[])
+{
+    char path[256];
+    config_set_t *configSet;
+
+    miniInit(HDD_MODE);
+
+    gAutoLaunchGame = malloc(sizeof(hdl_game_info_t));
+    memset(gAutoLaunchGame, 0, sizeof(hdl_game_info_t));
+
+    snprintf(gAutoLaunchGame->startup, sizeof(gAutoLaunchGame->startup), argv[1]);
+    gAutoLaunchGame->start_sector = strtoul(argv[2], NULL, 0);
+    snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:%s", argv[3]);
 
     snprintf(path, sizeof(path), "%sCFG/%s.cfg", gHDDPrefix, gAutoLaunchGame->startup);
     configSet = configAlloc(0, NULL, path);
     configRead(configSet);
 
     hddLaunchGame(-1, configSet);
+}
+
+static void autoLaunchBDMGame(char *argv[])
+{
+    char path[256];
+    config_set_t *configSet;
+
+    miniInit(BDM_MODE);
+    bdmSetPrefix();
+
+    gAutoLaunchBDMGame = malloc(sizeof(base_game_info_t));
+    memset(gAutoLaunchBDMGame, 0, sizeof(base_game_info_t));
+
+    int nameLen;
+    int format = isValidIsoName(argv[1], &nameLen);
+    if (format == GAME_FORMAT_OLD_ISO) {
+        strncpy(gAutoLaunchBDMGame->name, &argv[1][GAME_STARTUP_MAX], nameLen);
+        gAutoLaunchBDMGame->name[nameLen] = '\0';
+        strncpy(gAutoLaunchBDMGame->extension, &argv[1][GAME_STARTUP_MAX + nameLen], sizeof(gAutoLaunchBDMGame->extension));
+        gAutoLaunchBDMGame->extension[sizeof(gAutoLaunchBDMGame->extension) - 1] = '\0';
+    } else {
+        strncpy(gAutoLaunchBDMGame->name, argv[1], nameLen);
+        gAutoLaunchBDMGame->name[nameLen] = '\0';
+        strncpy(gAutoLaunchBDMGame->extension, &argv[1][nameLen], sizeof(gAutoLaunchBDMGame->extension));
+        gAutoLaunchBDMGame->extension[sizeof(gAutoLaunchBDMGame->extension) - 1] = '\0';
+    }
+
+    snprintf(gAutoLaunchBDMGame->startup, sizeof(gAutoLaunchBDMGame->startup), argv[2]);
+
+    if (strcasecmp("DVD", argv[3]) == 0)
+        gAutoLaunchBDMGame->media = SCECdPS2DVD;
+    else if (strcasecmp("CD", argv[3]) == 0)
+        gAutoLaunchBDMGame->media = SCECdPS2CD;
+
+    gAutoLaunchBDMGame->format = format;
+    gAutoLaunchBDMGame->parts = 1; // ul not supported.
+
+    if (gBDMPrefix[0] != '\0')
+        snprintf(path, sizeof(path), "mass0:%s/CFG/%s.cfg", gBDMPrefix, gAutoLaunchBDMGame->startup);
+    else
+        snprintf(path, sizeof(path), "mass0:CFG/%s.cfg", gAutoLaunchBDMGame->startup);
+
+    configSet = configAlloc(0, NULL, path);
+    configRead(configSet);
+
+    bdmLaunchGame(-1, configSet);
 }
 
 // --------------------- Main --------------------
@@ -1771,15 +1898,23 @@ int main(int argc, char *argv[])
 
     // reset, load modules
     reset();
+    ResetDeckardXParams();
 
-    /* argv[0] boot path
-       argv[1] game->startup
-       argv[2] str to u32 game->start_sector
-       argv[3] opl partition read from hdd0:__common/OPL/conf_hdd.cfg
-       argv[4] "mini" */
     if (argc >= 5) {
+        /* argv[0] boot path
+           argv[1] game->startup
+           argv[2] str to u32 game->start_sector
+           argv[3] opl partition read from hdd0:__common/OPL/conf_hdd.cfg
+           argv[4] "mini" */
         if (!strcmp(argv[4], "mini"))
             autoLaunchHDDGame(argv);
+        /* argv[0] boot path
+           argv[1] file name (including extention)
+           argv[2] game->startup
+           argv[3] game->media ("CD" / "DVD")
+           argv[4] "bdm" */
+        if (!strcmp(argv[4], "bdm"))
+            autoLaunchBDMGame(argv);
     }
 
     init();

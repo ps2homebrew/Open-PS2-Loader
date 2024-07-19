@@ -36,7 +36,7 @@ static void cdvdman_signal_read_end(void);
 static void cdvdman_signal_read_end_intr(void);
 static void cdvdman_startThreads(void);
 static void cdvdman_create_semaphores(void);
-static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
+static int cdvdman_read(u32 lsn, u32 sectors, u16 sector_size, void *buf);
 
 // Sector cache to improve IO
 static u8 MAX_SECTOR_CACHE = 0;
@@ -104,7 +104,7 @@ static void oplShutdown(int poff)
     if (poff) {
         DeviceStop();
 #ifdef __USE_DEV9
-        dev9Shutdown();
+        Dev9CardStop();
 #endif
         sceCdPowerOff(&stat);
     }
@@ -258,8 +258,27 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 {
     unsigned int remaining;
     void *ptr;
+    int endOfMedia = 0;
 
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
+
+    if (mediaLsnCount) {
+
+        // If lsn to read is already bigger error already.
+        if (lsn >= mediaLsnCount) {
+            DPRINTF("cdvdman_read eom lsn=%d sectors=%d leftsectors=%d MaxLsn=%d \n", lsn, sectors, mediaLsnCount - lsn, mediaLsnCount);
+            cdvdman_stat.err = SCECdErIPI;
+            return 1;
+        }
+
+        // As per PS2 mecha code continue to read what you can and then signal end of media error.
+        if ((lsn + sectors) > mediaLsnCount) {
+            DPRINTF("cdvdman_read eom lsn=%d sectors=%d leftsectors=%d MaxLsn=%d \n", lsn, sectors, mediaLsnCount - lsn, mediaLsnCount);
+            endOfMedia = 1;
+            // Limit how much sectors we can read.
+            sectors = mediaLsnCount - lsn;
+        }
+    }
 
     if (probed == 0) { // Probe for ZSO before first read
         // check for ZSO
@@ -324,16 +343,26 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
         }
     }
 
+    // If we had a read that went past the end of media, after reading what we can, set the end of media error.
+    if (endOfMedia) {
+        cdvdman_stat.err = SCECdErEOM;
+    }
+
     return (cdvdman_stat.err == SCECdErNO ? 0 : 1);
 }
 
-static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
+static int cdvdman_read(u32 lsn, u32 sectors, u16 sector_size, void *buf)
 {
     cdvdman_stat.status = SCECdStatRead;
 
+    // OPL only has 2048 bytes no matter what. For other sizes we have to copy to the offset and prepoluate the sector header data (the extra bytes.)
+    u32 offset = 0;
+
+    if (sector_size == 2340)
+        offset = 12; // head - sub - data(2048) -- edc-ecc
+
     buf = (void *)PHYSADDR(buf);
-#ifdef HDD_DRIVER // As of now, only the ATA interface requires this. We do this here to share cdvdman_buf.
-    if ((u32)(buf)&3) {
+    if (((u32)(buf)&3) || (sector_size != 2048)) {
         // For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.
         WaitSema(cdvdman_searchfilesema);
 
@@ -345,24 +374,48 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
             if (nsectors > CDVDMAN_BUF_SECTORS)
                 nsectors = CDVDMAN_BUF_SECTORS;
 
+            // For other sizes we can only read one sector at a time.
+            // There are only very few games (CDDA games, EA Tiburon) that will be affected
+            if (sector_size != 2048)
+                nsectors = 1;
+
             cdvdman_read_sectors(rpos, nsectors, cdvdman_buf);
 
             rpos += nsectors;
             sectors -= nsectors;
-            nbytes = nsectors * 2048;
+            nbytes = nsectors * sector_size;
 
-            memcpy(buf, cdvdman_buf, nbytes);
+
+            // Copy the data for buffer.
+            // For any sector other than 2048 one sector at a time is copied.
+            memcpy((void *)((u32)buf + offset), cdvdman_buf, nbytes);
+
+            // For these custom sizes we need to manually fix the header.
+            // For 2340 we have 12bytes. 4 are position.
+            if (sector_size == 2340) {
+                u8 *header = (u8 *)buf;
+                // position.
+                sceCdlLOCCD p;
+                sceCdIntToPos(rpos - 1, &p); // to get current pos.
+                header[0] = p.minute;
+                header[1] = p.second;
+                header[2] = p.sector;
+                header[3] = 0; // p.track for cdda only non-zero
+
+                // Subheader and copy of subheader.
+                header[4] = header[8] = 0;
+                header[5] = header[9] = 0;
+                header[6] = header[10] = 0x8;
+                header[7] = header[11] = 0;
+            }
 
             buf = (void *)((u8 *)buf + nbytes);
         }
 
         SignalSema(cdvdman_searchfilesema);
     } else {
-#endif
         cdvdman_read_sectors(lsn, sectors, buf);
-#ifdef HDD_DRIVER
     }
-#endif
 
     ReadPos = 0; /* Reset the buffer offset indicator. */
 
@@ -395,7 +448,7 @@ static int cdvdman_common_lock(int IntrContext)
     return 1;
 }
 
-int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
+int cdvdman_AsyncRead(u32 lsn, u32 sectors, u16 sector_size, void *buf)
 {
     int IsIntrContext, OldState;
 
@@ -411,6 +464,7 @@ int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
 
     cdvdman_stat.cdread_lba = lsn;
     cdvdman_stat.cdread_sectors = sectors;
+    cdvdman_stat.sector_size = sector_size;
     cdvdman_stat.cdread_buf = buf;
 
     CpuResumeIntr(OldState);
@@ -423,7 +477,7 @@ int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
     return 1;
 }
 
-int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf)
+int cdvdman_SyncRead(u32 lsn, u32 sectors, u16 sector_size, void *buf)
 {
     int IsIntrContext, OldState;
 
@@ -439,7 +493,7 @@ int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf)
 
     CpuResumeIntr(OldState);
 
-    cdvdman_read(lsn, sectors, buf);
+    cdvdman_read(lsn, sectors, sector_size, buf);
 
     cdvdman_cb_event(SCECdFuncRead);
     sync_flag = 0;
@@ -462,12 +516,14 @@ u32 sceCdPosToInt(sceCdlLOCCD *p)
 {
     register u32 result;
 
-    result = ((u32)p->minute >> 16) * 10 + ((u32)p->minute & 0xF);
+    result = ((u32)p->minute >> 4) * 10 + ((u32)p->minute & 0xF);
     result *= 60;
-    result += ((u32)p->second >> 16) * 10 + ((u32)p->second & 0xF);
+    result += ((u32)p->second >> 4) * 10 + ((u32)p->second & 0xF);
     result *= 75;
-    result += ((u32)p->sector >> 16) * 10 + ((u32)p->sector & 0xF);
+    result += ((u32)p->sector >> 4) * 10 + ((u32)p->sector & 0xF);
     result -= 150;
+
+    DPRINTF("%s({0x%X, 0x%X, 0x%X, 0x%X}) = %d\n", __FUNCTION__, p->minute, p->second, p->sector, p->track, result);
 
     return result;
 }
@@ -544,6 +600,7 @@ int sceCdSC(int code, int *param)
             result = 1;
             break;
         default:
+            DPRINTF("sceCdSC unknown, code=0x%X param=0x%X \n", code, *param);
             result = 1; // dummy result
     }
 
@@ -676,7 +733,7 @@ static void cdvdman_cdread_Thread(void *args)
     while (1) {
         WaitSema(cdrom_rthread_sema);
 
-        cdvdman_read(cdvdman_stat.cdread_lba, cdvdman_stat.cdread_sectors, cdvdman_stat.cdread_buf);
+        cdvdman_read(cdvdman_stat.cdread_lba, cdvdman_stat.cdread_sectors, cdvdman_stat.sector_size, cdvdman_stat.cdread_buf);
 
         /* This streaming callback is not compatible with the original SONY stream channel 0 (IOP) callback's design.
        The original is run from the interrupt handler, but we want it to run

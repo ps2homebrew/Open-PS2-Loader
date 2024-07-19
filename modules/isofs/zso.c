@@ -21,8 +21,9 @@ void ziso_init(ZISO_header *header, u32 first_block)
     // read header information
     ziso_align = header->align;
     ziso_idx_start_block = -1;
-    // calculate number of blocks without using uncompressed_size (avoid 64bit division)
-    ziso_total_block = ((((first_block & 0x7FFFFFFF) << ziso_align) - sizeof(ZISO_header)) / 4) - 1;
+    // calculate number of blocks without using 64bit division library
+    u32 *total_bytes_p = (u32 *)&(header->total_bytes);
+    ziso_total_block = (total_bytes_p[0] >> 11) | ((total_bytes_p[1] & 0x7ff) << 21);
     // allocate memory
     if (ziso_tmp_buf == NULL) {
         ziso_tmp_buf = ziso_alloc(2048 + sizeof(u32) * ZISO_IDX_MAX_ENTRIES + 64);
@@ -47,6 +48,10 @@ int ziso_read_sector(u8 *addr, u32 lsn, unsigned int count)
 
     if (lsn >= ziso_total_block) {
         return 0; // can't seek beyond file
+    }
+
+    if (lsn + count > ziso_total_block) {
+        count = ziso_total_block - lsn; // adjust oob reads
     }
 
     // refresh index table if needed

@@ -13,11 +13,6 @@
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
-#ifdef PADEMU
-#include <libds34bt.h>
-#include <libds34usb.h>
-#endif
-
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioFormat, fileXioMount, fileXioUmount, fileXioDevctl
 #include <io_common.h>   // FIO_MT_RDWR
@@ -188,6 +183,14 @@ void hddLoadModules(void)
                            "\0"
                            "20";
 
+    static char pfsarg[] = "\0"
+                           "-o" // max open
+                           "\0"
+                           "10" // Default value: 2
+                           "\0"
+                           "-n" // Number of buffers
+                           "\0"
+                           "40"; // Default value: 8 | Max value: 127
     LOG("HDDSUPPORT LoadModules\n");
 
     if (!hddModulesLoaded) {
@@ -200,10 +203,14 @@ void hddLoadModules(void)
         // if detected it loads the specific ATAD module
         hddHDProKitDetected = hddCheckHDProKit();
         if (hddHDProKitDetected) {
+            LOG("[ATAD_HDPRO]:\n");
             ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
+            LOG("[XHDD]:\n");
             sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 6, "-hdpro");
         } else {
+            LOG("[ATAD]:\n");
             ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+            LOG("[XHDD]:\n");
             sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 0, NULL);
         }
         if (ret < 0) {
@@ -212,6 +219,7 @@ void hddLoadModules(void)
             return;
         }
 
+        LOG("[HDD]:\n");
         ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
         if (ret < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
@@ -226,7 +234,8 @@ void hddLoadModules(void)
             return;
         }
 
-        ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
+        LOG("[PS2FS]:\n");
+        ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, sizeof(pfsarg), pfsarg);
         if (ret < 0) {
             LOG("HDD: HardDisk Drive not formatted (PFS).\n");
             setErrorMessageWithCode(_STR_HDD_NOT_FORMATTED_ERROR, ERROR_HDD_MODULE_PFS_FAILURE);
@@ -341,7 +350,7 @@ void hddLaunchGame(int id, config_set_t *configSet)
     int i, size_irx = 0;
     int EnablePS2Logo = 0;
     int result;
-    void **irx = NULL;
+    void *irx = NULL;
     char filename[32];
     hdl_game_info_t *game;
     struct cdvdman_settings_hdd *settings;
@@ -506,24 +515,16 @@ void hddLaunchGame(int id, config_set_t *configSet)
         }
     }
 
-    if (gAutoLaunchGame == NULL) {
+    if (gAutoLaunchGame == NULL)
         deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
-    } else {
-        ioBlockOps(1);
-#ifdef PADEMU
-        ds34usb_reset();
-        ds34bt_reset();
-#endif
-        configFree(configSet);
+    else {
+        miniDeinit(configSet);
 
         free(gAutoLaunchGame);
         gAutoLaunchGame = NULL;
 
         fileXioUmount("pfs0:");
         fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
-
-        ioEnd();
-        configEnd();
     }
 
     settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_DEV9;
@@ -532,7 +533,7 @@ void hddLaunchGame(int id, config_set_t *configSet)
     // adjust ZSO cache
     settings->common.zso_cache = hddCacheSize;
 
-    sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, EnablePS2Logo, compatMode);
+    sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }
 
 static config_set_t *hddGetConfig(int id)

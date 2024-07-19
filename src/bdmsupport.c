@@ -14,6 +14,7 @@
 
 #include <usbhdfsd-common.h>
 
+#include <ps2sdkapi.h>
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
 
@@ -27,9 +28,18 @@ static char bdmDriver[5];
 
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
+static s32 bdmLoadModuleLock = -1;
 
 // forward declaration
 static item_list_t bdmGameList;
+
+void bdmSetPrefix(void)
+{
+    if (gBDMPrefix[0] != '\0')
+        sprintf(bdmPrefix, "mass0:%s/", gBDMPrefix);
+    else
+        sprintf(bdmPrefix, "mass0:");
+}
 
 // Identifies the partition that the specified file is stored on and generates a full path to it.
 int bdmFindPartition(char *target, const char *name, int write)
@@ -74,9 +84,13 @@ static void bdmEventHandler(void *packet, void *opt)
 
 static void bdmLoadBlockDeviceModules(void)
 {
+    WaitSema(bdmLoadModuleLock);
+
     if (gEnableILK && !iLinkModLoaded) {
         // Load iLink Block Device drivers
+        LOG("[ILINKMAN]:\n");
         sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
+        LOG("[IEEE1394_BD]:\n");
         sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
 
         iLinkModLoaded = 1;
@@ -84,10 +98,13 @@ static void bdmLoadBlockDeviceModules(void)
 
     if (gEnableMX4SIO && !mx4sioModLoaded) {
         // Load MX4SIO Block Device drivers
+        LOG("[MX4SIO_BD]:\n");
         sysLoadModuleBuffer(&mx4sio_bd_irx, size_mx4sio_bd_irx, 0, NULL);
 
         mx4sioModLoaded = 1;
     }
+
+    SignalSema(bdmLoadModuleLock);
 }
 
 void bdmLoadModules(void)
@@ -95,18 +112,23 @@ void bdmLoadModules(void)
     LOG("BDMSUPPORT LoadModules\n");
 
     // Load Block Device Manager (BDM)
+    LOG("[BDM]:\n");
     sysLoadModuleBuffer(&bdm_irx, size_bdm_irx, 0, NULL);
 
     // Load FATFS (mass:) driver
+    LOG("[BDMFS_FATFS]:\n");
     sysLoadModuleBuffer(&bdmfs_fatfs_irx, size_bdmfs_fatfs_irx, 0, NULL);
 
     // Load USB Block Device drivers
+    LOG("[USBD]:\n");
     sysLoadModuleBuffer(&usbd_irx, size_usbd_irx, 0, NULL);
+    LOG("[USBMASS_BD]:\n");
     sysLoadModuleBuffer(&usbmass_bd_irx, size_usbmass_bd_irx, 0, NULL);
 
     // Load Optional Block Device drivers
     bdmLoadBlockDeviceModules();
 
+    LOG("[BDMEVENT]:\n");
     sysLoadModuleBuffer(&bdmevent_irx, size_bdmevent_irx, 0, NULL);
     SifAddCmdHandler(0, &bdmEventHandler, NULL);
 
@@ -152,7 +174,8 @@ static int bdmNeedsUpdate(void)
     DIR *dir = opendir("mass0:/");
     if (dir != NULL) {
         int *pBDMDriver = (int *)bdmDriver;
-        *pBDMDriver = fileXioIoctl(dir->dd_fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
+        int iop_fd = ps2sdk_get_iop_fd(dir->dd_fd);
+        *pBDMDriver = fileXioIoctl(iop_fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
         closedir(dir);
     }
 
@@ -237,18 +260,23 @@ static void bdmRenameGame(int id, char *newName)
     bdmULSizePrev = -2;
 }
 
-static void bdmLaunchGame(int id, config_set_t *configSet)
+void bdmLaunchGame(int id, config_set_t *configSet)
 {
-    int i, fd, index, compatmask = 0;
+    int i, fd, iop_fd, index, compatmask = 0;
     int EnablePS2Logo = 0;
     int result;
-    unsigned int start;
+    u64 startingLBA;
     unsigned int startCluster;
     char partname[256], filename[32];
-    base_game_info_t *game = &bdmGames[id];
+    base_game_info_t *game;
     struct cdvdman_settings_bdm *settings;
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
+
+    if (gAutoLaunchBDMGame == NULL)
+        game = &bdmGames[id];
+    else
+        game = gAutoLaunchBDMGame;
 
     char vmc_name[32], vmc_path[256], have_error = 0;
     int vmc_id, size_mcemu_irx = 0;
@@ -260,7 +288,8 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
         configGetVMC(configSet, vmc_name, sizeof(vmc_name), vmc_id);
         if (vmc_name[0]) {
             have_error = 1;
-            if (sysCheckVMC(bdmPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
+            int vmcSizeInMb = sysCheckVMC(bdmPrefix, "/", vmc_name, 0, &vmc_superblock);
+            if (vmcSizeInMb > 0) {
                 bdm_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
                 bdm_vmc_infos.flags |= 0x100;
                 bdm_vmc_infos.specs.page_size = vmc_superblock.page_size;
@@ -271,15 +300,23 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
                 fd = open(vmc_path, O_RDONLY);
                 if (fd >= 0) {
-                    if ((start = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, vmc_path)) != 0 && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
+                    iop_fd = ps2sdk_get_iop_fd(fd);
+                    if (fileXioIoctl2(iop_fd, USBMASS_IOCTL_GET_LBA, NULL, 0, &startingLBA, sizeof(startingLBA)) == 0 && (startCluster = (unsigned int)fileXioIoctl(iop_fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
 
+                        // VMC only supports 32bit LBAs at the moment, so if the starting LBA + size of the VMC crosses the 32bit boundary
+                        // just report the VMC as being fragmented to prevent file system corruption.
+                        int vmcSectorCount = vmcSizeInMb * ((1024 * 1024) / 512); // size in MB * sectors per MB
+                        if (startingLBA + vmcSectorCount > 0x100000000) {
+                            LOG("BDMSUPPORT VMC bad LBA range\n");
+                            have_error = 2;
+                        }
                         // Check VMC cluster chain for fragmentation (write operation can cause damage to the filesystem).
-                        if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") == 1) {
+                        else if (fileXioIoctl(iop_fd, USBMASS_IOCTL_CHECK_CHAIN, "") == 1) {
                             LOG("BDMSUPPORT Cluster Chain OK\n");
                             have_error = 0;
                             bdm_vmc_infos.active = 1;
-                            bdm_vmc_infos.start_sector = start;
-                            LOG("BDMSUPPORT VMC slot %d start: 0x%X\n", vmc_id, start);
+                            bdm_vmc_infos.start_sector = (u32)startingLBA;
+                            LOG("BDMSUPPORT VMC slot %d start: 0x%X\n", vmc_id, (u32)startingLBA);
                         } else {
                             LOG("BDMSUPPORT Cluster Chain NG\n");
                             have_error = 2;
@@ -291,16 +328,19 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
             }
         }
 
-        if (have_error) {
-            char error[256];
-            if (have_error == 2) // VMC file is fragmented
-                snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name, (vmc_id + 1));
-            else
-                snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
-            if (!guiMsgBox(error, 1, NULL)) {
-                return;
+        if (gAutoLaunchBDMGame == NULL) {
+            if (have_error) {
+                char error[256];
+                if (have_error == 2) // VMC file is fragmented
+                    snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name, (vmc_id + 1));
+                else
+                    snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+                if (!guiMsgBox(error, 1, NULL)) {
+                    return;
+                }
             }
-        }
+        } else
+            LOG("VMC error\n");
 
         for (i = 0; i < size_bdm_mcemu_irx; i++) {
             if (((u32 *)&bdm_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
@@ -312,7 +352,7 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
         }
     }
 
-    void **irx = &bdm_cdvdman_irx;
+    void *irx = &bdm_cdvdman_irx;
     int irx_size = size_bdm_cdvdman_irx;
     compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
     settings = (struct cdvdman_settings_bdm *)((u8 *)irx + index);
@@ -334,6 +374,7 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
         // Open file
         sbCreatePath(game, partname, bdmPrefix, "/", i);
         fd = open(partname, O_RDONLY);
+        iop_fd = ps2sdk_get_iop_fd(fd);
         if (fd < 0) {
             sbUnprepare(&settings->common);
             guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
@@ -342,10 +383,10 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
         // Get driver - we should only need to do this once
         int *pBDMDriver = (int *)bdmDriver;
-        *pBDMDriver = fileXioIoctl(fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
+        *pBDMDriver = fileXioIoctl(iop_fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
 
         // Get fragment list
-        int iFragCount = fileXioIoctl2(fd, USBMASS_IOCTL_GET_FRAGLIST, NULL, 0, (void *)&settings->frags[iTotalFragCount], sizeof(bd_fragment_t) * (BDM_MAX_FRAGS - iTotalFragCount));
+        int iFragCount = fileXioIoctl2(iop_fd, USBMASS_IOCTL_GET_FRAGLIST, NULL, 0, (void *)&settings->frags[iTotalFragCount], sizeof(bd_fragment_t) * (BDM_MAX_FRAGS - iTotalFragCount));
         if (iFragCount > BDM_MAX_FRAGS) {
             // Too many fragments
             close(fd);
@@ -390,13 +431,16 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     settings->common.zso_cache = bdmCacheSize;
 
     if ((result = sbLoadCheats(bdmPrefix, game->startup)) < 0) {
-        switch (result) {
-            case -ENOENT:
-                guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
-                break;
-            default:
-                guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
-        }
+        if (gAutoLaunchBDMGame == NULL) {
+            switch (result) {
+                case -ENOENT:
+                    guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
+                    break;
+                default:
+                    guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
+            }
+        } else
+            LOG("Cheats error\n");
     }
 
     if (gRememberLastPlayed) {
@@ -406,17 +450,25 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
-    deinit(NO_EXCEPTION, BDM_MODE); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
+
+    if (gAutoLaunchBDMGame == NULL)
+        deinit(NO_EXCEPTION, BDM_MODE); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
+    else {
+        miniDeinit(configSet);
+
+        free(gAutoLaunchBDMGame);
+        gAutoLaunchBDMGame = NULL;
+    }
 
     if (!strcmp(bdmDriver, "usb")) {
         settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
-        sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
+        sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
     } else if (!strcmp(bdmDriver, "sd") && strlen(bdmDriver) == 2) {
         settings->common.fakemodule_flags |= 0 /* TODO! fake ilinkman ? */;
-        sysLaunchLoaderElf(filename, "BDM_ILK_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
+        sysLaunchLoaderElf(filename, "BDM_ILK_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
     } else if (!strcmp(bdmDriver, "sdc") && strlen(bdmDriver) == 3) {
         settings->common.fakemodule_flags |= 0;
-        sysLaunchLoaderElf(filename, "BDM_M4S_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
+        sysLaunchLoaderElf(filename, "BDM_M4S_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
     }
 }
 
@@ -503,3 +555,11 @@ static item_list_t bdmGameList = {
     BDM_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, BDM_MODE_UPDATE_DELAY, &bdmGetTextId, &bdmGetPrefix, &bdmInit, &bdmNeedsUpdate,
     &bdmUpdateGameList, &bdmGetGameCount, &bdmGetGame, &bdmGetGameName, &bdmGetGameNameLength, &bdmGetGameStartup, &bdmDeleteGame, &bdmRenameGame,
     &bdmLaunchGame, &bdmGetConfig, &bdmGetImage, &bdmCleanUp, &bdmShutdown, &bdmCheckVMC, &bdmGetIconId};
+
+void bdmInitSemaphore()
+{
+    // Create a semaphore so only one thread can load IOP modules at a time.
+    if (bdmLoadModuleLock < 0) {
+        bdmLoadModuleLock = sbCreateSemaphore();
+    }
+}

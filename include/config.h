@@ -38,17 +38,18 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_DNAS         "$DNAS"
 #define CONFIG_ITEM_CONFIGSOURCE "$ConfigSource"
 
-#define CONFIG_ITEM_OSDLNG        "$CustomLanguageValue"
-#define CONFIG_ITEM_OSDLNG_SOURCE "$CustomLanguageSource"
-#define CONFIG_ITEM_OSDLNG_ENABLE "$CustomLanguageEnable"
-
+#define CONFIG_ITEM_OSD_SETTINGS_LANGID "$CustomLanguageValue"
+#define CONFIG_ITEM_OSD_SETTINGS_SOURCE "$CustomLanguageSource"
+#define CONFIG_ITEM_OSD_SETTINGS_ENABLE "$OSDSettingsEnable"
+#define CONFIG_ITEM_OSD_SETTINGS_TV_ASP "$OSDAspectRatio"
+#define CONFIG_ITEM_OSD_SETTINGS_VMODE  "$OSDVideoMode"
 // Per-Game GSM keys. -Bat-
-#define CONFIG_ITEM_GSMSOURCE   "$GSMSource"
-#define CONFIG_ITEM_ENABLEGSM   "$EnableGSM"
-#define CONFIG_ITEM_GSMVMODE    "$GSMVMode"
-#define CONFIG_ITEM_GSMXOFFSET  "$GSMXOffset"
-#define CONFIG_ITEM_GSMYOFFSET  "$GSMYOffset"
-#define CONFIG_ITEM_GSMFIELDFIX "$GSMFIELDFix"
+#define CONFIG_ITEM_GSMSOURCE           "$GSMSource"
+#define CONFIG_ITEM_ENABLEGSM           "$EnableGSM"
+#define CONFIG_ITEM_GSMVMODE            "$GSMVMode"
+#define CONFIG_ITEM_GSMXOFFSET          "$GSMXOffset"
+#define CONFIG_ITEM_GSMYOFFSET          "$GSMYOffset"
+#define CONFIG_ITEM_GSMFIELDFIX         "$GSMFIELDFix"
 
 // Per-Game CHEAT keys. -Bat-
 #define CONFIG_ITEM_CHEATSSOURCE "$CheatsSource"
@@ -102,8 +103,11 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_PARENTAL_LOCK_PWD    "parental_lock_password"
 #define CONFIG_OPL_SFX                  "enable_sfx"
 #define CONFIG_OPL_BOOT_SND             "enable_boot_snd"
+#define CONFIG_OPL_BGM                  "enable_bgm"
 #define CONFIG_OPL_SFX_VOLUME           "sfx_volume"
 #define CONFIG_OPL_BOOT_SND_VOLUME      "boot_snd_volume"
+#define CONFIG_OPL_BGM_VOLUME           "bgm_volume"
+#define CONFIG_OPL_DEFAULT_BGM_PATH     "default_bgm_path"
 
 // Network config keys
 #define CONFIG_NET_ETH_LINKM          "eth_linkmode"

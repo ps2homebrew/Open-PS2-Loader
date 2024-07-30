@@ -97,6 +97,7 @@ static void clearIOModuleT(opl_io_module_t *mod)
     mod->menuItem.text = NULL;
     mod->menuItem.text_id = -1;
     mod->menuItem.userdata = NULL;
+    mod->menuItem.index_id = -1;
 }
 
 // forward decl
@@ -338,6 +339,7 @@ static void initMenuForListSupport(opl_io_module_t *mod)
     mod->menuItem.icon_id = mod->support->itemIconId(mod->support);
     mod->menuItem.text = NULL;
     mod->menuItem.text_id = mod->support->itemTextId(mod->support);
+    mod->menuItem.index_id = -1;
     mod->menuItem.visible = 1;
 
     mod->menuItem.userdata = mod->support;
@@ -645,6 +647,8 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
     // refresh device icon and text (for bdm)
     mdl->menuItem.icon_id = mdl->support->itemIconId(mdl->support);
     mdl->menuItem.text_id = mdl->support->itemTextId(mdl->support);
+    if (mdl->support->mode <= BDM_MODE4)
+        mdl->menuItem.index_id = mdl->support->itemIndexId(mdl->support);
 
     // read the new game list
     struct gui_update_t *gup = NULL;

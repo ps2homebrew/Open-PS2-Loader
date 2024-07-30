@@ -108,6 +108,9 @@ typedef struct _item_list_t
     /// item description in localised form (used if value is not negative)
     int (*itemTextId)(item_list_t *itemList);
 
+    /// mass device index position eg mass0 mass1 etc
+    int (*itemIndexId)(item_list_t *itemList);
+
     /// @return path to device prefix (set callback to NULL if not applicable).
     char *(*itemGetPrefix)(item_list_t *itemList);
 

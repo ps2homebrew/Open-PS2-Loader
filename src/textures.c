@@ -20,6 +20,11 @@ extern void *m4s_bd_png;
 extern void *hdd_png;
 extern void *eth_png;
 extern void *app_png;
+extern void *Index_0_png;
+extern void *Index_1_png;
+extern void *Index_2_png;
+extern void *Index_3_png;
+extern void *Index_4_png;
 
 extern void *left_png;
 extern void *right_png;
@@ -121,6 +126,11 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {HDD_ICON, "hdd", &hdd_png},
     {ETH_ICON, "eth", &eth_png},
     {APP_ICON, "app", &app_png},
+    {INDEX_0, "Index_0", &Index_0_png},
+    {INDEX_1, "Index_1", &Index_1_png},
+    {INDEX_2, "Index_2", &Index_2_png},
+    {INDEX_3, "Index_3", &Index_3_png},
+    {INDEX_4, "Index_4", &Index_4_png},
     {LEFT_ICON, "left", &left_png},
     {RIGHT_ICON, "right", &right_png},
     {CROSS_ICON, "cross", &cross_png},

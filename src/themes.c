@@ -46,6 +46,7 @@ enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_HINT_TEXT,
     ELEM_TYPE_INFO_HINT_TEXT,
     ELEM_TYPE_LOADING_ICON,
+    ELEM_TYPE_BDM_INDEX,
 
     ELEM_TYPE_COUNT
 };
@@ -74,6 +75,7 @@ static const char *elementsType[ELEM_TYPE_COUNT] = {
     "HintText",
     "InfoHintText",
     "LoadingIcon",
+    "BdmIndex",
 };
 
 // Common functions for Text ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -778,6 +780,25 @@ static void drawMenuText(struct menu_list *menu, struct submenu_list *item, conf
     fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, menuItemGetText(menu->item), elem->color);
 }
 
+static void drawBDMIndex(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
+{
+    item_list_t *itemList = menu->item->userdata;
+    // Only render for bdm modes
+    if (itemList->mode >= ETH_MODE)
+        return;
+
+    // Only render if multiple mass devices are connected
+    if (itemList->mode == 0 && menu->next->item->visible == 0)
+        return;
+
+    char imgName[32];
+    snprintf(imgName, sizeof(imgName), "Index_%d", itemList->mode);
+
+    GSTEXTURE *indexTex = thmGetTexture(texLookupInternalTexId(&imgName[0]));
+    if (indexTex && indexTex->Mem)
+        rmDrawPixmap(indexTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
+}
+
 static void drawItemsList(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
     if (item) {
@@ -999,6 +1020,9 @@ static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t 
             } else if (!strcmp(elementsType[ELEM_TYPE_LOADING_ICON], type)) {
                 if (!theme->loadingIcon)
                     theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_LOADING_ICON, -40, -60, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+            } else if (!strcmp(elementsType[ELEM_TYPE_BDM_INDEX], type)) {
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_BDM_INDEX, screenWidth >> 1, 355, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+                elem->drawElem = &drawBDMIndex;
             }
 
             if (elem) {

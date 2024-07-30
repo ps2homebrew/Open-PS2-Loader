@@ -587,8 +587,9 @@ static void bdmShutdown(item_list_t *itemList)
     LOG("BDMSUPPORT Shutdown\n");
 
     // Format the device path.
+    // Getting the device number is only relevant per module ie usb0 and mx40 will result in both being massDeviceIndex = 0 or mass0, use mode to determine instead.
     bdm_device_data_t *pDeviceData = (bdm_device_data_t *)itemList->priv;
-    sprintf(path, "mass%d:", pDeviceData->massDeviceIndex);
+    sprintf(path, "mass%d:", itemList->mode);
 
     // As required by some (typically 2.5") HDDs, issue the SCSI STOP UNIT command to avoid causing an emergency park.
     fileXioDevctl(path, USBMASS_DEVCTL_STOP_ALL, NULL, 0, NULL, 0);

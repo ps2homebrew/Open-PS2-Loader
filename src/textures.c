@@ -20,18 +20,23 @@ extern void *m4s_bd_png;
 extern void *hdd_png;
 extern void *eth_png;
 extern void *app_png;
+extern void *Index_0_png;
+extern void *Index_1_png;
+extern void *Index_2_png;
+extern void *Index_3_png;
+extern void *Index_4_png;
 
+extern void *left_png;
+extern void *right_png;
 extern void *cross_png;
 extern void *triangle_png;
 extern void *circle_png;
 extern void *square_png;
 extern void *select_png;
 extern void *start_png;
-extern void *left_png;
-extern void *right_png;
+/* currently unused.
 extern void *up_png;
 extern void *down_png;
-/* currently unused.
 extern void *L1_png;
 extern void *L2_png;
 extern void *L3_png;
@@ -121,10 +126,13 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {HDD_ICON, "hdd", &hdd_png},
     {ETH_ICON, "eth", &eth_png},
     {APP_ICON, "app", &app_png},
+    {INDEX_0, "Index_0", &Index_0_png},
+    {INDEX_1, "Index_1", &Index_1_png},
+    {INDEX_2, "Index_2", &Index_2_png},
+    {INDEX_3, "Index_3", &Index_3_png},
+    {INDEX_4, "Index_4", &Index_4_png},
     {LEFT_ICON, "left", &left_png},
     {RIGHT_ICON, "right", &right_png},
-    {UP_ICON, "up", &up_png},
-    {DOWN_ICON, "down", &down_png},
     {CROSS_ICON, "cross", &cross_png},
     {TRIANGLE_ICON, "triangle", &triangle_png},
     {CIRCLE_ICON, "circle", &circle_png},
@@ -132,6 +140,8 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {SELECT_ICON, "select", &select_png},
     {START_ICON, "start", &start_png},
     /* currently unused.
+    {UP_ICON, "up", &up_png},
+    {DOWN_ICON, "down", &down_png},
     {L1_ICON, "L1", &L1_png},
     {L2_ICON, "L2", &L2_png},
     {L3_ICON, "L3", &L3_png},

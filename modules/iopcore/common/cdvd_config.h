@@ -78,6 +78,9 @@ struct cdvdman_settings_bdm
     // 0 = ISO
     struct cdvdman_fragfile fragfile[BDM_MAX_FILES];
 
+    // Device ID of the block device to bind to.
+    u32 bdDeviceId;
+
     // Fragment table, containing the fragments of all files
     bd_fragment_t frags[BDM_MAX_FRAGS];
 } __attribute__((packed));

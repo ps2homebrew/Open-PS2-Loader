@@ -37,7 +37,7 @@ static void cacheLoadImage(void *data)
     GSTEXTURE *texture = &req->entry->texture;
     texFree(texture);
 
-    if (handler->itemGetImage(req->cache->prefix, req->cache->isPrefixRelative, req->value, req->cache->suffix, texture, GS_PSM_CT24) < 0)
+    if (handler->itemGetImage(handler, req->cache->prefix, req->cache->isPrefixRelative, req->value, req->cache->suffix, texture, GS_PSM_CT24) < 0)
         req->entry->lastUsed = 0;
     else
         req->entry->lastUsed = guiFrameId;

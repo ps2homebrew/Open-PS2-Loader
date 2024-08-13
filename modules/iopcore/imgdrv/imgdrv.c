@@ -14,6 +14,12 @@ int dummy_fs()
     return 0;
 }
 
+int close_fs()
+{
+    DelDrv("host");
+    return 0;
+}
+
 int lseek_fs(iop_file_t *fd, int offset, int whence)
 {
     if (whence == SEEK_END) {
@@ -56,7 +62,7 @@ iop_device_ops_t my_device_ops =
         dummy_fs, // deinit
         NULL,     // dummy_fs,//format
         dummy_fs, // open_fs,//open
-        dummy_fs, // close_fs,//close
+        close_fs, // close
         read_fs,  // read
         NULL,     // dummy_fs,//write
         lseek_fs, // lseek

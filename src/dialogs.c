@@ -861,7 +861,7 @@ struct UIItem diaAbout[] = {
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Maximus32 - misfire - Polo35 - reprep - SP193 - volca", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Maximus32 - misfire - Polo35 - reprep - SP193 - volca - kr_ps2", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},

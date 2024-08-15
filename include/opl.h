@@ -73,7 +73,7 @@ void setErrorMessage(int strId);
 void setErrorMessageWithCode(int strId, int error);
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
-void applyConfig(int themeID, int langID);
+void applyConfig(int themeID, int langID, int skipDeviceRefresh);
 void menuDeferredUpdate(void *data);
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged);
 void handleLwnbdSrv();
@@ -209,9 +209,24 @@ extern base_game_info_t *gAutoLaunchBDMGame;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 
+void initSupport(item_list_t *itemList, int mode, int force_reinit);
+
 void setDefaultColors(void);
 
 #define MENU_ITEM_HEIGHT 19
+
+#include "include/menusys.h"
+
+typedef struct
+{
+    item_list_t *support;
+
+    /// menu item used with this list support
+    menu_item_t menuItem;
+
+    /// submenu list
+    submenu_list_t *subMenu;
+} opl_io_module_t;
 
 /*
 BLURT output char blurttext[128];

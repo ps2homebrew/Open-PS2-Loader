@@ -110,6 +110,11 @@ typedef struct theme
 
     theme_elems_t mainElems;
     theme_elems_t infoElems;
+    theme_element_t *gamesItemsList;
+
+    theme_elems_t appsMainElems;
+    theme_elems_t appsInfoElems;
+    theme_element_t *appsItemsList;
 
     int gameCacheCount;
 

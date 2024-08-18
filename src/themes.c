@@ -455,6 +455,8 @@ static mutable_image_t *initMutableImage(const char *themePath, config_set_t *th
 
     findDuplicate(theme->mainElems.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
     findDuplicate(theme->infoElems.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
+    findDuplicate(theme->appsMainElems.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
+    findDuplicate(theme->appsInfoElems.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
 
     if (cachePattern && !mutableImage->cache) {
         if (type == ELEM_TYPE_ATTRIBUTE_IMAGE)
@@ -906,33 +908,34 @@ static void drawInfoHintText(struct menu_list *menu, struct submenu_list *item, 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void validateGUIElems(const char *themePath, config_set_t *themeConfig, theme_t *theme)
+static void validateBackgroundElems(const char *themePath, config_set_t *themeConfig, theme_t *theme, theme_elems_t *mainElems, theme_elems_t *infoElems)
 {
-    // 1. check we have a valid Background elements
-    if (!theme->mainElems.first || (theme->mainElems.first->type != ELEM_TYPE_BACKGROUND)) {
+    if (!mainElems->first || (mainElems->first->type != ELEM_TYPE_BACKGROUND)) {
         LOG("THEMES No valid background found for main, add default BG_ART\n");
         theme_element_t *backgroundElem = initBasic(themePath, themeConfig, theme, "bg", ELEM_TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
         initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, NULL);
-        backgroundElem->next = theme->mainElems.first;
-        theme->mainElems.first = backgroundElem;
+        backgroundElem->next = mainElems->first;
+        mainElems->first = backgroundElem;
     }
 
-    if (theme->infoElems.first) {
-        if (theme->infoElems.first->type != ELEM_TYPE_BACKGROUND) {
+    if (infoElems->first) {
+        if (infoElems->first->type != ELEM_TYPE_BACKGROUND) {
             LOG("THEMES No valid background found for info, add default BG_ART\n");
             theme_element_t *backgroundElem = initBasic(themePath, themeConfig, theme, "bg", ELEM_TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
             initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, NULL);
-            backgroundElem->next = theme->infoElems.first;
-            theme->infoElems.first = backgroundElem;
+            backgroundElem->next = infoElems->first;
+            infoElems->first = backgroundElem;
         }
     }
+}
 
-    // 2. check we have a valid ItemsList element, and link its decorator to the target element
-    if (theme->itemsList) {
-        items_list_t *itemsList = (items_list_t *)theme->itemsList->extended;
+static void validateItemsList(const char *themePath, config_set_t *themeConfig, theme_t *theme, theme_element_t *list, theme_elems_t *mainElems)
+{
+    if (list) {
+        items_list_t *itemsList = (items_list_t *)list->extended;
         if (itemsList->decorator) {
             // Second pass to find the decorator
-            theme_element_t *decoratorElem = theme->mainElems.first;
+            theme_element_t *decoratorElem = mainElems->first;
             while (decoratorElem) {
                 if (decoratorElem->type == ELEM_TYPE_GAME_IMAGE) {
                     mutable_image_t *gameImage = (mutable_image_t *)decoratorElem->extended;
@@ -950,11 +953,22 @@ static void validateGUIElems(const char *themePath, config_set_t *themeConfig, t
         }
     } else {
         LOG("THEMES No itemsList found, adding a default one\n");
-        theme->itemsList = initBasic(themePath, themeConfig, theme, "il", ELEM_TYPE_ITEMS_LIST, 42, 42, ALIGN_NONE, 373, 316, SCALING_RATIO, theme->textColor, theme->fonts[0]);
-        initItemsList(themePath, themeConfig, theme, theme->itemsList, "il", NULL);
-        theme->itemsList->next = theme->mainElems.first->next; // Position the itemsList as second element (right after the Background)
-        theme->mainElems.first->next = theme->itemsList;
+        list = initBasic(themePath, themeConfig, theme, "il", ELEM_TYPE_ITEMS_LIST, 42, 42, ALIGN_NONE, 373, 316, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+        initItemsList(themePath, themeConfig, theme, list, "il", NULL);
+        list->next = mainElems->first->next; // Position the itemsList as second element (right after the Background)
+        mainElems->first->next = list;
     }
+}
+
+static void validateGUIElems(const char *themePath, config_set_t *themeConfig, theme_t *theme)
+{
+    // 1. check we have a valid Background elements
+    validateBackgroundElems(themePath, themeConfig, theme, &theme->mainElems, &theme->infoElems);
+    validateBackgroundElems(themePath, themeConfig, theme, &theme->appsMainElems, &theme->appsInfoElems);
+
+    // 2. check we have a valid ItemsList element, and link its decorator to the target element
+    validateItemsList(themePath, themeConfig, theme, theme->gamesItemsList, &theme->mainElems);
+    validateItemsList(themePath, themeConfig, theme, theme->appsItemsList, &theme->appsMainElems);
 }
 
 static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t *theme, theme_elems_t *elems, const char *type, const char *name)
@@ -997,10 +1011,14 @@ static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t 
                 elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_TEXT, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawMenuText;
             } else if (!strcmp(elementsType[ELEM_TYPE_ITEMS_LIST], type)) {
-                if (!theme->itemsList) {
+                if (!theme->gamesItemsList) {
                     elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEMS_LIST, 0, 0, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                     initItemsList(themePath, themeConfig, theme, elem, name, NULL);
-                    theme->itemsList = elem;
+                    theme->gamesItemsList = elem;
+                } else if (!theme->appsItemsList) {
+                    elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEMS_LIST, 42, 42, ALIGN_NONE, 400, 360, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                    initItemsList(themePath, themeConfig, theme, elem, name, NULL);
+                    theme->appsItemsList = elem;
                 }
             } else if (!strcmp(elementsType[ELEM_TYPE_ITEM_ICON], type)) {
                 elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
@@ -1077,6 +1095,8 @@ static void thmFree(theme_t *theme)
         // free elements
         freeGUIElems(&theme->mainElems);
         freeGUIElems(&theme->infoElems);
+        freeGUIElems(&theme->appsMainElems);
+        freeGUIElems(&theme->appsInfoElems);
 
         // free textures
         GSTEXTURE *texture;
@@ -1189,8 +1209,14 @@ static void thmLoad(const char *themePath)
     newT->mainElems.last = NULL;
     newT->infoElems.first = NULL;
     newT->infoElems.last = NULL;
+    newT->appsMainElems.first = NULL;
+    newT->appsMainElems.last = NULL;
+    newT->appsInfoElems.first = NULL;
+    newT->appsInfoElems.last = NULL;
     newT->gameCacheCount = 0;
     newT->itemsList = NULL;
+    newT->gamesItemsList = NULL;
+    newT->appsItemsList = NULL;
     newT->loadingIcon = NULL;
     newT->loadingIconCount = LOAD7_ICON - LOAD0_ICON + 1;
 
@@ -1231,18 +1257,42 @@ static void thmLoad(const char *themePath)
     if (themePath)
         thmLoadFonts(themeConfig, themePath, newT);
 
-    int i = 1;
+    int i = 1, j;
     snprintf(path, sizeof(path), "main0");
     while (addGUIElem(themePath, themeConfig, newT, &newT->mainElems, NULL, path))
         snprintf(path, sizeof(path), "main%d", i++);
+
+    for (j = 0; j < i; j++) {
+        snprintf(path, sizeof(path), "appsMain%d", j);
+
+        if (addGUIElem(themePath, themeConfig, newT, &newT->appsMainElems, NULL, path))
+            continue;
+        else {
+            snprintf(path, sizeof(path), "main%d", j);
+            addGUIElem(themePath, themeConfig, newT, &newT->appsMainElems, NULL, path);
+        }
+    }
 
     i = 1;
     snprintf(path, sizeof(path), "info0");
     while (addGUIElem(themePath, themeConfig, newT, &newT->infoElems, NULL, path))
         snprintf(path, sizeof(path), "info%d", i++);
 
+    for (j = 0; j < i; j++) {
+        snprintf(path, sizeof(path), "appsInfo%d", j);
+
+        if (addGUIElem(themePath, themeConfig, newT, &newT->appsInfoElems, NULL, path))
+            continue;
+        else {
+            snprintf(path, sizeof(path), "info%d", j);
+            addGUIElem(themePath, themeConfig, newT, &newT->appsInfoElems, NULL, path);
+        }
+    }
+
     if (themePath)
         validateGUIElems(themePath, themeConfig, newT);
+
+    newT->itemsList = newT->gamesItemsList;
 
     configFree(themeConfig);
 

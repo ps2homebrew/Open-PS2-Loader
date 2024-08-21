@@ -680,3 +680,11 @@ gui_strings:
   string: Default Theme Music
 - label: DEF_BGM_PATH_HINT
   string: Set path to stream music for internal theme.
+- label: HIGH
+  string: High
+- label: LOW
+  string: Low
+- label: XSENSITIVITY
+  string: Analog X-Axis Sensitivity
+- label: YSENSITIVITY
+  string: Analog Y-Axis Sensitivity

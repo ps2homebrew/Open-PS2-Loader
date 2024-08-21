@@ -1015,6 +1015,17 @@ struct UIItem diaControllerConfig[] = {
     {UI_SPACER},
     {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
+
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_XSENSITIVITY}}},
+    {UI_SPACER},
+    {UI_ENUM, CFG_XSENSITIVITY, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_YSENSITIVITY}}},
+    {UI_SPACER},
+    {UI_ENUM, CFG_YSENSITIVITY, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
 #ifdef PADEMU
     {UI_BREAK},
     {UI_BUTTON, PADEMU_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},

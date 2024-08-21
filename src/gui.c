@@ -911,16 +911,23 @@ void guiShowControllerConfig(void)
     // configure the enumerations
     const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
     const char *selectButtons[] = {_l(_STR_CIRCLE), _l(_STR_CROSS), NULL};
+    const char *sensitivity[] = {_l(_STR_LOW), _l(_STR_MEDIUM), _l(_STR_HIGH), NULL};
 
     diaSetEnum(diaControllerConfig, UICFG_SCROLL, scrollSpeeds);
     diaSetEnum(diaControllerConfig, CFG_SELECTBUTTON, selectButtons);
+    diaSetEnum(diaControllerConfig, CFG_XSENSITIVITY, sensitivity);
+    diaSetEnum(diaControllerConfig, CFG_YSENSITIVITY, sensitivity);
 
     diaSetInt(diaControllerConfig, UICFG_SCROLL, gScrollSpeed);
     diaSetInt(diaControllerConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
+    diaSetInt(diaControllerConfig, CFG_XSENSITIVITY, gXSensitivity);
+    diaSetInt(diaControllerConfig, CFG_YSENSITIVITY, gYSensitivity);
 
     int result = diaExecuteDialog(diaControllerConfig, -1, 1, NULL);
     if (result) {
         diaGetInt(diaControllerConfig, UICFG_SCROLL, &gScrollSpeed);
+        diaGetInt(diaControllerConfig, CFG_XSENSITIVITY, &gXSensitivity);
+        diaGetInt(diaControllerConfig, CFG_YSENSITIVITY, &gYSensitivity);
 
         if (diaGetInt(diaControllerConfig, CFG_SELECTBUTTON, &value))
             gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;

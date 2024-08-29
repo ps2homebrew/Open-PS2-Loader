@@ -34,11 +34,11 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
         command[arglen] = '\0'; /* In a normal IOP reset process, the IOP reset command line will be NULL-terminated properly somewhere.
                         Since we're now taking things into our own hands, NULL terminate it here.
                         Some games like SOCOM3 will use a command line that isn't NULL terminated, resulting in things like "cdrom0:\RUN\IRX\DNAS300.IMGG;1" */
-        _strcpy(&command[arglen + 1], "img0:");
-        CommandLen = arglen + 6;
+        _strcpy(&command[arglen + 1], "host0:");
+        CommandLen = arglen + 7;
     } else {
-        _strcpy(command, "img0:");
-        CommandLen = 5;
+        _strcpy(command, "host0:");
+        CommandLen = 6;
     }
 
     GetOPLModInfo(OPL_MODULE_ID_IOPRP, &IOPRP_img, &size_IOPRP_img);

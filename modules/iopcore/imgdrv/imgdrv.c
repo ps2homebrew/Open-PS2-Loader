@@ -8,6 +8,7 @@ IRX_ID(MODNAME, 1, 1);
 
 unsigned int ioprpimg = 0xDEC1DEC1;
 int ioprpsiz = 0xDEC2DEC2;
+const char name[] = "host";
 
 int dummy_fs()
 {
@@ -27,6 +28,12 @@ int read_fs(iop_file_t *fd, void *buffer, int size)
 {
     memcpy(buffer, (void *)ioprpimg, size);
     return size;
+}
+
+int close_fs()
+{
+    DelDrv(name);
+    return 0;
 }
 
 typedef struct _iop_device_tm
@@ -54,24 +61,25 @@ iop_device_ops_t my_device_ops =
     {
         dummy_fs, // init
         dummy_fs, // deinit
-        NULL,     // dummy_fs,//format
-        dummy_fs, // open_fs,//open
-        dummy_fs, // close_fs,//close
+        NULL,     // dummy_fs,// format
+        dummy_fs, // open_fs,// open
+        close_fs, // close
         read_fs,  // read
-        NULL,     // dummy_fs,//write
+        NULL,     // dummy_fs,// write
         lseek_fs, // lseek
-                  /*dummy_fs,//ioctl
-    dummy_fs,//remove
-    dummy_fs,//mkdir
-    dummy_fs,//rmdir
-    dummy_fs,//dopen
-    dummy_fs,//dclose
-    dummy_fs,//dread
-    dummy_fs,//getstat
-    dummy_fs,//chstat*/
+                  /*
+        dummy_fs, // ioctl
+        dummy_fs, // remove
+        dummy_fs, // mkdir
+        dummy_fs, // rmdir
+        dummy_fs, // dopen
+        dummy_fs, // dclose
+        dummy_fs, // dread
+        dummy_fs, // getstat
+        dummy_fs, // chstat
+                   */
 };
 
-const char name[] = "img";
 iop_device_t my_device = {
     name,
     IOP_DT_FS,
@@ -81,7 +89,7 @@ iop_device_t my_device = {
 
 int _start(int argc, char **argv)
 {
-    // DelDrv("img");
+    DelDrv(name);
     AddDrv((iop_device_t *)&my_device);
 
     return MODULE_RESIDENT_END;

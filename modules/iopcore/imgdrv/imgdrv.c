@@ -71,7 +71,7 @@ iop_device_ops_t my_device_ops =
     dummy_fs,//chstat*/
 };
 
-const char name[] = "host";
+const char name[] = "img";
 iop_device_t my_device = {
     name,
     IOP_DT_FS,
@@ -81,7 +81,7 @@ iop_device_t my_device = {
 
 int _start(int argc, char **argv)
 {
-    DelDrv("host");
+    // DelDrv("img");
     AddDrv((iop_device_t *)&my_device);
 
     return MODULE_RESIDENT_END;

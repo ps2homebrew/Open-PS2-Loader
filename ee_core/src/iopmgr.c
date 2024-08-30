@@ -63,15 +63,20 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     *(void **)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpimg])) = pIOP_buffer;
     *(u32 *)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpsiz])) = size_IOPRP_img;
 
-    LoadModule("rom0:SYSCLIB", 0, NULL, 0);
     LoadMemModule(0, imgdrv_irx, size_imgdrv_irx, 0, NULL);
-    LoadModule("rom0:UDNL", CommandLen, command, 1);
+
+    DIntr();
+    ee_kmode_enter();
+    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
+    ee_kmode_exit();
+    EIntr();
+
+    LoadOPLModule(OPL_MODULE_ID_UDNL, SIF_RPC_M_NOWAIT, CommandLen, command);
 
     DIntr();
     ee_kmode_enter();
     Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT);
     Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_CMDINIT);
-    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
     Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
     Old_SifSetReg(SIF_SYSREG_SUBADDR, (int)NULL);
     ee_kmode_exit();

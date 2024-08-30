@@ -86,7 +86,7 @@ typedef struct
 
 int LoadFileInit();
 void LoadFileExit();
-int LoadModule(const char *path, int arg_len, const char *args, int mode);
+int LoadModule(const char *path, int arg_len, const char *args);
 int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, const char *args);
 int GetOPLModInfo(int id, void **pointer, unsigned int *size);
 int LoadOPLModule(int id, int mode, int arg_len, const char *args);

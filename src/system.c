@@ -488,6 +488,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
     modcount = 0;
     // Basic modules
+    irxptr_tab[modcount].info = size_udnl_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDNL);
+    irxptr_tab[modcount++].ptr = (void *)&udnl_irx;
     irxptr_tab[modcount].info = size_ioprp_image | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPRP);
     irxptr_tab[modcount++].ptr = ioprp_image;
     irxptr_tab[modcount].info = size_imgdrv_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IMGDRV);
@@ -568,6 +570,20 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
     irxtable->modules = irxptr_tab;
     irxtable->count = modcount;
+
+#ifdef __DECI2_DEBUG
+    // For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
+    // total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
+    irxptr = (void *)0x00033000;
+    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, (void *)((u8 *)irxptr + GET_OPL_MOD_SIZE(irxptr_tab[0].info)));
+    DI();
+    ee_kmode_enter();
+    memcpy((void *)(0x80000000 | (unsigned int)irxptr), irxptr_tab[0].ptr, GET_OPL_MOD_SIZE(irxptr_tab[0].info));
+    ee_kmode_exit();
+    EI();
+
+    irxptr_tab[0].ptr = irxptr; // UDNL is the first module.
+#endif
 
     total_size = (sizeof(irxtab_t) + sizeof(irxptr_t) * modcount + 0xF) & ~0xF;
     irxptr = (void *)((((unsigned int)irxptr_tab + sizeof(irxptr_t) * modcount) + 0xF) & ~0xF);

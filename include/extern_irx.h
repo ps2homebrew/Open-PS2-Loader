@@ -126,6 +126,8 @@ IMPORT_BIN2C(udptty_irx);
 
 IMPORT_BIN2C(udptty_ingame_irx);
 
+IMPORT_BIN2C(udnl_irx);
+
 IMPORT_BIN2C(usbd_irx);
 
 IMPORT_BIN2C(usbmass_bd_irx);

@@ -121,7 +121,7 @@ def make_lng(
         label = string_def['label']
         translation = translation_obj['translations'].get(label)
         if translation is None:
-            print(f'WARNING: translation for {label} not found in {translation_filename}', file=sys.stderr)
+            #print(f'WARNING: translation for {label} not found in {translation_filename}', file=sys.stderr)
             translation = string_def['string']
         if not isinstance(translation, str):
             if "untranslated" not in translation and "same" not in translation:

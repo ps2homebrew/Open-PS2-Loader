@@ -609,29 +609,29 @@ gui_strings:
 - label: PADMACROCONFIG
   string: Configure PADMACRO
 - label: PADMACRO_SETTINGS
-  string: Pad macro Settings
+  string: Pad Macro Settings
 - label: PADMACRO_ENABLE
   string: Pad macros
 - label: PADMACRO_SLOWDOWN
-  string: 'Analog slow-down:'
+  string: 'Analog Slow-Down:'
 - label: HINT_PADMACRO_SLOWDOWN_AXIS
-  string: Reduce range of analog stick when button is pressed
+  string: Reduce the range of analog stick when button is pressed.
 - label: LEFT_ANALOG
-  string: Left stick
+  string: Left Stick
 - label: RIGHT_ANALOG
-  string: Right stick
+  string: Right Stick
 - label: PADMACRO_INVERT_AXIS
-  string: 'Analog axis invert:'
+  string: 'Analog Axis Invert:'
 - label: HINT_PADMACRO_INVERT_AXIS
-  string: Invert analog stick axis
+  string: Inverts the axis of selected analog stick.
 - label: TURBO_SPEED
-  string: Turbo button speed
+  string: Turbo Button Speed
 - label: HINT_TURBO_SPEED
-  string: How fast to press the button when turbo is active
+  string: How fast the button is pressed when turbo is active.
 - label: ACT_WHILE_PRESSED
-  string: While button pressed
+  string: While Button Pressed
 - label: ACT_TOGGLED
-  string: Toggled by button
+  string: Toggled By Button
 - label: LANGUAGE_JAPANESE
   string: JAPANESE
 - label: LANGUAGE_ENGLISH

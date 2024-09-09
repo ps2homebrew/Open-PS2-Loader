@@ -335,10 +335,15 @@ static void itemExecTriangle(struct menu_item *curMenu)
 
 static void initMenuForListSupport(opl_io_module_t *mod)
 {
+    item_list_t *list = mod->support;
+
     mod->menuItem.icon_id = mod->support->itemIconId(mod->support);
     mod->menuItem.text = NULL;
     mod->menuItem.text_id = mod->support->itemTextId(mod->support);
-    mod->menuItem.visible = 1;
+    if (list->mode >= BDM_MODE1 && list->mode <= BDM_MODE4)
+        mod->menuItem.visible = 0;
+    else
+        mod->menuItem.visible = 1;
 
     mod->menuItem.userdata = mod->support;
 
@@ -427,13 +432,8 @@ static void initAllSupport(int force_reinit)
 static void deinitAllSupport(int exception, int modeSelected)
 {
     for (int i = 0; i < MODE_COUNT; i++) {
-        if (list_support[i].support != NULL) {
-            // If the selected mode is one of the mass devices then skip deinit for all mass device objects.
-            if (modeSelected >= BDM_MODE && modeSelected <= BDM_MODE4 && i <= BDM_MODE4)
-                continue;
-
+        if (list_support[i].support != NULL)
             moduleCleanup(&list_support[i], exception, modeSelected);
-        }
     }
 }
 
@@ -1640,10 +1640,8 @@ void setDefaultColors(void)
 
 static void setDefaults(void)
 {
-    clearIOModuleT(&list_support[BDM_MODE]);
-    clearIOModuleT(&list_support[ETH_MODE]);
-    clearIOModuleT(&list_support[HDD_MODE]);
-    clearIOModuleT(&list_support[APP_MODE]);
+    for (int i = 0; i < MODE_COUNT; i++)
+        clearIOModuleT(&list_support[i]);
 
     gAutoLaunchGame = NULL;
     gAutoLaunchBDMGame = NULL;

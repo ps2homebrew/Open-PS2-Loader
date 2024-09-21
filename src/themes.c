@@ -785,8 +785,8 @@ static void drawMenuText(struct menu_list *menu, struct submenu_list *item, conf
 static void drawBDMIndex(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
     item_list_t *itemList = menu->item->userdata;
-    // Only render for bdm modes
-    if (itemList->mode >= ETH_MODE)
+    // Only render for bdm modes and if current mode is visible
+    if (itemList->mode >= ETH_MODE || menu->item->visible == 0)
         return;
 
     // Only render if multiple mass devices are connected

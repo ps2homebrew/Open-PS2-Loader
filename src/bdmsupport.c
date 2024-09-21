@@ -313,12 +313,15 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
 
-    bdm_device_data_t *pDeviceData = (bdm_device_data_t *)itemList->priv;
+    bdm_device_data_t *pDeviceData = NULL;
 
-    if (gAutoLaunchBDMGame == NULL)
+    if (gAutoLaunchBDMGame == NULL) {
+        pDeviceData = (bdm_device_data_t *)itemList->priv;
         game = &pDeviceData->bdmGames[id];
-    else
+    } else {
+        pDeviceData = gAutoLaunchDeviceData;
         game = gAutoLaunchBDMGame;
+    }
 
     char vmc_name[32], vmc_path[256], have_error = 0;
     int vmc_id, size_mcemu_irx = 0;
@@ -501,6 +504,9 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
 
         free(gAutoLaunchBDMGame);
         gAutoLaunchBDMGame = NULL;
+
+        free(gAutoLaunchDeviceData);
+        gAutoLaunchDeviceData = NULL;
     }
 
     LOG("bdm pre sysLaunchLoaderElf\n");

@@ -299,5 +299,9 @@ Since 05/07/2021 every OPL build dispatched to the release section of this repos
 
 > Main game executable could not be found. Either game is fragmented or image is corrupted
 
+### OPL does not display anything on boot
+
+> You may have selected a Video Mode which your TV does not support. Hold Triangle and Cross while OPL initializes to reset your video mode to "Auto".
+
 </p>
 </details>

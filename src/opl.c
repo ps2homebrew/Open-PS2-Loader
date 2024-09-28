@@ -890,7 +890,15 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_ENABLE_NOTIFICATIONS, &gEnableNotifications);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, &gEnableArt);
             configGetInt(configOPL, CONFIG_OPL_WIDESCREEN, &gWideScreen);
-            configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
+
+            if (!(getKeyPressed(KEY_TRIANGLE) && getKeyPressed(KEY_CROSS))) {
+                configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
+            } else {
+                LOG("--- Select held at boot - setting Video Mode to Auto ---\n");
+                gVMode = 0;
+                configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
+            }
+
             configGetInt(configOPL, CONFIG_OPL_XOFF, &gXOff);
             configGetInt(configOPL, CONFIG_OPL_YOFF, &gYOff);
             configGetInt(configOPL, CONFIG_OPL_OVERSCAN, &gOverscan);

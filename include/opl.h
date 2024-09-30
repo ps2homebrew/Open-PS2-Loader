@@ -146,6 +146,9 @@ extern int gBootSndVolume;
 extern int gBGMVolume;
 extern char gDefaultBGMPath[128];
 
+extern int gXSensitivity;
+extern int gYSensitivity;
+
 extern int gCheatSource;
 extern int gGSMSource;
 extern int gPadEmuSource;

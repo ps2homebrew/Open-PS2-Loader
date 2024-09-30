@@ -108,6 +108,8 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_BOOT_SND_VOLUME      "boot_snd_volume"
 #define CONFIG_OPL_BGM_VOLUME           "bgm_volume"
 #define CONFIG_OPL_DEFAULT_BGM_PATH     "default_bgm_path"
+#define CONFIG_OPL_XSENSITIVITY         "x_sensitivity"
+#define CONFIG_OPL_YSENSITIVITY         "y_sensitivity"
 
 // Network config keys
 #define CONFIG_NET_ETH_LINKM          "eth_linkmode"

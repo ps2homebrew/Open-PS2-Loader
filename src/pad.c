@@ -193,6 +193,54 @@ static void updatePadState(struct pad_data_t *pad, int state)
         pad->state = state;
 }
 
+static u32 readLeftJoy(struct pad_data_t *pad, u32 pdata)
+{
+    u32 padData = pdata;
+    int xDeadzone, yDeadzone;
+
+    if ((pad->buttons.mode >> 4) == 0x07) {
+        switch (gXSensitivity) {
+            case 0:
+                xDeadzone = 100;
+                break;
+            case 1:
+                xDeadzone = 80;
+                break;
+            case 2:
+                xDeadzone = 60;
+                break;
+            default:
+                xDeadzone = 80;
+        }
+
+        switch (gYSensitivity) {
+            case 0:
+                yDeadzone = 100;
+                break;
+            case 1:
+                yDeadzone = 80;
+                break;
+            case 2:
+                yDeadzone = 60;
+                break;
+            default:
+                yDeadzone = 80;
+        }
+
+        if (pad->buttons.ljoy_h < 127 - xDeadzone)
+            padData |= PAD_LEFT;
+        else if (pad->buttons.ljoy_h > 127 + xDeadzone)
+            padData |= PAD_RIGHT;
+
+        if (pad->buttons.ljoy_v < 127 - yDeadzone)
+            padData |= PAD_UP;
+        else if (pad->buttons.ljoy_v > 127 + yDeadzone)
+            padData |= PAD_DOWN;
+    }
+
+    return padData;
+}
+
 static int readPad(struct pad_data_t *pad)
 {
     int rcode = 0, oldState, newState, ret, padsRead;
@@ -246,6 +294,8 @@ static int readPad(struct pad_data_t *pad)
             rcode = 1;
         else
             rcode = 0;
+
+        newpdata |= readLeftJoy(pad, newpdata);
 
         pad->oldpaddata = pad->paddata;
         pad->paddata = newpdata;

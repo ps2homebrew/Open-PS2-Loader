@@ -22,8 +22,8 @@
 #include <smod.h>
 
 #ifdef __EESIO_DEBUG
-#define DPRINTF(args...) ;
-#define DINIT()          ;
+#define DPRINTF(args...) _print(args);
+#define DINIT()          InitDebug();
 #else
 #define DPRINTF(args...) \
     do {                 \

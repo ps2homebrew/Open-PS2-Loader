@@ -263,7 +263,7 @@ void hddLoadModules(void)
     }
 }
 
-void hddInit(void)
+void hddInit(item_list_t *itemList)
 {
     LOG("HDDSUPPORT Init\n");
     hddForceUpdate = 0; // Use cache at initial startup.
@@ -279,13 +279,13 @@ item_list_t *hddGetObject(int initOnly)
     return &hddGameList;
 }
 
-static int hddNeedsUpdate(void)
+static int hddNeedsUpdate(item_list_t *itemList)
 { /* Auto refresh is disabled by setting HDD_MODE_UPDATE_DELAY to MENU_UPD_DELAY_NOUPDATE, within hddsupport.h.
        Hence any update request would be issued by the user, which should be taken as an explicit request to re-scan the HDD. */
     return 1;
 }
 
-static int hddUpdateGameList(void)
+static int hddUpdateGameList(item_list_t *itemList)
 {
     hdl_games_list_t hddGamesNew;
     int ret;
@@ -306,38 +306,38 @@ static int hddUpdateGameList(void)
     return (ret == 0 ? hddGames.count : 0);
 }
 
-static int hddGetGameCount(void)
+static int hddGetGameCount(item_list_t *itemList)
 {
     return hddGames.count;
 }
 
-static void *hddGetGame(int id)
+static void *hddGetGame(item_list_t *itemList, int id)
 {
     return (void *)&hddGames.games[id];
 }
 
-static char *hddGetGameName(int id)
+static char *hddGetGameName(item_list_t *itemList, int id)
 {
     return hddGames.games[id].name;
 }
 
-static int hddGetGameNameLength(int id)
+static int hddGetGameNameLength(item_list_t *itemList, int id)
 {
     return HDL_GAME_NAME_MAX + 1;
 }
 
-static char *hddGetGameStartup(int id)
+static char *hddGetGameStartup(item_list_t *itemList, int id)
 {
     return hddGames.games[id].startup;
 }
 
-static void hddDeleteGame(int id)
+static void hddDeleteGame(item_list_t *itemList, int id)
 {
     hddDeleteHDLGame(&hddGames.games[id]);
     hddForceUpdate = 1;
 }
 
-static void hddRenameGame(int id, char *newName)
+static void hddRenameGame(item_list_t *itemList, int id, char *newName)
 {
     hdl_game_info_t *game = &hddGames.games[id];
     strcpy(game->name, newName);
@@ -345,7 +345,7 @@ static void hddRenameGame(int id, char *newName)
     hddForceUpdate = 1;
 }
 
-void hddLaunchGame(int id, config_set_t *configSet)
+void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
 {
     int i, size_irx = 0;
     int EnablePS2Logo = 0;
@@ -536,7 +536,7 @@ void hddLaunchGame(int id, config_set_t *configSet)
     sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }
 
-static config_set_t *hddGetConfig(int id)
+static config_set_t *hddGetConfig(item_list_t *itemList, int id)
 {
     char path[256];
     hdl_game_info_t *game = &hddGames.games[id];
@@ -554,7 +554,7 @@ static config_set_t *hddGetConfig(int id)
     return config;
 }
 
-static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
+static int hddGetImage(item_list_t *itemList, char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
 {
     char path[256];
     if (isRelative)
@@ -564,18 +564,18 @@ static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1);
 }
 
-static int hddGetTextId(void)
+static int hddGetTextId(item_list_t *itemList)
 {
     return _STR_HDD_GAMES;
 }
 
-static int hddGetIconId(void)
+static int hddGetIconId(item_list_t *itemList)
 {
     return HDD_ICON;
 }
 
 // This may be called, even if hddInit() was not.
-static void hddCleanUp(int exception)
+static void hddCleanUp(item_list_t *itemList, int exception)
 {
     LOG("HDDSUPPORT CleanUp\n");
 
@@ -594,13 +594,13 @@ static void hddCleanUp(int exception)
     }
 }
 
-static int hddCheckVMC(char *name, int createSize)
+static int hddCheckVMC(item_list_t *itemList, char *name, int createSize)
 {
     return sysCheckVMC(gHDDPrefix, "/", name, createSize, NULL);
 }
 
 // This may be called, even if hddInit() was not.
-static void hddShutdown(void)
+static void hddShutdown(item_list_t *itemList)
 {
     LOG("HDDSUPPORT Shutdown\n");
 
@@ -728,12 +728,12 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
     return result;
 }
 
-static char *hddGetPrefix(void)
+static char *hddGetPrefix(item_list_t *itemList)
 {
     return gHDDPrefix;
 }
 
 static item_list_t hddGameList = {
-    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, &hddGetTextId, &hddGetPrefix, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, NULL, NULL, &hddGetTextId, &hddGetPrefix, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
     &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, &hddGetIconId};

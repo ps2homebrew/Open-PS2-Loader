@@ -79,22 +79,25 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o bdmevent.o \
 		iremsndpatch.o apemodpatch.o f2techioppatch.o cleareffects.o resetspu.o \
 		libsd.o audsrv.o
 
-EECORE_OBJS = ee_core.o ioprp.o util.o imgdrv.o eesync.o \
+EECORE_OBJS = ee_core.o ioprp.o util.o \
+		udnl.o imgdrv.o eesync.o \
 		bdm_cdvdman.o IOPRP_img.o smb_cdvdman.o \
 		hdd_cdvdman.o hdd_hdpro_cdvdman.o cdvdfsv.o \
 		ingame_smstcpip.o smap_ingame.o smbman.o smbinit.o
 
 PNG_ASSETS = load0 load1 load2 load3 load4 load5 load6 load7 usb usb_bd ilk_bd \
-	m4s_bd hdd eth app cross triangle circle square select start left right up down \
+	m4s_bd hdd eth app cross triangle circle square select start left right \
 	background info cover disc screen ELF HDL ISO UL CD DVD Aspect_s Aspect_w Aspect_w1 \
 	Aspect_w2 Device_1 Device_2 Device_3 Device_4 Device_5 Device_6 Device_all Rating_0 \
 	Rating_1 Rating_2 Rating_3 Rating_4 Rating_5 Scan_240p Scan_240p1 Scan_480i Scan_480p \
 	Scan_480p1 Scan_480p2 Scan_480p3 Scan_480p4 Scan_480p5 Scan_576i Scan_576p Scan_720p \
-	Scan_1080i Scan_1080i2 Scan_1080p Vmode_multi Vmode_ntsc Vmode_pal logo case
+	Scan_1080i Scan_1080i2 Scan_1080p Vmode_multi Vmode_ntsc Vmode_pal logo case \
+	Index_0 Index_1 Index_2 Index_3 Index_4
+	# unused icons - up down l1 l2 l3 r1 r2 r3
 
 GFX_OBJS = $(PNG_ASSETS:%=%_png.o) poeveticanew.o icon_sys.o icon_icn.o
 
-AUDIO_OBJS =	boot.o cancel.o confirm.o cursor.o message.o transition.o
+AUDIO_OBJS =	boot.o cancel.o confirm.o cursor.o message.o transition.o bd_connect.o bd_disconnect.o
 
 MISC_OBJS =	icon_sys_A.o icon_sys_J.o icon_sys_C.o conf_theme_OPL.o
 
@@ -132,6 +135,9 @@ endif
 ifeq ($(DTL_T10000),1)
   EE_CFLAGS += -D_DTL_T10000
   EECORE_EXTRA_FLAGS += DTL_T10000=1
+  UDNL_OUT = $(PS2SDK)/iop/irx/udnl-t300.irx
+else
+  UDNL_OUT = $(PS2SDK)/iop/irx/udnl.irx
 endif
 
 ifeq ($(IGS),1)
@@ -380,6 +386,9 @@ ee_core/ee_core.elf: ee_core
 
 $(EE_ASM_DIR)ee_core.c: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ eecore_elf
+
+$(EE_ASM_DIR)udnl.c: $(UDNL_OUT) | $(EE_ASM_DIR)
+	$(BIN2C) $(UDNL_OUT) $@ udnl_irx
 
 modules/iopcore/imgdrv/imgdrv.irx: modules/iopcore/imgdrv
 	$(MAKE) -C $<
@@ -719,6 +728,12 @@ $(EE_ASM_DIR)message.c: audio/message.adp | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_adp
 
 $(EE_ASM_DIR)transition.c: audio/transition.adp | $(EE_ASM_DIR)
+	$(BIN2C) $< $@ $(*F)_adp
+
+$(EE_ASM_DIR)bd_connect.c: audio/bd_connect.adp | $(EE_ASM_DIR)
+	$(BIN2C) $< $@ $(*F)_adp
+
+$(EE_ASM_DIR)bd_disconnect.c: audio/bd_disconnect.adp | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_adp
 
 $(EE_ASM_DIR)IOPRP_img.c: modules/iopcore/IOPRP.img | $(EE_ASM_DIR)

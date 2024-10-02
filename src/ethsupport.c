@@ -415,7 +415,7 @@ static void smbLoadModules(void)
     ethDisplayErrorStatus();
 }
 
-void ethInit(void)
+void ethInit(item_list_t *itemList)
 {
     if (ethInitSema() < 0)
         return;
@@ -448,7 +448,7 @@ item_list_t *ethGetObject(int initOnly)
     return &ethGameList;
 }
 
-static int ethNeedsUpdate(void)
+static int ethNeedsUpdate(item_list_t *itemList)
 {
     int result;
 
@@ -484,7 +484,7 @@ static int ethNeedsUpdate(void)
     return result;
 }
 
-static int ethUpdateGameList(void)
+static int ethUpdateGameList(item_list_t *itemList)
 {
     if (gPCShareName[0]) {
         if (gNetworkStartup != 0)
@@ -530,22 +530,22 @@ static int ethUpdateGameList(void)
     return ethGameCount;
 }
 
-static int ethGetGameCount(void)
+static int ethGetGameCount(item_list_t *itemList)
 {
     return ethGameCount;
 }
 
-static void *ethGetGame(int id)
+static void *ethGetGame(item_list_t *itemList, int id)
 {
     return (void *)&ethGames[id];
 }
 
-static char *ethGetGameName(int id)
+static char *ethGetGameName(item_list_t *itemList, int id)
 {
     return ethGames[id].name;
 }
 
-static int ethGetGameNameLength(int id)
+static int ethGetGameNameLength(item_list_t *itemList, int id)
 {
     if (ethGames[id].format != GAME_FORMAT_USBLD)
         return ISO_GAME_NAME_MAX + 1;
@@ -553,24 +553,24 @@ static int ethGetGameNameLength(int id)
         return UL_GAME_NAME_MAX + 1;
 }
 
-static char *ethGetGameStartup(int id)
+static char *ethGetGameStartup(item_list_t *itemList, int id)
 {
     return ethGames[id].startup;
 }
 
-static void ethDeleteGame(int id)
+static void ethDeleteGame(item_list_t *itemList, int id)
 {
     sbDelete(&ethGames, ethPrefix, "\\", ethGameCount, id);
     ethULSizePrev = -2;
 }
 
-static void ethRenameGame(int id, char *newName)
+static void ethRenameGame(item_list_t *itemList, int id, char *newName)
 {
     sbRename(&ethGames, ethPrefix, "\\", ethGameCount, id, newName);
     ethULSizePrev = -2;
 }
 
-static void ethLaunchGame(int id, config_set_t *configSet)
+static void ethLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
 {
     int i, compatmask;
     int EnablePS2Logo = 0;
@@ -714,12 +714,12 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, smb_cdvdman_irx, size_mcemu_irx, smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
 
-static config_set_t *ethGetConfig(int id)
+static config_set_t *ethGetConfig(item_list_t *itemList, int id)
 {
     return sbPopulateConfig(&ethGames[id], ethPrefix, "\\");
 }
 
-static int ethGetImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
+static int ethGetImage(item_list_t *itemList, char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
 {
     char path[256];
     if (isRelative)
@@ -729,18 +729,18 @@ static int ethGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1);
 }
 
-static int ethGetTextId(void)
+static int ethGetTextId(item_list_t *itemList)
 {
     return _STR_NET_GAMES;
 }
 
-static int ethGetIconId(void)
+static int ethGetIconId(item_list_t *itemList)
 {
     return ETH_ICON;
 }
 
 // This may be called, even if ethInit() was not.
-static void ethCleanUp(int exception)
+static void ethCleanUp(item_list_t *itemList, int exception)
 {
     if (ethGameList.enabled) {
         LOG("ETHSUPPORT CleanUp\n");
@@ -757,7 +757,7 @@ static void ethCleanUp(int exception)
 }
 
 // This may be called, even if ethInit() was not.
-static void ethShutdown(void)
+static void ethShutdown(item_list_t *itemList)
 {
     if (ethGameList.enabled) {
         LOG("ETHSUPPORT Shutdown\n");
@@ -776,18 +776,18 @@ static void ethShutdown(void)
         sysShutdownDev9();
 }
 
-static int ethCheckVMC(char *name, int createSize)
+static int ethCheckVMC(item_list_t *itemList, char *name, int createSize)
 {
     return sysCheckVMC(ethPrefix, "\\", name, createSize, NULL);
 }
 
-static char *ethGetPrefix(void)
+static char *ethGetPrefix(item_list_t *itemList)
 {
     return ethPrefix;
 }
 
 static item_list_t ethGameList = {
-    ETH_MODE, 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, &ethGetTextId, &ethGetPrefix, &ethInit, &ethNeedsUpdate,
+    ETH_MODE, 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, NULL, NULL, &ethGetTextId, &ethGetPrefix, &ethInit, &ethNeedsUpdate,
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
     &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, &ethGetIconId};
 

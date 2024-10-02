@@ -17,8 +17,10 @@ int debugSetActive(void)
 #ifndef _DTL_T10000
     int ret;
 
+#if !defined(TTY_PPC_UART) // networkless logging! yay!!!
     if ((ret = ethLoadInitModules()) != 0)
         return -1;
+#endif
 
 #ifdef __DECI2_DEBUG
     LOG("[DRVTIF]:\n");

@@ -1,6 +1,7 @@
 enum OPL_MODULE_ID {
     // Basic modules
-    OPL_MODULE_ID_IOPRP = 1,
+    OPL_MODULE_ID_UDNL = 1,
+    OPL_MODULE_ID_IOPRP,
     OPL_MODULE_ID_IMGDRV,
     OPL_MODULE_ID_RESETSPU,
 

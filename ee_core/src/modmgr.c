@@ -50,7 +50,7 @@ void LoadFileExit()
 /*----------------------------------------------------------------------------------------*/
 /* Load an irx module from path with waiting.                                             */
 /*----------------------------------------------------------------------------------------*/
-int LoadModule(const char *path, int arg_len, const char *args, int mode)
+int LoadModule(const char *path, int arg_len, const char *args)
 {
     struct _lf_module_load_arg arg;
 
@@ -68,7 +68,7 @@ int LoadModule(const char *path, int arg_len, const char *args, int mode)
     } else
         arg.p.arg_len = 0;
 
-    if (SifCallRpc(&_lf_cd, LF_F_MOD_LOAD, mode, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
+    if (SifCallRpc(&_lf_cd, LF_F_MOD_LOAD, 0x0, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
         return -SCE_ECALLMISS;
 
     return arg.p.result;

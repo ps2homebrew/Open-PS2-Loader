@@ -98,15 +98,17 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     DPRINTF("Loading extra IOP modules...\n");
 
 #ifdef __LOAD_DEBUG_MODULES
+#if !defined(TTY_PPC)
     LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
+#endif
 #ifdef __DECI2_DEBUG
     LoadOPLModule(OPL_MODULE_ID_DRVTIF, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_TIFINET, 0, 0, NULL);
 #elif defined(TTY_UDP)
     LoadOPLModule(OPL_MODULE_ID_UDPTTY, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
-#elif defined(TTY_PPC_UART)
+#elif defined(TTY_PPC)
     LoadOPLModule(OPL_MODULE_ID_PPCTTY, 0, 0, NULL);
     LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
 #endif

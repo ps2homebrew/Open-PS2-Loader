@@ -17,8 +17,10 @@ int debugSetActive(void)
 #ifndef _DTL_T10000
     int ret;
 
+#if defined(TTY_UDP) || defined(__DECI2_DEBUG)
     if ((ret = ethLoadInitModules()) != 0)
         return -1;
+#endif
 
 #ifdef __DECI2_DEBUG
     LOG("[DRVTIF]:\n");

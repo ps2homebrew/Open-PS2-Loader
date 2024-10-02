@@ -6,11 +6,14 @@ EXTRAVERSION = Beta
 # How to DEBUG?
 # Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.
 # Debug modes:
-#	debug		-	UI-side debug mode (UDPTTY)
-#	iopcore_debug	-	UI-side + iopcore debug mode (UDPTTY).
-#	ingame_debug	-	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (UDPTTY).
-#	eesio_debug	-	UI-side + eecore debug mode (EE SIO)
-#	deci2_debug	-	UI-side + in-game DECI2 debug mode (EE-side only).
+#	debug		    	 -	UI-side debug mode (UDPTTY)
+#	iopcore_debug		 -	UI-side + iopcore debug mode (UDPTTY).
+#	ingame_debug		 -	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (UDPTTY).
+#	debug_ppctty		 -	UI-side debug mode (PowerPC UART)
+#	iopcore_ppctty_debug -	UI-side + iopcore debug mode (PowerPC UART).
+#	ingame_ppctty_debug	 -	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (PowerPC UART).
+#	eesio_debug			 -	UI-side + eecore debug mode (EE SIO)
+#	deci2_debug			 -	UI-side + in-game DECI2 debug mode (EE-side only).
 
 # I want to put my name in my custom build! How can I do it?
 # Type "make LOCALVERSION=-foobar"
@@ -177,9 +180,9 @@ ifeq ($(DEBUG),1)
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
     SMSTCPIP_INGAME_CFLAGS =
-	ifeq ($(TTY_APPROACH),UDP)
+    ifeq ($(TTY_APPROACH),UDP)
       IOP_OBJS += udptty-ingame.o
-	endif
+    endif
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
     EE_LIBS += -lsiocookie
@@ -222,7 +225,7 @@ EE_LDFLAGS += -fdata-sections -ffunction-sections -Wl,--gc-sections
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug debug_ppctty iopcore_ppctty_debug ingame_ppctty_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
 
 ifdef PS2SDK
 
@@ -253,13 +256,13 @@ deci2_debug:
 	$(MAKE) DEBUG=1 INGAME_DEBUG=1 DECI2_DEBUG=1 all
 
 debug_ppctty:
-	$(MAKE) DEBUG=1 all TTY_APPROACH=PPC_UART
+	$(MAKE) DEBUG=1 TTY_APPROACH=PPC_UART all
 
 iopcore_ppctty_debug:
-	$(MAKE) DEBUG=1 IOPCORE_DEBUG=1 all TTY_APPROACH=PPC_UART
+	$(MAKE) DEBUG=1 IOPCORE_DEBUG=1 TTY_APPROACH=PPC_UART all
 
 ingame_ppctty_debug:
-	$(MAKE) DEBUG=1 INGAME_DEBUG=1 all TTY_APPROACH=PPC_UART
+	$(MAKE) DEBUG=1 INGAME_DEBUG=1 TTY_APPROACH=PPC_UART all
 
 clean:	download_lwNBD
 	echo "Cleaning..."

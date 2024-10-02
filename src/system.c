@@ -832,7 +832,10 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 #ifdef __DECI2_DEBUG
     modules |= CORE_IRX_DECI2 | CORE_IRX_ETH;
 #elif defined(__INGAME_DEBUG)
-    modules |= CORE_IRX_DEBUG | CORE_IRX_ETH;
+    modules |= CORE_IRX_DEBUG;
+#ifdef TTY_UDP
+    modules |= CORE_IRX_ETH;
+#endif
 #endif
 
     modules |= CORE_IRX_VMC;

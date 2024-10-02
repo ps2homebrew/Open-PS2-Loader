@@ -120,9 +120,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        debug: [debug, iopcore_debug, ingame_debug, deci2_debug, eesio_debug,
-          debug_ppctty, iopcore_ppctty_debug, ingame_ppctty_debug,
-        ]
+        debug: [iopcore_debug, ingame_debug, eesio_debug, iopcore_ppctty_debug, ingame_ppctty_debug]
     runs-on: ubuntu-latest
     container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:

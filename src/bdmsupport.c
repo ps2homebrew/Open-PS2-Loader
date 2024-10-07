@@ -313,12 +313,15 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
 
-    bdm_device_data_t *pDeviceData = (bdm_device_data_t *)itemList->priv;
+    bdm_device_data_t *pDeviceData = NULL;
 
-    if (gAutoLaunchBDMGame == NULL)
+    if (gAutoLaunchBDMGame == NULL) {
+        pDeviceData = (bdm_device_data_t *)itemList->priv;
         game = &pDeviceData->bdmGames[id];
-    else
+    } else {
+        pDeviceData = gAutoLaunchDeviceData;
         game = gAutoLaunchBDMGame;
+    }
 
     char vmc_name[32], vmc_path[256], have_error = 0;
     int vmc_id, size_mcemu_irx = 0;
@@ -489,6 +492,11 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
 
+    // deinit will free per device data.. copy driver name before free to compare for launch
+    char bdmCurrentDriver[32];
+    snprintf(bdmCurrentDriver, sizeof(bdmCurrentDriver), "%s", pDeviceData->bdmDriver);
+    settings->bdDeviceId = pDeviceData->massDeviceIndex;
+
     if (gAutoLaunchBDMGame == NULL)
         deinit(NO_EXCEPTION, itemList->mode); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
     else {
@@ -496,17 +504,19 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
 
         free(gAutoLaunchBDMGame);
         gAutoLaunchBDMGame = NULL;
+
+        free(gAutoLaunchDeviceData);
+        gAutoLaunchDeviceData = NULL;
     }
 
     LOG("bdm pre sysLaunchLoaderElf\n");
-    settings->bdDeviceId = pDeviceData->massDeviceIndex;
-    if (!strcmp(pDeviceData->bdmDriver, "usb")) {
+    if (!strcmp(bdmCurrentDriver, "usb")) {
         settings->common.fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
         sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
-    } else if (!strcmp(pDeviceData->bdmDriver, "sd") && strlen(pDeviceData->bdmDriver) == 2) {
+    } else if (!strcmp(bdmCurrentDriver, "sd") && strlen(bdmCurrentDriver) == 2) {
         settings->common.fakemodule_flags |= 0 /* TODO! fake ilinkman ? */;
         sysLaunchLoaderElf(filename, "BDM_ILK_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
-    } else if (!strcmp(pDeviceData->bdmDriver, "sdc") && strlen(pDeviceData->bdmDriver) == 3) {
+    } else if (!strcmp(bdmCurrentDriver, "sdc") && strlen(bdmCurrentDriver) == 3) {
         settings->common.fakemodule_flags |= 0;
         sysLaunchLoaderElf(filename, "BDM_M4S_MODE", irx_size, irx, size_mcemu_irx, bdm_mcemu_irx, EnablePS2Logo, compatmask);
     }

@@ -378,9 +378,9 @@ static void appLaunchItem(item_list_t *itemList, int id, config_set_t *configSet
 
     fd = open(filename, O_RDONLY);
     if (fd >= 0) {
-        int mode, argc = 1;
+        int mode, argc = 0;
         char partition[128];
-        char *argv[2];
+        char *argv[1];
         close(fd);
 
         strcpy(partition, "");
@@ -393,11 +393,9 @@ static void appLaunchItem(item_list_t *itemList, int id, config_set_t *configSet
         if (mode == HDD_MODE)
             snprintf(partition, sizeof(partition), "%s:", gOPLPart);
 
-        argv[0] = (char *)filename;
-
         if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &argv1) != 0) {
-            argv[1] = (char *)argv1;
-            argc = 2;
+            argv[0] = (char *)argv1;
+            argc = 1;
         }
 
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed

@@ -76,3 +76,11 @@ int ata_device_set_transfer_mode(int device, int type, int mode)
 
     return 0;
 }
+
+int ata_device_identify(int device, void *info)
+{
+    int res;
+    if (!(res = sceAtaExecCmd(info, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_IDENTIFY_DEVICE)))
+        res = sceAtaWaitResult();
+    return res;
+}

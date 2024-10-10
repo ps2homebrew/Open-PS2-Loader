@@ -149,15 +149,29 @@ int GetOPLModInfo(int id, void **pointer, unsigned int *size)
 
 int LoadOPLModule(int id, int mode, int arg_len, const char *args)
 {
-    int result;
+    int result, x = 50;
     void *pointer;
     unsigned int size;
 
     if ((result = GetOPLModInfo(id, &pointer, &size)) == 0) {
-        if (size > 0)
+        if (size > 0) {
             result = LoadMemModule(mode, pointer, size, arg_len, args);
+            if (result < 1) { // El_isra: only check for MODLOAD errors for simplicity
+                if (EnableDebug) {
+                    GS_BGCOLOUR = 0xdcff00; // Yellow. MODLOAD cannot load IRX
+                    while(--x)
+                        ;
+                }
+            }
+        } else {
+            if (EnableDebug) {
+                GS_BGCOLOUR = 0xdcff00; // Teal // Module size is not right
+                while(--x)
+                    ;
+            }
+        }
     }
-
+    GS_BGCOLOUR = 0x000000; // reset color
     return result;
 }
 

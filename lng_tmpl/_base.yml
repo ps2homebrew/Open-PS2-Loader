@@ -165,9 +165,9 @@ gui_strings:
 - label: BDMMODE
   string: BDM Start Mode
 - label: HDDMODE
-  string: HDD Device Start Mode
+  string: HDD (APA) Start Mode
 - label: ETHMODE
-  string: ETH Device Start Mode
+  string: ETH Start Mode
 - label: APPMODE
   string: Applications Start Mode
 - label: AUTO
@@ -692,3 +692,5 @@ gui_strings:
   string: 'Files found: %i'
 - label: CHEAT_SELECTION
   string: Cheat Selection
+- label: HDD_HINT
+  string: Only one HDD allowed, enabling locks APA or GPT.

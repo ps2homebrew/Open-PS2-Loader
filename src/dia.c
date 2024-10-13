@@ -131,7 +131,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
 
         guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 
-        rmEndFrame();
+        guiEndFrame();
 
         if (getKey(KEY_LEFT)) {
             sfxPlay(SFX_CURSOR);
@@ -281,7 +281,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
     while (1) {
         readPads();
 
-        rmStartFrame();
+        guiStartFrame();
         guiDrawBGPlasma();
         rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
@@ -321,7 +321,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
         guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_OK, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
         guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 
-        rmEndFrame();
+        guiEndFrame();
 
         if (getKey(KEY_LEFT)) {
             if (col[selc] > 0) {
@@ -880,9 +880,9 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
     // okay, we have the first selectable item
     // we can proceed with rendering etc. etc.
     while (1) {
-        rmStartFrame();
+        guiStartFrame();
         diaRenderUI(ui, inMenu, cur, haveFocus);
-        rmEndFrame();
+        guiEndFrame();
 
         readPads();
 

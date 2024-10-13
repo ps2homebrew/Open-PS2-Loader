@@ -75,6 +75,12 @@ void guiLock();
 /** Unlocks gui after direct gui data updates */
 void guiUnlock();
 
+/** Locks gui for rendering a frame */
+void guiStartFrame();
+
+/** Displays frame and ulocks gui */
+void guiEndFrame();
+
 /** invokes the intro loop */
 void guiIntroLoop();
 

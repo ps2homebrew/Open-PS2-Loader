@@ -1152,9 +1152,12 @@ void applyConfig(int themeID, int langID, int skipDeviceRefresh)
     guiUpdateScrollSpeed();
 
     guiSetFrameHook(&menuUpdateHook);
-
+    
+    guiLock();
     int changed = rmSetMode(0);
-    if (changed) {
+    guiUnlock();
+	
+	if (changed) {
         bgmMute();
         // reinit the graphics...
         thmReloadScreenExtents();

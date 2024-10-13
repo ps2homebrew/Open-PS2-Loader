@@ -336,6 +336,19 @@ void rmDrawQuad(rm_quad_t *q)
     order++;
 }
 
+void rmSetBackground(GSTEXTURE *txt)
+{
+    gsGlobal->PrimAlphaEnable = GS_SETTING_OFF;
+    gsKit_set_test(gsGlobal, GS_ATEST_OFF);
+    gsKit_TexManager_bind(gsGlobal, txt);
+    gsKit_prim_sprite_texture(gsGlobal, txt,
+                              0, 0,
+                              0, 0,
+                              gsGlobal->Width, gsGlobal->Height,
+                              txt->Width, txt->Height, order, gDefaultCol);
+    order++;
+}
+
 void rmDrawPixmap(GSTEXTURE *txt, int x, int y, short aligned, int w, int h, short scaled, u64 color)
 {
     rm_quad_t quad;

@@ -1297,7 +1297,7 @@ void guiDrawBGPlasma()
 
     pery = ymax;
     rmInvalidateTexture(&gBackgroundTex);
-    rmDrawPixmap(&gBackgroundTex, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol);
+    rmSetBackground(&gBackgroundTex);
 }
 
 int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color)

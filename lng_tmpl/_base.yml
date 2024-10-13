@@ -593,13 +593,13 @@ gui_strings:
 - label: INFO_DESCRIPTION
   string: Description
 - label: BLOCKDEVICE_SETTINGS
-  string: Block Devices
+  string: BDM Devices
 - label: CONTROLLER_SETTINGS
   string: Controller Settings
 - label: HINT_BDM_START
   string: Turn on/off Block Device Manager.
 - label: HINT_BLOCK_DEVICES
-  string: Turn on/off Block Devices (e.g. USB).
+  string: Turn on/off BDM Devices (USB/MX4SIO/ILINK/HDD).
 - label: USB_GAMES
   string: USB Games
 - label: ILINK_GAMES

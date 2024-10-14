@@ -159,12 +159,12 @@ static void IGR_Thread(void *arg)
     ) {
 
         if (EnableDebug)
-                DBGCOL(0xFF8000, IGR, "oplIGRShutdown()");
+            DBGCOL(0xFF8000, IGR, "oplIGRShutdown()");
 
         oplIGRShutdown(0);
 
         if (EnableDebug)
-                DBGCOL(0x0000FF, IGR, "Reset IOP");
+            DBGCOL(0x0000FF, IGR, "Reset IOP");
 
         // Reset IO Processor
         while (!Reset_Iop("", 0)) {

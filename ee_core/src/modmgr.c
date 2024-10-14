@@ -149,7 +149,7 @@ int GetOPLModInfo(int id, void **pointer, unsigned int *size)
 
 int LoadOPLModule(int id, int mode, int arg_len, const char *args)
 {
-    int result, x = 50;
+    int result;
     void *pointer;
     unsigned int size;
 
@@ -158,20 +158,24 @@ int LoadOPLModule(int id, int mode, int arg_len, const char *args)
             result = LoadMemModule(mode, pointer, size, arg_len, args);
             if (result < 1) { // El_isra: only check for MODLOAD errors for simplicity
                 if (EnableDebug) {
-                    GS_BGCOLOUR = 0xdcff00; // Yellow. MODLOAD cannot load IRX
-                    while(--x)
+                    DBGCOL(0x00FFDC, MODMGR, "IRX loading error (from MODLOAD)");
+                    delay(3);
+                }
+                if (result == -400) {
+                    DBGCOL_BLNK(1, 0x0000FF, true, MODMGR, "MODLOAD: out of IOP Memory"); // yellow blinking
+                    while (1)
                         ;
                 }
             }
         } else {
             if (EnableDebug) {
-                GS_BGCOLOUR = 0xdcff00; // Teal // Module size is not right
-                while(--x)
-                    ;
+                DBGCOL(0xDCFF00, MODMGR, "IRX size is 0 or less");
+                delay(3);
             }
         }
     }
-    GS_BGCOLOUR = 0x000000; // reset color
+
+    BGCOLND(0x000000);
     return result;
 }
 

@@ -38,22 +38,6 @@ static void FastDelay(int count)
     }
 }
 
-static void BlinkColour(u8 x, u32 colour, u8 forever)
-{
-    u8 i;
-    do {
-        delay(2);
-        BGCOLND(0x000000); // Black
-        //foo
-        for (i = 1; i <= x; i++) {
-            delay(1);
-            BGCOLND(colour); // Chosen colour
-            delay(1);
-            BGCOLND(0x000000); // Black
-        }
-    } while (forever);
-}
-
 static u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
 {
     u128 *addr = (u128 *)start;
@@ -73,12 +57,12 @@ static u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
 
     if (counter == emptysize) {
         result = (u32)addr - emptysize;
-        result = (((result) >> 4) << 4); // It must be 16-bytes aligned
-        DBGCOL_BLNK(2, 0x00FF00, false, IGS, "FindEmptyArea(): Found");     // FOUND => Double Green :-)
+        result = (((result) >> 4) << 4);                                // It must be 16-bytes aligned
+        DBGCOL_BLNK(2, 0x00FF00, false, IGS, "FindEmptyArea(): Found"); // FOUND => Double Green :-)
     } else {
         // result = 0x00100000;                                // 1st. possible workaround: Use the ingame area (Typically starts on "0x00100000"). It must be 16-bytes aligned
-        result = ((0x01F32568 - emptysize - 16) >> 4) << 4; // 2nd. possible workaround: Himem area ("0x01F32568" taken from  PS2LINK hi-mem).   It must be 16-bytes aligned
-        DBGCOL_BLNK(2, 0x0066FF, false, IGS, "FindEmptyArea(): Not found");                        // Double Orange :-(
+        result = ((0x01F32568 - emptysize - 16) >> 4) << 4;                 // 2nd. possible workaround: Himem area ("0x01F32568" taken from  PS2LINK hi-mem).   It must be 16-bytes aligned
+        DBGCOL_BLNK(2, 0x0066FF, false, IGS, "FindEmptyArea(): Not found"); // Double Orange :-(
     }
 
     return result;
@@ -612,7 +596,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
     // Sequential numbering feature
     while (1) {
-        if (Number == 255)               // 255 screenshots per-game should be enough? lol
+        if (Number == 255)                                                          // 255 screenshots per-game should be enough? lol
             DBGCOL_BLNK(6, 0x0000FF, true, IGS, "SaveBitmapFile(): Number == 255"); // Red
         Number++;
         _strcpy(PathFilenameExtension, "mc1:/");
@@ -675,7 +659,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
         ret = fioWrite(file_handle, addr, lenght);
         if (ret != lenght)
             DBGCOL_BLNK(5, 0x0000FF, true, IGS, "SaveBitmapFile(): FILEIO write error"); // Red
-        if (intffmd == 3) {              // Interlace Mode, FRAME Mode (Read every line)
+        if (intffmd == 3) {                                                              // Interlace Mode, FRAME Mode (Read every line)
             ret = fioWrite(file_handle, addr, lenght);
             if (ret != lenght)
                 DBGCOL_BLNK(5, 0x0000FF, true, IGS, "SaveBitmapFile(): FILEIO write error"); // Red

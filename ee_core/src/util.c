@@ -392,3 +392,22 @@ void delay(int count)
             asm("nop\nnop\nnop\nnop");
     }
 }
+
+/*----------------------------------------------------------------------------------------*/
+/* for debug colors                                                                           */
+/*----------------------------------------------------------------------------------------*/
+void BlinkColour(u8 x, u32 colour, u8 forever)
+{
+    u8 i;
+    do {
+        delay(2);
+        BGCOLND(0x000000); // Black
+        //foo
+        for (i = 1; i <= x; i++) {
+            delay(1);
+            BGCOLND(colour); // Chosen colour
+            delay(1);
+            BGCOLND(0x000000); // Black
+        }
+    } while (forever);
+}

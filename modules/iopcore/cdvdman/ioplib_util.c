@@ -145,7 +145,7 @@ static int Hook_LoadStartModule(char *modpath, int arg_len, char *args, int *mod
 {
     const struct FakeModule *mod;
 
-    DPRINTF("Hook_LoadStartModule() modpath = %s\n", modpath);
+    DPRINTF("Hook_LoadStartModule() modpath = %s freeram = %d\n", modpath, QueryTotalFreeMemSize());
 
     mod = checkFakemodByFile(modpath, modulefake_list);
     if (mod != NULL && mod->flag) {
@@ -161,7 +161,7 @@ static int Hook_StartModule(int id, char *modname, int arg_len, char *args, int 
 {
     const struct FakeModule *mod;
 
-    DPRINTF("Hook_StartModule() id=%d modname = %s\n", id, modname);
+    DPRINTF("Hook_StartModule() id=%d modname = %s freeram = %d\n", id, modname, QueryTotalFreeMemSize());
 
     mod = checkFakemodById(id, modulefake_list);
     if (mod != NULL && mod->flag) {
@@ -177,7 +177,7 @@ static int Hook_LoadModuleBuffer(void *ptr)
 {
     const struct FakeModule *mod;
 
-    DPRINTF("Hook_LoadModuleBuffer() modname = %s\n", ((char *)ptr + 0x8e));
+    DPRINTF("Hook_LoadModuleBuffer() modname = %s freeram = %d\n", ((char *)ptr + 0x8e), QueryTotalFreeMemSize());
 
     mod = checkFakemodByName(((char *)ptr + 0x8e), modulefake_list);
     if (mod != NULL && mod->flag)
@@ -191,7 +191,7 @@ static int Hook_StopModule(int id, int arg_len, char *args, int *modres)
 {
     const struct FakeModule *mod;
 
-    DPRINTF("Hook_StopModule() id=%d arg_len=%d\n", id, arg_len);
+    DPRINTF("Hook_StopModule() id=%d arg_len=%d freeram=%d\n", id, arg_len, QueryTotalFreeMemSize());
 
     mod = checkFakemodById(id, modulefake_list);
     if (mod != NULL && mod->flag) {
@@ -207,7 +207,7 @@ static int Hook_UnloadModule(int id)
 {
     const struct FakeModule *mod;
 
-    DPRINTF("Hook_UnloadModule() id=%d\n", id);
+    DPRINTF("Hook_UnloadModule() id=%d freeram\n", id, QueryTotalFreeMemSize());
 
     mod = checkFakemodById(id, modulefake_list);
     if (mod != NULL && mod->flag)
@@ -276,6 +276,7 @@ void hookMODLOAD(void)
 
     // check modload version
     if (info.version > 0x102) {
+        DPRINTF("MODLOAD supports unloading\n");
         // hook modload's ReferModuleStatus
         ReferModuleStatus = (void *)info.exports[17];
         info.exports[17] = (void *)Hook_ReferModuleStatus;

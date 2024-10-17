@@ -2,7 +2,6 @@
 #include "include/textures.h"
 #include "include/util.h"
 #include "include/ioman.h"
-#include <libjpg_ps2_addons.h>
 #include <png.h>
 
 extern void *load0_png;
@@ -94,6 +93,8 @@ extern void *Vmode_pal_png;
 
 extern void *logo_png;
 extern void *case_png;
+
+extern GSGLOBAL *gsGlobal; // Handler for the textures
 
 static int texPngLoad(GSTEXTURE *texture, const char *path);
 static int texPngLoadInternal(GSTEXTURE *texture, int texId);
@@ -213,12 +214,12 @@ int texLookupInternalTexId(const char *name)
     return result;
 }
 
-static int texSizeValidate(int width, int height, short psm)
+static int texSizeValidate(int width, int height, u8 psm)
 {
     if (width > 1024 || height > 1024)
         return -1;
 
-    if (gsKit_texture_size(width, height, psm) > maxSize)
+    if (gsKit_texture_size(width, height, (int)psm) > maxSize)
         return -1;
 
     return 0;
@@ -617,25 +618,25 @@ static int texPngLoadInternal(GSTEXTURE *texture, int texId)
 static int texJpgLoad(GSTEXTURE *texture, const char *filePath)
 {
     texPrepare(texture);
-    int result = ERR_BAD_FILE;
-    jpgData *jpg = NULL;
-
-    jpg = jpgFromFilename(filePath, JPG_NORMAL);
-    if (jpg) {
-        texture->Width = jpg->width;
-        texture->Height = jpg->height;
-        texture->PSM = GS_PSM_CT24;
-        texture->Mem = jpg->buffer;
-        free(jpg);
-        result = 0;
+    int result;
+    if (gsKit_texture_jpeg(gsGlobal, texture, (char *)filePath) < 0) {
+        result = ERR_BAD_FILE;
+        return result;
     }
+    texture->Filter = GS_FILTER_LINEAR;
+
+    if (texSizeValidate(texture->Width, texture->Height, texture->PSM) < 0) {
+        texFree(texture);
+        result = ERR_BAD_DIMENSION;
+        return result;
+    }
+
     return result;
 }
 
 
 /// BMP SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
 
-extern GSGLOBAL *gsGlobal;
 static int texBmpLoad(GSTEXTURE *texture, const char *filePath)
 {
     texPrepare(texture);

@@ -113,7 +113,7 @@ static int eecoreInit(int argc, char **argv)
     Install_Kernel_Hooks();
 
     if (config->EnableDebug)
-        DBGCOL(0xFF0000, MAIN, "Reached end of eecoreinit()");
+        GS_BGCOLOUR = 0xff0000; // Blue
 
     SifExitRpc();
 

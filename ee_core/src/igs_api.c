@@ -38,6 +38,21 @@ static void FastDelay(int count)
     }
 }
 
+static void BlinkColour(u8 x, u32 colour, u8 forever)
+{
+    u8 i;
+    do {
+        delay(2);
+        GS_BGCOLOUR = 0x000000; // Black
+        for (i = 1; i <= x; i++) {
+            delay(1);
+            GS_BGCOLOUR = colour; // Chosen colour
+            delay(1);
+            GS_BGCOLOUR = 0x000000; // Black
+        }
+    } while (forever);
+}
+
 static u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
 {
     u128 *addr = (u128 *)start;
@@ -57,12 +72,12 @@ static u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
 
     if (counter == emptysize) {
         result = (u32)addr - emptysize;
-        result = (((result) >> 4) << 4);                                // It must be 16-bytes aligned
-        DBGCOL_BLNK(2, 0x00FF00, false, IGS, "FindEmptyArea(): Found"); // FOUND => Double Green :-)
+        result = (((result) >> 4) << 4); // It must be 16-bytes aligned
+        BlinkColour(2, 0x00FF00, 0);     // FOUND => Double Green :-)
     } else {
         // result = 0x00100000;                                // 1st. possible workaround: Use the ingame area (Typically starts on "0x00100000"). It must be 16-bytes aligned
-        result = ((0x01F32568 - emptysize - 16) >> 4) << 4;                 // 2nd. possible workaround: Himem area ("0x01F32568" taken from  PS2LINK hi-mem).   It must be 16-bytes aligned
-        DBGCOL_BLNK(2, 0x0066FF, false, IGS, "FindEmptyArea(): Not found"); // Double Orange :-(
+        result = ((0x01F32568 - emptysize - 16) >> 4) << 4; // 2nd. possible workaround: Himem area ("0x01F32568" taken from  PS2LINK hi-mem).   It must be 16-bytes aligned
+        BlinkColour(2, 0x0066FF, 0);                        // Double Orange :-(
     }
 
     return result;
@@ -161,7 +176,7 @@ static u8 PixelSize(u8 spsm)
     else if ((spsm == GS_PSM_CT16) || (spsm == GS_PSM_CT16S))
         result = 2;
     else
-        DBGCOL_BLNK(1, 0x0000FF, true, IGS, "PixelSize(): Unknown?"); // Red
+        BlinkColour(1, 0x0000FF, 1); // Red
     return result;
 }
 
@@ -169,7 +184,7 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
 {
 
     delay(1);
-    DBGCOL(0xCCFFFF, IGS, "Screenshot() begins");
+    GS_BGCOLOUR = 0xCCFFFF; // Light Yellow
 
     static u128 EnableGIFPATH3;
 
@@ -191,10 +206,10 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
     u8 i;
 
     if ((sbw < 1) || (sbw > 32))
-        DBGCOL_BLNK(2, 0x0000FF, true, IGS, "Screenshot(): sbw out of range [1-32]"); // Red
+        BlinkColour(2, 0x0000FF, 1); // Red
 
     if ((height < 64) || (height > 1080))
-        DBGCOL_BLNK(3, 0x0000FF, true, IGS, "Screenshot(): height out of range [64-1080]"); // Red
+        BlinkColour(3, 0x0000FF, 1); // Red
 
     // Number of qwords (each qword = 2^4 bytes = 16 bytes = 128 bits)
     qwords = image_size >> 4;
@@ -301,7 +316,7 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
             ;
 
         delay(1);
-        BGCOLND((0x00FFFF - (255 * i / slices) * 0x000101)); // Yellow Fade Out Effect
+        GS_BGCOLOUR = (0x00FFFF - (255 * i / slices) * 0x000101); // Yellow Fade Out Effect
 
     } while (i < slices);
 
@@ -338,7 +353,7 @@ static void ConvertColors32(u32 *buffer, u32 dimensions)
         buffer[i] = ((x32 >> 16) & 0xFF) | ((x32 << 16) & 0xFF0000) | (x32 & 0xFF00FF00);
 
         FastDelay(1);
-        BGCOLND((0x0000FF - (255 * (i + 1) / dimensions) * 0x000001)); // Red Fade Out Effect
+        GS_BGCOLOUR = (0x0000FF - (255 * (i + 1) / dimensions) * 0x000001); // Red Fade Out Effect
     }
 }
 
@@ -354,7 +369,7 @@ static void ConvertColors24(u8 *buffer, u32 image_size)
         buffer[i + 2] = (u8)((x32 >> 16) & 0xFF);
 
         FastDelay(1);
-        BGCOLND((0x00FF00 - (255 * (i + 1) / image_size) * 0x000100)); // Green Fade Out Effect
+        GS_BGCOLOUR = (0x00FF00 - (255 * (i + 1) / image_size) * 0x000100); // Green Fade Out Effect
     }
 }
 
@@ -368,7 +383,7 @@ static void ConvertColors16(u16 *buffer, u32 dimensions)
         buffer[i] = (x16 & 0x8000) | ((x16 << 10) & 0x7C00) | (x16 & 0x3E0) | ((x16 >> 10) & 0x1F);
 
         FastDelay(1);
-        BGCOLND((0xFF0000 - (255 * (i + 1) / dimensions) * 0x010000)); // Blue Fade Out Effect
+        GS_BGCOLOUR = (0xFF0000 - (255 * (i + 1) / dimensions) * 0x010000); // Blue Fade Out Effect
     }
 }
 
@@ -377,7 +392,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
     USE_LOCAL_EECORE_CONFIG;
 
     delay(1);
-    DBGCOL(0x0099FF, IGS, "SaveTextFile() begins");
+    GS_BGCOLOUR = 0x0099FF; // Orange
 
     //  0000000001111111111222222222
     //  1234567890123456789012345678
@@ -410,7 +425,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
     // Create file
     file_handle = fioOpen(PathFilenameExtension, O_CREAT | O_WRONLY);
     if (file_handle < 0)
-        DBGCOL_BLNK(4, 0x0000FF, true, IGS, "SaveTextFile(): FILEIO Open Error"); // Red
+        BlinkColour(4, 0x0000FF, 1); // Red
 
     _strcpy(text, "PS2 IGS (InGame Screenshot)\n---------------------------\n");
     _strcat(text, "\n\nGame ID=");
@@ -554,7 +569,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
     fioClose(file_handle);
 
     delay(1);
-    BGCOLND(0x000000); // Black
+    GS_BGCOLOUR = 0x000000; // Black
 }
 
 static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 intffmd)
@@ -562,7 +577,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
     USE_LOCAL_EECORE_CONFIG;
 
     delay(1);
-    BGCOLND(0x990066); // Purple Violet
+    GS_BGCOLOUR = 0x990066; // Purple Violet
 
     //  00000000011111111112222222222
     //  12345678901234567890123456789
@@ -596,8 +611,8 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
     // Sequential numbering feature
     while (1) {
-        if (Number == 255)                                                          // 255 screenshots per-game should be enough? lol
-            DBGCOL_BLNK(6, 0x0000FF, true, IGS, "SaveBitmapFile(): Number == 255"); // Red
+        if (Number == 255)               // 255 screenshots per-game should be enough? lol
+            BlinkColour(6, 0x0000FF, 1); // Red
         Number++;
         _strcpy(PathFilenameExtension, "mc1:/");
         _strcat(PathFilenameExtension, config->GameID);
@@ -617,13 +632,13 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
     // Create file
     file_handle = fioOpen(PathFilenameExtension, O_CREAT | O_WRONLY);
     if (file_handle < 0)
-        DBGCOL_BLNK(4, 0x0000FF, true, IGS, "SaveBitmapFile(): FILEIO error"); // Red
+        BlinkColour(4, 0x0000FF, 1); // Red
 
     // Write Bitmap Header
     //(first, write the BMP Header ID ouside of struct, due to alignment issues...)
     ret = fioWrite(file_handle, id, 2);
     if (ret != 2)
-        DBGCOL_BLNK(5, 0x0000FF, true, IGS, "SaveBitmapFile(): FILEIO write err"); // Red
+        BlinkColour(5, 0x0000FF, 1); // Red
     //(...then, write the remaining info!)
     bh = (void *)((u8 *)buffer + image_size);
     bh->filesize = (u32)file_size;
@@ -645,7 +660,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
     ret = fioWrite(file_handle, bh, 52);
     if (ret != 52)
-        DBGCOL_BLNK(5, 0x0000FF, true, IGS, "SaveBitmapFile(): FILEIO write error"); // Red
+        BlinkColour(5, 0x0000FF, 1); // Red
 
     // Write image in reverse order (since BMP is written Left to Right, Bottom to Top)
     if (intffmd == 3) // Interlace Mode, FRAME Mode (Read every line)
@@ -658,20 +673,20 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
         ret = fioWrite(file_handle, addr, lenght);
         if (ret != lenght)
-            DBGCOL_BLNK(5, 0x0000FF, true, IGS, "SaveBitmapFile(): FILEIO write error"); // Red
-        if (intffmd == 3) {                                                              // Interlace Mode, FRAME Mode (Read every line)
+            BlinkColour(5, 0x0000FF, 1); // Red
+        if (intffmd == 3) {              // Interlace Mode, FRAME Mode (Read every line)
             ret = fioWrite(file_handle, addr, lenght);
             if (ret != lenght)
-                DBGCOL_BLNK(5, 0x0000FF, true, IGS, "SaveBitmapFile(): FILEIO write error"); // Red
+                BlinkColour(5, 0x0000FF, 1); // Red
         }
-        BGCOLND((0xFFFFFF - (255 * i / height) * 0x010101)); // Gray Fade Out Effect
+        GS_BGCOLOUR = (0xFFFFFF - (255 * i / height) * 0x010101); // Gray Fade Out Effect
     }
 
     // Close file
     fioClose(file_handle);
 
     delay(1);
-    BGCOLND(0x000000); // Black
+    GS_BGCOLOUR = 0x000000; // Black
 
     // Return the Sequential Number to the related Text File
     return Number;
@@ -760,7 +775,7 @@ int InGameScreenshot(void)
     EI();
 
     delay(1);
-    BGCOLND(0x660033); // Midnight Blue
+    GS_BGCOLOUR = 0x660033; // Midnight Blue
 
     // Load modules.
     LoadFileInit();
@@ -784,7 +799,7 @@ int InGameScreenshot(void)
     FlushCache(0);
     FlushCache(2);
 
-    DBGCOL_BLNK(1, 0xFF0000, false, IGS, "InGameScreenshot() end"); // Double Blue :-)
+    BlinkColour(1, 0xFF0000, 0); // Double Blue :-)
 
     return 0;
 }

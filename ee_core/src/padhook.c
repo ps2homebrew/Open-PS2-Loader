@@ -67,19 +67,19 @@ static void t_loadElf(void)
     t_ExecData elf;
 
     if (EnableDebug)
-        DBGCOL(0x80FF00, LOADELF, "t_loadElf() begins");
+        GS_BGCOLOUR = 0x80FF00; // Blue Green
 
     // Init RPC & CMD
     SifInitRpc(0);
 
     if (EnableDebug)
-        DBGCOL(0x000080, LOADELF, "Patch prefix check");
+        GS_BGCOLOUR = 0x000080; // Dark Red
 
     // Apply Sbv patches
     sbv_patch_disable_prefix_check();
 
     if (EnableDebug)
-        DBGCOL(0xFF8000, LOADELF, "loading SIO2 modules and USBD if found");
+        GS_BGCOLOUR = 0xFF8000; // Blue sky
 
     // Load basic modules
     LoadModule("rom0:SIO2MAN", 0, NULL);
@@ -118,14 +118,14 @@ static void t_loadElf(void)
         FlushCache(2);
 
         if (EnableDebug)
-            DBGCOL(0x0080FF, LOADELF, "ExecPS2() begins");
+            GS_BGCOLOUR = 0x0080FF; // Orange
 
         // Execute BOOT.ELF
         ExecPS2((void *)elf.epc, (void *)elf.gp, 1, argv);
     }
 
     if (EnableDebug) {
-        DBGCOL(0x0000FF, LOADELF, "LoadElf() error");
+        GS_BGCOLOUR = 0x0000FF; // Red
         delay(5);
     }
 
@@ -146,7 +146,7 @@ static void IGR_Thread(void *arg)
     DPRINTF("IGR thread woken up!\n");
 
     if (EnableDebug)
-        DBGCOL(0xFFFFFF, IGR, "Thread WakeUp");
+        GS_BGCOLOUR = 0xFFFFFF; // White
 
     // Re-Init RPC & CMD
     SifInitRpc(0);
@@ -159,12 +159,12 @@ static void IGR_Thread(void *arg)
     ) {
 
         if (EnableDebug)
-            DBGCOL(0xFF8000, IGR, "oplIGRShutdown()");
+            GS_BGCOLOUR = 0xFF8000; // Blue sky
 
         oplIGRShutdown(0);
 
         if (EnableDebug)
-            DBGCOL(0x0000FF, IGR, "Reset IOP");
+            GS_BGCOLOUR = 0x0000FF; // Red
 
         // Reset IO Processor
         while (!Reset_Iop("", 0)) {
@@ -197,27 +197,27 @@ static void IGR_Thread(void *arg)
 
         if (config->EnableGSMOp) {
             if (EnableDebug)
-                DBGCOL(0x00FF00, IGR, "Stopping GSM");
+                GS_BGCOLOUR = 0x00FF00; // Green
             DPRINTF("Stopping GSM...\n");
             DisableGSM();
         }
 
         if (config->gCheatList) {
             if (EnableDebug)
-                DBGCOL(0xFF0000, IGR, "Stopping CheatEngine");
+                GS_BGCOLOUR = 0xFF0000; // Blue
             DPRINTF("Stopping PS2RD Cheat Engine...\n");
             DisableCheats();
         }
 
         if (EnableDebug)
-            DBGCOL(0x00FFFF, IGR, "Waiting for IOP Reboot");
+            GS_BGCOLOUR = 0x00FFFF; // Yellow
 
         while (!SifIopSync()) {
             ;
         }
 
         if (EnableDebug)
-            DBGCOL(0xFF80FF, IGR, "Initializing RPC and services");
+            GS_BGCOLOUR = 0xFF80FF; // Pink
 
         // Init RPC & CMD
         SifInitRpc(0);
@@ -226,7 +226,7 @@ static void IGR_Thread(void *arg)
         sbv_patch_enable_lmb();
 
         if (EnableDebug)
-            DBGCOL(0x800000, IGR, "Execute RESETSPU.IRX");
+            GS_BGCOLOUR = 0x800000; // Dark Blue
 
         // Reset SPU - do it after the IOP reboot, so nothing will compete with the EE for it.
         LoadOPLModule(OPL_MODULE_ID_RESETSPU, 0, 0, NULL);
@@ -237,7 +237,7 @@ static void IGR_Thread(void *arg)
 #endif
 
         if (EnableDebug)
-            DBGCOL(0x008000, IGR, "Exiting services");
+            GS_BGCOLOUR = 0x008000; // Dark Green
 
         // Exit services
         SifExitIopHeap();
@@ -247,7 +247,7 @@ static void IGR_Thread(void *arg)
         IGR_Exit(0);
     } else {
         if (EnableDebug)
-            DBGCOL(0x0000FF, IGR, "oplIGRShutdown(1)");
+            GS_BGCOLOUR = 0x0000FF; // Red
 
         // If combo is R3 + L3, Poweroff PS2
         oplIGRShutdown(1);
@@ -534,7 +534,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
         while (ptr) {
             // Purple while PadOpen pattern search
             if (EnableDebug)
-                DBGCOL(0x800080, PADHOOK, "Searching PadOpen() pattern");
+                GS_BGCOLOUR = 0x800080; // Purple
 
             mem_size = mem_end - (u32)ptr;
 
@@ -546,7 +546,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
                 // Green while PadOpen patches
                 if (EnableDebug)
-                    DBGCOL(0x008000, PADHOOK, "Patching PadOpen()");
+                    GS_BGCOLOUR = 0x008000; // Dark green
 
                 // Save original PadOpen function
                 if (padopen_patterns[i].type == IGR_LIBPAD)
@@ -661,7 +661,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
     // Done
     if (EnableDebug)
-        BGCOLND(0x000000); // Black
+        GS_BGCOLOUR = 0x000000; // Black
 
     return patched;
 }

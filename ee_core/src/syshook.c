@@ -87,7 +87,7 @@ void sysLoadElf(char *filename, int argc, char **argv)
     DPRINTF("t_loadElf: elf path = '%s'\n", filename);
 
     if (EnableDebug)
-        DBGCOL(0x00FF00, SYSHOOK, "WipeUserMemory()");
+        GS_BGCOLOUR = 0x00ff00; // Green
 
     DPRINTF("t_loadElf: cleaning user memory...");
 
@@ -128,7 +128,7 @@ void sysLoadElf(char *filename, int argc, char **argv)
     DPRINTF(" failed\n");
 
     // Error
-    DBGCOL(0xFFFFFF, LOADELF, "sysLoadElf() error. hitting function end");
+    GS_BGCOLOUR = 0xffffff; // White    - shouldn't happen.
     SleepThread();
 }
 

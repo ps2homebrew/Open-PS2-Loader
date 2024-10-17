@@ -17,6 +17,7 @@ extern void *usb_png; // Leave BDM Icon as usb.png to maintain theme compat
 extern void *usb_bd_png;
 extern void *ilk_bd_png;
 extern void *m4s_bd_png;
+extern void *hdd_bd_png;
 extern void *hdd_png;
 extern void *eth_png;
 extern void *app_png;
@@ -53,7 +54,9 @@ extern void *screen_png;
 extern void *ELF_png;
 extern void *HDL_png;
 extern void *ISO_png;
+extern void *ZSO_png;
 extern void *UL_png;
+extern void *APPS_png;
 extern void *CD_png;
 extern void *DVD_png;
 extern void *Aspect_s_png;
@@ -94,6 +97,7 @@ extern void *Vmode_pal_png;
 
 extern void *logo_png;
 extern void *case_png;
+extern void *apps_case_png;
 
 static int texPngLoad(GSTEXTURE *texture, const char *path);
 static int texPngLoadInternal(GSTEXTURE *texture, int texId);
@@ -123,6 +127,7 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {USB_ICON, "usb_bd", &usb_bd_png},
     {ILINK_ICON, "ilk_bd", &ilk_bd_png},
     {MX4SIO_ICON, "m4s_bd", &m4s_bd_png},
+    {HDD_BD_ICON, "hdd_bd", &hdd_bd_png},
     {HDD_ICON, "hdd", &hdd_png},
     {ETH_ICON, "eth", &eth_png},
     {APP_ICON, "app", &app_png},
@@ -156,7 +161,9 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {ELF_FORMAT, "ELF", &ELF_png},
     {HDL_FORMAT, "HDL", &HDL_png},
     {ISO_FORMAT, "ISO", &ISO_png},
+    {ZSO_FORMAT, "ZSO", &ZSO_png},
     {UL_FORMAT, "UL", &UL_png},
+    {APP_MEDIA, "APP", &APPS_png},
     {CD_MEDIA, "CD", &CD_png},
     {DVD_MEDIA, "DVD", &DVD_png},
     {ASPECT_STD, "Aspect_s", &Aspect_s_png},
@@ -196,6 +203,7 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {VMODE_PAL, "Vmode_pal", &Vmode_pal_png},
     {LOGO_PICTURE, "logo", &logo_png},
     {CASE_OVERLAY, "case", &case_png},
+    {APPS_CASE_OVERLAY, "apps_case", &apps_case_png},
 };
 
 int texLookupInternalTexId(const char *name)

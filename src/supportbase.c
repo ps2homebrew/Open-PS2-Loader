@@ -798,7 +798,14 @@ config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
     configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
 
-    configSetStr(config, CONFIG_ITEM_FORMAT, game->format != GAME_FORMAT_USBLD ? "ISO" : "UL");
+    if (game->format != GAME_FORMAT_USBLD) {
+        if (!strcmp(game->extension, ".iso"))
+            configSetStr(config, CONFIG_ITEM_FORMAT, "ISO");
+        else if (!strcmp(game->extension, ".zso"))
+            configSetStr(config, CONFIG_ITEM_FORMAT, "ZSO");
+    } else if (game->format == GAME_FORMAT_USBLD)
+        configSetStr(config, CONFIG_ITEM_FORMAT, "UL");
+
     configSetStr(config, CONFIG_ITEM_MEDIA, game->media == SCECdPS2CD ? "CD" : "DVD");
 
     configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);

@@ -199,8 +199,6 @@ jobs:
         title: "${{ steps.version.outputs.version }}"
         files: |
           OPNPS2LD-${{ env.OPL_VERSION }}.7z
-          OPNPS2LD-VARIANTS-${{ env.OPL_VERSION }}.7z
-          OPNPS2LD-LANGS-${{ env.OPL_VERSION }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z
           OPNPS2LD-LANGS.7z
@@ -216,9 +214,6 @@ jobs:
           OPNPS2LD-${{ env.OPL_VERSION }}.7z
           OPNPS2LD-VARIANTS-${{ env.OPL_VERSION }}.7z
           OPNPS2LD-LANGS-${{ env.OPL_VERSION }}.7z
-          OPNPS2LD.7z
-          OPNPS2LD-VARIANTS.7z
-          OPNPS2LD-LANGS.7z
 
     - name: Upload pre-release to Mega
       if: github.ref == 'refs/heads/master' && env.USERNAME != null

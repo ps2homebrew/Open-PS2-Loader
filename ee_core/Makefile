@@ -29,14 +29,19 @@ ifeq ($(EESIO_DEBUG),1)
 endif
 
 ifeq ($(DTL_T10000),1)
-	EE_CFLAGS += -D_DTL_T10000
+    EE_CFLAGS += -D_DTL_T10000
 endif
 
 ifeq ($(LOAD_DEBUG_MODULES),1)
 EE_CFLAGS += -D__LOAD_DEBUG_MODULES
-	ifeq ($(DECI2_DEBUG),1)
-	EE_CFLAGS += -D__DECI2_DEBUG
-	endif
+    ifeq ($(DECI2_DEBUG),1)
+    EE_CFLAGS += -D__DECI2_DEBUG
+    endif
+    ifeq ($(TTY_APPROACH),UDP)
+    EE_CFLAGS += -DTTY_UDP
+    else ifeq ($(TTY_APPROACH),PPC_UART)
+    EE_CFLAGS += -DTTY_PPC
+    endif
 endif
 
 ifeq ($(IGS),1)

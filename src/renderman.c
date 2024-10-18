@@ -23,7 +23,7 @@ static u8 hires = 0;
 static u8 guiWakeupCount;
 static int vsync_id = -1;
 
-#define NUM_RM_VMODES 12
+#define NUM_RM_VMODES 14
 #define RM_VMODE_AUTO 0
 
 // RM Vmode -> GS Vmode conversion table
@@ -59,6 +59,9 @@ static struct rm_mode rm_mode_table[NUM_RM_VMODES] = {
     // 16 bit color mode full screen, multi-pass (3 passes, HIRES)
     {GS_MODE_DTV_720P,   31, 1280,  720,  3, 1, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_16_9, 1,  1}, // HDTV720P@60Hz
     {GS_MODE_DTV_1080I,  31, 1920, 1080,  3, 1, GS_INTERLACED,    GS_FRAME, RM_ARATIO_16_9, 1,  1}, // HDTV1080I@60Hz
+    // 24 bit color mode for older systems (non-interlaced, low resolution)
+    {GS_MODE_PAL,        16,  640,  256,  1, 4, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  8, 15}, // PAL@50Hz
+    {GS_MODE_NTSC,       16,  640,  224,  1, 4, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  7, 15}, // NTSC@60Hz
 };
 // clang-format on
 

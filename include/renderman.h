@@ -92,6 +92,8 @@ void rmUnloadTexture(GSTEXTURE *txt);
 
 void rmDrawQuad(rm_quad_t *q);
 
+void rmSetBackground(GSTEXTURE *txt);
+
 /** Queues a specified pixmap (tinted with colour) to be rendered on specified position */
 void rmDrawPixmap(GSTEXTURE *txt, int x, int y, short aligned, int w, int h, short scaled, u64 color);
 

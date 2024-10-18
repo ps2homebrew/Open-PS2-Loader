@@ -950,6 +950,7 @@ int guiShowKeyboard(char *value, int maxLength)
 {
     char tmp[maxLength];
     strncpy(tmp, value, maxLength);
+    tmp[maxLength - 1] = '\0';
 
     int result = diaShowKeyb(tmp, maxLength, 0, NULL);
     if (result) {

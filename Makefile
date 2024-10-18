@@ -6,11 +6,14 @@ EXTRAVERSION = Beta
 # How to DEBUG?
 # Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.
 # Debug modes:
-#	debug		-	UI-side debug mode (UDPTTY)
-#	iopcore_debug	-	UI-side + iopcore debug mode (UDPTTY).
-#	ingame_debug	-	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (UDPTTY).
-#	eesio_debug	-	UI-side + eecore debug mode (EE SIO)
-#	deci2_debug	-	UI-side + in-game DECI2 debug mode (EE-side only).
+#	debug		    	 -	UI-side debug mode (UDPTTY)
+#	iopcore_debug		 -	UI-side + iopcore debug mode (UDPTTY).
+#	ingame_debug		 -	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (UDPTTY).
+#	debug_ppctty		 -	UI-side debug mode (PowerPC UART)
+#	iopcore_ppctty_debug -	UI-side + iopcore debug mode (PowerPC UART).
+#	ingame_ppctty_debug	 -	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (PowerPC UART).
+#	eesio_debug			 -	UI-side + eecore debug mode (EE SIO)
+#	deci2_debug			 -	UI-side + in-game DECI2 debug mode (EE-side only).
 
 # I want to put my name in my custom build! How can I do it?
 # Type "make LOCALVERSION=-foobar"
@@ -41,6 +44,8 @@ DEBUG ?= 0
 EESIO_DEBUG ?= 0
 INGAME_DEBUG ?= 0
 DECI2_DEBUG ?= 0
+#How the TTY will reach developer: 'UDP', 'PPC_UART'.
+TTY_APPROACH ?= UDP
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
 REVISION = $(shell expr $(shell git rev-list --count HEAD) + 2)
@@ -159,23 +164,31 @@ ifeq ($(DEBUG),1)
   ifeq ($(DECI2_DEBUG),1)
     EE_OBJS += debug.o drvtif_irx.o tifinet_irx.o deci2_img.o
     EE_LDFLAGS += -liopreboot
-  else
+  else ifeq ($(TTY_APPROACH),UDP)
     EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
+    EE_CFLAGS += -DTTY_UDP
+  else ifeq ($(TTY_APPROACH),PPC_UART)
+    EE_OBJS += debug.o ppctty.o ioptrap.o
+    EE_CFLAGS += -DTTY_PPC_UART
+  else
+	$(error Unknown value for TTY_APPROACH: '$(TTY_APPROACH)')
   endif
   MOD_DEBUG_FLAGS = DEBUG=1
   ifeq ($(IOPCORE_DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
-    EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
+    EECORE_EXTRA_FLAGS += LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
     SMSTCPIP_INGAME_CFLAGS =
-    IOP_OBJS += udptty-ingame.o
+    ifeq ($(TTY_APPROACH),UDP)
+      IOP_OBJS += udptty-ingame.o
+    endif
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
     EE_LIBS += -lsiocookie
   else ifeq ($(INGAME_DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
-    EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
+    EECORE_EXTRA_FLAGS += LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
     SMSTCPIP_INGAME_CFLAGS =
     ifeq ($(DECI2_DEBUG),1)
@@ -184,8 +197,11 @@ ifeq ($(DEBUG),1)
       IOP_OBJS += drvtif_ingame_irx.o tifinet_ingame_irx.o
       DECI2_DEBUG=1
       CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #(clear IOPCORE_DEBUG) dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
-    else
+    else ifeq ($(TTY_APPROACH),UDP)
       IOP_OBJS += udptty-ingame.o
+      EECORE_EXTRA_FLAGS += "TTY_APPROACH=$(TTY_APPROACH)"
+    else ifeq ($(TTY_APPROACH),PPC_UART)
+      EECORE_EXTRA_FLAGS += "TTY_APPROACH=$(TTY_APPROACH)"
     endif
   endif
 else
@@ -209,7 +225,7 @@ EE_LDFLAGS += -fdata-sections -ffunction-sections -Wl,--gc-sections
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug debug_ppctty iopcore_ppctty_debug ingame_ppctty_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
 
 ifdef PS2SDK
 
@@ -238,6 +254,15 @@ ingame_debug:
 
 deci2_debug:
 	$(MAKE) DEBUG=1 INGAME_DEBUG=1 DECI2_DEBUG=1 all
+
+debug_ppctty:
+	$(MAKE) DEBUG=1 TTY_APPROACH=PPC_UART all
+
+iopcore_ppctty_debug:
+	$(MAKE) DEBUG=1 IOPCORE_DEBUG=1 TTY_APPROACH=PPC_UART all
+
+ingame_ppctty_debug:
+	$(MAKE) DEBUG=1 INGAME_DEBUG=1 TTY_APPROACH=PPC_UART all
 
 clean:	download_lwNBD
 	echo "Cleaning..."
@@ -619,6 +644,9 @@ $(EE_ASM_DIR)lwnbdsvr.c: modules/network/lwNBD/lwnbdsvr.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 $(EE_ASM_DIR)udptty.c: $(PS2SDK)/iop/irx/udptty.irx | $(EE_ASM_DIR)
+	$(BIN2C) $< $@ $(*F)_irx
+
+$(EE_ASM_DIR)ppctty.c: $(PS2SDK)/iop/irx/ppctty.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 modules/debug/udptty-ingame/udptty.irx: modules/debug/udptty-ingame

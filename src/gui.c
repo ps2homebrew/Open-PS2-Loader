@@ -654,6 +654,8 @@ void guiShowUIConfig(void)
         , "EDTV 704x576p @50Hz 24bit (HIRES)"
         , "HDTV 1280x720p @60Hz 16bit (HIRES)"
         , "HDTV 1920x1080i @60Hz 16bit (HIRES)"
+        , "PAL 640x256p @50Hz 24bit"
+        , "NTSC 640x224p @60Hz 24bit"
         , NULL};
     // clang-format on
     int previousVMode;

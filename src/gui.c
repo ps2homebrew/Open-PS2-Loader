@@ -1837,3 +1837,80 @@ int guiGameShowRemoveSettings(config_set_t *configSet, config_set_t *configGame)
 
     return 1;
 }
+
+void guiManageCheats(void)
+{
+    int offset = 0;
+    int terminate = 0;
+    int cheatCount = 0;
+    int selectedCheat = 0;
+    int visibleCheats = 10; // Maximum number of cheats visible on screen
+
+    while (cheatCount < MAX_CODES && strlen(gCheats[cheatCount].name) > 0)
+        cheatCount++;
+
+    sfxPlay(SFX_MESSAGE);
+
+    while (!terminate) {
+        guiStartFrame();
+        readPads();
+
+        if (getKeyOn(KEY_UP) && selectedCheat > 0) {
+            selectedCheat -= 1;
+            if (selectedCheat < offset)
+                offset = selectedCheat;
+        }
+
+        if (getKeyOn(KEY_DOWN) && selectedCheat < cheatCount - 1) {
+            selectedCheat += 1;
+            if (selectedCheat >= offset + visibleCheats)
+                offset = selectedCheat - visibleCheats + 1;
+        }
+
+        if (getKeyOn(gSelectButton)) {
+            if (!(strncasecmp(gCheats[selectedCheat].name, "mastercode", 10) == 0 || strncasecmp(gCheats[selectedCheat].name, "master code", 11) == 0))
+                gCheats[selectedCheat].enabled = !gCheats[selectedCheat].enabled;
+        }
+
+        if (getKeyOn(KEY_START))
+            terminate = 1;
+
+        guiShow();
+
+        rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
+        rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
+        rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
+
+        fntRenderString(gTheme->fonts[0], screenWidth >> 1, 60, ALIGN_CENTER, 0, 0, _l(_STR_CHEAT_SELECTION), gTheme->textColor);
+
+        int renderedCheats = 0;
+        for (int i = offset; renderedCheats < visibleCheats && i < cheatCount; i++) {
+            if (strlen(gCheats[i].name) == 0)
+                continue;
+
+            int enabled = gCheats[i].enabled;
+
+            int boxX = 50;
+            int boxY = 100 + (renderedCheats * 30);
+            int boxWidth = rmWideScale(25);
+            int boxHeight = 17;
+
+            if (enabled) {
+                rmDrawRect(boxX, boxY + 3, boxWidth, boxHeight, gTheme->textColor);
+                rmDrawRect(boxX + 2, boxY + 5, boxWidth - 4, boxHeight - 4, gTheme->selTextColor);
+            }
+
+            u32 textColour = (i == selectedCheat) ? gTheme->selTextColor : gTheme->textColor;
+            fntRenderString(gTheme->fonts[0], boxX + 35, boxY + 3, ALIGN_LEFT, 0, 0, gCheats[i].name, textColour);
+
+            renderedCheats++;
+        }
+
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_SELECT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
+        guiDrawIconAndText(START_ICON, _STR_RUN, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+
+        guiEndFrame();
+    }
+
+    sfxPlay(SFX_CONFIRM);
+}

@@ -690,3 +690,5 @@ gui_strings:
   string: Analog Y-Axis Sensitivity
 - label: FILE_COUNT
   string: 'Files found: %i'
+- label: CHEAT_SELECTION
+  string: Cheat Selection

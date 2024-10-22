@@ -2,7 +2,6 @@
 #include "include/textures.h"
 #include "include/util.h"
 #include "include/ioman.h"
-#include <libjpg_ps2_addons.h>
 #include <png.h>
 
 extern void *load0_png;
@@ -101,8 +100,6 @@ extern void *apps_case_png;
 
 static int texPngLoad(GSTEXTURE *texture, const char *path);
 static int texPngLoadInternal(GSTEXTURE *texture, int texId);
-static int texJpgLoad(GSTEXTURE *texture, const char *path);
-static int texBmpLoad(GSTEXTURE *texture, const char *path);
 
 // Not related to screen size, just to limit at some point
 static int maxSize = 720 * 512 * 4;
@@ -262,38 +259,23 @@ void texFree(GSTEXTURE *texture)
 }
 
 typedef int (*fpTexLoad)(GSTEXTURE *texture, const char *path);
-struct STexLoader
-{
-    char *sFileExtension;
-    fpTexLoad load;
-};
-static struct STexLoader texLoader[] = {
-    {"png", texPngLoad},
-    {"jpg", texJpgLoad},
-    {"bmp", texBmpLoad},
-    {NULL, NULL}};
 
 int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId)
 {
     char filePath[256];
-    int loaderId = 0;
 
     LOG("texDiscoverLoad(%s)\n", path);
 
-    while (texLoader[loaderId].load != NULL) {
-        if (texId != -1)
-            snprintf(filePath, sizeof(filePath), "%s%s.%s", path, internalDefault[texId].name, texLoader[loaderId].sFileExtension);
-        else
-            snprintf(filePath, sizeof(filePath), "%s.%s", path, texLoader[loaderId].sFileExtension);
+    if (texId != -1)
+        snprintf(filePath, sizeof(filePath), "%s%s.%s", path, internalDefault[texId].name, "png");
+    else
+        snprintf(filePath, sizeof(filePath), "%s.%s", path, "png");
 
-        int fd = open(filePath, O_RDONLY);
-        if (fd > 0) {
-            // File found, load it
-            close(fd);
-            return (texLoader[loaderId].load(texture, filePath) >= 0) ? 0 : ERR_BAD_FILE;
-        }
-
-        loaderId++;
+    int fd = open(filePath, O_RDONLY);
+    if (fd > 0) {
+        // File found, load it
+        close(fd);
+        return (texPngLoad(texture, filePath) >= 0) ? 0 : ERR_BAD_FILE;
     }
 
     return ERR_BAD_FILE;
@@ -617,46 +599,4 @@ static int texPngLoad(GSTEXTURE *texture, const char *filePath)
 static int texPngLoadInternal(GSTEXTURE *texture, int texId)
 {
     return texPngLoadAll(texture, NULL, texId);
-}
-
-/// JPG SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
-
-
-static int texJpgLoad(GSTEXTURE *texture, const char *filePath)
-{
-    texPrepare(texture);
-    int result = ERR_BAD_FILE;
-    jpgData *jpg = NULL;
-
-    jpg = jpgFromFilename(filePath, JPG_NORMAL);
-    if (jpg) {
-        texture->Width = jpg->width;
-        texture->Height = jpg->height;
-        texture->PSM = GS_PSM_CT24;
-        texture->Mem = jpg->buffer;
-        free(jpg);
-        result = 0;
-    }
-    return result;
-}
-
-
-/// BMP SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
-
-extern GSGLOBAL *gsGlobal;
-static int texBmpLoad(GSTEXTURE *texture, const char *filePath)
-{
-    texPrepare(texture);
-
-    if (gsKit_texture_bmp(gsGlobal, texture, (char *)filePath) < 0)
-        return ERR_BAD_FILE;
-
-    texture->Filter = GS_FILTER_LINEAR;
-
-    if (texSizeValidate(texture->Width, texture->Height, texture->PSM) < 0) {
-        texFree(texture);
-        return ERR_BAD_DIMENSION;
-    }
-
-    return 0;
 }

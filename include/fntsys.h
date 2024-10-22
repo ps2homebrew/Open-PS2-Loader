@@ -1,8 +1,6 @@
 #ifndef __FNTSYS_H
 #define __FNTSYS_H
 
-#include <gsToolkit.h>
-
 /// default (built-in) font id
 #define FNT_DEFAULT (0)
 /// Value returned on errors

@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include "include/opl.h"
 #include "include/atlas.h"
 #include "include/renderman.h"
 

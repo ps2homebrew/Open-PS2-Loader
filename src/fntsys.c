@@ -494,95 +494,7 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t *glyph, int pen_x, int pen_y)
     }
 }
 
-
-#ifndef EXTRA_FEATURES
-int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const char *string, u64 colour)
-{
-    // wait for font lock to unlock
-    WaitSema(gFontSemaId);
-    font_t *font = &fonts[id];
-    SignalSema(gFontSemaId);
-
-    // Convert to native display resolution
-    x = rmScaleX(x);
-    y = rmScaleY(y);
-    width = rmScaleX(width);
-    height = rmScaleY(height);
-
-    if (aligned & ALIGN_HCENTER) {
-        if (width) {
-            x -= min(fntCalcDimensions(id, string), width) >> 1;
-        } else {
-            x -= fntCalcDimensions(id, string) >> 1;
-        }
-    }
-
-    if (aligned & ALIGN_VCENTER) {
-        y += rmScaleY(FNTSYS_CHAR_SIZE - 4) >> 1;
-    } else {
-        y += rmScaleY(FNTSYS_CHAR_SIZE - 2);
-    }
-
-    quad.color = colour;
-
-    int pen_x = x;
-    int xmax = x + width;
-    int ymax = y + height;
-
-    use_kerning = FT_HAS_KERNING(font->face);
-    state = UTF8_ACCEPT;
-    previous = 0;
-
-    // Note: We need to change this so that we'll accumulate whole word before doing a layout with it
-    // for now this method breaks on any character - which is a bit ugly
-
-    // I don't want to do anything complicated though so I'd say
-    // we should instead have a dynamic layout routine that'll replace spaces with newlines as appropriate
-    // because that'll make the code run only once per N frames, not every frame
-
-    // cache glyphs and render as we go
-    for (; *string; ++string) {
-        if (utf8Decode(&state, &codepoint, *string)) // accumulate the codepoint value
-            continue;
-
-        glyph = fntCacheGlyph(font, codepoint);
-        if (!glyph)
-            continue;
-
-        // kerning
-        if (use_kerning && previous) {
-            glyph_index = FT_Get_Char_Index(font->face, codepoint);
-            if (glyph_index) {
-                FT_Get_Kerning(font->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
-                pen_x += delta.x >> 6;
-            }
-            previous = glyph_index;
-        }
-
-        if (width) {
-            if (codepoint == '\n') {
-                pen_x = x;
-                y += rmScaleY(MENU_ITEM_HEIGHT); // hmax is too tight and unordered, generally
-                continue;
-            }
-
-            if (y > ymax) // stepped over the max
-                break;
-
-            if (pen_x + glyph->width > xmax) {
-                pen_x = xmax + 1; // to be sure no other cahr will be written (even not a smaller one just following)
-                continue;
-            }
-        }
-
-        fntRenderGlyph(glyph, pen_x, y);
-        pen_x += glyph->shx >> 6;
-    }
-
-    return rmUnScaleX(pen_x);
-}
-
-#else
+#ifdef EXTRA_FEATURES
 static int isRTL(u32 character)
 {
     return (((character >= 0x00000590 && character <= 0x000008FF) || (character >= 0x0000FB50 && character <= 0x0000FDFF) || (character >= 0x0000FE70 && character <= 0x0000FEFF) || (character >= 0x00010800 && character <= 0x00010FFF) || (character >= 0x0001E800 && character <= 0x0001EFFF)) ? 1 : 0);
@@ -621,6 +533,7 @@ static void fntRenderSubRTL(font_t *font, const char *startRTL, const char *stri
         fntRenderGlyph(glyph, x, y);
     }
 }
+#endif
 
 int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const char *string, u64 colour)
 {
@@ -659,10 +572,19 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     state = UTF8_ACCEPT;
     previous = 0;
 
+#ifdef EXTRA_FEATURES
     short inRTL = 0;
     int delta_x, pen_xRTL = 0;
     fnt_glyph_cache_entry_t *glyphRTL = NULL;
     const char *startRTL = NULL;
+#endif
+
+    // Note: We need to change this so that we'll accumulate whole word before doing a layout with it
+    // for now this method breaks on any character - which is a bit ugly
+
+    // I don't want to do anything complicated though so I'd say
+    // we should instead have a dynamic layout routine that'll replace spaces with newlines as appropriate
+    // because that'll make the code run only once per N frames, not every frame
 
     // cache glyphs and render as we go
     for (; *string; ++string) {
@@ -673,7 +595,8 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
         if (!glyph)
             continue;
 
-        // kerning
+            // kerning
+#ifdef EXTRA_FEATURES
         delta_x = 0;
         if (use_kerning && previous) {
             glyph_index = FT_Get_Char_Index(font->face, codepoint);
@@ -683,7 +606,17 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
             }
             previous = glyph_index;
         }
-
+#else
+        // kerning
+        if (use_kerning && previous) {
+            glyph_index = FT_Get_Char_Index(font->face, codepoint);
+            if (glyph_index) {
+                FT_Get_Kerning(font->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
+                pen_x += delta.x >> 6;
+            }
+            previous = glyph_index;
+        }
+#endif
 
         if (width) {
             if (codepoint == '\n') {
@@ -691,11 +624,20 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
                 y += rmScaleY(MENU_ITEM_HEIGHT); // hmax is too tight and unordered, generally
                 continue;
             }
-
+#ifdef EXTRA_FEATURES
             if ((pen_x + glyph->width > xmax) || (y > ymax)) // stepped over the max
                 break;
-        }
+#else
+            if (y > ymax) // stepped over the max
+                break;
 
+            if (pen_x + glyph->width > xmax) {
+                pen_x = xmax + 1; // to be sure no other cahr will be written (even not a smaller one just following)
+                continue;
+            }
+#endif
+        }
+#ifdef EXTRA_FEATURES
         if (isRTL(codepoint)) {
             if (!inRTL && !isWeak(codepoint)) {
                 inRTL = 1;
@@ -718,16 +660,22 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
             fntRenderGlyph(glyph, pen_x, y);
             pen_x += glyph->shx >> 6;
         }
+#else
+        fntRenderGlyph(glyph, pen_x, y);
+        pen_x += glyph->shx >> 6;
+#endif
     }
 
+#ifdef EXTRA_FEATURES
     if (inRTL) {
         pen_x = pen_xRTL;
         fntRenderSubRTL(font, startRTL, string, glyphRTL, pen_xRTL, y);
     }
+#endif
 
     return rmUnScaleX(pen_x);
 }
-#endif
+
 
 void fntFitString(int id, char *string, size_t width)
 {

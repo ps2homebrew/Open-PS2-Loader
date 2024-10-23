@@ -147,7 +147,6 @@ enum UI_ITEMS {
     OSD_TVASPECT_VALUE,
     OSD_VMODE_VALUE,
 
-#ifdef EXTRA_FEATURES
     PADEMU_GLOBAL_BUTTON,
     PADCFG_PADEMU_SOURCE,
     PADCFG_PADEMU_CONFIG,
@@ -190,9 +189,6 @@ enum UI_ITEMS {
     PADMACRO_TURBO_SPEED,
 
     COMPAT_MODE_BASE = 250,
-#else
-    COMPAT_MODE_BASE = 200,
-#endif
 };
 
 #define COMPAT_NOEXIT       0x70000000
@@ -203,11 +199,9 @@ enum UI_ITEMS {
 #define COMPAT_VMC1_DEFINE (COMPAT_VMC1_DEFINE_ID | COMPAT_NOEXIT)
 #define COMPAT_VMC2_DEFINE (COMPAT_VMC2_DEFINE_ID | COMPAT_NOEXIT)
 
-#ifdef EXTRA_FEATURES
 extern struct UIItem diaPadEmuConfig[];
 extern struct UIItem diaPadMacroConfig[];
 extern struct UIItem diaPadEmuInfo[];
-#endif
 
 extern struct UIItem diaNetConfig[];
 extern struct UIItem diaUIConfig[];

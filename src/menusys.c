@@ -40,10 +40,8 @@ enum GAME_MENU_IDs {
     GAME_CHEAT_SETTINGS,
     GAME_GSM_SETTINGS,
     GAME_VMC_SETTINGS,
-#ifdef EXTRA_FEATURES
     GAME_PADEMU_SETTINGS,
     GAME_PADMACRO_SETTINGS,
-#endif
     GAME_OSD_LANGUAGE_SETTINGS,
     GAME_SAVE_CHANGES,
     GAME_TEST_CHANGES,
@@ -244,10 +242,8 @@ void menuInitGameMenu(void)
     submenuAppendItem(&gameMenu, -1, NULL, GAME_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_GSM_SETTINGS, _STR_GSCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_VMC_SETTINGS, _STR_VMC_SCREEN);
-#ifdef EXTRA_FEATURES
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADEMU_SETTINGS, _STR_PADEMUCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADMACRO_SETTINGS, _STR_PADMACROCONFIG);
-#endif
     submenuAppendItem(&gameMenu, -1, NULL, GAME_OSD_LANGUAGE_SETTINGS, _STR_OSD_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_TEST_CHANGES, _STR_TEST);
@@ -897,10 +893,8 @@ void menuHandleInputMenu()
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
                 guiGameSaveOSDLanguageGlobalConfig(configGetByType(CONFIG_GAME));
-#ifdef EXTRA_FEATURES
                 guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
                 guiGameSavePadMacroGlobalConfig(configGetByType(CONFIG_GAME));
-#endif
                 saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
                 menuSetParentalLockCheckState(1); // Re-enable parental lock check.
             }
@@ -1135,12 +1129,10 @@ void menuHandleInputGameMenu()
             guiGameShowGSConfig();
         } else if (menuID == GAME_VMC_SETTINGS) {
             guiGameShowVMCMenu(selected_item->item->current->item.id, selected_item->item->userdata);
-#ifdef EXTRA_FEATURES
         } else if (menuID == GAME_PADEMU_SETTINGS) {
             guiGameShowPadEmuConfig(0);
         } else if (menuID == GAME_PADMACRO_SETTINGS) {
             guiGameShowPadMacroConfig(0);
-#endif
         } else if (menuID == GAME_OSD_LANGUAGE_SETTINGS) {
             guiGameShowOSDLanguageConfig(0);
         } else if (menuID == GAME_SAVE_CHANGES) {

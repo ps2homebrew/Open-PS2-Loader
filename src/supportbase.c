@@ -643,7 +643,6 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
 
     config_set_t *configGame = configGetByType(CONFIG_GAME);
 
-#ifdef EXTRA_FEATURES
     gPadEmuSource = 0;
     gEnablePadEmu = 0;
     gPadEmuSettings = 0;
@@ -667,7 +666,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     if (gEnablePadEmu) {
         settings->fakemodule_flags |= FAKE_MODULE_FLAG_USBD;
     }
-#endif
+
     // sanitise the settings
     gOSDLanguageSource = 0;
     gOSDLanguageEnable = 0;

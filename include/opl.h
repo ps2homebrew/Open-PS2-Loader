@@ -164,6 +164,7 @@ extern int showCfgPopup;
 
 #ifdef EXTRA_FEATURES
 #define IGS_VERSION "0.1"
+#endif
 
 // ------------------------------------------------------------------------------------------------------------------------
 
@@ -171,7 +172,7 @@ extern int gEnablePadEmu;
 extern int gPadEmuSettings;
 extern int gPadMacroSource;
 extern int gPadMacroSettings;
-#endif
+
 
 // ------------------------------------------------------------------------------------------------------------------------
 

@@ -68,9 +68,7 @@ static int eecoreInit(int argc, char **argv)
 
     DPRINTF("GSM = %s\n", config->EnableGSMOp == 0 ? "Disabled" : "Enabled");
 
-#ifdef EXTRA_FEATURES
     DPRINTF("PADEMU = %s\n", config->EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
-#endif
 
     DPRINTF("enforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
 

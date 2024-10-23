@@ -28,10 +28,8 @@
 #include "include/cheatman.h"
 #include "include/xparam.h"
 
-#ifdef EXTRA_FEATURES
 #include <libds34bt.h>
 #include <libds34usb.h>
-#endif
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioInit, fileXioExit, fileXioDevctl
@@ -180,10 +178,8 @@ void sysShutdownDev9(void)
 
 void sysReset(int modload_mask)
 {
-#ifdef EXTRA_FEATURES
     ds34usb_reset();
     ds34bt_reset();
-#endif
     fileXioExit();
     SifExitIopHeap();
     SifLoadFileExit();
@@ -265,7 +261,6 @@ void sysReset(int modload_mask)
     LOG("[AUDSRV]:\n");
     sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
 
-#ifdef EXTRA_FEATURES
     int ds3pads = 1; // only one pad enabled
 
     ds34usb_deinit();
@@ -280,7 +275,6 @@ void sysReset(int modload_mask)
         ds34usb_init();
         ds34bt_init();
     }
-#endif
 
     fileXioInit();
     poweroffInit();
@@ -497,12 +491,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     irxptr_tab[modcount].info = size_resetspu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_RESETSPU);
     irxptr_tab[modcount++].ptr = (void *)&resetspu_irx;
 
-#ifdef EXTRA_FEATURES
-#define PADEMU_ARG || gEnablePadEmu
-#else
-#define PADEMU_ARG
-#endif
-    if ((modules & CORE_IRX_USB) PADEMU_ARG) {
+
+    if ((modules & CORE_IRX_USB) || gEnablePadEmu) {
         irxptr_tab[modcount].info = size_usbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
         irxptr_tab[modcount++].ptr = (void *)&usbd_irx;
     }
@@ -536,7 +526,6 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
     }
 
-#ifdef EXTRA_FEATURES
     if (gEnablePadEmu) {
         if (gPadEmuSettings & 0xFF) {
             irxptr_tab[modcount].info = size_bt_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
@@ -546,7 +535,6 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
             irxptr_tab[modcount++].ptr = (void *)&usb_pademu_irx;
         }
     }
-#endif
 
 #ifdef __INGAME_DEBUG
 #ifdef __DECI2_DEBUG
@@ -924,11 +912,9 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         config->GsmConfig.FIELD_fix = gsm_config.FIELD_fix;
     }
 
-#ifdef EXTRA_FEATURES
     config->EnablePadEmuOp = gEnablePadEmu;
     config->PadEmuSettings = (unsigned int)(gPadEmuSettings >> 8);
     config->PadMacroSettings = (unsigned int)(gPadMacroSettings);
-#endif
 
     config->CustomOSDConfigParam.spdifMode = PARAM.spdifMode;
     config->CustomOSDConfigParam.screenType = PARAM.screenType;

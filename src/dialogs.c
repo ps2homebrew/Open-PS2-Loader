@@ -543,7 +543,6 @@ struct UIItem diaCheatConfig[] = {
     // end of dialog
     {UI_TERMINATOR}};
 
-#ifdef EXTRA_FEATURES
 struct UIItem diaPadEmuConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMU_SETTINGS}}},
     {UI_SPLITTER},
@@ -844,7 +843,6 @@ struct UIItem diaPadMacroConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 // About Menu
 struct UIItem diaAbout[] = {
@@ -1029,13 +1027,11 @@ struct UIItem diaControllerConfig[] = {
     {UI_SPACER},
     {UI_ENUM, CFG_YSENSITIVITY, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
-#ifdef EXTRA_FEATURES
     {UI_BREAK},
     {UI_BUTTON, PADEMU_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
     {UI_BREAK},
     {UI_BUTTON, PADMACRO_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADMACROCONFIG}}},
     {UI_BREAK},
-#endif
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},

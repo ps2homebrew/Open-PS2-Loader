@@ -209,7 +209,6 @@ void guiShowAbout()
 #ifdef EXTRA_FEATURES
                                                        " - RTL"
                                                        " - IGS %s"
-                                                       " - PADEMU"
 #endif
              // Version numbers
              ,
@@ -931,13 +930,11 @@ void guiShowControllerConfig(void)
             gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
         else
             gSelectButton = KEY_CIRCLE;
-#ifdef EXTRA_FEATURES
         if (result == PADEMU_GLOBAL_BUTTON) {
             guiGameShowPadEmuConfig(1);
         } else if (result == PADMACRO_GLOBAL_BUTTON) {
             guiGameShowPadMacroConfig(1);
         }
-#endif
         applyConfig(-1, -1, 1);
     }
 }

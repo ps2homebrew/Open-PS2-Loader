@@ -25,10 +25,6 @@ ifeq ($(IOPCORE_DEBUG),1)
 IOP_CFLAGS += -DDEBUG
 endif
 
-ifeq ($(EXTRA_FEATURES),1)
-IOP_CFLAGS += -DEXTRA_FEATURES
-endif
-
 include $(PS2SDK)/Defs.make
 include ../Rules.bin.make
 include $(PS2SDK)/samples/Makefile.iopglobal

@@ -42,10 +42,8 @@
 int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 
 #include <unistd.h>
-#ifdef EXTRA_FEATURES
 #include <libds34bt.h>
 #include <libds34usb.h>
-#endif
 
 #ifdef __EESIO_DEBUG
 #include "SIOCookie.h"
@@ -162,12 +160,10 @@ int gPadEmuSource;
 int gFadeDelay;
 int toggleSfx;
 int showCfgPopup;
-#ifdef EXTRA_FEATURES
 int gEnablePadEmu;
 int gPadEmuSettings;
 int gPadMacroSource;
 int gPadMacroSettings;
-#endif
 int gScrollSpeed;
 char gExitPath[256];
 int gEnableDebug;
@@ -1612,10 +1608,8 @@ void deinit(int exception, int modeSelected)
     ioBlockOps(1);
     guiExecDeferredOps();
 
-#ifdef EXTRA_FEATURES
     ds34usb_reset();
     ds34bt_reset();
-#endif
     unloadPads();
 
     deinitAllSupport(exception, modeSelected);
@@ -1869,10 +1863,8 @@ static void miniInit(int mode)
 void miniDeinit(config_set_t *configSet)
 {
     ioBlockOps(1);
-#ifdef EXTRA_FEATURES
     ds34usb_reset();
     ds34bt_reset();
-#endif
     configFree(configSet);
 
     ioEnd();

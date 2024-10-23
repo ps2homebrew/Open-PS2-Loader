@@ -24,7 +24,7 @@ EXTRAVERSION = Beta
 # Do not COMMENT out the variables!!
 # You can also specify variables when executing make: "make EXTRA_FEATURES = 1"
 
-EXTRA_FEATURES ?= 1
+EXTRA_FEATURES ?= 0
 
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 ?= 0

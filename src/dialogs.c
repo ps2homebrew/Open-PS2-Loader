@@ -288,6 +288,11 @@ struct UIItem diaUIConfig[] = {
     {UI_BOOL, UICFG_AUTOREFRESH, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SHOWCOUNT}}},
+    {UI_SPACER},
+    {UI_BOOL, UICFG_SHOWCOUNT, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_COVERART}}},
     {UI_SPACER},
     {UI_BOOL, UICFG_COVERART, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},

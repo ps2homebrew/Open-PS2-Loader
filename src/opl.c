@@ -141,6 +141,7 @@ int gEnableMX4SIO;
 int gAutosort;
 int gAutoRefresh;
 int gEnableNotifications;
+int gShowFileCount;
 int gEnableArt;
 int gWideScreen;
 int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
@@ -887,13 +888,14 @@ static void _loadConfig()
             configGetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
             configGetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_NOTIFICATIONS, &gEnableNotifications);
+            configGetInt(configOPL, CONFIG_OPL_SHOW_COUNT, &gShowFileCount);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, &gEnableArt);
             configGetInt(configOPL, CONFIG_OPL_WIDESCREEN, &gWideScreen);
 
             if (!(getKeyPressed(KEY_TRIANGLE) && getKeyPressed(KEY_CROSS))) {
                 configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
             } else {
-                LOG("--- Select held at boot - setting Video Mode to Auto ---\n");
+                LOG("--- Triangle + Cross held at boot - setting Video Mode to Auto ---\n");
                 gVMode = 0;
                 configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
             }
@@ -1067,6 +1069,7 @@ static void _saveConfig()
         configSetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
         configSetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_NOTIFICATIONS, gEnableNotifications);
+        configSetInt(configOPL, CONFIG_OPL_SHOW_COUNT, gShowFileCount);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, gEnableArt);
         configSetInt(configOPL, CONFIG_OPL_WIDESCREEN, gWideScreen);
         configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
@@ -1710,6 +1713,7 @@ static void setDefaults(void)
     gBDMPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
     gEnableNotifications = 0;
+    gShowFileCount = 0;
     gEnableArt = 0;
     gWideScreen = 0;
     gEnableSFX = 0;

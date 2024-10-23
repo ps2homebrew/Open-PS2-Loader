@@ -47,7 +47,7 @@ enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_INFO_HINT_TEXT,
     ELEM_TYPE_LOADING_ICON,
     ELEM_TYPE_BDM_INDEX,
-
+    ELEM_TYPE_GAME_COUNT_TEXT,
     ELEM_TYPE_COUNT
 };
 
@@ -76,7 +76,7 @@ static const char *elementsType[ELEM_TYPE_COUNT] = {
     "InfoHintText",
     "LoadingIcon",
     "BdmIndex",
-};
+    "GameCountText"};
 
 // Common functions for Text ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -196,6 +196,44 @@ static void initStaticText(const char *themePath, config_set_t *themeConfig, the
         elem->drawElem = &drawStaticText;
     } else
         LOG("THEMES StaticText %s: NO value, elem disabled !!\n", name);
+}
+
+// GameCountText ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static int getGameCount(void *support)
+{
+    item_list_t *list = (item_list_t *)support;
+    return list->itemGetCount(list);
+}
+
+static void drawGameCountText(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
+{
+    if (gShowFileCount) {
+        mutable_text_t *mutableText = (mutable_text_t *)elem->extended;
+
+        if (config) {
+            if (mutableText->currentConfigId != config->uid) {
+                // force refresh
+                mutableText->currentConfigId = config->uid;
+
+                int count = getGameCount(menu->item->userdata);
+                snprintf(mutableText->value, sizeof(char) * 60, "%i File%s Found:", count, count == 1 ? "" : "s");
+            }
+        }
+
+        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->value, elem->color);
+    }
+}
+
+static void initGameCountText(const char *themePath, config_set_t *themeConfig, theme_t *theme, theme_element_t *elem, const char *name)
+{
+    int length = 60;
+    const char *countStr = (char *)malloc(length * sizeof(char));
+    memset(countStr, 0, length * sizeof(char));
+
+    elem->extended = initMutableText(themePath, themeConfig, theme, name, ELEM_TYPE_ATTRIBUTE_TEXT, elem, countStr, NULL, DISPLAY_ALWAYS, SIZING_NONE);
+    elem->endElem = &endMutableText;
+    elem->drawElem = &drawGameCountText;
 }
 
 // AttributeText ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -990,6 +1028,9 @@ static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t 
             } else if (!strcmp(elementsType[ELEM_TYPE_STATIC_TEXT], type)) {
                 elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 initStaticText(themePath, themeConfig, theme, elem, name);
+            } else if (!strcmp(elementsType[ELEM_TYPE_GAME_COUNT_TEXT], type)) {
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                initGameCountText(themePath, themeConfig, theme, elem, name);
             } else if (!strcmp(elementsType[ELEM_TYPE_ATTRIBUTE_IMAGE], type)) {
                 elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ATTRIBUTE_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
                 initAttributeImage(themePath, themeConfig, theme, elem, name);

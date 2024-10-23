@@ -672,6 +672,7 @@ reselect_video_mode:
     diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
     diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
     diaSetInt(diaUIConfig, UICFG_NOTIFICATIONS, gEnableNotifications);
+    diaSetInt(diaUIConfig, UICFG_SHOWCOUNT, gShowFileCount);
     diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
     diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
     diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
@@ -693,6 +694,7 @@ reselect_video_mode:
         diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
         diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
         diaGetInt(diaUIConfig, UICFG_NOTIFICATIONS, &gEnableNotifications);
+        diaGetInt(diaUIConfig, UICFG_SHOWCOUNT, &gShowFileCount);
         diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
         diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
         diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);

@@ -148,6 +148,8 @@ gui_strings:
   string: Debug Colors
 - label: NO_CONTROLLER
   string: No controller detected, waiting...
+- label: SHOWCOUNT
+  string: File Count
 - label: COVERART
   string: Cover Art
 - label: WIDE_SCREEN

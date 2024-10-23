@@ -495,7 +495,7 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t *glyph, int pen_x, int pen_y)
 }
 
 
-#ifndef __RTL
+#ifndef EXTRA_FEATURES
 int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const char *string, u64 colour)
 {
     // wait for font lock to unlock

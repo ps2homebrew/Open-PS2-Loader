@@ -48,9 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rtl: [RTL=0, RTL=1]
-        pademu: [PADEMU=0, PADEMU=1]
-        igs: [IGS=0, IGS=1]
+        extra_features: [EXTRA_FEATURES=0, EXTRA_FEATURES=1]
         t10k: [DTL_T10000=0, DTL_T10000=1]
     runs-on: ubuntu-latest
     container: ghcr.io/ps2homebrew/ps2homebrew:main
@@ -66,10 +64,10 @@ jobs:
       run: |
         echo "OPL_VERSION=$(make oplversion)" >> $GITHUB_ENV
 
-    - name: Compile -> make ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
+    - name: Compile -> make ${{ matrix.t10k }} ${{ matrix.extra_features }} NOT_PACKED=1
       run: |
-        make --trace ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
-        mv opl.elf OPNPS2LD-${{ env.OPL_VERSION }}-${{ matrix.t10k }}-${{ matrix.igs }}-${{ matrix.pademu }}-${{ matrix.rtl }}.ELF
+        make --trace ${{ matrix.t10k }} ${{ matrix.extra_features }} NOT_PACKED=1
+        mv opl.elf OPNPS2LD-${{ env.OPL_VERSION }}-${{ matrix.t10k }}-${{ matrix.extra_features }}.ELF
 
     - name: Create detailed changelog
       run: sh ./make_changelog.sh
@@ -77,7 +75,7 @@ jobs:
     - name: Upload variants artifact ELF
       uses: actions/upload-artifact@v4
       with:
-        name: OPNPS2LD-VARIANTS ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }}
+        name: OPNPS2LD-VARIANTS ${{ matrix.t10k }} ${{ matrix.t10k }} ${{ matrix.extra_features }}
         path: OPNPS2LD*.ELF
 
   merge-variants:

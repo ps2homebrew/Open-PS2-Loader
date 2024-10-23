@@ -42,7 +42,7 @@
 int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 
 #include <unistd.h>
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 #include <libds34bt.h>
 #include <libds34usb.h>
 #endif
@@ -162,7 +162,7 @@ int gPadEmuSource;
 int gFadeDelay;
 int toggleSfx;
 int showCfgPopup;
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 int gEnablePadEmu;
 int gPadEmuSettings;
 int gPadMacroSource;
@@ -1612,7 +1612,7 @@ void deinit(int exception, int modeSelected)
     ioBlockOps(1);
     guiExecDeferredOps();
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     ds34usb_reset();
     ds34bt_reset();
 #endif
@@ -1869,7 +1869,7 @@ static void miniInit(int mode)
 void miniDeinit(config_set_t *configSet)
 {
     ioBlockOps(1);
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     ds34usb_reset();
     ds34bt_reset();
 #endif

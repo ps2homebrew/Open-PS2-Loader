@@ -11,7 +11,7 @@
 #include <timer.h>
 #include <time.h>
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 #include <libds34bt.h>
 #include <libds34usb.h>
 #endif
@@ -270,7 +270,7 @@ static int readPad(struct pad_data_t *pad)
         }
     }
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     if (ds34bt_get_status(pad->port) & DS34BT_STATE_RUNNING) {
         ret = ds34bt_get_data(pad->port, (u8 *)&pad->buttons.btns);
         ds34bt_set_rumble(pad->port, 0, 0);

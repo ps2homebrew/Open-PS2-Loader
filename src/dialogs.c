@@ -543,7 +543,7 @@ struct UIItem diaCheatConfig[] = {
     // end of dialog
     {UI_TERMINATOR}};
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 struct UIItem diaPadEmuConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMU_SETTINGS}}},
     {UI_SPLITTER},
@@ -1029,7 +1029,7 @@ struct UIItem diaControllerConfig[] = {
     {UI_SPACER},
     {UI_ENUM, CFG_YSENSITIVITY, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     {UI_BREAK},
     {UI_BUTTON, PADEMU_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
     {UI_BREAK},

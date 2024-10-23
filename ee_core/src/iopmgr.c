@@ -114,7 +114,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 #endif
 #endif
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 #define PADEMU_ARG || config->EnablePadEmuOp
 #else
 #define PADEMU_ARG
@@ -184,14 +184,14 @@ int New_Reset_Iop(const char *arg, int arglen)
     }
 
     if (iop_reboot_count >= 2) {
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
         config->PadEmuSettings |= (LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL) > 0) << 24;
 #else
         LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL);
 #endif
     }
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     if (iop_reboot_count >= 2 && config->EnablePadEmuOp) {
         char args_for_pademu[8];
         memcpy(args_for_pademu, &config->PadEmuSettings, 4);

@@ -14,7 +14,7 @@ void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configS
 void guiGameShowGSConfig(void);
 void guiGameShowCheatConfig(void);
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 void guiGameShowPadEmuConfig(int forceGlobal);
 void guiGameShowPadMacroConfig(int forceGlobal);
 void guiGameSavePadEmuGlobalConfig(config_set_t *configGame);

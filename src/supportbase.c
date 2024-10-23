@@ -643,7 +643,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
 
     config_set_t *configGame = configGetByType(CONFIG_GAME);
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     gPadEmuSource = 0;
     gEnablePadEmu = 0;
     gPadEmuSettings = 0;

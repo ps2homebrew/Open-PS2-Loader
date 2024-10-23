@@ -28,7 +28,7 @@
 #include "include/cheatman.h"
 #include "include/xparam.h"
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 #include <libds34bt.h>
 #include <libds34usb.h>
 #endif
@@ -180,7 +180,7 @@ void sysShutdownDev9(void)
 
 void sysReset(int modload_mask)
 {
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     ds34usb_reset();
     ds34bt_reset();
 #endif
@@ -265,7 +265,7 @@ void sysReset(int modload_mask)
     LOG("[AUDSRV]:\n");
     sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     int ds3pads = 1; // only one pad enabled
 
     ds34usb_deinit();
@@ -497,7 +497,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     irxptr_tab[modcount].info = size_resetspu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_RESETSPU);
     irxptr_tab[modcount++].ptr = (void *)&resetspu_irx;
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 #define PADEMU_ARG || gEnablePadEmu
 #else
 #define PADEMU_ARG
@@ -536,7 +536,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
     }
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     if (gEnablePadEmu) {
         if (gPadEmuSettings & 0xFF) {
             irxptr_tab[modcount].info = size_bt_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
@@ -924,7 +924,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         config->GsmConfig.FIELD_fix = gsm_config.FIELD_fix;
     }
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     config->EnablePadEmuOp = gEnablePadEmu;
     config->PadEmuSettings = (unsigned int)(gPadEmuSettings >> 8);
     config->PadMacroSettings = (unsigned int)(gPadMacroSettings);

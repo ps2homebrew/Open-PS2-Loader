@@ -44,19 +44,15 @@ EE_CFLAGS += -D__LOAD_DEBUG_MODULES
     endif
 endif
 
-ifeq ($(IGS),1)
+ifeq ($(EXTRA_FEATURES),1)
 EE_OBJS += $(IGSCORE_EE_OBJS)
-EE_CFLAGS += -DIGS
+EE_CFLAGS += -DEXTRA_FEATURES
 endif
-
 EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 EE_LDFLAGS = -nostartfiles -nostdlib -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
 EE_LIBS += -lpatches
 
-ifeq ($(PADEMU),1)
-EE_CFLAGS += -DPADEMU
-endif
 
 EE_LIBS += -lkernel -lgcc
 

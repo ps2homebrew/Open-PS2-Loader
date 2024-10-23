@@ -9,7 +9,7 @@
 
 static int readyToGo = -1;
 void StartNow(void *param);
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 void no_pademu(Sio2Packet *sd, Sio2McProc sio2proc)
 {
     sio2proc(sd);
@@ -278,7 +278,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
             DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
             return ret;
         }
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     } else if (!strcmp(lib->name, "pademu")) {
         pademu_hookSio2man = GetExportEntry(&lib[1], 4);
 #endif
@@ -339,7 +339,7 @@ void hookSio2man(Sio2Packet *sd, Sio2McProc sio2proc)
     }
 
 /* calling original SIO2MAN routine */
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     pademu_hookSio2man(sd, sio2proc);
 #else
     sio2proc(sd);

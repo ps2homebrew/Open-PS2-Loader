@@ -29,7 +29,7 @@
 #include "syshook.h"
 #include "tlb.h"
 #include "gsm_api.h"
-#ifdef IGS
+#ifdef EXTRA_FEATURES
 #include "igs_api.h"
 #endif
 #include "cheat_api.h"
@@ -153,7 +153,7 @@ static void IGR_Thread(void *arg)
 
     // If Pad Combo is Start + Select then Return to Home, else if Pad Combo is UP then take IGS
     if ((Pad_Data.combo_type == IGR_COMBO_START_SELECT)
-#ifdef IGS
+#ifdef EXTRA_FEATURES
         || ((Pad_Data.combo_type == IGR_COMBO_UP) && (config->EnableGSMOp))
 #endif
     ) {
@@ -231,7 +231,7 @@ static void IGR_Thread(void *arg)
         // Reset SPU - do it after the IOP reboot, so nothing will compete with the EE for it.
         LoadOPLModule(OPL_MODULE_ID_RESETSPU, 0, 0, NULL);
 
-#ifdef IGS
+#ifdef EXTRA_FEATURES
         if ((Pad_Data.combo_type == IGR_COMBO_UP) && (config->EnableGSMOp))
             InGameScreenshot();
 #endif
@@ -299,7 +299,7 @@ static int IGR_Intc_Handler(int cause)
                 // Combo Start + Select, R3 + L3 or UP
                 if ((pad_pos_combo2 == IGR_COMBO_START_SELECT) || // Start + Select combo, so reset
                     (pad_pos_combo2 == IGR_COMBO_R3_L3)           // R3 + L3 combo, so poweroff
-#ifdef IGS
+#ifdef EXTRA_FEATURES
                     || ((pad_pos_combo2 == IGR_COMBO_UP) && (config->EnableGSMOp)) // UP combo, so take IGS
 #endif
                 )

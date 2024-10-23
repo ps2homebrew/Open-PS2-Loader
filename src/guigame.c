@@ -16,7 +16,7 @@
 #include "include/guigame.h"
 #include "include/ds34common.h"
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 #include <libds34bt.h>
 #include <libds34usb.h>
 #endif
@@ -39,7 +39,7 @@ static int CheatMode;
 
 static int forceGlobalOSDLanguage;
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 static int EnablePadEmu;
 static int PadEmuSettings;
 static union
@@ -72,7 +72,7 @@ static char configSource[128];
 // forward declarations.
 static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame);
 static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame);
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame);
 static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *configGame);
 #endif
@@ -460,7 +460,7 @@ void guiGameShowCheatConfig(void)
 }
 
 // PADEMU
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 // from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
 static char *bt_ver_str[] = {
     "1.0b",
@@ -1066,7 +1066,7 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
         configSetInt(configGame, CONFIG_ITEM_CHEATMODE, CheatMode);
     }
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     /// PADEMU ///
     result = guiGameSavePadEmuGameConfig(configSet, result);
     guiGameSavePadEmuGlobalConfig(configGame);
@@ -1107,13 +1107,13 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         configRemoveKey(configGame, CONFIG_ITEM_GSMXOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMFIELDFIX);
-        //OSD Language
+        // OSD Language
         configRemoveKey(configGame, CONFIG_ITEM_OSD_SETTINGS_LANGID);
         configRemoveKey(configGame, CONFIG_ITEM_OSD_SETTINGS_TV_ASP);
         configRemoveKey(configGame, CONFIG_ITEM_OSD_SETTINGS_VMODE);
         configRemoveKey(configGame, CONFIG_ITEM_OSD_SETTINGS_ENABLE);
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
         // PADEMU
         configRemoveKey(configGame, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configGame, CONFIG_ITEM_PADEMUSETTINGS);
@@ -1145,14 +1145,14 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 
-        //OSD Language
+        // OSD Language
         configRemoveKey(configSet, CONFIG_ITEM_OSD_SETTINGS_LANGID);
         configRemoveKey(configSet, CONFIG_ITEM_OSD_SETTINGS_TV_ASP);
         configRemoveKey(configSet, CONFIG_ITEM_OSD_SETTINGS_VMODE);
         configRemoveKey(configSet, CONFIG_ITEM_OSD_SETTINGS_SOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_OSD_SETTINGS_ENABLE);
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
         // PADEMU
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
@@ -1239,7 +1239,7 @@ static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *confi
     diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
 }
 
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame)
 {
     EnablePadEmu = 0;
@@ -1314,7 +1314,7 @@ static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *con
 }
 #endif
 
-//OSD
+// OSD
 
 static int guiGameOSDLanguageUpdater(int modified)
 {
@@ -1431,7 +1431,7 @@ static void guiGameLoadOSDLanguageConfig(config_set_t *configSet, config_set_t *
     diaSetInt(diaOSDConfig, OSD_TVASPECT_VALUE, gOSDTVAspectRatio);
     diaSetInt(diaOSDConfig, OSD_VMODE_VALUE, gOSDVideOutput);
 }
-//OSD Language
+// OSD Language
 
 // loads defaults if no config found
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
@@ -1462,7 +1462,7 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     guiGameLoadGSMConfig(configSet, configGame);
 
     guiGameLoadCheatsConfig(configSet, configGame);
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     guiGameLoadPadEmuConfig(configSet, configGame);
     guiGameLoadPadMacroConfig(configSet, configGame);
 #endif

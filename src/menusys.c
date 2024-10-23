@@ -40,7 +40,7 @@ enum GAME_MENU_IDs {
     GAME_CHEAT_SETTINGS,
     GAME_GSM_SETTINGS,
     GAME_VMC_SETTINGS,
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     GAME_PADEMU_SETTINGS,
     GAME_PADMACRO_SETTINGS,
 #endif
@@ -244,7 +244,7 @@ void menuInitGameMenu(void)
     submenuAppendItem(&gameMenu, -1, NULL, GAME_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_GSM_SETTINGS, _STR_GSCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_VMC_SETTINGS, _STR_VMC_SCREEN);
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADEMU_SETTINGS, _STR_PADEMUCONFIG);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADMACRO_SETTINGS, _STR_PADMACROCONFIG);
 #endif
@@ -897,7 +897,7 @@ void menuHandleInputMenu()
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
                 guiGameSaveOSDLanguageGlobalConfig(configGetByType(CONFIG_GAME));
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
                 guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
                 guiGameSavePadMacroGlobalConfig(configGetByType(CONFIG_GAME));
 #endif
@@ -1135,7 +1135,7 @@ void menuHandleInputGameMenu()
             guiGameShowGSConfig();
         } else if (menuID == GAME_VMC_SETTINGS) {
             guiGameShowVMCMenu(selected_item->item->current->item.id, selected_item->item->userdata);
-#ifdef PADEMU
+#ifdef EXTRA_FEATURES
         } else if (menuID == GAME_PADEMU_SETTINGS) {
             guiGameShowPadEmuConfig(0);
         } else if (menuID == GAME_PADMACRO_SETTINGS) {

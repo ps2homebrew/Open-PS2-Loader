@@ -25,8 +25,8 @@ ifeq ($(IOPCORE_DEBUG),1)
 IOP_CFLAGS += -DDEBUG
 endif
 
-ifeq ($(PADEMU),1)
-IOP_CFLAGS += -DPADEMU
+ifeq ($(EXTRA_FEATURES),1)
+IOP_CFLAGS += -DEXTRA_FEATURES
 endif
 
 include $(PS2SDK)/Defs.make

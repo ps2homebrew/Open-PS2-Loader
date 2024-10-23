@@ -22,16 +22,9 @@ EXTRAVERSION = Beta
 # You can adjust the variables in this section to meet your needs.
 # To enable a feature, set its variable's value to 1. To disable, change it to 0.
 # Do not COMMENT out the variables!!
-# You can also specify variables when executing make: "make RTL=1 IGS=1 PADEMU=1"
+# You can also specify variables when executing make: "make EXTRA_FEATURES = 1"
 
-#Enables/disables Right-To-Left (RTL) language support
-RTL ?= 0
-
-#Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
-IGS ?= 1
-
-#Enables/disables pad emulator
-PADEMU ?= 1
+EXTRA_FEATURES ?= 1
 
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 ?= 0
@@ -131,9 +124,13 @@ BIN2C = $(PS2SDK)/bin/bin2c
 # WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)
 # but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule!
 
-ifeq ($(RTL),1)
-  EE_CFLAGS += -D__RTL
+ifeq ($(EXTRA_FEATURES),1)
+EE_CFLAGS += -DEXTRA_FEATURES -D__RTL
+EXTRA_FEATURES_FLAGS = EXTRA_FEATURES=1
+IOP_OBJS += bt_pademu.o usb_pademu.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
+EE_INCS += -Imodules/ds34bt/ee -Imodules/ds34usb/ee
 endif
+
 
 ifeq ($(DTL_T10000),1)
   EE_CFLAGS += -D_DTL_T10000
@@ -141,22 +138,6 @@ ifeq ($(DTL_T10000),1)
   UDNL_OUT = $(PS2SDK)/iop/irx/udnl-t300.irx
 else
   UDNL_OUT = $(PS2SDK)/iop/irx/udnl.irx
-endif
-
-ifeq ($(IGS),1)
-  EE_CFLAGS += -DIGS
-  IGS_FLAGS = IGS=1
-else
-  IGS_FLAGS = IGS=0
-endif
-
-ifeq ($(PADEMU),1)
-  IOP_OBJS += bt_pademu.o usb_pademu.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
-  EE_CFLAGS += -DPADEMU
-  EE_INCS += -Imodules/ds34bt/ee -Imodules/ds34usb/ee
-  PADEMU_FLAGS = PADEMU=1
-else
-  PADEMU_FLAGS = PADEMU=0
 endif
 
 ifeq ($(DEBUG),1)
@@ -385,7 +366,7 @@ $(EE_VPKD).ZIP: $(EE_VPKD).ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
 
 ee_core/ee_core.elf: ee_core
 	echo "-EE core"
-	$(MAKE) $(IGS_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
+	$(MAKE) $(EXTRA_FEATURES_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
 
 $(EE_ASM_DIR)ee_core.c: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ eecore_elf
@@ -463,19 +444,19 @@ $(EE_ASM_DIR)resetspu.c: modules/iopcore/resetspu/resetspu.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 modules/mcemu/bdm_mcemu.irx: modules/mcemu
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_BDM=1 -C $< all
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(EXTRA_FEATURES_FLAGS) USE_BDM=1 -C $< all
 
 $(EE_ASM_DIR)bdm_mcemu.c: modules/mcemu/bdm_mcemu.irx
 	$(BIN2C) $< $@ $(*F)_irx
 
 modules/mcemu/hdd_mcemu.irx: modules/mcemu
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_HDD=1 -C $< all
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(EXTRA_FEATURES_FLAGS) USE_HDD=1 -C $< all
 
 $(EE_ASM_DIR)hdd_mcemu.c: modules/mcemu/hdd_mcemu.irx
 	$(BIN2C) $< $@ $(*F)_irx
 
 modules/mcemu/smb_mcemu.irx: modules/mcemu
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_SMB=1 -C $< all
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(EXTRA_FEATURES_FLAGS) USE_SMB=1 -C $< all
 
 $(EE_ASM_DIR)smb_mcemu.c: modules/mcemu/smb_mcemu.irx
 	$(BIN2C) $< $@ $(*F)_irx

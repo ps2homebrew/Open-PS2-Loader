@@ -40,7 +40,6 @@
 
 #include "include/hddsupport.h"
 #include "include/supportbase.h"
-#include "include/bdmsupport.h"
 
 // Last Played Auto Start
 #include <time.h>
@@ -208,10 +207,8 @@ extern unsigned char gDefaultTextColor[3];
 extern unsigned char gDefaultSelTextColor[3];
 extern unsigned char gDefaultUITextColor[3];
 
-// Launching games with args
 extern hdl_game_info_t *gAutoLaunchGame;
 extern base_game_info_t *gAutoLaunchBDMGame;
-extern bdm_device_data_t *gAutoLaunchDeviceData;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 

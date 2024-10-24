@@ -431,8 +431,13 @@ static void initAllSupport(int force_reinit)
 static void deinitAllSupport(int exception, int modeSelected)
 {
     for (int i = 0; i < MODE_COUNT; i++) {
-        if (list_support[i].support != NULL)
+        if (list_support[i].support != NULL) {
+            // If the selected mode is one of the mass devices then skip deinit for all mass device objects.
+            if (modeSelected >= BDM_MODE && modeSelected <= BDM_MODE4 && i <= BDM_MODE4)
+                continue;
+
             moduleCleanup(&list_support[i], exception, modeSelected);
+        }
     }
 }
 
@@ -1651,8 +1656,10 @@ void setDefaultColors(void)
 
 static void setDefaults(void)
 {
-    for (int i = 0; i < MODE_COUNT; i++)
-        clearIOModuleT(&list_support[i]);
+    clearIOModuleT(&list_support[BDM_MODE]);
+    clearIOModuleT(&list_support[ETH_MODE]);
+    clearIOModuleT(&list_support[HDD_MODE]);
+    clearIOModuleT(&list_support[APP_MODE]);
 
     gAutoLaunchGame = NULL;
     gAutoLaunchBDMGame = NULL;

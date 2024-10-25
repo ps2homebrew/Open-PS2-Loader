@@ -24,11 +24,14 @@ EXTRAVERSION = Beta
 # Do not COMMENT out the variables!!
 # You can also specify variables when executing make: "make RTL=1 IGS=1 PADEMU=1"
 
-#Enables/disables Right-To-Left (RTL) language support
-RTL ?= 0
+# Check if EXTRA_FEATURES is set, default to 0
+EXTRA_FEATURES ?= 0
 
+# Set RTL and IGS based on EXTRA_FEATURES, but allow user overrides
+#Enables/disables Right-To-Left (RTL) language support
+RTL ?= $(EXTRA_FEATURES)
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
-IGS ?= 1
+IGS ?= $(EXTRA_FEATURES)
 
 #Enables/disables pad emulator
 PADEMU ?= 1

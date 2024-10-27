@@ -216,7 +216,7 @@ static void drawGameCountText(struct menu_list *menu, struct submenu_list *item,
             mutableText->currentConfigId = config->uid;
 
             int count = getGameCount(menu->item->userdata);
-            snprintf(mutableText->value, sizeof(char) * 60, "%i File%s Found:", count, count == 1 ? "" : "s");
+            snprintf(mutableText->value, sizeof(char) * 60, _l(_STR_FILE_COUNT), count);
         }
     }
 

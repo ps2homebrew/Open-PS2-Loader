@@ -130,7 +130,6 @@ extern int gEnableMX4SIO;
 extern int gAutosort;
 extern int gAutoRefresh;
 extern int gEnableNotifications;
-extern int gShowFileCount;
 extern int gEnableArt;
 extern int gWideScreen;
 extern int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC

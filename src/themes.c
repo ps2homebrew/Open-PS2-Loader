@@ -208,27 +208,25 @@ static int getGameCount(void *support)
 
 static void drawGameCountText(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
-    if (gShowFileCount) {
-        mutable_text_t *mutableText = (mutable_text_t *)elem->extended;
+    mutable_text_t *mutableText = (mutable_text_t *)elem->extended;
 
-        if (config) {
-            if (mutableText->currentConfigId != config->uid) {
-                // force refresh
-                mutableText->currentConfigId = config->uid;
+    if (config) {
+        if (mutableText->currentConfigId != config->uid) {
+            // force refresh
+            mutableText->currentConfigId = config->uid;
 
-                int count = getGameCount(menu->item->userdata);
-                snprintf(mutableText->value, sizeof(char) * 60, "%i File%s Found:", count, count == 1 ? "" : "s");
-            }
+            int count = getGameCount(menu->item->userdata);
+            snprintf(mutableText->value, sizeof(char) * 60, "%i File%s Found:", count, count == 1 ? "" : "s");
         }
-
-        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->value, elem->color);
     }
+
+    fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->value, elem->color);
 }
 
 static void initGameCountText(const char *themePath, config_set_t *themeConfig, theme_t *theme, theme_element_t *elem, const char *name)
 {
     int length = 60;
-    const char *countStr = (char *)malloc(length * sizeof(char));
+    char *countStr = (char *)malloc(length * sizeof(char));
     memset(countStr, 0, length * sizeof(char));
 
     elem->extended = initMutableText(themePath, themeConfig, theme, name, ELEM_TYPE_ATTRIBUTE_TEXT, elem, countStr, NULL, DISPLAY_ALWAYS, SIZING_NONE);

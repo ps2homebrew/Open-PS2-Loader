@@ -48,10 +48,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rtl: [RTL=0, RTL=1]
+        extra: [EXTRA_FEATURES=0, EXTRA_FEATURES=1]
         pademu: [PADEMU=0, PADEMU=1]
-        igs: [IGS=0, IGS=1]
-        t10k: [DTL_T10000=0, DTL_T10000=1]
     runs-on: ubuntu-latest
     container: ghcr.io/ps2homebrew/ps2homebrew:main
     steps:
@@ -66,10 +64,10 @@ jobs:
       run: |
         echo "OPL_VERSION=$(make oplversion)" >> $GITHUB_ENV
 
-    - name: Compile -> make ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
+    - name: Compile -> make ${{ matrix.extra }} ${{ matrix.pademu }} ${{ matrix.extra }} NOT_PACKED=1
       run: |
-        make --trace ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
-        mv opl.elf OPNPS2LD-${{ env.OPL_VERSION }}-${{ matrix.t10k }}-${{ matrix.igs }}-${{ matrix.pademu }}-${{ matrix.rtl }}.ELF
+        make --trace ${{ matrix.pademu }} ${{ matrix.extra }} NOT_PACKED=1
+        mv opl.elf OPNPS2LD-${{ env.OPL_VERSION }}-${{ matrix.pademu }}-${{ matrix.extra }}.ELF
 
     - name: Create detailed changelog
       run: sh ./make_changelog.sh
@@ -77,7 +75,7 @@ jobs:
     - name: Upload variants artifact ELF
       uses: actions/upload-artifact@v4
       with:
-        name: OPNPS2LD-VARIANTS ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }}
+        name: OPNPS2LD-VARIANTS ${{ matrix.pademu }} ${{ matrix.extra }}
         path: OPNPS2LD*.ELF
 
   merge-variants:
@@ -120,9 +118,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        debug: [iopcore_debug, ingame_debug, eesio_debug, iopcore_ppctty_debug, ingame_ppctty_debug]
+        debug: [iopcore_debug, ingame_debug, eesio_debug, iopcore_ppctty_debug, ingame_ppctty_debug, DTL_T10000=1]
+        # container_commit: [":main", "@sha256:1f00689809455d43b520e4cd4eea00c6be56d71819ae38efc6b55b56464cbd1e"] Replace with desired docker image hash or tag
+        container_commit: [":main"]
     runs-on: ubuntu-latest
-    container: ghcr.io/ps2homebrew/ps2homebrew:main
+    container: ghcr.io/ps2homebrew/ps2homebrew${{ matrix.container_commit }}
     steps:
     - name: git checkout
       uses: actions/checkout@v4
@@ -134,16 +134,20 @@ jobs:
     - name: Get version
       run: |
         echo "OPL_VERSION=$(make oplversion)" >> $GITHUB_ENV
+        SHORT_COMMIT="${{ matrix.container_commit }}"
+        # Extract the last 4 characters
+        SHORT_COMMIT=${SHORT_COMMIT: -4}
+        echo "SHORT_COMMIT=$SHORT_COMMIT" >> $GITHUB_ENV
 
     - name: Compile -> make debug
       run: |
         make ${{ matrix.debug }} --trace
-        mv opl.elf opl-${{ matrix.debug }}.elf
+        mv opl.elf opl-${{ matrix.debug }}-${{ env.OPL_VERSION }}-${{ env.SHORT_COMMIT }}.elf
 
     - name: Upload variants artifact ELF
       uses: actions/upload-artifact@v4
       with:
-        name: opl-${{ matrix.debug }}-${{ env.OPL_VERSION }}
+        name: opl-${{ matrix.debug }}-${{ env.OPL_VERSION }}-${{ env.SHORT_COMMIT }}
         path: opl-*.elf
 
   merge-debug:

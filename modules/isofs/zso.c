@@ -1,4 +1,4 @@
-#include "lz4.h"
+#include "lz4/lz4.h"
 #include "zso.h"
 
 #ifdef _IOP

@@ -68,8 +68,10 @@ ifneq ($(GIT_TAG),latest)
 endif
 endif
 
+LZ4 := modules/isofs/lz4/
+
 FRONTEND_OBJS = pad.o xparam.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o lang_internal.o config.o hdd.o dialogs.o \
-		dia.o ioman.o texcache.o themes.o supportbase.o bdmsupport.o ethsupport.o hddsupport.o zso.o lz4.o \
+		dia.o ioman.o texcache.o themes.o supportbase.o bdmsupport.o ethsupport.o hddsupport.o zso.o ../$(LZ4)lz4.o \
 		appsupport.o gui.o guigame.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o sound.o ps2cnf.o
 
 IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o bdmevent.o \
@@ -225,11 +227,11 @@ EE_LDFLAGS += -fdata-sections -ffunction-sections -Wl,--gc-sections
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug debug_ppctty iopcore_ppctty_debug ingame_ppctty_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_lwNBD languages
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug debug_ppctty iopcore_ppctty_debug ingame_ppctty_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup download_lng download_ext_modules languages
 
 ifdef PS2SDK
 
-all: download_lng download_lwNBD languages
+all: download_lng download_dependencies languages
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
 ifneq ($(NOT_PACKED),1)
@@ -238,7 +240,7 @@ else
 	$(MAKE) $(EE_BIN)
 endif
 
-release: download_lng download_lwNBD languages $(EE_VPKD).ZIP
+release: download_lng download_dependencies languages $(EE_VPKD).ZIP
 
 debug:
 	$(MAKE) DEBUG=1 all
@@ -264,7 +266,7 @@ iopcore_ppctty_debug:
 ingame_ppctty_debug:
 	$(MAKE) DEBUG=1 INGAME_DEBUG=1 TTY_APPROACH=PPC_UART all
 
-clean:	download_lwNBD
+clean:	download_dependencies
 	echo "Cleaning..."
 	echo "-Interface"
 	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PACKED) $(EE_BIN_STRIPPED) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
@@ -782,8 +784,8 @@ languages: $(ENGLISH_TEMPLATE_YML) $(TRANSLATIONS_YML) $(ENGLISH_LNG) $(TRANSLAT
 download_lng:
 	./download_lng.sh
 
-download_lwNBD:
-	./download_lwNBD.sh
+download_dependencies:
+	./download_dependencies.sh
 
 download_cfla:
 	./download_cfla.sh

@@ -45,6 +45,7 @@ asm/*.c
 #
 # 3rd party
 #
+*modules/isofs/lz4
 *modules/network/lwNBD
 *thirdparty/clang-format-lint-action
 

@@ -31,7 +31,7 @@ if test ! -d "$LZ4_REPO_FOLDER"; then
   git clone -b $LZ4_BRANCH_NAME $LZ4_REPO_URL "$LZ4_REPO_FOLDER" || { exit 1; }
   (cd $LZ4_REPO_FOLDER && git checkout "$LZ4_BRANCH_NAME" && cd - ) || { exit 1; }
 else
-  (cd "$LZ4_REPO_FOLDER" && git fetch origin && git reset --hard "${LZ4_BRANCH_NAME}" && git checkout "$LZ4_BRANCH_NAME" && cd - )|| exit 1
+  (cd "$LZ4_REPO_FOLDER" && git fetch origin && git checkout "$LZ4_BRANCH_NAME" && cd - )|| exit 1
 fi
 
 # Port by JoseAaronLopezGarcia.
@@ -46,3 +46,4 @@ sed -i '872i#endif' lz4.c
 sed -i '884d' lz4.c
 sed -i '883d' lz4.c
 popd
+

@@ -497,7 +497,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
             int len;
 
             if (strlen(item->stringvalue.text)) {
-                len = min(strlen(item->stringvalue.text), sizeof(stars) - 1);
+                len = MIN(strlen(item->stringvalue.text), sizeof(stars) - 1);
                 for (i = 0; i < len; ++i)
                     stars[i] = '*';
 

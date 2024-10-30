@@ -6,13 +6,15 @@
 #include <stdio.h>
 #include <tamtypes.h>
 
+#ifndef MIN
+#define MIN(x, y) ((x < y) ? x : y)
+#endif
+
 #define ZSO_MAGIC 0x4F53495A // ZISO
 
 // no game should request more than 256 sectors per read (512KB of data)
 // should allow us to decompress all data with only 2 IO calls at most.
 #define ZISO_IDX_MAX_ENTRIES 257
-
-#define MIN(x, y) ((x < y) ? x : y)
 
 // CSO Header (same for ZSO)
 typedef struct

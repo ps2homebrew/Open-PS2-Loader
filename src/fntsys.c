@@ -511,7 +511,7 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
 
     if (aligned & ALIGN_HCENTER) {
         if (width) {
-            x -= min(fntCalcDimensions(id, string), width) >> 1;
+            x -= MIN(fntCalcDimensions(id, string), width) >> 1;
         } else {
             x -= fntCalcDimensions(id, string) >> 1;
         }
@@ -637,7 +637,7 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
 
     if (aligned & ALIGN_HCENTER) {
         if (width) {
-            x -= min(fntCalcDimensions(id, string), width) >> 1;
+            x -= MIN(fntCalcDimensions(id, string), width) >> 1;
         } else {
             x -= fntCalcDimensions(id, string) >> 1;
         }

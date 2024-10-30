@@ -442,18 +442,6 @@ void closeFileBuffer(file_buffer_t *fileBuffer)
     free(fileBuffer);
 }
 
-// a simple maximum of two
-int max(int a, int b)
-{
-    return a > b ? a : b;
-}
-
-// a simple minimum of two
-int min(int a, int b)
-{
-    return a < b ? a : b;
-}
-
 // single digit from hex decode
 int fromHex(char digit)
 {

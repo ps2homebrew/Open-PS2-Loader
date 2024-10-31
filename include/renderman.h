@@ -1,8 +1,6 @@
 #ifndef __RENDERMAN_H
 #define __RENDERMAN_H
 
-#include <gsToolkit.h>
-
 /*
  * Rendering using renderman
  *

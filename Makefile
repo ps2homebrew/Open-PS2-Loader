@@ -24,11 +24,14 @@ EXTRAVERSION = Beta
 # Do not COMMENT out the variables!!
 # You can also specify variables when executing make: "make RTL=1 IGS=1 PADEMU=1"
 
-#Enables/disables Right-To-Left (RTL) language support
-RTL ?= 0
+# Check if EXTRA_FEATURES is set, default to 0
+EXTRA_FEATURES ?= 0
 
+# Set RTL and IGS based on EXTRA_FEATURES, but allow user overrides
+#Enables/disables Right-To-Left (RTL) language support
+RTL ?= $(EXTRA_FEATURES)
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
-IGS ?= 1
+IGS ?= $(EXTRA_FEATURES)
 
 #Enables/disables pad emulator
 PADEMU ?= 1
@@ -123,9 +126,8 @@ PNG_ASSETS_DIR = gfx/
 MAPFILE = opl.map
 EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
 
-EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg_ps2_addons -ljpeg -lpng -lz -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips -laudsrv -lvorbisfile -lvorbis -logg -lpadx -lelf-loader-nocolour
-EE_INCS += -I$(PS2SDK)/ports/include -I$(PS2SDK)/ports/include/freetype2 -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Imodules/hdd/common -Iinclude
-
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lpoweroff -lfileXio -lpatches -lpng -lz -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips -laudsrv -lvorbisfile -lvorbis -logg -lpadx -lelf-loader-nocolour
+EE_INCS += -I$(PS2SDK)/ports/include -I$(PS2SDK)/ports/include/freetype2 -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -Imodules/iopcore/common -Imodules/network/common -Imodules/hdd/common -Iinclude
 BIN2C = $(PS2SDK)/bin/bin2c
 
 # WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)

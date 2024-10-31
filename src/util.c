@@ -201,22 +201,12 @@ void *readFile(char *path, int align, int *size)
         if (!buffer) {
             LOG("UTIL ReadFile: Failed allocation of %d bytes", realSize);
             *size = 0;
+        } else {
+            read(fd, buffer, realSize);
             close(fd);
-            return NULL;
+            *size = realSize;
         }
-
-        if (read(fd, buffer, realSize) != realSize) {
-            LOG("UTIL ReadFile: Failed to read file: %s\n", path);
-            free(buffer);
-            close(fd);
-            *size = 0;
-            return NULL;
-        }
-
-        close(fd);
-        *size = realSize;
     }
-
     return buffer;
 }
 
@@ -250,20 +240,9 @@ file_buffer_t *openFileBuffer(char *fpath, int mode, short allocResult, unsigned
     int fd = openFile(fpath, mode);
     if (fd >= 0) {
         fileBuffer = (file_buffer_t *)malloc(sizeof(file_buffer_t));
-        if (fileBuffer == NULL) {
-            close(fd);
-            return NULL;
-        }
-
         fileBuffer->size = size;
         fileBuffer->available = 0;
         fileBuffer->buffer = (char *)malloc(size * sizeof(char));
-        if (fileBuffer->buffer == NULL) {
-            free(fileBuffer);
-            close(fd);
-            return NULL;
-        }
-
         if (mode == O_RDONLY) {
             fileBuffer->lastPtr = NULL;
 
@@ -275,7 +254,6 @@ file_buffer_t *openFileBuffer(char *fpath, int mode, short allocResult, unsigned
             }
         } else
             fileBuffer->lastPtr = fileBuffer->buffer;
-
         fileBuffer->allocResult = allocResult;
         fileBuffer->fd = fd;
         fileBuffer->mode = mode;
@@ -287,23 +265,12 @@ file_buffer_t *openFileBuffer(char *fpath, int mode, short allocResult, unsigned
 /* size will be the maximum line size possible */
 file_buffer_t *openFileBufferBuffer(short allocResult, const void *buffer, unsigned int size)
 {
-    if (buffer == NULL || size == 0)
-        return NULL;
-
     file_buffer_t *fileBuffer = NULL;
 
     fileBuffer = (file_buffer_t *)malloc(sizeof(file_buffer_t));
-    if (fileBuffer == NULL)
-        return NULL;
-
-    fileBuffer->buffer = (char *)malloc((size + 1) * sizeof(char));
-    if (fileBuffer->buffer == NULL) {
-        free(fileBuffer);
-        return NULL;
-    }
-
     fileBuffer->size = size;
     fileBuffer->available = size;
+    fileBuffer->buffer = (char *)malloc((size + 1) * sizeof(char));
     fileBuffer->lastPtr = fileBuffer->buffer; // O_RDONLY, but with the data in the buffer.
     fileBuffer->allocResult = allocResult;
     fileBuffer->fd = -1;

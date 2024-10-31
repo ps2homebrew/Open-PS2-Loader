@@ -83,16 +83,14 @@ static int splitAssignment(char *line, char *key, size_t keymax, char *val, size
 
     if (eqpos) {
         // copy the name and the value
-        size_t keylen = min(keymax - 1, eqpos - line);
+        size_t keylen = min(keymax, eqpos - line);
 
         strncpy(key, line, keylen);
-        key[keylen] = '\0';
 
         eqpos++;
 
-        size_t vallen = min(valmax - 1, strlen(line) - (eqpos - line));
+        size_t vallen = min(valmax, strlen(line) - (eqpos - line));
         strncpy(val, eqpos, vallen);
-        val[vallen] = '\0';
     }
 
     return (int)eqpos;
@@ -127,9 +125,6 @@ static int configKeyValidate(const char *key)
 static struct config_value_t *allocConfigItem(const char *key, const char *val)
 {
     struct config_value_t *it = (struct config_value_t *)malloc(sizeof(struct config_value_t));
-    if (it == NULL)
-        return NULL;
-
     strncpy(it->key, key, sizeof(it->key));
     it->key[sizeof(it->key) - 1] = '\0';
     strncpy(it->val, val, sizeof(it->val));
@@ -238,11 +233,8 @@ void configEnd()
 
 config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName)
 {
-    if (!configSet) {
+    if (!configSet)
         configSet = (config_set_t *)malloc(sizeof(config_set_t));
-        if (configSet == NULL)
-            return NULL;
-    }
 
     configSet->uid = ++currentUID;
     configSet->type = type;
@@ -251,15 +243,9 @@ config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName)
     if (fileName) {
         int length = strlen(fileName) + 1;
         configSet->filename = (char *)malloc(length * sizeof(char));
-        if (configSet->filename)
-            memcpy(configSet->filename, fileName, length);
-        else {
-            free(configSet);
-            return NULL;
-        }
+        memcpy(configSet->filename, fileName, length);
     } else
         configSet->filename = NULL;
-
     configSet->modified = 0;
     return configSet;
 }
@@ -267,14 +253,7 @@ config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName)
 void configMove(config_set_t *configSet, const char *fileName)
 {
     int length = strlen(fileName) + 1;
-    char *tmp = realloc(configSet->filename, length);
-    if (tmp == NULL) {
-        free(configSet->filename);
-        configSet->filename = NULL;
-        return;
-    }
-
-    configSet->filename = tmp;
+    configSet->filename = realloc(configSet->filename, length);
     memcpy(configSet->filename, fileName, length);
 }
 
@@ -307,10 +286,6 @@ int configSetStr(config_set_t *configSet, const char *key, const char *value)
 
     if (it) {
         if (strncmp(it->val, value, sizeof(it->val)) != 0) {
-            // make sure that value fits in the allocated space
-            if (strlen(value) >= sizeof(it->val) - 1)
-                return 0;
-
             strncpy(it->val, value, sizeof(it->val));
             it->val[sizeof(it->val) - 1] = '\0';
             if (it->key[0] != '#')
@@ -402,26 +377,22 @@ int configRemoveKey(config_set_t *configSet, const char *key)
             if (key[0] != '#')
                 configSet->modified = 1;
 
-            struct config_value_t *next = val->next;
-
-            if (val == configSet->head)
-                configSet->head = next;
-            else
-                prev->next = next;
-
             if (val == configSet->tail)
                 configSet->tail = prev;
 
-            free(val);
-            val = next;
+            val = val->next;
+            if (prev) {
+                free(prev->next);
+                prev->next = val;
+            } else {
+                free(configSet->head);
+                configSet->head = val;
+            }
         } else {
             prev = val;
             val = val->next;
         }
     }
-
-    if (configSet->head == NULL)
-        configSet->tail = NULL;
 
     return 1;
 }
@@ -603,9 +574,6 @@ int configGetStat(config_set_t *configSet, iox_stat_t *stat)
 
 void configClear(config_set_t *configSet)
 {
-    if (configSet == NULL)
-        return;
-
     while (configSet->head) {
         struct config_value_t *cur = configSet->head;
         configSet->head = cur->next;

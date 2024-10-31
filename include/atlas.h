@@ -1,8 +1,6 @@
 #ifndef __ATLAS_H
 #define __ATLAS_H
 
-#include <gsToolkit.h>
-
 struct atlas_allocation_t
 {
     int x, y;

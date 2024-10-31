@@ -1,7 +1,6 @@
 #ifndef __MENUSYS_H
 #define __MENUSYS_H
 
-#include <gsToolkit.h>
 #include "include/config.h"
 #include "include/dia.h"
 

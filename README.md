@@ -112,7 +112,7 @@ formatted with the APA partition scheme, recommended tools are listed below. OPL
 To avoid this, before running OPL the first time, create a text file at the location `hdd0:/__common/OPL/conf_hdd.txt`
 that contains the preferred partition name (for example `hdd_partition=__common`).
 
-It is recommended to FIRST create the desired partition and conf_hdd.txt file. edit the file with `hdd_partition=__+partition of choice here` before loading the drive up with homebrew/games. Adding/removing out of order can and will break the software that is loaded on the drive therefore, if deciding to REMOVE partitions/games, it is recommended instead to wipe the drive and start over. Anything you wish to save should be backed up.
+It is recommended to FIRST create the desired partition and conf_hdd.txt file. Edit the file with `hdd_partition=__+partition of choice here` before loading the drive up with homebrew/games. Adding/removing out of order can and will break the software that is loaded on the drive therefore, if deciding to REMOVE partitions/games, it is recommended instead to wipe the drive and start over. Anything you wish to save should be backed up.
 NOTE: partitions that start with 2 underscores such as __common are considered protected IE can not be deleted. Files/Folders within however can be added/removed. Partitions that start with + are UNPROTECTED, meaning they can be deleted.
 
 Recommended tools (no affiliation):

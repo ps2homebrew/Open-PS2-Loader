@@ -69,9 +69,9 @@ USB modes:
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
-For HDD users, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
-If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
-All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
+For HDD users, OPL will read `hdd0:/__common/OPL/conf_hdd.cfg` which contains one line: `hdd_partition=+OPL` to use as your OPL partition. It is recommended to use `__common`, `+OPL`, or if you have a Crystal Chip modchip: `+Crystal`.
+If a config a config file is not found, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
+Partitions created by OPL will be 128MB. It is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed. Be warned, it is wise to format and create the desired OPL partition first before adding games as editing, deleting, and adding partitions out of order is not recommended and may break the software.
 
 </p>
 </details>
@@ -107,10 +107,17 @@ are supported using the folder structure above.
   <summary> <b> HDD </b> </summary>
 <p>
 
-For PS2, 48-bit LBA internal HDDs up to 2TB are supported. HDD should be
-formatted with the APA partition scheme. OPL will create the `+OPL` partition on the HDD.
-To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
-that contains the preferred partition name (for example `__common`).
+For PS2, 48-bit LBA internal HDDs up to 2TB are supported. The HDD should be
+formatted with the APA partition scheme, recommended tools are listed below. OPL will create the `+OPL` partition.
+To avoid this, before running OPL the first time, create a text file at the location `hdd0:/__common/OPL/conf_hdd.txt`
+that contains the preferred partition name (for example `hdd_partition=__common`).
+
+It is recommended to FIRST create the desired partition and conf_hdd.txt file. edit the file with `hdd_partition=__+partition of choice here` before loading the drive up with homebrew/games. Adding/removing out of order can and will break the software that is loaded on the drive therefore, if deciding to REMOVE partitions/games, it is recommended instead to wipe the drive and start over. Anything you wish to save should be backed up.
+NOTE: partitions that start with 2 underscores such as __common are considered protected IE can not be deleted. Files/Folders within however can be added/removed. Partitions that start with + are UNPROTECTED, meaning they can be deleted.
+
+Recommended tools (no affiliation):
+PS2: [Official wLaunchELF](https://github.com/ps2homebrew/wLaunchELF) or [wLaunchELF_ISR](https://github.com/israpps/wLaunchELF_ISR) (File Browser and Editor /FTP Server)
+PC Windows: [OPL Manager](https://oplmanager.com/site/index.php) and [PFS Batchkit Manager](https://github.com/GDX-X/PFS-BatchKit-Manager) (PC Tools to Manage the HDD and fetch OPL assets)
 
 </p>
 </details>

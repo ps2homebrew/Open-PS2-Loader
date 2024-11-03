@@ -69,9 +69,9 @@ USB modes:
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
-For HDD users, OPL will read `hdd0:/__common/OPL/conf_hdd.cfg` which contains one line: `hdd_partition=+OPL` to use as your OPL partition. It is recommended to use `__common`, `+OPL`, or if you have a Crystal Chip modchip: `+Crystal`.
+For HDD users, OPL will read `hdd0:/__common/OPL/conf_hdd.cfg` which contains one line: `hdd_partition=+OPL` to use as your OPL partition. It is recommended to use `__common` or `+OPL`.
 If a config file is not found, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
-Partitions created by OPL will be 128MB. It is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed. Be warned, it is wise to format and create the desired OPL partition first before adding games as editing, deleting, and adding partitions out of order is not recommended and may break the software.
+Partitions created by OPL will be 128MB. It is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed. Be warned, it is wise to format and create the desired OPL partition first before adding games as resizing, deleting, and adding partitions out of order is not recommended and may break the software.
 
 </p>
 </details>

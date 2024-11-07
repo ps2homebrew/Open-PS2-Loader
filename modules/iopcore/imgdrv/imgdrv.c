@@ -10,11 +10,6 @@ unsigned int ioprpimg = 0xDEC1DEC1;
 int ioprpsiz = 0xDEC2DEC2;
 const char name[] = "host";
 
-int dummy_fs()
-{
-    return 0;
-}
-
 int lseek_fs(iop_file_t *fd, int offset, int whence)
 {
     if (whence == SEEK_END) {
@@ -59,15 +54,15 @@ typedef struct _iop_device_ops_tm
 
 iop_device_ops_t my_device_ops =
     {
-        dummy_fs, // init
-        dummy_fs, // deinit
-        NULL,     // dummy_fs,// format
-        dummy_fs, // open_fs,// open
-        close_fs, // close
-        read_fs,  // read
-        NULL,     // dummy_fs,// write
-        lseek_fs, // lseek
-                  /*
+        NOT_SUPPORTED, // init
+        NOT_SUPPORTED, // deinit
+        NOT_SUPPORTED, // format
+        NOT_SUPPORTED, // open
+        NOT_SUPPORTED, // close
+        NOT_SUPPORTED, // read
+        NOT_SUPPORTED, // write
+        NOT_SUPPORTED, // lseek
+                       /*
         dummy_fs, // ioctl
         dummy_fs, // remove
         dummy_fs, // mkdir

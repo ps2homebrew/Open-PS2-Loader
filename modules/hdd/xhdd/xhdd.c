@@ -18,11 +18,6 @@ static int xhddInit(iop_device_t *device)
     return 0;
 }
 
-static int xhddUnsupported(void)
-{
-    return -1;
-}
-
 static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsigned int arglen, void *buf, unsigned int buflen)
 {
     ata_devinfo_t *devinfo;
@@ -45,28 +40,28 @@ static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsi
 
 static iop_device_ops_t xhdd_ops = {
     &xhddInit,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
+    NOT_SUPPORTED,
     &xhddDevctl,
 };
 

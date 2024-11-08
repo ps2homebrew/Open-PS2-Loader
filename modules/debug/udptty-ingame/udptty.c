@@ -41,26 +41,27 @@ static int tty_init(iop_device_t *device);
 static int tty_deinit(iop_device_t *device);
 static int tty_stdout_fd(void);
 static int tty_write(iop_file_t *file, void *buf, size_t size);
+static int tty_error(void);
 
 /* device ops */
 static iop_device_ops_t tty_ops = {
     tty_init,
     tty_deinit,
-    NOT_SUPPORTED,
+    (void *)tty_error,
     (void *)tty_stdout_fd,
     (void *)tty_stdout_fd,
-    NOT_SUPPORTED,
+    (void *)tty_error,
     (void *)tty_write,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED};
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error,
+    (void *)tty_error};
 
 /* device descriptor */
 static iop_device_t tty_device = {
@@ -264,4 +265,9 @@ static int tty_write(iop_file_t *file, void *buf, size_t size)
     SignalSema(tty_sema);
 
     return res;
+}
+
+static int tty_error(void)
+{
+    return -EIO;
 }

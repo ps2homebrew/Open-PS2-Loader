@@ -67,6 +67,11 @@ struct MountData
 static struct MountData MountPoint;
 static unsigned char cdvdman_buf[2048];
 
+static int IsofsUnsupported(void)
+{
+    return -1;
+}
+
 static int IsofsInit(iop_device_t *device)
 {
     iop_sema_t SemaData;
@@ -598,31 +603,31 @@ static int IsofsUmount(iop_file_t *f, const char *fsname)
 static iop_device_ops_t IsofsDeviceOps = {
     &IsofsInit,
     &IsofsDeinit,
-    NOT_SUPPORTED,
+    (void *)&IsofsUnsupported,
     &IsofsOpen,
     &IsofsClose,
     &IsofsRead,
-    NOT_SUPPORTED,
+    (void *)&IsofsUnsupported,
     &IsofsLseek,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
     &IsofsMount,
     &IsofsUmount,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED};
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported,
+    (void *)&IsofsUnsupported};
 
 static iop_device_t IsofsDevice = {
     "iso",

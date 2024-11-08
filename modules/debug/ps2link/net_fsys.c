@@ -50,6 +50,13 @@ static int fsys_pid = 0;
 // static iop_device_t fsys_driver;
 
 ////////////////////////////////////////////////////////////////////////
+static int dummy5()
+{
+    printf("dummy function called\n");
+    return -5;
+}
+
+////////////////////////////////////////////////////////////////////////
 static void fsysInit(iop_device_t *driver)
 {
     struct _iop_thread mythread;
@@ -296,25 +303,12 @@ static int fsysDclose(int fd)
     return ret;
 }
 
-iop_device_ops_t fsys_functarray = {
-    (void *)fsysInit,
-    (void *)fsysDestroy,
-    NOT_SUPPORTED,
-    (void *)fsysOpen,
-    (void *)fsysClose,
-    (void *)fsysRead,
-    (void *)fsysWrite,
-    (void *)fsysLseek,
-    NOT_SUPPORTED,
-    (void *)fsysRemove,
-    (void *)fsysMkdir,
-    (void *)fsysRmdir,
-    (void *)fsysDopen,
-    (void *)fsysDclose,
-    (void *)fsysDread,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-};
+iop_device_ops_t fsys_functarray = {(void *)fsysInit, (void *)fsysDestroy, (void *)dummy5,
+                                    (void *)fsysOpen, (void *)fsysClose, (void *)fsysRead,
+                                    (void *)fsysWrite, (void *)fsysLseek, (void *)dummy5,
+                                    (void *)fsysRemove, (void *)fsysMkdir, (void *)fsysRmdir,
+                                    (void *)fsysDopen, (void *)fsysDclose, (void *)fsysDread,
+                                    (void *)dummy5, (void *)dummy5};
 
 iop_device_t fsys_driver = {fsname, 16, 1, "fsys driver",
                             &fsys_functarray};

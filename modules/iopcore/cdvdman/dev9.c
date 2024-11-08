@@ -81,6 +81,7 @@ static int pcmcia_init(void);
 static void expbay_set_stat(int stat);
 static int expbay_init(void);
 
+static int dev9x_dummy(void) { return 0; }
 static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
 {
     switch (cmd) {
@@ -97,31 +98,30 @@ static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, in
 
 /* driver ops func tab */
 static iop_device_ops_t dev9x_ops = {
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
-    NOT_SUPPORTED,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
+    (void *)dev9x_dummy,
     (void *)dev9x_devctl};
-
 
 /* driver descriptor */
 static iop_device_t dev9x_dev = {

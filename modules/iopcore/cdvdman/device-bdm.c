@@ -131,7 +131,7 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
-int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
+int DeviceReadSectors(u64 lsn, void *buffer, unsigned int sectors)
 {
     int rv = SCECdErNO;
 
@@ -152,7 +152,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 // oplutils exported function, used by MCEMU
 //
 
-void bdm_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer)
+void bdm_readSector(u64 lba, unsigned short int nsectors, unsigned char *buffer)
 {
     DPRINTF("%s\n", __func__);
 
@@ -161,7 +161,7 @@ void bdm_readSector(unsigned int lba, unsigned short int nsectors, unsigned char
     SignalSema(bdm_io_sema);
 }
 
-void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer)
+void bdm_writeSector(u64 lba, unsigned short int nsectors, const unsigned char *buffer)
 {
     DPRINTF("%s\n", __func__);
 

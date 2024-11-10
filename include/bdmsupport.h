@@ -10,7 +10,7 @@
 typedef struct
 {
     int active;       /* Activation flag */
-    u32 start_sector; /* Start sector of vmc file */
+    u64 start_sector; /* Start sector of vmc file */
     int flags;        /* Card flag */
     vmc_spec_t specs; /* Card specifications */
 } bdm_vmc_infos_t;

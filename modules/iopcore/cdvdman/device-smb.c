@@ -115,7 +115,7 @@ void DeviceStop(void)
 {
 }
 
-int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
+int DeviceReadSectors(u64 lsn, void *buffer, unsigned int sectors)
 {
     register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
     register int i, esc_flag = 0;
@@ -124,15 +124,15 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 
     lbound = 0;
     ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
-    offslsn = lsn;
+    offslsn = (u32)lsn;
     r = nlsn = 0;
     sectors_to_read = sectors;
 
     for (i = 0; i < cdvdman_settings.common.NumParts; i++, lbound = ubound, ubound += 0x80000, offslsn -= 0x80000) {
 
-        if (lsn >= lbound && lsn < ubound) {
-            if ((lsn + sectors) > (ubound - 1)) {
-                sectors_to_read = ubound - lsn;
+        if ((u32)lsn >= lbound && (u32)lsn < ubound) {
+            if (((u32)lsn + sectors) > (ubound - 1)) {
+                sectors_to_read = ubound - (u32)lsn;
                 sectors -= sectors_to_read;
                 nlsn = ubound;
             } else

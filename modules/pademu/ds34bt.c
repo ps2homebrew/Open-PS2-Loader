@@ -15,8 +15,14 @@
 #include "sys_utils.h"
 #include "padmacro.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+#define MODNAME "DS34BT"
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
 
 static int bt_probe(int devId);
 static int bt_connect(int devId);
@@ -42,16 +48,16 @@ static int bt_probe(int devId)
     UsbConfigDescriptor *config = NULL;
     UsbInterfaceDescriptor *intf = NULL;
 
-    DPRINTF("DS34BT: probe: devId=%i\n", devId);
+    DPRINTF("probe: devId=%i\n", devId);
 
     if ((bt_dev.devId > 0) && (bt_dev.status & DS34BT_STATE_USB_AUTHORIZED)) {
-        DPRINTF("DS34BT: Error - only one device allowed !\n");
+        DPRINTF("Error - only one device allowed !\n");
         return 0;
     }
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
-        DPRINTF("DS34BT: Error - Couldn't get device descriptor\n");
+        DPRINTF("Error - Couldn't get device descriptor\n");
         return 0;
     }
 
@@ -60,18 +66,18 @@ static int bt_probe(int devId)
 
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     if (config == NULL) {
-        DPRINTF("DS34BT: Error - Couldn't get configuration descriptor\n");
+        DPRINTF("Error - Couldn't get configuration descriptor\n");
         return 0;
     }
 
     if ((config->bNumInterfaces < 1) || (config->wTotalLength < (sizeof(UsbConfigDescriptor) + sizeof(UsbInterfaceDescriptor)))) {
-        DPRINTF("DS34BT: Error - No interfaces available\n");
+        DPRINTF("Error - No interfaces available\n");
         return 0;
     }
 
     intf = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    DPRINTF("DS34BT: bInterfaceClass %X bInterfaceSubClass %X bInterfaceProtocol %X\n", intf->bInterfaceClass, intf->bInterfaceSubClass, intf->bInterfaceProtocol);
+    DPRINTF("bInterfaceClass %X bInterfaceSubClass %X bInterfaceProtocol %X\n", intf->bInterfaceClass, intf->bInterfaceSubClass, intf->bInterfaceProtocol);
 
     if ((intf->bInterfaceClass != USB_CLASS_WIRELESS_CONTROLLER) ||
         (intf->bInterfaceSubClass != USB_SUBCLASS_RF_CONTROLLER) ||
@@ -91,10 +97,10 @@ static int bt_connect(int devId)
     UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
-    DPRINTF("DS34BT: connect: devId=%i\n", devId);
+    DPRINTF("connect: devId=%i\n", devId);
 
     if (bt_dev.devId != -1) {
-        DPRINTF("DS34BT: Error - only one device allowed !\n");
+        DPRINTF("Error - only one device allowed !\n");
         return 1;
     }
 
@@ -112,7 +118,7 @@ static int bt_connect(int devId)
 
     epCount = interface->bNumEndpoints - 1;
 
-    DPRINTF("DS34BT: Endpoint Count %d \n", epCount + 1);
+    DPRINTF("Endpoint Count %d \n", epCount + 1);
 
     endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
@@ -121,15 +127,15 @@ static int bt_connect(int devId)
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_BULK) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && bt_dev.outEndp < 0) {
                 bt_dev.outEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("DS34BT: register Output endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             } else if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_dev.inEndp < 0) {
                 bt_dev.inEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("DS34BT: register Input endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.inEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Input endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.inEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         } else if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_dev.interruptEndp < 0) {
                 bt_dev.interruptEndp = UsbOpenEndpoint(devId, endpoint);
-                DPRINTF("DS34BT: register Interrupt endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Interrupt endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 
@@ -138,7 +144,7 @@ static int bt_connect(int devId)
     } while (epCount--);
 
     if (bt_dev.interruptEndp < 0 || bt_dev.inEndp < 0 || bt_dev.outEndp < 0) {
-        DPRINTF("DS34BT: Error - connect failed: not enough endpoints! \n");
+        DPRINTF("Error - connect failed: not enough endpoints! \n");
         return -1;
     }
 
@@ -152,7 +158,7 @@ static int bt_connect(int devId)
 
 static int bt_disconnect(int devId)
 {
-    DPRINTF("DS34BT: disconnect: devId=%i\n", devId);
+    DPRINTF("disconnect: devId=%i\n", devId);
 
     if (bt_dev.status & DS34BT_STATE_USB_AUTHORIZED) {
 
@@ -1384,14 +1390,14 @@ int ds34bt_init(u8 pads, u8 options)
     bt_dev.hid_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
     if (bt_dev.hid_sema < 0) {
-        DPRINTF("DS34BT: Failed to allocate semaphore.\n");
+        DPRINTF("Failed to allocate semaphore.\n");
         return 0;
     }
 
     ret = UsbRegisterDriver(&bt_driver);
 
     if (ret != USB_RC_OK) {
-        DPRINTF("DS34BT: Error registering USB devices: %02X\n", ret);
+        DPRINTF("Error registering USB devices: %02X\n", ret);
         return 0;
     }
 

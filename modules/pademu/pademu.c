@@ -37,8 +37,16 @@
 #error "must define mode"
 #endif
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+#define MODNAME "pademu"
+IRX_ID(MODNAME, 1, 1);
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
+
 
 typedef struct
 {
@@ -62,8 +70,6 @@ typedef struct
 #define MAX_PORTS 4
 
 #define PAD_STATE_RUNNING 0x08
-
-IRX_ID("pademu", 1, 1);
 
 PtrRegisterLibraryEntires pRegisterLibraryEntires; /* Pointer to RegisterLibraryEntires routine */
 Sio2McProc pSio2man25, pSio2man51;                 /* Pointers to SIO2MAN routines */

@@ -11,8 +11,14 @@
 #include "sys_utils.h"
 #include "padmacro.h"
 
-// #define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+#define MODNAME "DS34USB"
+
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 #define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
@@ -75,11 +81,11 @@ int usb_probe(int devId)
 {
     UsbDeviceDescriptor *device = NULL;
 
-    DPRINTF("DS34USB: probe: devId=%i\n", devId);
+    DPRINTF("probe: devId=%i\n", devId);
 
     device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
-        DPRINTF("DS34USB: Error - Couldn't get device descriptor\n");
+        DPRINTF("Error - Couldn't get device descriptor\n");
         return 0;
     }
 
@@ -101,7 +107,7 @@ int usb_connect(int devId)
     UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
-    DPRINTF("DS34USB: connect: devId=%i\n", devId);
+    DPRINTF("connect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (ds34pad[pad].devId == -1 && ds34pad[pad].enabled)
@@ -109,7 +115,7 @@ int usb_connect(int devId)
     }
 
     if (pad >= MAX_PADS) {
-        DPRINTF("DS34USB: Error - only %d device allowed !\n", MAX_PADS);
+        DPRINTF("Error - only %d device allowed !\n", MAX_PADS);
         return 1;
     }
 
@@ -145,11 +151,11 @@ int usb_connect(int devId)
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds34pad[pad].interruptEndp < 0) {
                 ds34pad[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("DS34USB: register Event endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Event endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && ds34pad[pad].outEndp < 0) {
                 ds34pad[pad].outEndp = UsbOpenEndpointAligned(devId, endpoint);
-                DPRINTF("DS34USB: register Output endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 
@@ -174,7 +180,7 @@ int usb_disconnect(int devId)
 {
     u8 pad;
 
-    DPRINTF("DS34USB: disconnect: devId=%i\n", devId);
+    DPRINTF("disconnect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         if (ds34pad[pad].devId == devId)
@@ -212,7 +218,7 @@ static void usb_data_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    // DPRINTF("DS34USB: usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    DPRINTF("usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     usb_resulCode = resultCode;
 
@@ -223,7 +229,7 @@ static void usb_cmd_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
 
-    // DPRINTF("DS34USB: usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
+    DPRINTF("usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     SignalSema(ds34pad[pad].cmd_sema);
 }
@@ -466,7 +472,7 @@ int ds34usb_get_data(u8 *dst, int size, int port)
 
         usb_resulCode = 1;
     } else {
-        DPRINTF("DS34USB: ds34usb_get_data usb transfer error %d\n", ret);
+        DPRINTF("ds34usb_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, ds34pad[port].data, size);
@@ -477,7 +483,7 @@ int ds34usb_get_data(u8 *dst, int size, int port)
         if (ret == USB_RC_OK)
             TransferWait(ds34pad[port].cmd_sema);
         else
-            DPRINTF("DS34USB: LEDRumble usb transfer error %d\n", ret);
+            DPRINTF("LEDRumble usb transfer error %d\n", ret);
 
         ds34pad[port].update_rum = 0;
     }
@@ -561,13 +567,13 @@ int ds34usb_init(u8 pads, u8 options)
         ds34pad[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
         if (ds34pad[pad].sema < 0 || ds34pad[pad].cmd_sema < 0) {
-            DPRINTF("DS34USB: Failed to allocate I/O semaphore.\n");
+            DPRINTF("Failed to allocate I/O semaphore.\n");
             return 0;
         }
     }
 
     if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
-        DPRINTF("DS34USB: Error registering USB devices\n");
+        DPRINTF("Error registering USB devices\n");
         return 0;
     }
 

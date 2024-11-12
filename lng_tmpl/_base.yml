@@ -452,14 +452,6 @@ gui_strings:
   string: Pad Emulator
 - label: HINT_PADEMU_ENABLE
   string: Turns on/off Pad Emulator for selected game.
-- label: PADEMU_MODE
-  string: Pad Emulator Mode
-- label: HINT_PADEMU_MODE
-  string: Select Pad Emulator mode.
-- label: DS34USB_MODE
-  string: DualShock3/4 USB
-- label: DS34BT_MODE
-  string: DualShock3/4 BT
 - label: PADPORT
   string: 'Settings For Port:'
 - label: HINT_PAD_PORT

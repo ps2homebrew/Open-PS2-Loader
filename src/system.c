@@ -538,13 +538,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
 #ifdef PADEMU
     if (gEnablePadEmu) {
-        if (gPadEmuSettings & 0xFF) {
-            irxptr_tab[modcount].info = size_bt_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
-            irxptr_tab[modcount++].ptr = (void *)&bt_pademu_irx;
-        } else {
-            irxptr_tab[modcount].info = size_usb_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
-            irxptr_tab[modcount++].ptr = (void *)&usb_pademu_irx;
-        }
+        irxptr_tab[modcount].info = size_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
+        irxptr_tab[modcount++].ptr = (void *)&pademu_irx;
     }
 #endif
 

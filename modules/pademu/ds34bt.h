@@ -5,24 +5,8 @@
 
 #include <ds34common.h>
 
-#define DS3 0
-#define DS4 1
-
-#define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
-
 #define PENDING    1
 #define SUCCESSFUL 0
-
-typedef struct
-{
-    int devId;
-    int hid_sema;
-    int controlEndp;
-    int interruptEndp;
-    int inEndp;
-    int outEndp;
-    u8 status;
-} bt_device;
 
 typedef struct
 {
@@ -202,39 +186,7 @@ enum eL2CAP {
 #define l2cap_interrupt_channel ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == interrupt_dcid)
 #define l2cap_command_channel   ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == control_dcid)
 
-enum eHID {
-    // {{{
-    /* HID event flag */
-    HID_FLAG_STATUS_REPORTED = 0x01,
-    HID_FLAG_BUTTONS_CHANGED = 0x02,
-    HID_FLAG_EXTENSION = 0x04,
-    HID_FLAG_COMMAND_SUCCESS = 0x08,
-
-    /* Bluetooth HID Transaction Header (THdr) */
-    HID_THDR_GET_REPORT_FEATURE = 0x43,
-    HID_THDR_SET_REPORT_OUTPUT = 0x52,
-    HID_THDR_SET_REPORT_FEATURE = 0x53,
-    HID_THDR_DATA_INPUT = 0xa1,
-
-    /* Defines of various parameters for PS3 Game controller reports */
-    PS3_F4_REPORT_ID = 0xF4,
-    PS3_F4_REPORT_LEN = 0x04,
-
-    PS3_01_REPORT_ID = 0x01,
-    PS3_01_REPORT_LEN = 0x30,
-
-    PS4_02_REPORT_ID = 0x02,
-    PS4_11_REPORT_ID = 0x11,
-    PS4_11_REPORT_LEN = 0x4D,
-
-    // }}}
-};
-
 int ds34bt_init(u8 pads, u8 options);
-int ds34bt_get_status(int port);
 void ds34bt_reset();
-int ds34bt_get_data(u8 *dst, int size, int port);
-void ds34bt_set_rumble(u8 lrum, u8 rrum, int port);
-void ds34bt_set_mode(int mode, int lock, int port);
 
 #endif

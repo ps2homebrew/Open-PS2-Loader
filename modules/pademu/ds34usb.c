@@ -10,6 +10,8 @@
 #include "ds34usb.h"
 #include "sys_utils.h"
 #include "padmacro.h"
+#include "pademu.h"
+#include "ds34.h"
 
 #define MODNAME "DS34USB"
 
@@ -62,22 +64,28 @@ static u8 rgbled_patterns[][2][3] =
 
 static u8 usb_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
 
-int usb_probe(int devId);
-int usb_connect(int devId);
-int usb_disconnect(int devId);
+static int usb_probe(int devId);
+static int usb_connect(int devId);
+static int usb_disconnect(int devId);
 
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
 
-UsbDriver usb_driver = {NULL, NULL, "ds34usb", usb_probe, usb_connect, usb_disconnect};
+static UsbDriver usb_driver = {NULL, NULL, "ds34usb", usb_probe, usb_connect, usb_disconnect};
 
 static void DS3USB_init(int pad);
 static void readReport(u8 *data, int pad);
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
 
-ds34usb_device ds34pad[MAX_PADS];
+static int ds34usb_get_model(struct pad_funcs *pf, int port);
+static int ds34usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port);
+static void ds34usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum);
+static void ds34usb_set_mode(struct pad_funcs *pf, int mode, int lock);
 
-int usb_probe(int devId)
+static ds34usb_device ds34pad[MAX_PADS];
+static struct pad_funcs padf[MAX_PADS];
+
+static int usb_probe(int devId)
 {
     UsbDeviceDescriptor *device = NULL;
 
@@ -99,7 +107,7 @@ int usb_probe(int devId)
     return 0;
 }
 
-int usb_connect(int devId)
+static int usb_connect(int devId)
 {
     int pad, epCount;
     UsbDeviceDescriptor *device;
@@ -176,7 +184,7 @@ int usb_connect(int devId)
     return 0;
 }
 
-int usb_disconnect(int devId)
+static int usb_disconnect(int devId)
 {
     u8 pad;
 
@@ -187,8 +195,10 @@ int usb_disconnect(int devId)
             break;
     }
 
-    if (pad < MAX_PADS)
+    if (pad < MAX_PADS) {
         usb_release(pad);
+        pademu_disconnect(&padf[pad]);
+    }
 
     return 0;
 }
@@ -260,6 +270,8 @@ static void usb_config_set(int result, int count, void *arg)
     ds34pad[pad].status |= DS34USB_STATE_RUNNING;
 
     SignalSema(ds34pad[pad].sema);
+
+    pademu_connect(&padf[pad]);
 }
 
 static void DS3USB_init(int pad)
@@ -444,29 +456,33 @@ static void TransferWait(int sema)
     }
 }
 
-void ds34usb_set_rumble(u8 lrum, u8 rrum, int port)
+static void ds34usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum)
 {
-    WaitSema(ds34pad[port].sema);
+    ds34usb_device *pad = pf->priv;
+    WaitSema(pad->sema);
 
-    ds34pad[port].update_rum = 1;
-    ds34pad[port].lrum = lrum;
-    ds34pad[port].rrum = rrum;
+    if ((pad->lrum != lrum) || (pad->rrum != rrum)) {
+        pad->lrum = lrum;
+        pad->rrum = rrum;
+        pad->update_rum = 1;
+    }
 
-    SignalSema(ds34pad[port].sema);
+    SignalSema(pad->sema);
 }
 
-int ds34usb_get_data(u8 *dst, int size, int port)
+static int ds34usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port)
 {
+    ds34usb_device *pad = pf->priv;
     int ret = 0;
 
-    WaitSema(ds34pad[port].sema);
+    WaitSema(pad->sema);
 
-    PollSema(ds34pad[port].sema);
+    PollSema(pad->sema);
 
-    ret = sceUsbdInterruptTransfer(ds34pad[port].interruptEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
+    ret = sceUsbdInterruptTransfer(pad->interruptEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
 
     if (ret == USB_RC_OK) {
-        TransferWait(ds34pad[port].sema);
+        TransferWait(pad->sema);
         if (!usb_resulCode)
             readReport(usb_buf, port);
 
@@ -475,30 +491,33 @@ int ds34usb_get_data(u8 *dst, int size, int port)
         DPRINTF("ds34usb_get_data usb transfer error %d\n", ret);
     }
 
-    mips_memcpy(dst, ds34pad[port].data, size);
-    ret = ds34pad[port].analog_btn & 1;
+    mips_memcpy(dst, pad->data, size);
+    ret = pad->analog_btn & 1;
 
-    if (ds34pad[port].update_rum) {
-        ret = LEDRumble(ds34pad[port].oldled, ds34pad[port].lrum, ds34pad[port].rrum, port);
+    if (pad->update_rum) {
+        ret = LEDRumble(pad->oldled, pad->lrum, pad->rrum, port);
         if (ret == USB_RC_OK)
-            TransferWait(ds34pad[port].cmd_sema);
+            TransferWait(pad->cmd_sema);
         else
-            DPRINTF("LEDRumble usb transfer error %d\n", ret);
+            DPRINTF("DS34USB: LEDRumble usb transfer error %d\n", ret);
 
-        ds34pad[port].update_rum = 0;
+        pad->update_rum = 0;
     }
 
-    SignalSema(ds34pad[port].sema);
+    SignalSema(pad->sema);
 
     return ret;
 }
 
-void ds34usb_set_mode(int mode, int lock, int port)
+static void ds34usb_set_mode(struct pad_funcs *pf, int mode, int lock)
 {
+    ds34usb_device *pad = pf->priv;
+    WaitSema(pad->sema);
     if (lock == 3)
-        ds34pad[port].analog_btn = 3;
+        pad->analog_btn = 3;
     else
-        ds34pad[port].analog_btn = mode;
+        pad->analog_btn = mode;
+    SignalSema(pad->sema);
 }
 
 void ds34usb_reset()
@@ -509,28 +528,33 @@ void ds34usb_reset()
         usb_release(pad);
 }
 
-int ds34usb_get_status(int port)
+static int ds34usb_get_status(struct pad_funcs *pf)
 {
+    ds34usb_device *pad = pf->priv;
     int ret;
 
-    WaitSema(ds34pad[port].sema);
-    ret = ds34pad[port].status;
-    SignalSema(ds34pad[port].sema);
+    WaitSema(pad->sema);
+
+    ret = pad->status;
+
+    SignalSema(pad->sema);
 
     return ret;
 }
 
-int ds34usb_get_model(int port)
+static int ds34usb_get_model(struct pad_funcs *pf, int port)
 {
+    (void *)port;
+    ds34usb_device *pad = pf->priv;
     int ret;
 
-    WaitSema(ds34pad[port].sema);
-    if (ds34pad[port].type == GUITAR_GH || ds34pad[port].type == GUITAR_RB) {
+    WaitSema(pad->sema);
+    if (pad->type == GUITAR_GH || pad->type == GUITAR_RB) {
         ret = MODEL_GUITAR;
     } else {
         ret = MODEL_PS2;
     }
-    SignalSema(ds34pad[port].sema);
+    SignalSema(pad->sema);
 
     return ret;
 }
@@ -570,6 +594,12 @@ int ds34usb_init(u8 pads, u8 options)
             DPRINTF("Failed to allocate I/O semaphore.\n");
             return 0;
         }
+        padf[pad].priv = &ds34pad[pad];
+        padf[pad].get_status = ds34usb_get_status;
+        padf[pad].get_model = ds34usb_get_model;
+        padf[pad].get_data = ds34usb_get_data;
+        padf[pad].set_rumble = ds34usb_set_rumble;
+        padf[pad].set_mode = ds34usb_set_mode;
     }
 
     if (sceUsbdRegisterLdd(&usb_driver) != USB_RC_OK) {

@@ -4,6 +4,8 @@
    Licenced under Academic Free License version 3.0
    Review OpenUsbLd README & LICENSE files for further details.
    */
+#ifndef __PADEMU_H
+#define __PADEMU_H
 
 #include <ioman.h>
 #include <intrman.h>
@@ -55,3 +57,18 @@ typedef struct
 typedef void (*Sio2McProc)(sio2_transfer_data_t *arg);
 
 void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc);
+
+struct pad_funcs
+{
+    // Private driver data
+    void *priv;
+    int (*get_status)(struct pad_funcs *pf);
+    int (*get_data)(struct pad_funcs *pf, u8 *dst, int size, int port);
+    void (*set_rumble)(struct pad_funcs *pf, u8 lrum, u8 rrum);
+    void (*set_mode)(struct pad_funcs *pf, int mode, int lock);
+    int (*get_model)(struct pad_funcs *pf, int port);
+};
+void pademu_connect(struct pad_funcs *pf);
+void pademu_disconnect(struct pad_funcs *pf);
+
+#endif /* __PADEMU_H */

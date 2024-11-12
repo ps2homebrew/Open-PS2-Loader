@@ -14,6 +14,8 @@
 #include "ds34bt.h"
 #include "sys_utils.h"
 #include "padmacro.h"
+#include "pademu.h"
+#include "ds34.h"
 
 #define MODNAME "DS34BT"
 
@@ -32,15 +34,15 @@ static void bt_config_set(int result, int count, void *arg);
 static UsbDriver bt_driver = {NULL, NULL, "ds34bt", bt_probe, bt_connect, bt_disconnect};
 static bt_device bt_dev = {-1, -1, -1, -1, -1, -1, DS34BT_STATE_USB_DISCONNECTED};
 
-static int chrg_probe(int devId);
-static int chrg_connect(int devId);
-static int chrg_disconnect(int devId);
-static int chrg_dev = -1;
-
-static UsbDriver chrg_driver = {NULL, NULL, "ds34chrg", chrg_probe, chrg_connect, chrg_disconnect};
 
 static void ds34pad_clear(int pad);
 static void ds34pad_init();
+static int ds34bt_get_status(struct pad_funcs *pf);
+static int ds34bt_get_model(struct pad_funcs *pf, int port);
+static int ds34bt_get_data(struct pad_funcs *pf, u8 *dst, int size, int port);
+static void ds34bt_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum);
+static void ds34bt_set_mode(struct pad_funcs *pf, int mode, int lock);
+
 
 static int bt_probe(int devId)
 {
@@ -185,57 +187,6 @@ static int bt_disconnect(int devId)
     return 0;
 }
 
-int chrg_probe(int devId)
-{
-    UsbDeviceDescriptor *device = NULL;
-
-    DPRINTF("DS34CHRG: probe: devId=%i\n", devId);
-
-    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
-    if (device == NULL) {
-        DPRINTF("DS34CHRG: Error - Couldn't get device descriptor\n");
-        return 0;
-    }
-
-    if (device->idVendor == DS34_VID && (device->idProduct == DS3_PID || device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
-        return 1;
-
-    return 0;
-}
-
-int chrg_connect(int devId)
-{
-    int chrg_end;
-    UsbDeviceDescriptor *device;
-    UsbConfigDescriptor *config;
-
-    DPRINTF("DS34CHRG: connect: devId=%i\n", devId);
-
-    if (chrg_dev != -1) {
-        DPRINTF("DS34CHRG: Error - only one device allowed !\n");
-        return 1;
-    }
-
-    chrg_dev = devId;
-
-    chrg_end = UsbOpenEndpoint(devId, NULL);
-
-    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
-    config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
-
-    UsbSetDeviceConfiguration(chrg_end, config->bConfigurationValue, NULL, NULL);
-
-    return 0;
-}
-
-int chrg_disconnect(int devId)
-{
-    DPRINTF("DS34CHRG: disconnect: devId=%i\n", devId);
-
-    chrg_dev = -1;
-
-    return 0;
-}
 
 #define OUTPUT_01_REPORT_SIZE 48
 static const u8 hid_cmd_payload_led_arguments[] = {0xff, 0x27, 0x10, 0x00, 0x32};
@@ -346,6 +297,7 @@ static u8 g_press_emu = 0;
 static u8 enable_fake = 0;
 
 static ds34bt_pad_t ds34pad[MAX_PADS];
+static struct pad_funcs padf[MAX_PADS];
 
 static void hci_event_cb(int resultCode, int bytes, void *arg);
 static void l2cap_event_cb(int resultCode, int bytes, void *arg);
@@ -381,9 +333,17 @@ static int HCI_Command(int nbytes, u8 *dataptr)
 
 static int hci_reset()
 {
+    int pad;
     hci_cmd_buf[0] = HCI_OCF_RESET;
     hci_cmd_buf[1] = HCI_OGF_CTRL_BBAND;
     hci_cmd_buf[2] = 0x00; // Parameter Total Length = 0
+
+    padf[pad].priv = &ds34pad[pad];
+    padf[pad].get_status = ds34bt_get_status;
+    padf[pad].get_model = ds34bt_get_model;
+    padf[pad].get_data = ds34bt_get_data;
+    padf[pad].set_rumble = ds34bt_set_rumble;
+    padf[pad].set_mode = ds34bt_set_mode;
 
     return HCI_Command(3, hci_cmd_buf);
 }
@@ -1015,6 +975,7 @@ static int L2CAP_event_task(int result, int bytes)
                             DelayThread(CMD_DELAY);
                             hid_LEDRumbleCommand(ds34pad[pad].oldled, 0, 0, pad);
                             pad_status_set(DS34BT_STATE_RUNNING, pad);
+                            pademu_connect(&padf[pad]);
                         }
                         ds34pad[pad].btn_delay = 0xFF;
                         break;
@@ -1326,54 +1287,69 @@ static void hid_readReport(u8 *data, int bytes, int pad_idx)
 /* DS34BT Commands                                          */
 /************************************************************/
 
-void ds34bt_set_rumble(u8 lrum, u8 rrum, int port)
+static void ds34bt_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum)
 {
+    ds34bt_pad_t *pad = pf->priv;
+
     WaitSema(bt_dev.hid_sema);
 
-    ds34pad[port].update_rum = 1;
-    ds34pad[port].lrum = lrum;
-    ds34pad[port].rrum = rrum;
+    if ((pad->lrum != lrum) || (pad->rrum != rrum)) {
+        pad->lrum = lrum;
+        pad->rrum = rrum;
+        pad->update_rum = 1;
+    }
 
     SignalSema(bt_dev.hid_sema);
 }
 
-int ds34bt_get_data(u8 *dst, int size, int port)
+static int ds34bt_get_data(struct pad_funcs *pf, u8 *dst, int size, int port)
 {
+    ds34bt_pad_t *pad = pf->priv;
     int ret;
 
     WaitSema(bt_dev.hid_sema);
 
-    mips_memcpy(dst, ds34pad[port].data, size);
-    ret = ds34pad[port].analog_btn & 1;
+    mips_memcpy(dst, pad->data, size);
+    ret = pad->analog_btn & 1;
 
     SignalSema(bt_dev.hid_sema);
 
     return ret;
 }
 
-void ds34bt_set_mode(int mode, int lock, int port)
+static void ds34bt_set_mode(struct pad_funcs *pf, int mode, int lock)
 {
+    ds34bt_pad_t *pad = pf->priv;
+
     WaitSema(bt_dev.hid_sema);
 
     if (lock == 3)
-        ds34pad[port].analog_btn = 3;
+        pad->analog_btn = 3;
     else
-        ds34pad[port].analog_btn = mode;
+        pad->analog_btn = mode;
 
     SignalSema(bt_dev.hid_sema);
 }
 
-int ds34bt_get_status(int port)
+static int ds34bt_get_status(struct pad_funcs *pf)
 {
+    ds34bt_pad_t *pad = pf->priv;
     int ret;
 
     WaitSema(bt_dev.hid_sema);
 
-    ret = ds34pad[port].status;
+    ret = pad->status;
 
     SignalSema(bt_dev.hid_sema);
 
     return ret;
+}
+
+static int ds34bt_get_model(struct pad_funcs *pf, int port)
+{
+    (void)port;
+    (void)pf;
+    return 3;
 }
 
 int ds34bt_init(u8 pads, u8 options)
@@ -1400,8 +1376,6 @@ int ds34bt_init(u8 pads, u8 options)
         DPRINTF("Error registering USB devices: %02X\n", ret);
         return 0;
     }
-
-    sceUsbdRegisterLdd(&chrg_driver);
 
     return 1;
 }

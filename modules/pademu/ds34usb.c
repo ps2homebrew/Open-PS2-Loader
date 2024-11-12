@@ -499,7 +499,7 @@ static int ds34usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port)
         if (ret == USB_RC_OK)
             TransferWait(pad->cmd_sema);
         else
-            DPRINTF("DS34USB: LEDRumble usb transfer error %d\n", ret);
+            DPRINTF("LEDRumble usb transfer error %d\n", ret);
 
         pad->update_rum = 0;
     }

@@ -333,7 +333,7 @@ static int HCI_Command(int nbytes, u8 *dataptr)
 
 static int hci_reset()
 {
-    int pad;
+    int pad = 0;
     hci_cmd_buf[0] = HCI_OCF_RESET;
     hci_cmd_buf[1] = HCI_OGF_CTRL_BBAND;
     hci_cmd_buf[2] = 0x00; // Parameter Total Length = 0
@@ -451,6 +451,17 @@ static int hci_link_key_request_reply(u8 *bdaddr)
     return HCI_Command(9 + sizeof(link_key), hci_cmd_buf);
 }
 
+static void print_bd_addr(const u8 *addr)
+{
+    int i;
+    for (i = 0; i < 6; i++) {
+        // DPRINTF("0x%02X", addr[i]);
+        DPRINTF("%02X", addr[i]);
+        if (i < 5)
+            DPRINTF(":");
+    }
+}
+
 static void HCI_event_task(int result)
 {
     int i, pad;
@@ -459,6 +470,11 @@ static void HCI_event_task(int result)
         /*  buf[0] = Event Code                            */
         /*  buf[1] = Parameter Total Length                */
         /*  buf[n] = Event Parameters based on each event  */
+
+        // Ignore this packet
+        if (hci_buf[0] == HCI_EVENT_NUM_COMPLETED_PKT)
+            return;
+
         DPRINTF("HCI event = 0x%02X \n", hci_buf[0]);
         switch (hci_buf[0]) { // switch on event type
             case HCI_EVENT_COMMAND_COMPLETE:
@@ -495,11 +511,7 @@ static void HCI_event_task(int result)
                 if (!hci_buf[2]) { // check if connected OK
                     DPRINTF("\t Connection_Handle 0x%02X \n", hci_buf[3] | ((hci_buf[4] & 0x0F) << 8));
                     DPRINTF("\t Requested by BD_ADDR: \n\t");
-                    for (i = 0; i < 6; i++) {
-                        DPRINTF("0x%02X", hci_buf[5 + i]);
-                        if (i < 5)
-                            DPRINTF(":");
-                    }
+                    print_bd_addr(&hci_buf[5]);
                     DPRINTF("\n");
                     for (i = 0; i < MAX_PADS; i++) {
                         if (memcmp(ds34pad[i].bdaddr, hci_buf + 5, 6) == 0) {
@@ -539,6 +551,7 @@ static void HCI_event_task(int result)
                         break;
                     }
                 }
+                pademu_disconnect(&padf[i]);
                 ds34pad_clear(i);
                 break;
 
@@ -590,11 +603,7 @@ static void HCI_event_task(int result)
 
             case HCI_EVENT_CONNECT_REQUEST:
                 DPRINTF("HCI Connection Requested by BD_ADDR: \n\t");
-                for (i = 0; i < 6; i++) {
-                    DPRINTF("0x%02X", hci_buf[2 + i]);
-                    if (i < 5)
-                        DPRINTF(":");
-                }
+                print_bd_addr(&hci_buf[2]);
                 DPRINTF("\n\t Link = 0x%02X \n", hci_buf[11]);
                 DPRINTF("\t Class = 0x%02X 0x%02X 0x%02X \n", hci_buf[8], hci_buf[9], hci_buf[10]);
                 for (i = 0; i < MAX_PADS; i++) { // find free slot
@@ -636,11 +645,7 @@ static void HCI_event_task(int result)
                 DPRINTF("HCI Role Change Event: \n");
                 DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
                 DPRINTF("\t BD_ADDR: ");
-                for (i = 0; i < 6; i++) {
-                    DPRINTF("0x%02X", hci_buf[3 + i]);
-                    if (i < 5)
-                        DPRINTF(":");
-                }
+                print_bd_addr(&hci_buf[3]);
                 DPRINTF("\n\t Role 0x%02X \n", hci_buf[9]);
                 break;
 
@@ -656,11 +661,7 @@ static void HCI_event_task(int result)
 
             case HCI_EVENT_LINK_KEY_REQUEST:
                 DPRINTF("HCI Link Key Request Event by BD_ADDR: \n\t");
-                for (i = 0; i < 6; i++) {
-                    DPRINTF("0x%02X", hci_buf[2 + i]);
-                    if (i < 5)
-                        DPRINTF(":");
-                }
+                print_bd_addr(&hci_buf[2]);
                 DPRINTF("\n");
                 hci_link_key_request_reply(hci_buf + 2);
                 break;
@@ -724,7 +725,7 @@ static void hci_event_cb(int resultCode, int bytes, void *arg)
 /* L2CAP Commands                                           */
 /************************************************************/
 
-static int L2CAP_Command(u16 handle, u8 *data, u8 length)
+static int L2CAP_Command(u16 handle, u16 scid, u8 *data, u8 length)
 {
     l2cap_cmd_buf[0] = (u8)(handle & 0xff); // HCI handle with PB,BC flag
     l2cap_cmd_buf[1] = (u8)(((handle >> 8) & 0x0f) | 0x20);
@@ -732,8 +733,8 @@ static int L2CAP_Command(u16 handle, u8 *data, u8 length)
     l2cap_cmd_buf[3] = (u8)((4 + length) >> 8);
     l2cap_cmd_buf[4] = (u8)(length & 0xff); // L2CAP header: Length
     l2cap_cmd_buf[5] = (u8)(length >> 8);
-    l2cap_cmd_buf[6] = 0x01; // L2CAP header: Channel ID
-    l2cap_cmd_buf[7] = 0x00; // L2CAP Signalling channel over ACL-U logical link
+    l2cap_cmd_buf[6] = (u8)(scid & 0xff); // L2CAP header: Channel ID
+    l2cap_cmd_buf[7] = (u8)(scid >> 8);   // L2CAP Signalling channel over ACL-U logical link
 
     mips_memcpy(&l2cap_cmd_buf[8], data, length);
 
@@ -754,7 +755,7 @@ static int l2cap_connection_request(u16 handle, u8 rxid, u16 scid, u16 psm)
     cmd_buf[6] = (u8)(scid & 0xff); // Source CID (PS Remote)
     cmd_buf[7] = (u8)(scid >> 8);
 
-    return L2CAP_Command(handle, cmd_buf, 8);
+    return L2CAP_Command(handle, 1, cmd_buf, 8);
 }
 
 static int l2cap_connection_response(u16 handle, u8 rxid, u16 dcid, u16 scid, u8 result)
@@ -777,7 +778,7 @@ static int l2cap_connection_response(u16 handle, u8 rxid, u16 dcid, u16 scid, u8
     if (result != 0)
         cmd_buf[10] = 0x01; // Authentication pending
 
-    return L2CAP_Command(handle, cmd_buf, 12);
+    return L2CAP_Command(handle, 1, cmd_buf, 12);
 }
 
 static int l2cap_config_request(u16 handle, u8 rxid, u16 dcid)
@@ -801,7 +802,7 @@ static int l2cap_config_request(u16 handle, u8 rxid, u16 dcid)
     cmd_buf[10] = 0xFF; // Config Opt: data
     cmd_buf[11] = 0xFF;
 
-    return L2CAP_Command(handle, cmd_buf, 12);
+    return L2CAP_Command(handle, 1, cmd_buf, 12);
 }
 
 static int l2cap_config_response(u16 handle, u8 rxid, u16 scid)
@@ -823,7 +824,7 @@ static int l2cap_config_response(u16 handle, u8 rxid, u16 scid)
     cmd_buf[12] = 0xA0;
     cmd_buf[13] = 0x02;
 
-    return L2CAP_Command(handle, cmd_buf, 14);
+    return L2CAP_Command(handle, 1, cmd_buf, 14);
 }
 
 static int l2cap_disconnection_request(u16 handle, u8 rxid, u16 dcid, u16 scid)
@@ -839,7 +840,7 @@ static int l2cap_disconnection_request(u16 handle, u8 rxid, u16 dcid, u16 scid)
     cmd_buf[6] = (u8)(scid & 0xff); // Source CID
     cmd_buf[7] = (u8)(scid >> 8);
 
-    return L2CAP_Command(handle, cmd_buf, 8);
+    return L2CAP_Command(handle, 1, cmd_buf, 8);
 }
 
 static int l2cap_disconnection_response(u16 handle, u8 rxid, u16 scid, u16 dcid)
@@ -855,7 +856,7 @@ static int l2cap_disconnection_response(u16 handle, u8 rxid, u16 scid, u16 dcid)
     cmd_buf[6] = (u8)(scid & 0xff); // Source CID
     cmd_buf[7] = (u8)(scid >> 8);
 
-    return L2CAP_Command(handle, cmd_buf, 8);
+    return L2CAP_Command(handle, 1, cmd_buf, 8);
 }
 
 #define CMD_DELAY 2
@@ -1060,23 +1061,6 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
 /* HID Commands                                             */
 /************************************************************/
 
-static int HID_command(u16 handle, u16 scid, u8 *data, u8 length, int pad)
-{
-    l2cap_cmd_buf[0] = (u8)(handle & 0xff); // HCI handle with PB,BC flag
-    l2cap_cmd_buf[1] = (u8)(((handle >> 8) & 0x0f) | 0x20);
-    l2cap_cmd_buf[2] = (u8)((4 + length) & 0xff); // HCI ACL total data length
-    l2cap_cmd_buf[3] = (u8)((4 + length) >> 8);
-    l2cap_cmd_buf[4] = (u8)(length & 0xff); // L2CAP header: Length
-    l2cap_cmd_buf[5] = (u8)(length >> 8);
-    l2cap_cmd_buf[6] = (u8)(scid & 0xff); // L2CAP header: Channel ID
-    l2cap_cmd_buf[7] = (u8)(scid >> 8);
-
-    mips_memcpy(&l2cap_cmd_buf[8], data, length);
-
-    // output on endpoint 2
-    return sceUsbdBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
-}
-
 static int hid_initDS34(int pad)
 {
     u8 init_buf[PS3_F4_REPORT_LEN + 2];
@@ -1095,7 +1079,7 @@ static int hid_initDS34(int pad)
         init_buf[1] = PS4_02_REPORT_ID;            // Report ID
     }
 
-    return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, init_buf, size, pad);
+    return L2CAP_Command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, init_buf, size);
 }
 
 /**
@@ -1170,7 +1154,7 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
     ds34pad[pad].oldled[2] = led[2];
     ds34pad[pad].oldled[3] = led[3];
 
-    return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, led_buf, size, pad);
+    return L2CAP_Command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, led_buf, size);
 }
 
 static void hid_readReport(u8 *data, int bytes, int pad_idx)

@@ -2,13 +2,13 @@ IOP_OBJS = pademu.o sys_utils.o imports.o exports.o padmacro.o ds34common.o
 
 IOP_BIN = pademu.irx
 
-ifeq ($(USE_USB),1)
-IOP_CFLAGS += -DUSB
+ifeq ($(USE_DS34USB),1)
+IOP_CFLAGS += -DDS34USB
 IOP_OBJS += ds34usb.o
 endif
 
-ifeq ($(USE_BT),1)
-IOP_CFLAGS += -DBT
+ifeq ($(USE_DS34BT),1)
+IOP_CFLAGS += -DDS34BT
 IOP_OBJS += ds34bt.o
 endif
 

@@ -133,7 +133,7 @@ static int usb_connect(int devId)
 
     ds34pad[pad].status = DS34USB_STATE_AUTHORIZED;
 
-    ds34pad[pad].controlEndp = UsbOpenEndpoint(devId, NULL);
+    ds34pad[pad].controlEndp = sceUsbdOpenPipe(devId, NULL);
 
     device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
@@ -544,7 +544,7 @@ static int ds34usb_get_status(struct pad_funcs *pf)
 
 static int ds34usb_get_model(struct pad_funcs *pf, int port)
 {
-    (void *)port;
+    (void)port;
     ds34usb_device *pad = pf->priv;
     int ret;
 

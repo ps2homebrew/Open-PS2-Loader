@@ -12,13 +12,13 @@
 
 static struct pad_funcs *padf[MAX_PORTS];
 
-#ifdef BT
+#ifdef DS34BT
 
 #include "ds34bt.h"
 
 #endif
 
-#ifdef USB
+#ifdef DS34USB
 
 #include "ds34usb.h"
 

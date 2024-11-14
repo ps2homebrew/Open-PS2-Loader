@@ -1,6 +1,8 @@
 #ifndef _DS34_H_
 #define _DS34_H_
 
+#include <ds34common.h>
+
 #define DS34_VID        0x054C // Sony Corporation
 #define DS3_PID         0x0268 // PS3 Controller
 #define DS4_PID         0x05C4 // PS4 Controller

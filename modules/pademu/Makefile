@@ -16,6 +16,18 @@ ifeq ($(VMC),1)
 IOP_CFLAGS += -DVMC
 endif
 
+ifeq ($(USE_XBOX360),1)
+IOP_CFLAGS += -DX360 -Wall -fno-builtin
+IOP_LDFLAGS += -s
+IOP_OBJS += xbox360usb.o
+endif
+
+ifeq ($(USE_XBOXONE),1)
+IOP_CFLAGS += -DXONE -Wall -fno-builtin
+IOP_LDFLAGS += -s
+IOP_OBJS += xboxoneusb.o
+endif
+
 IOP_CFLAGS += -DUSE_SMSUTILS
 IOP_INCS += -I../../include/
 

@@ -328,7 +328,7 @@ clean:	download_lwNBD
 	echo " -ds34bt"
 	$(MAKE) -C modules/ds34bt clean
 	echo " -pademu"
-	$(MAKE) -C modules/pademu USE_DS34USB=1 USE_DS34BT=1 clean
+	$(MAKE) -C modules/pademu USE_DS34USB=1 USE_DS34BT=1 USE_XBOXONE=1 USE_XBOX360=1 clean
 	echo "-pc tools"
 	$(MAKE) -C pc clean
 
@@ -521,7 +521,7 @@ $(EE_ASM_DIR)ds34usb.c: modules/ds34usb/iop/ds34usb.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 modules/pademu/pademu.irx: modules/pademu
-	$(MAKE) USE_DS34USB=1 USE_DS34BT=1 -C $< all
+	$(MAKE) USE_DS34USB=1 USE_DS34BT=1 USE_XBOXONE=1 USE_XBOX360=1 -C $< all
 
 $(EE_ASM_DIR)pademu.c: modules/pademu/pademu.irx
 	$(BIN2C) $< $@ $(*F)_irx

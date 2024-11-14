@@ -12,13 +12,13 @@
 
 static struct pad_funcs *padf[MAX_PORTS];
 
-#ifdef BT
+#ifdef DS34BT
 
 #include "ds34bt.h"
 
 #endif
 
-#ifdef USB
+#ifdef DS34USB
 
 #include "ds34usb.h"
 
@@ -135,10 +135,10 @@ int _start(int argc, char *argv[])
 
     pademu_setup(pad_enable, pad_vibration);
 
-#ifdef BT
+#ifdef DS34BT
     ds34bt_init(pad_enable, pad_options);
 #endif
-#ifdef USB
+#ifdef DS34USB
     ds34usb_init(pad_enable, pad_options);
 #endif
 
@@ -181,10 +181,10 @@ void pademu_disconnect(struct pad_funcs *pf)
 
 void _exit(int mode)
 {
-#ifdef BT
+#ifdef DS34BT
     ds34bt_reset();
 #endif
-#ifdef USB
+#ifdef DS34USB
     ds34usb_reset();
 #endif
 }

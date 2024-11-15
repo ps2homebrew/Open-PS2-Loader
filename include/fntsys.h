@@ -6,6 +6,8 @@
 /// Value returned on errors
 #define FNT_ERROR   (-1)
 
+#define FNTSYS_DEFAULT_SIZE 17
+
 /** Initializes the font subsystem */
 void fntInit();
 
@@ -15,7 +17,7 @@ void fntEnd();
 /** Loads a font from a file path
  * @param path The path to the font file
  * @return font slot id (negative value means error happened) */
-int fntLoadFile(char *path);
+int fntLoadFile(char *path, int fontSize);
 
 /** Reloads the default font */
 int fntLoadDefault(char *path);

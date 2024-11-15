@@ -893,7 +893,7 @@ static void _loadConfig()
             if (!(getKeyPressed(KEY_TRIANGLE) && getKeyPressed(KEY_CROSS))) {
                 configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
             } else {
-                LOG("--- Select held at boot - setting Video Mode to Auto ---\n");
+                LOG("--- Triangle + Cross held at boot - setting Video Mode to Auto ---\n");
                 gVMode = 0;
                 configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
             }

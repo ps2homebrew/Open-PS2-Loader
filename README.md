@@ -116,6 +116,25 @@ that contains the preferred partition name (for example `__common`).
 </details>
 
 <details>
+  <summary> <b> Cheats </b> </summary>
+<p>
+
+OPL accepts `.cht` files in PS2RD format. Each cheat file corresponds to a specific game and must be stored in the `CHT` directory on your device.
+Cheats are structured as hexadecimal codes, with proper headers as descriptions to identify their function.
+You can activate cheats via OPL's graphical interface. Navigate to a games settings, enable cheats and select the desired mode.
+
+### cheat modes
+
+  * Auto Select Cheats:  
+This mode will enable and apply all cheat codes in your `.cht` file to your game automatically.
+
+  * Select Game Cheats:  
+When enabled a cheat selection menu will appear when you launch a game. You can navigate the menu and disable undesired cheats for this launch session. `Mastercode`s cannot be disabled as they are required for any other cheats to be applied.
+
+</p>
+</details>
+
+<details>
   <summary> <b> NBD Server </b> </summary>
 <p>
 

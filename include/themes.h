@@ -8,6 +8,8 @@
 #define THM_MAX_FILES 64
 #define THM_MAX_FONTS 16
 
+#define IS_DEFAULT_THEME(themeID) ((themeID) == 0)
+
 typedef struct
 {
     // optional, only for overlays

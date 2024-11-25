@@ -181,7 +181,7 @@ int sfxInit(int bootSnd)
 
     // Check default theme is not current theme
     int themeID = thmGetGuiValue();
-    if (themeID != 0) {
+    if (!IS_DEFAULT_THEME(themeID)) {
         // Get theme path for sfx
         char *thmPath = thmGetFilePath(themeID);
         snprintf(sound_path, sizeof(sound_path), "%ssound", thmPath);
@@ -334,7 +334,7 @@ static int bgmLoad(void)
     memset(vorbisFile, 0, sizeof(OggVorbis_File));
 
     int themeID = thmGetGuiValue();
-    if (themeID != 0) {
+    if (!IS_DEFAULT_THEME(themeID)) {
         char *thmPath = thmGetFilePath(themeID);
         snprintf(bgmPath, sizeof(bgmPath), "%ssound/bgm.ogg", thmPath);
     } else

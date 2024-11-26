@@ -1177,6 +1177,13 @@ void applyConfig(int themeID, int langID, int skipDeviceRefresh)
 
             moduleUpdateMenuInternal(&list_support[i], changed, langChanged);
         }
+    } else {
+        if (changed) {
+            for (int i = 0; i < MODE_COUNT; i++) {
+                if (list_support[i].support && list_support[i].subMenu)
+                    submenuRebuildCache(list_support[i].subMenu);
+            }
+        }
     }
 
     bgmUnMute();

@@ -95,7 +95,7 @@ atlas_t *atlasNew(size_t width, size_t height, u8 psm)
 
     size_t txtsize = gsKit_texture_size(width, height, psm);
     atlas->surface.PSM = psm;
-    atlas->surface.Mem = (u32 *)memalign(128, txtsize);
+    atlas->surface.Mem = (u32 *)aligned_alloc(128, txtsize);
     atlas->surface.Vram = 0;
 
     // defaults to no clut

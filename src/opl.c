@@ -1275,7 +1275,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     result = 0;
     LOG("CompatUpdate: updating for: device %d game %d\n", device, configSet == NULL ? -1 : id);
 
-    if ((HttpBuffer = memalign(64, HTTP_IOBUF_SIZE)) != NULL) {
+    if ((HttpBuffer = aligned_alloc(64, HTTP_IOBUF_SIZE)) != NULL) {
         count = configSet != NULL ? 1 : support->itemGetCount(support);
 
         if (count > 0) {

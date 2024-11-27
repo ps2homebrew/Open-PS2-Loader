@@ -194,7 +194,7 @@ void *readFile(char *path, int align, int *size)
         }
 
         if (align > 0)
-            buffer = memalign(64, realSize); // The allocation is aligned to aid the DMA transfers
+            buffer = aligned_alloc(64, realSize); // The allocation is aligned to aid the DMA transfers
         else
             buffer = malloc(realSize);
 

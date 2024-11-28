@@ -10,6 +10,7 @@
 #include "include/pggsm.h"
 #include "include/cheatman.h"
 #include "include/ps2cnf.h"
+#include "include/gui.h"
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioMount("iso:", ***), fileXioUmount("iso:")
@@ -838,28 +839,20 @@ void sbCreateFolders(const char *path, int createDiscImgFolders)
 int sbLoadCheats(const char *path, const char *file)
 {
     char cheatfile[64];
-    const u32 *cheatList;
-    int result;
+    int cheatMode = 0;
 
     if (GetCheatsEnabled()) {
         snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", path, file);
         LOG("Loading Cheat File %s\n", cheatfile);
-        if ((result = load_cheats(cheatfile)) < 0) {
-            LOG("Error: failed to load cheats\n");
-        } else {
-            cheatList = GetCheatsList();
 
-            if (!((cheatList[0] == 0) && (cheatList[1] == 0))) {
-                LOG("Cheats found\n");
-                result = 0;
-            } else {
-                LOG("No cheats found\n");
-                result = -ENOENT;
-            }
+        if ((cheatMode = load_cheats(cheatfile)) < 0)
+            LOG("Error: failed to load cheats\n");
+        else {
+            LOG("Cheats found\n");
+            if ((gAutoLaunchGame == NULL) && (gAutoLaunchBDMGame == NULL) && (cheatMode == 1))
+                guiManageCheats();
         }
-    } else {
-        result = 0;
     }
 
-    return result;
+    return cheatMode;
 }

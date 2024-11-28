@@ -30,6 +30,7 @@ static int gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
 static int gCheatMode;   // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
 
 static u32 gCheatList[MAX_CHEATLIST]; // Store hooks/codes addr+val pairs
+cheat_entry_t gCheats[MAX_CODES];
 
 void InitCheatsConfig(config_set_t *configSet)
 {
@@ -39,7 +40,6 @@ void InitCheatsConfig(config_set_t *configSet)
     gCheatSource = 0;
     gEnableCheat = 0;
     gCheatMode = 0;
-    memset(gCheatList, 0, sizeof(gCheatList));
 
     if (configGetInt(configSet, CONFIG_ITEM_CHEATSSOURCE, &gCheatSource)) {
         // Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
@@ -79,6 +79,8 @@ static code_t make_code(const char *s)
             digits[i++] = *s;
         s++;
     }
+
+    digits[i] = '\0';
 
     sscanf(digits, "%08X %08X", &address, &value);
 
@@ -244,17 +246,18 @@ static int parse_buf(const char *buf)
     code_t code;
     char line[CHEAT_LINE_MAX + 1];
     int linenumber = 1;
+    int cheat_index = -1; // Starts at -1.. indicating no cheat being processed yet
+    int code_index = 0;
+    char temp_name[CHEAT_NAME_MAX + 1] = {0};
 
     if (buf == NULL)
         return -1;
-
-    int i = 0;
 
     while (*buf) {
         /* Scanner */
         int len = chr_idx(buf, LF);
         if (len < 0)
-            len = strlen(line);
+            len = strlen(buf);
         else if (len > CHEAT_LINE_MAX)
             len = CHEAT_LINE_MAX;
 
@@ -266,22 +269,34 @@ static int parse_buf(const char *buf)
             term_str(line, is_cmt_str);
             trim_str(line);
 
-            /* Parser */
-            code = parse_line(line, linenumber);
-            if (!((code.addr == 0) && (code.val == 0))) {
-                gCheatList[i] = code.addr;
-                i++;
-                gCheatList[i] = code.val;
-                i++;
+            // Check if the line is a cheat name
+            if (!is_cheat_code(line) && strlen(line) > 0) {
+                // Store the cheat name temporarily
+                strncpy(temp_name, line, CHEAT_NAME_MAX);
+                temp_name[CHEAT_NAME_MAX] = NUL;
+                // Reset code index in case this is a new cheat
+                code_index = 0;
+            } else {
+                /* Parser */
+                code = parse_line(line, linenumber);
+                if (!(code.addr == 0 && code.val == 0)) {
+                    // Only add the cheat entry if we have a valid cheat name in temp_name
+                    if (cheat_index < MAX_CODES && temp_name[0] != NUL) {
+                        cheat_index++; // Move to the next cheat entry
+                        strncpy(gCheats[cheat_index].name, temp_name, CHEAT_NAME_MAX);
+                        gCheats[cheat_index].name[CHEAT_NAME_MAX] = NUL;
+                        gCheats[cheat_index].enabled = 1; // Set cheat as enabled
+                        temp_name[0] = NUL;               // Clear temp_name after use
+                    }
+                    // Add the cheat code to the current cheat entry
+                    if (cheat_index >= 0 && code_index < MAX_CHEATLIST)
+                        gCheats[cheat_index].codes[code_index++] = code;
+                }
             }
         }
         linenumber++;
         buf += len + 1;
     }
-
-    gCheatList[i] = 0;
-    i++;
-    gCheatList[i] = 0;
 
     return 0;
 }
@@ -304,15 +319,23 @@ static inline char *read_text_file(const char *filename, int maxsize)
     }
 
     filesize = lseek(fd, 0, SEEK_END);
-    if (maxsize && filesize > maxsize) {
+    if (filesize < 0) {
+        LOG("%s: Can't seek in text file %s\n", __FUNCTION__, filename);
+        close(fd);
+        return NULL;
+    }
+
+    if (maxsize > 0 && filesize > maxsize) {
         LOG("%s: Text file too large: %i bytes, max: %i bytes\n", __FUNCTION__, filesize, maxsize);
-        goto end;
+        close(fd);
+        return NULL;
     }
 
     buf = malloc(filesize + 1);
     if (buf == NULL) {
         LOG("%s: Unable to allocate %i bytes\n", __FUNCTION__, filesize + 1);
-        goto end;
+        close(fd);
+        return NULL;
     }
 
     if (filesize > 0) {
@@ -320,14 +343,14 @@ static inline char *read_text_file(const char *filename, int maxsize)
         if (read(fd, buf, filesize) != filesize) {
             LOG("%s: Can't read from text file %s\n", __FUNCTION__, filename);
             free(buf);
-            buf = NULL;
-            goto end;
+            close(fd);
+            return NULL;
         }
     }
 
     buf[filesize] = '\0';
-end:
     close(fd);
+
     return buf;
 }
 
@@ -339,19 +362,52 @@ int load_cheats(const char *cheatfile)
     char *buf = NULL;
     int ret;
 
-    memset(gCheatList, 0, sizeof(gCheatList));
+    memset(gCheats, 0, sizeof(gCheats));
 
-    LOG("%s: Reading cheat file '%s'...", __FUNCTION__, cheatfile);
+    LOG("%s: Reading cheat file '%s'...\n", __FUNCTION__, cheatfile);
     buf = read_text_file(cheatfile, 0);
     if (buf == NULL) {
-        LOG("\n%s: Could not read cheats file '%s'\n", __FUNCTION__, cheatfile);
+        LOG("%s: Could not read cheats file '%s'\n", __FUNCTION__, cheatfile);
         return -1;
     }
-    LOG("Ok!\n");
+
     ret = parse_buf(buf);
     free(buf);
+
     if (ret < 0)
-        return -1;
-    else
-        return 0;
+        return ret;
+
+    return (gCheatMode == 0) ? 0 : 1;
+}
+
+void set_cheats_list(void)
+{
+    int cheatCount = 0;
+
+    memset((void *)gCheatList, 0, sizeof(gCheatList));
+
+    // Populate the cheat list
+    for (int i = 0; i < MAX_CODES; ++i) {
+        if (gCheats[i].enabled) {
+            for (int j = 0; j < MAX_CHEATLIST && gCheats[i].codes[j].addr != 0; ++j) {
+                if (cheatCount + 2 <= MAX_CHEATLIST) {
+                    // Store the address and value in gCheatList
+                    gCheatList[cheatCount++] = gCheats[i].codes[j].addr;
+                    gCheatList[cheatCount++] = gCheats[i].codes[j].val;
+                    LOG("%s: Setting cheat for eecore:\n%s\n%08X %08X\n", __FUNCTION__, gCheats[i].name, gCheats[i].codes[j].addr, gCheats[i].codes[j].val);
+                } else
+                    break;
+            }
+        }
+    }
+
+    // Append a blank cheat entry if theres space
+    if (cheatCount < MAX_CHEATLIST) {
+        gCheatList[cheatCount++] = 0; // addr
+        gCheatList[cheatCount++] = 0; // val
+    } else {
+        // Overwrite the last cheat with a blank cheat if we are at max
+        gCheatList[cheatCount - 2] = 0; // addr
+        gCheatList[cheatCount - 1] = 0; // val
+    }
 }

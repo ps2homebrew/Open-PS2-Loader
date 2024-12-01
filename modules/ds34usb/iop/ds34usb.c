@@ -83,7 +83,7 @@ int usb_probe(int devId)
 
     DPRINTF("DS34USB: probe: devId=%i\n", devId);
 
-    device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
+    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
         DPRINTF("DS34USB: Error - Couldn't get device descriptor\n");
         return 0;
@@ -121,10 +121,10 @@ int usb_connect(int devId)
 
     ds34pad[pad].status = DS34USB_STATE_AUTHORIZED;
 
-    ds34pad[pad].controlEndp = UsbOpenEndpoint(devId, NULL);
+    ds34pad[pad].controlEndp = sceUsbdOpenPipe(devId, NULL);
 
-    device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
-    config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
+    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
+    config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
     if (device->idProduct == DS3_PID) {
@@ -135,16 +135,16 @@ int usb_connect(int devId)
         epCount = 20; // ds4 v2 returns interface->bNumEndpoints as 0
     }
 
-    endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
+    endpoint = (UsbEndpointDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
     do {
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds34pad[pad].interruptEndp < 0) {
-                ds34pad[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
+                ds34pad[pad].interruptEndp = sceUsbdOpenPipeAligned(devId, endpoint);
                 DPRINTF("DS34USB: register Event endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && ds34pad[pad].outEndp < 0) {
-                ds34pad[pad].outEndp = UsbOpenEndpointAligned(devId, endpoint);
+                ds34pad[pad].outEndp = sceUsbdOpenPipeAligned(devId, endpoint);
                 DPRINTF("DS34USB: register Output endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
@@ -160,7 +160,7 @@ int usb_connect(int devId)
 
     ds34pad[pad].status |= DS34USB_STATE_CONNECTED;
 
-    UsbSetDeviceConfiguration(ds34pad[pad].controlEndp, config->bConfigurationValue, usb_config_set, (void *)pad);
+    sceUsbdSetConfiguration(ds34pad[pad].controlEndp, config->bConfigurationValue, usb_config_set, (void *)pad);
     SignalSema(ds34pad[pad].sema);
 
     return 0;
@@ -188,10 +188,10 @@ static void usb_release(int pad)
     PollSema(ds34pad[pad].sema);
 
     if (ds34pad[pad].interruptEndp >= 0)
-        UsbCloseEndpoint(ds34pad[pad].interruptEndp);
+        sceUsbdClosePipe(ds34pad[pad].interruptEndp);
 
     if (ds34pad[pad].outEndp >= 0)
-        UsbCloseEndpoint(ds34pad[pad].outEndp);
+        sceUsbdClosePipe(ds34pad[pad].outEndp);
 
     ds34pad[pad].controlEndp = -1;
     ds34pad[pad].interruptEndp = -1;
@@ -260,7 +260,7 @@ static void DS3USB_init(int pad)
     usb_buf[2] = 0x00;
     usb_buf[3] = 0x00;
 
-    UsbControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF4, 0, 4, usb_buf, NULL, NULL);
+    sceUsbdControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF4, 0, 4, usb_buf, NULL, NULL);
 }
 
 static void readReport(u8 *data, int pad)
@@ -430,7 +430,7 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
             usb_buf[28] = 0x32;
         }
 
-        ret = UsbControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_SET_REPORT_OUTPUT << 8) | 0x01, 0, sizeof(output_01_report), usb_buf, usb_cmd_cb, (void *)pad);
+        ret = sceUsbdControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_SET_REPORT_OUTPUT << 8) | 0x01, 0, sizeof(output_01_report), usb_buf, usb_cmd_cb, (void *)pad);
     } else if (ds34pad[pad].type == DS4) {
         usb_buf[0] = 0x05;
         usb_buf[1] = 0xFF;
@@ -447,7 +447,7 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
             usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)
         }
 
-        ret = UsbInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
+        ret = sceUsbdInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
     }
 
     ds34pad[pad].oldled[0] = led[0];
@@ -572,7 +572,7 @@ int ds34usb_get_bdaddr(u8 *data, int port)
     PollSema(ds34pad[port].cmd_sema);
 
     if (ds34pad[port].type == DS3) {
-        ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF5, 0, 8, usb_buf, usb_cmd_cb, (void *)port);
+        ret = sceUsbdControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF5, 0, 8, usb_buf, usb_cmd_cb, (void *)port);
 
         if (ret == USB_RC_OK) {
             TransferWait(ds34pad[port].cmd_sema);
@@ -586,7 +586,7 @@ int ds34usb_get_bdaddr(u8 *data, int port)
             ret = 0;
         }
     } else {
-        ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x12, 0, 16, usb_buf, usb_cmd_cb, (void *)port);
+        ret = sceUsbdControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x12, 0, 16, usb_buf, usb_cmd_cb, (void *)port);
 
         if (ret == USB_RC_OK) {
             TransferWait(ds34pad[port].cmd_sema);
@@ -625,7 +625,7 @@ void ds34usb_set_bdaddr(u8 *data, int port)
         for (i = 0; i < 6; i++)
             usb_buf[i + 2] = data[5 - i];
 
-        ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF5, 0, 8, usb_buf, usb_cmd_cb, (void *)port);
+        ret = sceUsbdControlTransfer(ds34pad[port].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF5, 0, 8, usb_buf, usb_cmd_cb, (void *)port);
     } else {
         usb_buf[0] = 0x13;
 
@@ -635,7 +635,7 @@ void ds34usb_set_bdaddr(u8 *data, int port)
         for (i = 0; i < sizeof(link_key); i++)
             usb_buf[i + 7] = link_key[i];
 
-        ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x13, 0, 24, usb_buf, usb_cmd_cb, (void *)port);
+        ret = sceUsbdControlTransfer(ds34pad[port].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x13, 0, 24, usb_buf, usb_cmd_cb, (void *)port);
     }
 
     if (ret == USB_RC_OK)
@@ -782,7 +782,7 @@ int _start(int argc, char *argv[])
         }
     }
 
-    if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
+    if (sceUsbdRegisterLdd(&usb_driver) != USB_RC_OK) {
         DPRINTF("DS34USB: Error registering USB devices\n");
         return MODULE_NO_RESIDENT_END;
     }

@@ -49,7 +49,7 @@ static int bt_probe(int devId)
         return 0;
     }
 
-    device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
+    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
         DPRINTF("DS34BT: Error - Couldn't get device descriptor\n");
         return 0;
@@ -58,7 +58,7 @@ static int bt_probe(int devId)
     if (device->bNumConfigurations < 1)
         return 0;
 
-    config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
+    config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
     if (config == NULL) {
         DPRINTF("DS34BT: Error - Couldn't get configuration descriptor\n");
         return 0;
@@ -104,10 +104,10 @@ static int bt_connect(int devId)
     bt_dev.inEndp = -1;
     bt_dev.outEndp = -1;
 
-    bt_dev.controlEndp = UsbOpenEndpoint(devId, NULL);
+    bt_dev.controlEndp = sceUsbdOpenPipe(devId, NULL);
 
-    device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
-    config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
+    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
+    config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
     bt_dev.vid = device->idVendor;
@@ -118,21 +118,21 @@ static int bt_connect(int devId)
 
     DPRINTF("DS34BT: Endpoint Count %d \n", epCount + 1);
 
-    endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
+    endpoint = (UsbEndpointDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
     do {
 
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_BULK) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && bt_dev.outEndp < 0) {
-                bt_dev.outEndp = UsbOpenEndpointAligned(devId, endpoint);
+                bt_dev.outEndp = sceUsbdOpenPipeAligned(devId, endpoint);
                 DPRINTF("DS34BT: register Output endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             } else if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_dev.inEndp < 0) {
-                bt_dev.inEndp = UsbOpenEndpointAligned(devId, endpoint);
+                bt_dev.inEndp = sceUsbdOpenPipeAligned(devId, endpoint);
                 DPRINTF("DS34BT: register Input endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.inEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         } else if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_dev.interruptEndp < 0) {
-                bt_dev.interruptEndp = UsbOpenEndpoint(devId, endpoint);
+                bt_dev.interruptEndp = sceUsbdOpenPipe(devId, endpoint);
                 DPRINTF("DS34BT: register Interrupt endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
@@ -149,7 +149,7 @@ static int bt_connect(int devId)
     bt_dev.devId = devId;
     bt_dev.status = DS34BT_STATE_USB_AUTHORIZED;
 
-    UsbSetDeviceConfiguration(bt_dev.controlEndp, config->bConfigurationValue, bt_config_set, NULL);
+    sceUsbdSetConfiguration(bt_dev.controlEndp, config->bConfigurationValue, bt_config_set, NULL);
 
     return 0;
 }
@@ -161,13 +161,13 @@ static int bt_disconnect(int devId)
     if (bt_dev.status & DS34BT_STATE_USB_AUTHORIZED) {
 
         if (bt_dev.interruptEndp >= 0)
-            UsbCloseEndpoint(bt_dev.interruptEndp);
+            sceUsbdClosePipe(bt_dev.interruptEndp);
 
         if (bt_dev.inEndp >= 0)
-            UsbCloseEndpoint(bt_dev.inEndp);
+            sceUsbdClosePipe(bt_dev.inEndp);
 
         if (bt_dev.outEndp >= 0)
-            UsbCloseEndpoint(bt_dev.outEndp);
+            sceUsbdClosePipe(bt_dev.outEndp);
 
         bt_dev.devId = -1;
         bt_dev.interruptEndp = -1;
@@ -189,7 +189,7 @@ int chrg_probe(int devId)
 
     DPRINTF("DS34CHRG: probe: devId=%i\n", devId);
 
-    device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
+    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     if (device == NULL) {
         DPRINTF("DS34CHRG: Error - Couldn't get device descriptor\n");
         return 0;
@@ -218,10 +218,10 @@ int chrg_connect(int devId)
 
     chrg_end = UsbOpenEndpoint(devId, NULL);
 
-    device = (UsbDeviceDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_DEVICE);
-    config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
+    device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
+    config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
 
-    UsbSetDeviceConfiguration(chrg_end, config->bConfigurationValue, NULL, NULL);
+    sceUsbdSetConfiguration(chrg_end, config->bConfigurationValue, NULL, NULL);
 
     return 0;
 }
@@ -376,8 +376,8 @@ static void bt_config_set(int result, int count, void *arg)
 {
     PollSema(bt_dev.hid_sema);
 
-    UsbInterruptTransfer(bt_dev.interruptEndp, hci_buf, MAX_BUFFER_SIZE, hci_event_cb, NULL);
-    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
+    sceUsbdInterruptTransfer(bt_dev.interruptEndp, hci_buf, MAX_BUFFER_SIZE, hci_event_cb, NULL);
+    sceUsbdBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
 
     ds34pad_init();
     hci_reset();
@@ -391,7 +391,7 @@ static void bt_config_set(int result, int count, void *arg)
 
 static int HCI_Command(int nbytes, u8 *dataptr)
 {
-    return UsbControlTransfer(bt_dev.controlEndp, REQ_HCI_OUT, HCI_COMMAND_REQ, 0, 0, nbytes, dataptr, NULL, NULL);
+    return sceUsbdControlTransfer(bt_dev.controlEndp, REQ_HCI_OUT, HCI_COMMAND_REQ, 0, 0, nbytes, dataptr, NULL, NULL);
 }
 
 static int hci_reset()
@@ -825,7 +825,7 @@ static void hci_event_cb(int resultCode, int bytes, void *arg)
 {
     PollSema(bt_dev.hid_sema);
     HCI_event_task(resultCode);
-    UsbInterruptTransfer(bt_dev.interruptEndp, hci_buf, MAX_BUFFER_SIZE, hci_event_cb, NULL);
+    sceUsbdInterruptTransfer(bt_dev.interruptEndp, hci_buf, MAX_BUFFER_SIZE, hci_event_cb, NULL);
     SignalSema(bt_dev.hid_sema);
 }
 
@@ -847,7 +847,7 @@ static int L2CAP_Command(u16 handle, u8 *data, u8 length)
     mips_memcpy(&l2cap_cmd_buf[8], data, length);
 
     // output on endpoint 2
-    return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
+    return sceUsbdBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
 }
 
 static int l2cap_connection_request(u16 handle, u8 rxid, u16 scid, u16 psm)
@@ -1157,7 +1157,7 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
         }
     }
 
-    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE + 23, l2cap_event_cb, arg);
+    sceUsbdBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE + 23, l2cap_event_cb, arg);
     SignalSema(bt_dev.hid_sema);
 }
 
@@ -1179,7 +1179,7 @@ static int HID_command(u16 handle, u16 scid, u8 *data, u8 length, int pad)
     mips_memcpy(&l2cap_cmd_buf[8], data, length);
 
     // output on endpoint 2
-    return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
+    return sceUsbdBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
 }
 
 static int hid_initDS34(int pad)
@@ -1593,7 +1593,7 @@ void ds34bt_init_charging()
     int ret;
 
     if (!chrg_inited) {
-        ret = UsbRegisterDriver(&chrg_driver);
+        ret = sceUsbdRegisterLdd(&chrg_driver);
         if (ret != USB_RC_OK) {
             DPRINTF("DS34BT: Error registering charging 0x%02X \n", ret);
             chrg_inited = 0;
@@ -1693,7 +1693,7 @@ int _start(int argc, char *argv[])
         return MODULE_NO_RESIDENT_END;
     }
 
-    ret = UsbRegisterDriver(&bt_driver);
+    ret = sceUsbdRegisterLdd(&bt_driver);
 
     if (ret != USB_RC_OK) {
         DPRINTF("DS34BT: Error registering BT devices 0x%02X \n", ret);

@@ -8,7 +8,7 @@
 
 #include "pademu.h"
 #include "padmacro.h"
-#include "ds34.h"
+#include "ds34common.h"
 
 static struct pad_funcs *padf[MAX_PORTS];
 

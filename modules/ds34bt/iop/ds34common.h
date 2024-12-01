@@ -14,27 +14,6 @@
 #define GUITAR_HERO_PS3_PID 0x0100 // PS3 Guitar Hero Guitar
 #define ROCK_BAND_PS3_PID   0x0200 // PS3 Rock Band Guitar
 
-// NOTE: struct member prefixed with "n" means it's active-low (i.e. value of 0 indicates button is pressed, value 1 is released)
-enum DS2ButtonBitNumber {
-    DS2BtnBit_Select = 0,
-    DS2BtnBit_L3 = 1,
-    DS2BtnBit_R3 = 2,
-    DS2BtnBit_Start = 3,
-    DS2BtnBit_Up = 4,
-    DS2BtnBit_Right = 5,
-    DS2BtnBit_Down = 6,
-    DS2BtnBit_Left = 7,
-    DS2BtnBit_L2 = 8,
-    DS2BtnBit_R2 = 9,
-    DS2BtnBit_L1 = 10,
-    DS2BtnBit_R1 = 11,
-    DS2BtnBit_Triangle = 12,
-    DS2BtnBit_Circle = 13,
-    DS2BtnBit_Cross = 14,
-    DS2BtnBit_Square = 15,
-};
-
-
 enum DS2Buttons {
     DS2ButtonSelect = (1 << 0),
     DS2ButtonL3 = (1 << 1),

@@ -1,10 +1,5 @@
 #pragma once
 
-#include "stdbool.h"
-#include "types.h"
-
-#include "ds34common.h"
-
 enum PadMacroAxes {
     PadMacroAxisLX = 0,
     PadMacroAxisLY = 1,
@@ -24,4 +19,4 @@ void padMacroInit(u32 padMacroSettings);
  * @param special_button Is the "special button" pressed (e.g. PS button on DS3 controller)
  * @return true if the internal state of PadMacro was changed
  */
-bool padMacroPerform(struct ds2report *rep, bool special_button);
+u8 padMacroPerform(struct ds2report *rep, u8 special_button);

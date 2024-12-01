@@ -15,7 +15,7 @@
 #include "sys_utils.h"
 #include "padmacro.h"
 #include "pademu.h"
-#include "ds34.h"
+#include "ds34common.h"
 
 #define MODNAME "DS34BT"
 

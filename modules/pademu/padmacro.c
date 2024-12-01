@@ -1,8 +1,10 @@
-#include "padmacro.h"
-
 #include "loadcore.h"
 #include "stdio.h"
 #include "sysclib.h"
+#include "types.h"
+#include "ds34common.h"
+#include "padmacro.h"
+
 
 // The minimum value that makes this code work is 1, but then the turbo is too fast
 // and the game misses some button presses.
@@ -47,7 +49,7 @@ static const u8 button_to_analog_lookup[12] = {
 static struct
 {
     u16 buttons;
-    bool special_button;
+    u8 special_button;
 } gPreviousButtons = {0};
 static u16 gLeftStickSlowdownMask;
 enum StickSlowdownToggle {
@@ -60,7 +62,7 @@ static u8 gLeftStickSlowdownToggle;
 static u16 gRightStickSlowdownMask;
 static u8 gRightStickSlowdownToggle;
 static u8 gStickInvertBitfield;
-static bool gTurboButtonWaiting = false; // Waiting for user to choose which button to add to turbo
+static u8 gTurboButtonWaiting = 0; // Waiting for user to choose which button to add to turbo
 static u16 gTurboButtonMask = 0;         // bit 1 for each button added to turbo
 static u8 gTurboSpeed = 0;
 static u8 gTurboButtonCounter = 0;
@@ -96,7 +98,7 @@ void padMacroInit(u32 padMacroSettings)
 
 static u8 scaleAnalogStick(u16 buttons, u8 stick_input, u8 axis)
 {
-    bool invert = (gStickInvertBitfield >> axis) & 1;
+    u8 invert = (gStickInvertBitfield >> axis) & 1;
     if (invert) {
         u8 inverted = ~stick_input;
         if (inverted != 128 && stick_input != 128) { // avoid converting values close to middle
@@ -104,10 +106,10 @@ static u8 scaleAnalogStick(u16 buttons, u8 stick_input, u8 axis)
         }
     }
 
-    bool left_stick = (axis < PadMacroAxisRX);
+    u8 left_stick = (axis < PadMacroAxisRX);
     u16 mask = left_stick ? gLeftStickSlowdownMask : gRightStickSlowdownMask;
     u8 toggle_mode = left_stick ? gLeftStickSlowdownToggle : gRightStickSlowdownToggle;
-    bool do_slowdown = false;
+    u8 do_slowdown = 0;
     if (toggle_mode == SLOWDOWN_PRESS_MODE) {
         do_slowdown = (buttons & mask) != 0;
     } else {
@@ -136,10 +138,10 @@ static void scaleAnalogSticks(struct ds2report *rep)
     rep->LeftStickY = scaleAnalogStick(buttons, rep->LeftStickY, PadMacroAxisLY);   // ly
 }
 
-static bool changeInternalState(struct ds2report *rep, bool special_button)
+static u8 changeInternalState(struct ds2report *rep, u8 special_button)
 {
     u16 buttons = ~rep->nButtonState;
-    bool action_happened = false;
+    u8 action_happened = 0;
     if (!special_button) {
         if (gTurboButtonWaiting) {
             if (gPreviousButtons.buttons != buttons && buttons != 0) {
@@ -148,13 +150,13 @@ static bool changeInternalState(struct ds2report *rep, bool special_button)
                 // before choosing the button to turbo-press
                 rep->nButtonState = 0xFFFF;
                 gTurboButtonMask ^= buttons;
-                gTurboButtonWaiting = false;
-                action_happened = true;
+                gTurboButtonWaiting = 0;
+                action_happened = 1;
             }
         }
 
         if (gLeftStickSlowdownToggle != SLOWDOWN_PRESS_MODE) {
-            bool left_slowdown_change =
+            u8 left_slowdown_change =
                 (gPreviousButtons.buttons & gLeftStickSlowdownMask) !=
                 (buttons & gLeftStickSlowdownMask);
             if (left_slowdown_change && (buttons & gLeftStickSlowdownMask)) {
@@ -163,7 +165,7 @@ static bool changeInternalState(struct ds2report *rep, bool special_button)
         }
 
         if (gRightStickSlowdownToggle != SLOWDOWN_PRESS_MODE) {
-            bool right_slowdown_change =
+            u8 right_slowdown_change =
                 (gPreviousButtons.buttons & gRightStickSlowdownMask) !=
                 (buttons & gRightStickSlowdownMask);
             if (right_slowdown_change && (buttons & gRightStickSlowdownMask)) {
@@ -189,27 +191,27 @@ static bool changeInternalState(struct ds2report *rep, bool special_button)
     switch (buttons) {
         case DS2ButtonUp:
             gStickInvertBitfield ^= (1 << PadMacroAxisLY);
-            action_happened = true;
+            action_happened = 1;
             break;
 
         case DS2ButtonLeft:
             gStickInvertBitfield ^= (1 << PadMacroAxisLX);
-            action_happened = true;
+            action_happened = 1;
             break;
 
         case DS2ButtonDown:
             gStickInvertBitfield ^= (1 << PadMacroAxisRY);
-            action_happened = true;
+            action_happened = 1;
             break;
 
         case DS2ButtonRight:
             gStickInvertBitfield ^= (1 << PadMacroAxisRX);
-            action_happened = true;
+            action_happened = 1;
             break;
 
         case DS2ButtonStart:
             gTurboButtonWaiting = !gTurboButtonWaiting;
-            action_happened = true;
+            action_happened = 1;
             break;
 
         default:
@@ -245,9 +247,9 @@ static void performTurbo(struct ds2report *rep)
     }
 }
 
-bool padMacroPerform(struct ds2report *rep, bool special_button)
+u8 padMacroPerform(struct ds2report *rep, u8 special_button)
 {
-    bool action_happened = changeInternalState(rep, special_button);
+    u8 action_happened = changeInternalState(rep, special_button);
 
     scaleAnalogSticks(rep);
     performTurbo(rep);

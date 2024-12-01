@@ -1,4 +1,4 @@
-IOP_OBJS = pademu.o sys_utils.o imports.o exports.o padmacro.o ds34common.o
+IOP_OBJS = ds34common.o pademu.o sys_utils.o imports.o exports.o padmacro.o
 
 IOP_BIN = pademu.irx
 

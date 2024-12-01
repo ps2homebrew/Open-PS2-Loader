@@ -261,30 +261,4 @@ struct ds4report
 
 } __attribute__((packed));
 
-/**
- * Translate DS3 pad data into DS2 pad data.
- * @param in DS3 report
- * @param out DS2 report
- * @param pressure_emu set to 1 to extrapolate digital buttons into button pressure
- * NOTE: if set to 0, ds3report must be large enough for that data to be read!
- */
-void translate_pad_ds3(const struct ds3report *in, struct ds2report *out, uint8_t pressure_emu);
-
-/**
- * Translate PS3 Guitar pad data into DS2 Guitar pad data.
- * @param in PS3 Guitar report
- * @param out PS2 Guitar report
- * @param guitar_hero_format set to 1 if this is a guitar hero guitar, set to 0 if this is a rock band guitar
- */
-void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out, uint8_t guitar_hero_format);
-
-/**
- * Translate DS3 pad data into DS2 pad data.
- * @param in DS4 report
- * @param out DS2 report
- * @param have_touchpad set to 1 if input report has touchpad data
- * NOTE: if set to 1, ds4report must be large enough for that data to be read!
- */
-void translate_pad_ds4(const struct ds4report *in, struct ds2report *out, uint8_t have_touchpad);
-
 #endif

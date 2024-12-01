@@ -8,21 +8,33 @@
 
 #include "pademu.h"
 #include "padmacro.h"
-#include "ds34common.h"
+#include "pademu_common.h"
 
 static struct pad_funcs *padf[MAX_PORTS];
 
-#ifdef DS34BT
+#ifdef DS3BT
 
-#include "ds34bt.h"
+#include "ds3bt.h"
+#endif
+
+#ifdef DS3USB
+
+#include "ds3usb.h"
 
 #endif
 
-#ifdef DS34USB
+#ifdef DS4BT
 
-#include "ds34usb.h"
+#include "ds4bt.h"
 
 #endif
+
+#ifdef DS4USB
+
+#include "ds4usb.h"
+
+#endif
+
 
 #define MODNAME "pademu"
 IRX_ID(MODNAME, 1, 1);
@@ -33,7 +45,6 @@ IRX_ID(MODNAME, 1, 1);
 #else
 #define DPRINTF(args...)
 #endif
-
 
 typedef struct
 {
@@ -135,11 +146,17 @@ int _start(int argc, char *argv[])
 
     pademu_setup(pad_enable, pad_vibration);
 
-#ifdef DS34BT
-    ds34bt_init(pad_enable, pad_options);
+#ifdef DS3BT
+    ds3bt_init(pad_enable, pad_options);
 #endif
-#ifdef DS34USB
-    ds34usb_init(pad_enable, pad_options);
+#ifdef DS3USB
+    ds3usb_init(pad_enable, pad_options);
+#endif
+#ifdef DS4BT
+    ds4bt_init(pad_enable, pad_options);
+#endif
+#ifdef DS4USB
+    ds4usb_init(pad_enable, pad_options);
 #endif
 
     return MODULE_RESIDENT_END;
@@ -181,11 +198,17 @@ void pademu_disconnect(struct pad_funcs *pf)
 
 void _exit(int mode)
 {
-#ifdef DS34BT
-    ds34bt_reset();
+#ifdef DS3BT
+    ds3bt_reset();
 #endif
-#ifdef DS34USB
-    ds34usb_reset();
+#ifdef DS3USB
+    ds3usb_reset();
+#endif
+#ifdef DS4BT
+    ds4bt_reset();
+#endif
+#ifdef DS4USB
+    ds4usb_reset();
 #endif
 }
 

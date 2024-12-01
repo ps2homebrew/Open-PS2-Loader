@@ -7,13 +7,13 @@
 #include "usbd_macro.h"
 #include "thbase.h"
 #include "thsemap.h"
-#include "ds34usb.h"
 #include "sys_utils.h"
-#include "padmacro.h"
 #include "pademu.h"
-#include "ds34common.h"
+#include "pademu_common.h"
+#include "ds4usb.h"
+#include "padmacro.h"
 
-#define MODNAME "DS34USB"
+#define MODNAME "DS4USB"
 
 #ifdef DEBUG
 #define DPRINTF(format, args...) \
@@ -26,33 +26,6 @@
 #define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 4
-
-static u8 output_01_report[] =
-    {
-        0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x02,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00};
-
-static u8 led_patterns[][2] =
-    {
-        {0x1C, 0x02},
-        {0x1A, 0x04},
-        {0x16, 0x08},
-        {0x0E, 0x10},
-};
-
-static u8 power_level[] =
-    {
-        0x00, 0x00, 0x02, 0x06, 0x0E, 0x1E};
 
 static u8 rgbled_patterns[][2][3] =
     {
@@ -71,18 +44,17 @@ static int usb_disconnect(int devId);
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
 
-static UsbDriver usb_driver = {NULL, NULL, "ds34usb", usb_probe, usb_connect, usb_disconnect};
+static UsbDriver usb_driver = {NULL, NULL, "ds4usb", usb_probe, usb_connect, usb_disconnect};
 
-static void DS3USB_init(int pad);
 static void readReport(u8 *data, int pad);
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
 
-static int ds34usb_get_model(struct pad_funcs *pf, int port);
-static int ds34usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port);
-static void ds34usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum);
-static void ds34usb_set_mode(struct pad_funcs *pf, int mode, int lock);
+static int ds4usb_get_model(struct pad_funcs *pf, int port);
+static int ds4usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port);
+static void ds4usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum);
+static void ds4usb_set_mode(struct pad_funcs *pf, int mode, int lock);
 
-static ds34usb_device ds34pad[MAX_PADS];
+static ds4usb_device ds34pad[MAX_PADS];
 static struct pad_funcs padf[MAX_PADS];
 
 static int usb_probe(int devId)
@@ -101,7 +73,7 @@ static int usb_probe(int devId)
         return 1;
     }
 
-    if (device->idVendor == DS34_VID && (device->idProduct == DS3_PID || device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
+    if (device->idVendor == DS34_VID && (device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
         return 1;
 
     return 0;
@@ -112,7 +84,6 @@ static int usb_connect(int devId)
     int pad, epCount;
     UsbDeviceDescriptor *device;
     UsbConfigDescriptor *config;
-    UsbInterfaceDescriptor *interface;
     UsbEndpointDescriptor *endpoint;
 
     DPRINTF("connect: devId=%i\n", devId);
@@ -131,27 +102,15 @@ static int usb_connect(int devId)
 
     ds34pad[pad].devId = devId;
 
-    ds34pad[pad].status = DS34USB_STATE_AUTHORIZED;
+    ds34pad[pad].status = DS4USB_STATE_AUTHORIZED;
 
     ds34pad[pad].controlEndp = sceUsbdOpenPipe(devId, NULL);
 
     device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
-    interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    if (device->idProduct == DS3_PID) {
-        ds34pad[pad].type = DS3;
-        epCount = interface->bNumEndpoints - 1;
-    } else if (device->idProduct == GUITAR_HERO_PS3_PID) {
-        ds34pad[pad].type = GUITAR_GH;
-        epCount = interface->bNumEndpoints - 1;
-    } else if (device->idProduct == ROCK_BAND_PS3_PID) {
-        ds34pad[pad].type = GUITAR_RB;
-        epCount = interface->bNumEndpoints - 1;
-    } else {
-        ds34pad[pad].type = DS4;
-        epCount = 20; // ds4 v2 returns interface->bNumEndpoints as 0
-    }
+    ds34pad[pad].type = DS4;
+    epCount = 20; // ds4 v2 returns interface->bNumEndpoints as 0
 
     endpoint = (UsbEndpointDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
@@ -176,7 +135,7 @@ static int usb_connect(int devId)
         return 1;
     }
 
-    ds34pad[pad].status |= DS34USB_STATE_CONNECTED;
+    ds34pad[pad].status |= DS4USB_STATE_CONNECTED;
 
     sceUsbdSetConfiguration(ds34pad[pad].controlEndp, config->bConfigurationValue, usb_config_set, (void *)pad);
     SignalSema(ds34pad[pad].sema);
@@ -217,7 +176,7 @@ static void usb_release(int pad)
     ds34pad[pad].interruptEndp = -1;
     ds34pad[pad].outEndp = -1;
     ds34pad[pad].devId = -1;
-    ds34pad[pad].status = DS34USB_STATE_DISCONNECTED;
+    ds34pad[pad].status = DS4USB_STATE_DISCONNECTED;
 
     SignalSema(ds34pad[pad].sema);
 }
@@ -251,44 +210,27 @@ static void usb_config_set(int result, int count, void *arg)
 
     PollSema(ds34pad[pad].sema);
 
-    ds34pad[pad].status |= DS34USB_STATE_CONFIGURED;
+    ds34pad[pad].status |= DS4USB_STATE_CONFIGURED;
 
-    if (ds34pad[pad].type == DS3) {
-        DS3USB_init(pad);
-        DelayThread(10000);
-        led[0] = led_patterns[pad][1];
-        led[3] = 0;
-    } else if (ds34pad[pad].type == DS4) {
-        led[0] = rgbled_patterns[pad][1][0];
-        led[1] = rgbled_patterns[pad][1][1];
-        led[2] = rgbled_patterns[pad][1][2];
-        led[3] = 0;
-    }
+    led[0] = rgbled_patterns[pad][1][0];
+    led[1] = rgbled_patterns[pad][1][1];
+    led[2] = rgbled_patterns[pad][1][2];
+    led[3] = 0;
 
     LEDRumble(led, 0, 0, pad);
 
-    ds34pad[pad].status |= DS34USB_STATE_RUNNING;
+    ds34pad[pad].status |= DS4USB_STATE_RUNNING;
 
     SignalSema(ds34pad[pad].sema);
 
     pademu_connect(&padf[pad]);
 }
 
-static void DS3USB_init(int pad)
-{
-    usb_buf[0] = 0x42;
-    usb_buf[1] = 0x0c;
-    usb_buf[2] = 0x00;
-    usb_buf[3] = 0x00;
-
-    sceUsbdControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF4, 0, 4, usb_buf, NULL, NULL);
-}
-
 #define MAX_DELAY 10
 
 static void readReport(u8 *data, int pad_idx)
 {
-    ds34usb_device *pad = &ds34pad[pad_idx];
+    ds4usb_device *pad = &ds34pad[pad_idx];
     if (pad->type == GUITAR_GH || pad->type == GUITAR_RB) {
         struct ds3guitarreport *report;
 
@@ -298,83 +240,42 @@ static void readReport(u8 *data, int pad_idx)
         padMacroPerform(&pad->ds2, report->PSButton);
     }
     if (data[0]) {
+        struct ds4report *report;
+        report = (struct ds4report *)data;
+        translate_pad_ds4(report, &pad->ds2, 1);
+        padMacroPerform(&pad->ds2, report->PSButton);
 
-        if (pad->type == DS3) {
-            struct ds3report *report;
+        if (report->PSButton) {                                   // display battery level
+            if (report->Share && (pad->btn_delay == MAX_DELAY)) { // PS + Share
+                if (pad->analog_btn < 2)                          // unlocked mode
+                    pad->analog_btn = !pad->analog_btn;
 
-            report = (struct ds3report *)&data[2];
-
-            if (report->RightStickX == 0 && report->RightStickY == 0) // ledrumble cmd causes null report sometime
-                return;
-
-            pad->data[0] = ~report->ButtonStateL;
-            pad->data[1] = ~report->ButtonStateH;
-
-            translate_pad_ds3(report, &pad->ds2, 0);
-            padMacroPerform(&pad->ds2, report->PSButton);
-            if (report->PSButton) {                                    // display battery level
-                if (report->Select && (pad->btn_delay == MAX_DELAY)) { // PS + SELECT
-                    if (pad->analog_btn < 2)                           // unlocked mode
-                        pad->analog_btn = !pad->analog_btn;
-
-                    pad->oldled[0] = led_patterns[pad_idx][(pad->analog_btn & 1)];
-                    pad->btn_delay = 1;
-                } else {
-                    if (report->Power <= 0x05)
-                        pad->oldled[0] = power_level[report->Power];
-
-                    if (pad->btn_delay < MAX_DELAY)
-                        pad->btn_delay++;
-                }
-            } else {
-                pad->oldled[0] = led_patterns[pad_idx][(pad->analog_btn & 1)];
-
-                if (pad->btn_delay > 0)
-                    pad->btn_delay--;
-            }
-
-            if (report->Power == 0xEE) // charging
-                pad->oldled[3] = 1;
-            else
-                pad->oldled[3] = 0;
-
-        } else if (pad->type == DS4) {
-            struct ds4report *report;
-            report = (struct ds4report *)data;
-            translate_pad_ds4(report, &pad->ds2, 1);
-            padMacroPerform(&pad->ds2, report->PSButton);
-
-            if (report->PSButton) {                                   // display battery level
-                if (report->Share && (pad->btn_delay == MAX_DELAY)) { // PS + Share
-                    if (pad->analog_btn < 2)                          // unlocked mode
-                        pad->analog_btn = !pad->analog_btn;
-
-                    pad->oldled[0] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][0];
-                    pad->oldled[1] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][1];
-                    pad->oldled[2] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][2];
-                    pad->btn_delay = 1;
-                } else {
-                    pad->oldled[0] = report->Battery;
-                    pad->oldled[1] = 0;
-                    pad->oldled[2] = 0;
-
-                    if (pad->btn_delay < MAX_DELAY)
-                        pad->btn_delay++;
-                }
-            } else {
                 pad->oldled[0] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][0];
                 pad->oldled[1] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][1];
                 pad->oldled[2] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][2];
+                pad->btn_delay = 1;
+            } else {
+                pad->oldled[0] = report->Battery;
+                pad->oldled[1] = 0;
+                pad->oldled[2] = 0;
 
-                if (pad->btn_delay > 0)
-                    pad->btn_delay--;
+                if (pad->btn_delay < MAX_DELAY)
+                    pad->btn_delay++;
             }
+        } else {
+            pad->oldled[0] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][0];
+            pad->oldled[1] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][1];
+            pad->oldled[2] = rgbled_patterns[pad_idx][(pad->analog_btn & 1)][2];
 
-            if (report->Power != 0xB && report->Usb_plugged) // charging
-                pad->oldled[3] = 1;
-            else
-                pad->oldled[3] = 0;
+            if (pad->btn_delay > 0)
+                pad->btn_delay--;
         }
+
+        if (report->Power != 0xB && report->Usb_plugged) // charging
+            pad->oldled[3] = 1;
+        else
+            pad->oldled[3] = 0;
+
         if (pad->btn_delay > 0) {
             pad->update_rum = 1;
         }
@@ -389,44 +290,23 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
     mips_memset(usb_buf, 0, sizeof(usb_buf));
 
-    if (ds34pad[pad].type == DS3) {
-        mips_memcpy(usb_buf, output_01_report, sizeof(output_01_report));
+    usb_buf[0] = 0x05;
+    usb_buf[1] = 0xFF;
 
-        usb_buf[1] = 0xFE; // rt
-        usb_buf[2] = rrum; // rp
-        usb_buf[3] = 0xFE; // lt
-        usb_buf[4] = lrum; // lp
+    usb_buf[4] = rrum * 255; // ds4 has full control
+    usb_buf[5] = lrum;
 
-        usb_buf[9] = led[0] & 0x7F; // LED Conf
+    usb_buf[6] = led[0]; // r
+    usb_buf[7] = led[1]; // g
+    usb_buf[8] = led[2]; // b
 
-        if (led[3]) // means charging, so blink
-        {
-            usb_buf[13] = 0x32;
-            usb_buf[18] = 0x32;
-            usb_buf[23] = 0x32;
-            usb_buf[28] = 0x32;
-        }
-
-        ret = sceUsbdControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_SET_REPORT_OUTPUT << 8) | 0x01, 0, sizeof(output_01_report), usb_buf, usb_cmd_cb, (void *)pad);
-    } else if (ds34pad[pad].type == DS4) {
-        usb_buf[0] = 0x05;
-        usb_buf[1] = 0xFF;
-
-        usb_buf[4] = rrum * 255; // ds4 has full control
-        usb_buf[5] = lrum;
-
-        usb_buf[6] = led[0]; // r
-        usb_buf[7] = led[1]; // g
-        usb_buf[8] = led[2]; // b
-
-        if (led[3]) // means charging, so blink
-        {
-            usb_buf[9] = 0x80;  // Time to flash bright (255 = 2.5 seconds)
-            usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)
-        }
-
-        ret = sceUsbdInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
+    if (led[3]) // means charging, so blink
+    {
+        usb_buf[9] = 0x80;  // Time to flash bright (255 = 2.5 seconds)
+        usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)
     }
+
+    ret = sceUsbdInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
 
     ds34pad[pad].oldled[0] = led[0];
     ds34pad[pad].oldled[1] = led[1];
@@ -456,9 +336,9 @@ static void TransferWait(int sema)
     }
 }
 
-static void ds34usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum)
+static void ds4usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum)
 {
-    ds34usb_device *pad = pf->priv;
+    ds4usb_device *pad = pf->priv;
     WaitSema(pad->sema);
 
     if ((pad->lrum != lrum) || (pad->rrum != rrum)) {
@@ -470,9 +350,9 @@ static void ds34usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum)
     SignalSema(pad->sema);
 }
 
-static int ds34usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port)
+static int ds4usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port)
 {
-    ds34usb_device *pad = pf->priv;
+    ds4usb_device *pad = pf->priv;
     int ret = 0;
 
     WaitSema(pad->sema);
@@ -488,7 +368,7 @@ static int ds34usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port)
 
         usb_resulCode = 1;
     } else {
-        DPRINTF("ds34usb_get_data usb transfer error %d\n", ret);
+        DPRINTF("ds4usb_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, pad->data, size);
@@ -509,9 +389,9 @@ static int ds34usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port)
     return ret;
 }
 
-static void ds34usb_set_mode(struct pad_funcs *pf, int mode, int lock)
+static void ds4usb_set_mode(struct pad_funcs *pf, int mode, int lock)
 {
-    ds34usb_device *pad = pf->priv;
+    ds4usb_device *pad = pf->priv;
     WaitSema(pad->sema);
     if (lock == 3)
         pad->analog_btn = 3;
@@ -520,7 +400,7 @@ static void ds34usb_set_mode(struct pad_funcs *pf, int mode, int lock)
     SignalSema(pad->sema);
 }
 
-void ds34usb_reset()
+void ds4usb_reset()
 {
     int pad;
 
@@ -528,9 +408,9 @@ void ds34usb_reset()
         usb_release(pad);
 }
 
-static int ds34usb_get_status(struct pad_funcs *pf)
+static int ds4usb_get_status(struct pad_funcs *pf)
 {
-    ds34usb_device *pad = pf->priv;
+    ds4usb_device *pad = pf->priv;
     int ret;
 
     WaitSema(pad->sema);
@@ -542,10 +422,10 @@ static int ds34usb_get_status(struct pad_funcs *pf)
     return ret;
 }
 
-static int ds34usb_get_model(struct pad_funcs *pf, int port)
+static int ds4usb_get_model(struct pad_funcs *pf, int port)
 {
     (void)port;
-    ds34usb_device *pad = pf->priv;
+    ds4usb_device *pad = pf->priv;
     int ret;
 
     WaitSema(pad->sema);
@@ -559,7 +439,7 @@ static int ds34usb_get_model(struct pad_funcs *pf, int port)
     return ret;
 }
 
-int ds34usb_init(u8 pads, u8 options)
+int ds4usb_init(u8 pads, u8 options)
 {
     int pad;
 
@@ -595,11 +475,11 @@ int ds34usb_init(u8 pads, u8 options)
             return 0;
         }
         padf[pad].priv = &ds34pad[pad];
-        padf[pad].get_status = ds34usb_get_status;
-        padf[pad].get_model = ds34usb_get_model;
-        padf[pad].get_data = ds34usb_get_data;
-        padf[pad].set_rumble = ds34usb_set_rumble;
-        padf[pad].set_mode = ds34usb_set_mode;
+        padf[pad].get_status = ds4usb_get_status;
+        padf[pad].get_model = ds4usb_get_model;
+        padf[pad].get_data = ds4usb_get_data;
+        padf[pad].set_rumble = ds4usb_set_rumble;
+        padf[pad].set_mode = ds4usb_set_mode;
     }
 
     if (sceUsbdRegisterLdd(&usb_driver) != USB_RC_OK) {

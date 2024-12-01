@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include "sysclib.h"
 #include "types.h"
-#include "ds34common.h"
+#include "pademu_common.h"
 #include "padmacro.h"
 
 
@@ -63,7 +63,7 @@ static u16 gRightStickSlowdownMask;
 static u8 gRightStickSlowdownToggle;
 static u8 gStickInvertBitfield;
 static u8 gTurboButtonWaiting = 0; // Waiting for user to choose which button to add to turbo
-static u16 gTurboButtonMask = 0;         // bit 1 for each button added to turbo
+static u16 gTurboButtonMask = 0;   // bit 1 for each button added to turbo
 static u8 gTurboSpeed = 0;
 static u8 gTurboButtonCounter = 0;
 

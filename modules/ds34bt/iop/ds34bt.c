@@ -15,8 +15,12 @@
 
 IRX_ID("ds34bt", 1, 1);
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+#ifdef DEBUG
+#define DPRINTF(format, args...) \
+    printf(MODNAME ": " format, ##args)
+#else
+#define DPRINTF(args...)
+#endif
 
 static int bt_probe(int devId);
 static int bt_connect(int devId);

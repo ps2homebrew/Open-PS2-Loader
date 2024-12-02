@@ -38,6 +38,7 @@ struct gui_update_t
             int id;
             int text_id;
             int selected;
+            void *owner;
         } submenu;
 
         struct

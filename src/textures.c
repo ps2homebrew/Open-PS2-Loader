@@ -20,12 +20,15 @@ extern void *hdd_bd_png;
 extern void *hdd_png;
 extern void *eth_png;
 extern void *app_png;
+extern void *fav_png;
+extern void *fav_mark_png;
 extern void *Index_0_png;
 extern void *Index_1_png;
 extern void *Index_2_png;
 extern void *Index_3_png;
 extern void *Index_4_png;
 
+extern void *R3_png;
 extern void *left_png;
 extern void *right_png;
 extern void *cross_png;
@@ -41,8 +44,7 @@ extern void *L1_png;
 extern void *L2_png;
 extern void *L3_png;
 extern void *R1_png;
-extern void *R2_png;
-extern void *R3_png; */
+extern void *R2_png;*/
 
 extern void *background_png;
 extern void *info_png;
@@ -143,11 +145,14 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {HDD_ICON, "hdd", &hdd_png},
     {ETH_ICON, "eth", &eth_png},
     {APP_ICON, "app", &app_png},
+    {FAV_ICON, "fav", &fav_png},
+    {FAV_MARK, "fav_mark", &fav_mark_png},
     {INDEX_0, "Index_0", &Index_0_png},
     {INDEX_1, "Index_1", &Index_1_png},
     {INDEX_2, "Index_2", &Index_2_png},
     {INDEX_3, "Index_3", &Index_3_png},
     {INDEX_4, "Index_4", &Index_4_png},
+    {R3_ICON, "R3", &R3_png},
     {LEFT_ICON, "left", &left_png},
     {RIGHT_ICON, "right", &right_png},
     {CROSS_ICON, "cross", &cross_png},
@@ -163,8 +168,7 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {L2_ICON, "L2", &L2_png},
     {L3_ICON, "L3", &L3_png},
     {R1_ICON, "R1", &R1_png},
-    {R2_ICON, "R2", &R2_png},
-    {R3_ICON, "R3", &R3_png}, */
+    {R2_ICON, "R2", &R2_png}, */
     {MAIN_BG, "background", &background_png},
     {INFO_BG, "info", &info_png},
     {COVER_DEFAULT, "cover", &cover_png},

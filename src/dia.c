@@ -563,6 +563,9 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
     }
 }
 
+static int maxScrollOffset = 0;
+static int scrollOffset = 0;
+
 /// renders whole ui screen (for given dialog setup)
 void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus)
 {
@@ -573,7 +576,8 @@ void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFo
 
     // render all items
     struct UIItem *rc = ui;
-    int x = x0, y = y0, hmax = 0;
+    int x = x0, hmax = 0;
+    int y = y0 - scrollOffset; // adjust y position based on scroll offset
 
     while (rc->type != UI_TERMINATOR) {
         int w = 0, h = 0;
@@ -877,6 +881,18 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
     setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
     setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
 
+    // calculate content height and maximum scroll offset
+    scrollOffset = 0;
+    int lineCount = 0;
+    struct UIItem *item = ui;
+    while (item && item->type != UI_TERMINATOR) {
+        if ((item->type == UI_BREAK) || (item->type == UI_SPLITTER))
+            lineCount++;
+        item++;
+    }
+    int contentHeight = lineCount * 25;
+    maxScrollOffset = (contentHeight > screenHeight) ? (contentHeight - screenHeight) : 0;
+
     // okay, we have the first selectable item
     // we can proceed with rendering etc. etc.
     while (1) {
@@ -911,15 +927,21 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
             }
 
             if (getKey(KEY_UP)) {
+                scrollOffset = max(0, scrollOffset - 12); // prevent negative scroll offset
                 newf = diaGetPrevLine(cur, ui);
-                if (newf == cur)
+                if (newf == cur) {
                     newf = diaGetLastControl(ui);
+                    scrollOffset = maxScrollOffset;
+                }
             }
 
             if (getKey(KEY_DOWN)) {
+                scrollOffset = min(maxScrollOffset, scrollOffset + 12); // prevent exceeding max scroll offset
                 newf = diaGetNextLine(cur, ui);
-                if (newf == cur)
+                if (newf == cur) {
                     newf = diaGetFirstControl(ui);
+                    scrollOffset = 0;
+                }
             }
 
             if (newf != cur) {

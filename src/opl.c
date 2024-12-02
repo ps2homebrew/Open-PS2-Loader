@@ -30,6 +30,7 @@
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
+#include "include/favsupport.h"
 
 #include "include/cheatman.h"
 #include "include/sound.h"
@@ -87,6 +88,7 @@ static void clearIOModuleT(opl_io_module_t *mod)
     mod->menuItem.execCircle = NULL;
     mod->menuItem.execSquare = NULL;
     mod->menuItem.execTriangle = NULL;
+    mod->menuItem.fav = NULL;
     mod->menuItem.hints = NULL;
     mod->menuItem.icon_id = -1;
     mod->menuItem.current = NULL;
@@ -133,6 +135,7 @@ int gBDMStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
+int gFAVStartMode;
 int bdmCacheSize;
 int hddCacheSize;
 int smbCacheSize;
@@ -238,6 +241,7 @@ void moduleUpdateMenuInternal(opl_io_module_t *mod, int themeChanged, int langCh
             menuAddHint(&mod->menuItem, _STR_OPTIONS, TRIANGLE_ICON);
 
         menuAddHint(&mod->menuItem, _STR_REFRESH, SELECT_ICON);
+        menuAddHint(&mod->menuItem, _STR_FAV_HINT, R3_ICON);
     }
 
     // refresh Cache
@@ -321,6 +325,9 @@ static void itemExecTriangle(struct menu_item *curMenu)
     item_list_t *support = curMenu->userdata;
 
     if (support) {
+        if (support->mode == FAV_MODE)
+            support->flags = favGetFlags(support);
+
         if (!(support->flags & MODE_FLAG_NO_COMPAT)) {
             if (menuCheckParentalLock() == 0) {
                 menuInitGameMenu();
@@ -335,6 +342,138 @@ static void itemExecTriangle(struct menu_item *curMenu)
         }
     } else
         guiMsgBox("NULL Support object. Please report", 0, NULL);
+}
+
+static void updateFavouritesMenu(submenu_item_t *item, opl_io_module_t *mdl)
+{
+    struct gui_update_t *gup = NULL;
+    gup = guiOpCreate(GUI_OP_APPEND_MENU);
+
+    gup->menu.menu = &mdl->menuItem;
+    gup->menu.subMenu = &mdl->subMenu;
+
+    gup->submenu.icon_id = item->icon_id;
+    gup->submenu.id = item->id;
+    gup->submenu.text = item->text;
+    gup->submenu.text_id = item->text_id;
+    gup->submenu.selected = 0;
+    gup->submenu.owner = (void *)item->owner;
+
+    guiDeferUpdate(gup);
+
+    if (gAutosort) {
+        gup = guiOpCreate(GUI_OP_SORT);
+        gup->menu.menu = &mdl->menuItem;
+        gup->menu.subMenu = &mdl->subMenu;
+        guiDeferUpdate(gup);
+    }
+}
+
+item_list_t *getFavouritesOwnerPointer(short int mode)
+{
+    return list_support[mode].support;
+}
+
+static int validateFavouriteItem(submenu_item_t *item)
+{
+    item_list_t *itemOwner = (item_list_t *)item->owner;
+    int i, startMode = itemOwner->mode;
+
+    LOG("Validating favourite: text=%s, id=%d, startMode=%d\n", item->text, item->id, startMode);
+
+    // make sure item from favourites.bin is on a connected device before adding it to the favourites submenu list
+    // if item was on a bdm device, hot plugging could result in a different mount point.. might need to check them all..
+    if (startMode >= BDM_MODE && startMode <= BDM_MODE4) {
+        for (i = BDM_MODE; i <= BDM_MODE4; i++) {
+            opl_io_module_t *mdl = &list_support[i];
+
+            if (mdl->support && mdl->support->enabled) {
+                submenu_list_t *cur = submenuFindItemByIdAndText(mdl->menuItem.submenu, item->id, item->text);
+                if (cur != NULL) {
+                    if (startMode != i) {                   // item found on a new mount point
+                        item->owner = (void *)mdl->support; // update submenu_item owner to the new mode, only in the list.. leave the file alone
+                        LOG("Favourite item found on new mount point, adjusting startMode to %d\n", i);
+                    }
+                    cur->item.favourited = 1;
+                    return 1;
+                }
+            }
+        }
+    } else {
+        opl_io_module_t *mdl = &list_support[startMode];
+
+        if (mdl->support && mdl->support->enabled) {
+            submenu_list_t *cur = submenuFindItemByIdAndText(mdl->menuItem.submenu, item->id, item->text);
+            if (cur != NULL) {
+                cur->item.favourited = 1;
+                return 1;
+            }
+        }
+    }
+
+    LOG("Favourite item not found %s\n", item->text);
+
+    // can't find the item on a connected device.. keep it in favourites.bin but don't add it to the list for render or execution.
+    return 0;
+}
+
+void loadFavourites(void)
+{
+    int size, i;
+    submenu_item_t *items = readFavouritesFile(&size);
+
+    guiExecDeferredOps();
+    clearMenuGameList(&list_support[FAV_MODE]);
+
+    if (items != NULL) {
+        int count = size / sizeof(submenu_item_t);
+        for (i = 0; i < count; ++i) {
+            if (validateFavouriteItem(&items[i])) {
+                LOG("Favourite found, adding to list\n");
+                updateFavouritesMenu(&items[i], &list_support[FAV_MODE]);
+            }
+        }
+
+        free(items);
+    } else
+        LOG("Failed to load favourites.\n");
+}
+
+static void itemExecFav(struct menu_item *curMenu)
+{
+    if (!curMenu->current)
+        return;
+
+    item_list_t *support = curMenu->userdata;
+    opl_io_module_t *mdl = &list_support[FAV_MODE];
+
+    if (!mdl->support || mdl->support->enabled == 0)
+        return;
+
+    if (curMenu->current->item.favourited || support->mode == FAV_MODE) {
+        removeFavouriteByIdAndText(curMenu->current->item.id, curMenu->current->item.text);
+        ioPutRequest(IO_CUSTOM_SIMPLEACTION, &loadFavourites);
+        curMenu->current->item.favourited = 0;
+
+        // remove favourited flag from source if item removed within fav menu
+        if (support->mode == FAV_MODE) {
+            item_list_t *source = curMenu->current->item.owner;
+            opl_io_module_t *pOwner = (opl_io_module_t *)source->owner;
+            submenu_list_t *sourceItem = submenuFindItemByIdAndText(pOwner->menuItem.submenu, curMenu->current->item.id, curMenu->current->item.text);
+            sourceItem->item.favourited = 0;
+        }
+
+        sfxPlay(SFX_CANCEL);
+        return;
+    }
+
+    if (support && support->enabled) {
+        addFavouriteItem(&curMenu->current->item);
+        ioPutRequest(IO_CUSTOM_SIMPLEACTION, &loadFavourites);
+        curMenu->current->item.favourited = 1;
+
+        sfxPlay(SFX_CONFIRM);
+    }
 }
 
 static void initMenuForListSupport(opl_io_module_t *mod)
@@ -358,6 +497,7 @@ static void initMenuForListSupport(opl_io_module_t *mod)
     mod->menuItem.execTriangle = &itemExecTriangle;
     mod->menuItem.execSquare = &itemExecSquare;
     mod->menuItem.execCircle = &itemExecCircle;
+    mod->menuItem.fav = &itemExecFav;
 
     mod->menuItem.hints = NULL;
 
@@ -400,6 +540,8 @@ void initSupport(item_list_t *itemList, int mode, int force_reinit)
         startMode = gHDDStartMode;
     else if (mode == APP_MODE)
         startMode = gAPPStartMode;
+    else if (mode == FAV_MODE)
+        startMode = gFAVStartMode;
 
     if (startMode) {
         if (!mod->support) {
@@ -426,6 +568,7 @@ static void initAllSupport(int force_reinit)
     initSupport(ethGetObject(0), ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), HDD_MODE, force_reinit);
     initSupport(appGetObject(0), APP_MODE, force_reinit);
+    initSupport(favGetObject(0), FAV_MODE, force_reinit);
 }
 
 static void deinitAllSupport(int exception, int modeSelected)
@@ -680,6 +823,7 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
             gup->submenu.text = mdl->support->itemGetName(mdl->support, i);
             gup->submenu.text_id = -1;
             gup->submenu.selected = 0;
+            gup->submenu.owner = (void *)mdl->support;
 
             if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(mdl->support, i)) == 0) {
                 gup->submenu.selected = 1; // Select Last Played Game
@@ -712,6 +856,9 @@ void menuDeferredUpdate(void *data)
         // If other modes have been updated, then the apps list should be updated too.
         if (mod->support->mode != APP_MODE)
             shouldAppsUpdate = 1;
+
+        if (mod->support->mode != FAV_MODE)
+            loadFavourites();
     }
 }
 
@@ -934,6 +1081,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
+            configGetInt(configOPL, CONFIG_OPL_FAV_MODE, &gFAVStartMode);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, &gEnableILK);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
@@ -1090,6 +1238,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
+        configSetInt(configOPL, CONFIG_OPL_FAV_MODE, gFAVStartMode);
         configSetInt(configOPL, CONFIG_OPL_BDM_CACHE, bdmCacheSize);
         configSetInt(configOPL, CONFIG_OPL_HDD_CACHE, hddCacheSize);
         configSetInt(configOPL, CONFIG_OPL_SMB_CACHE, smbCacheSize);
@@ -1146,7 +1295,7 @@ static void _saveConfig()
 
 void applyConfig(int themeID, int langID, int skipDeviceRefresh)
 {
-    if (gDefaultDevice < 0 || gDefaultDevice > APP_MODE)
+    if (gDefaultDevice < 0 || gDefaultDevice > FAV_MODE)
         gDefaultDevice = APP_MODE;
 
     guiUpdateScrollSpeed();
@@ -1733,6 +1882,7 @@ static void setDefaults(void)
     gHDDStartMode = START_MODE_DISABLED;
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
+    gFAVStartMode = START_MODE_DISABLED;
 
     gEnableILK = 0;
     gEnableMX4SIO = 0;

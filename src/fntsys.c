@@ -27,8 +27,6 @@ extern int size_poeveticanew_raw;
 /// Atlas height in pixels
 #define ATLAS_HEIGHT 256
 
-#define FNTSYS_CHAR_SIZE 17
-
 // freetype vars
 static FT_Library font_library;
 
@@ -75,6 +73,8 @@ typedef struct
 
     /// Nonzero if font is used
     int isValid;
+
+    int fontSize;
 
     /// Texture atlases (default to NULL)
     atlas_t *atlases[ATLAS_MAX];
@@ -200,6 +200,7 @@ static void fntInitSlot(font_t *font)
     font->cacheMaxPageID = -1;
     font->dataPtr = NULL;
     font->isValid = 0;
+    font->fontSize = 0;
 
     int aid = 0;
     for (; aid < ATLAS_MAX; ++aid)
@@ -220,6 +221,7 @@ static void fntDeleteSlot(font_t *font)
     }
 
     font->isValid = 0;
+    font->fontSize = 0;
 }
 
 void fntRelease(int id)
@@ -228,7 +230,7 @@ void fntRelease(int id)
         fntDeleteSlot(&fonts[id]);
 }
 
-static int fntLoadSlot(font_t *font, char *path)
+static int fntLoadSlot(font_t *font, char *path, int fontSize)
 {
     void *buffer = NULL;
     int bufferSize = -1;
@@ -256,6 +258,7 @@ static int fntLoadSlot(font_t *font, char *path)
     }
 
     font->isValid = 1;
+    font->fontSize = fontSize;
     fntUpdateAspectRatio();
 
     return 0;
@@ -285,14 +288,14 @@ void fntInit()
     fntLoadDefault(NULL);
 }
 
-int fntLoadFile(char *path)
+int fntLoadFile(char *path, int fontSize)
 {
     font_t *font;
     int i = 1;
     for (; i < FNT_MAX_COUNT; i++) {
         font = &fonts[i];
         if (!font->isValid) {
-            if (fntLoadSlot(font, path) != FNT_ERROR)
+            if (fntLoadSlot(font, path, fontSize) != FNT_ERROR)
                 return i;
             break;
         }
@@ -305,7 +308,7 @@ int fntLoadDefault(char *path)
 {
     font_t newFont, oldFont;
 
-    if (fntLoadSlot(&newFont, path) != FNT_ERROR) {
+    if (fntLoadSlot(&newFont, path, FNTSYS_DEFAULT_SIZE) != FNT_ERROR) {
         // copy over the new font definition
         // we have to lock this phase, as the old font may still be used
         // Note: No check for concurrency is done here, which is kinda funky!
@@ -454,7 +457,7 @@ void fntUpdateAspectRatio()
         if (fonts[i].isValid) {
             fntCacheFlush(&fonts[i]);
             // TODO: this seems correct, but the rest of the OPL UI (i.e. spacers) doesn't seem to be correctly scaled.
-            FT_Set_Char_Size(fonts[i].face, FNTSYS_CHAR_SIZE * 64, FNTSYS_CHAR_SIZE * 64, fDPI * ws, fDPI * hs);
+            FT_Set_Char_Size(fonts[i].face, fonts[i].fontSize * 64, fonts[i].fontSize * 64, fDPI * ws, fDPI * hs);
         }
     }
 }
@@ -518,9 +521,9 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     }
 
     if (aligned & ALIGN_VCENTER) {
-        y += rmScaleY(FNTSYS_CHAR_SIZE - 4) >> 1;
+        y += rmScaleY(fonts[id].fontSize - 4) >> 1;
     } else {
-        y += rmScaleY(FNTSYS_CHAR_SIZE - 2);
+        y += rmScaleY(fonts[id].fontSize - 2);
     }
 
     quad.color = colour;
@@ -644,9 +647,9 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     }
 
     if (aligned & ALIGN_VCENTER) {
-        y += rmScaleY(FNTSYS_CHAR_SIZE - 4) >> 1;
+        y += rmScaleY(fonts[id].fontSize - 4) >> 1;
     } else {
-        y += rmScaleY(FNTSYS_CHAR_SIZE - 2);
+        y += rmScaleY(fonts[id].fontSize - 2);
     }
 
     quad.color = colour;

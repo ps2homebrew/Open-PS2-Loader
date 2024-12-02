@@ -1224,8 +1224,18 @@ static void thmLoadFonts(config_set_t *themeConfig, const char *themePath, theme
         const char *fntFile;
         if (configGetStr(themeConfig, fntKey, &fntFile)) {
             snprintf(fullPath, sizeof(fullPath), "%s%s", themePath, fntFile);
-            int fntHandle = fntLoadFile(fullPath);
 
+            int fontSize;
+            char sizeKey[64];
+            if (fntID == 0)
+                snprintf(sizeKey, sizeof(sizeKey), "default_font_size");
+            else
+                snprintf(sizeKey, sizeof(sizeKey), "font%d_size", fntID);
+
+            if (!configGetInt(themeConfig, sizeKey, &fontSize) || fontSize <= 0)
+                fontSize = FNTSYS_DEFAULT_SIZE;
+
+            int fntHandle = fntLoadFile(fullPath, fontSize);
             // Do we have a valid font? Assign the font handle to the theme font slot
             if (fntHandle != FNT_ERROR)
                 theme->fonts[fntID] = fntHandle;

@@ -11,12 +11,22 @@
 
 #include "device.h"
 
+#ifdef USE_BDM_ATA
+#include "atad.h"
+char lba_48bit = 0;
+char atad_inited = 0;
+#endif
+
 extern struct cdvdman_settings_bdm cdvdman_settings;
 static struct block_device *g_bd = NULL;
 static u32 g_bd_sectors_per_sector = 4;
 static int bdm_io_sema;
 
 extern struct irx_export_table _exp_bdm;
+
+#ifdef USE_BDM_ATA
+extern struct irx_export_table _exp_atad;
+#endif
 
 //
 // BDM exported functions
@@ -67,6 +77,13 @@ void DeviceInit(void)
     bdm_io_sema = CreateSema(&smp);
 
     RegisterLibraryEntries(&_exp_bdm);
+
+#ifdef USE_BDM_ATA
+    RegisterLibraryEntries(&_exp_atad);
+    // Initialize ATA interface which will register the HDD as a block device.
+    atad_start();
+    atad_inited = 1;
+#endif
 }
 
 void DeviceDeinit(void)
@@ -91,6 +108,11 @@ void DeviceStop(void)
 
 void DeviceFSInit(void)
 {
+#ifdef USE_BDM_ATA
+    lba_48bit = cdvdman_settings.hddIsLBA48;
+    // TODO: there's more cdvdman init stuff after this in device-hdd.c...
+#endif
+
     DPRINTF("Waiting for device...\n");
     WaitSema(bdm_io_sema);
     DPRINTF("Waiting for device...done!\n");
@@ -109,7 +131,7 @@ void DeviceUnmount(void)
     DPRINTF("%s\n", __func__);
 }
 
-int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
+int DeviceReadSectors(u64 lsn, void *buffer, unsigned int sectors)
 {
     int rv = SCECdErNO;
 
@@ -130,7 +152,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 // oplutils exported function, used by MCEMU
 //
 
-void bdm_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer)
+void bdm_readSector(u64 lba, unsigned short int nsectors, unsigned char *buffer)
 {
     DPRINTF("%s\n", __func__);
 
@@ -139,7 +161,7 @@ void bdm_readSector(unsigned int lba, unsigned short int nsectors, unsigned char
     SignalSema(bdm_io_sema);
 }
 
-void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer)
+void bdm_writeSector(u64 lba, unsigned short int nsectors, const unsigned char *buffer)
 {
     DPRINTF("%s\n", __func__);
 

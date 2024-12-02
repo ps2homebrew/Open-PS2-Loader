@@ -39,6 +39,18 @@ USE_DEV9 = 1
 endif
 endif
 
+ifeq ($(USE_BDM_ATA),1)
+IOP_BIN  = bdm_ata_cdvdman.irx
+IOP_OBJS_DIR = obj.bdm_ata/
+IOP_OBJS += device-bdm.o atad.o
+IOP_CFLAGS += -DBDM_DRIVER -DUSE_BDM_ATA
+IOP_LIBS += -L$(PS2SDK)/iop/lib -lbdm
+USE_DEV9 = 1
+ifeq ($(IOPCORE_DEBUG),1)
+IOP_CFLAGS += -DDEV9_DEBUG
+endif
+endif
+
 IOP_INCS += -I../common
 
 ifeq ($(IOPCORE_DEBUG),1)

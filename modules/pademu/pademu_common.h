@@ -7,7 +7,7 @@
 #define USB_PROTOCOL_BLUETOOTH_PROG   0x01
 
 #define SONY_VID            0x12ba // Sony
-#define DS34_VID            0x054C // Sony Corporation
+#define DS_VID              0x054C // Sony Corporation
 #define DS3_PID             0x0268 // PS3 Controller
 #define DS4_PID             0x05C4 // PS4 Controller
 #define DS4_PID_SLIM        0x09CC // PS4 Slim Controller

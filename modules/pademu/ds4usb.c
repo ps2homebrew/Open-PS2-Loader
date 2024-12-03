@@ -73,7 +73,7 @@ static int usb_probe(int devId)
         return 1;
     }
 
-    if (device->idVendor == DS34_VID && (device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
+    if (device->idVendor == DS_VID && (device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
         return 1;
 
     return 0;

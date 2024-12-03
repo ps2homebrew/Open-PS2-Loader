@@ -39,9 +39,9 @@ enum eDS34BTStatus {
     DS3BT_STATE_DISCONNECT_REQUEST = 0x20,
 };
 
-#define pad_status_clear(flag, pad) ds3pad[pad].status &= ~flag
-#define pad_status_set(flag, pad)   ds3pad[pad].status |= flag
-#define pad_status_check(flag, pad) (ds3pad[pad].status & flag)
+#define ds3pad_status_clear(flag, pad) ds3pad[pad].status &= ~flag
+#define ds3pad_status_set(flag, pad)   ds3pad[pad].status |= flag
+#define ds3pad_status_check(flag, pad) (ds3pad[pad].status & flag)
 
 #define hci_event_flag_clear(flag) hci_event_flag &= ~flag
 #define hci_event_flag_set(flag)   hci_event_flag |= flag

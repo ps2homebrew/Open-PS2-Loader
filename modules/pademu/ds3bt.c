@@ -187,7 +187,6 @@ static int bt_disconnect(int devId)
     return 0;
 }
 
-
 #define OUTPUT_01_REPORT_SIZE 48
 static const u8 hid_cmd_payload_led_arguments[] = {0xff, 0x27, 0x10, 0x00, 0x32};
 
@@ -514,7 +513,7 @@ static void HCI_event_task(int result)
                     if (i >= MAX_PADS) {
                         break;
                     }
-                    pad_status_set(DS3BT_STATE_CONNECTED, i);
+                    ds3pad_status_set(DS3BT_STATE_CONNECTED, i);
                     hci_remote_name(ds3pad[i].bdaddr);
                 } else {
                     DPRINTF("\t Error 0x%02X \n", hci_buf[2]);
@@ -588,9 +587,9 @@ static void HCI_event_task(int result)
                 DPRINTF("\n\t Link = 0x%02X \n", hci_buf[11]);
                 DPRINTF("\t Class = 0x%02X 0x%02X 0x%02X \n", hci_buf[8], hci_buf[9], hci_buf[10]);
                 for (i = 0; i < MAX_PADS; i++) { // find free slot
-                    if (!pad_status_check(DS3BT_STATE_RUNNING, i) && ds3pad[i].enabled) {
-                        if (pad_status_check(DS3BT_STATE_CONNECTED, i)) {
-                            if (pad_status_check(DS3BT_STATE_DISCONNECTING, i)) // if we're waiting for hci disconnect event
+                    if (!ds3pad_status_check(DS3BT_STATE_RUNNING, i) && ds3pad[i].enabled) {
+                        if (ds3pad_status_check(DS3BT_STATE_CONNECTED, i)) {
+                            if (ds3pad_status_check(DS3BT_STATE_DISCONNECTING, i)) // if we're waiting for hci disconnect event
                                 continue;
                             else
                                 hci_disconnect(ds3pad[i].hci_handle); // try to disconnect
@@ -616,9 +615,9 @@ static void HCI_event_task(int result)
                         }
                     }
                 }
-                pad_status_clear(DS3BT_STATE_CONNECTED, pad);
-                pad_status_clear(DS3BT_STATE_RUNNING, pad);
-                pad_status_clear(DS3BT_STATE_DISCONNECTING, pad);
+                ds3pad_status_clear(DS3BT_STATE_CONNECTED, pad);
+                ds3pad_status_clear(DS3BT_STATE_RUNNING, pad);
+                ds3pad_status_clear(DS3BT_STATE_DISCONNECTING, pad);
                 hci_accept_connection(ds3pad[pad].bdaddr);
                 break;
 
@@ -706,7 +705,7 @@ static void hci_event_cb(int resultCode, int bytes, void *arg)
 /* L2CAP Commands                                           */
 /************************************************************/
 
-static int L2CAP_Command(u16 handle, u16 scid, u8 *data, u8 length)
+static int L2CAP_Command(u16 handle, u8 *data, u8 length)
 {
     l2cap_cmd_buf[0] = (u8)(handle & 0xff); // HCI handle with PB,BC flag
     l2cap_cmd_buf[1] = (u8)(((handle >> 8) & 0x0f) | 0x20);
@@ -714,8 +713,8 @@ static int L2CAP_Command(u16 handle, u16 scid, u8 *data, u8 length)
     l2cap_cmd_buf[3] = (u8)((4 + length) >> 8);
     l2cap_cmd_buf[4] = (u8)(length & 0xff); // L2CAP header: Length
     l2cap_cmd_buf[5] = (u8)(length >> 8);
-    l2cap_cmd_buf[6] = (u8)(scid & 0xff); // L2CAP header: Channel ID
-    l2cap_cmd_buf[7] = (u8)(scid >> 8);   // L2CAP Signalling channel over ACL-U logical link
+    l2cap_cmd_buf[6] = 0x01; // L2CAP header: Channel ID
+    l2cap_cmd_buf[7] = 0x00; // L2CAP Signalling channel over ACL-U logical link
 
     mips_memcpy(&l2cap_cmd_buf[8], data, length);
 
@@ -743,7 +742,7 @@ static int l2cap_connection_response(u16 handle, u8 rxid, u16 dcid, u16 scid, u8
     if (result != 0)
         cmd_buf[10] = 0x01; // Authentication pending
 
-    return L2CAP_Command(handle, 1, cmd_buf, 12);
+    return L2CAP_Command(handle, cmd_buf, 12);
 }
 
 static int l2cap_config_request(u16 handle, u8 rxid, u16 dcid)
@@ -767,7 +766,7 @@ static int l2cap_config_request(u16 handle, u8 rxid, u16 dcid)
     cmd_buf[10] = 0xFF; // Config Opt: data
     cmd_buf[11] = 0xFF;
 
-    return L2CAP_Command(handle, 1, cmd_buf, 12);
+    return L2CAP_Command(handle, cmd_buf, 12);
 }
 
 static int l2cap_config_response(u16 handle, u8 rxid, u16 scid)
@@ -789,7 +788,7 @@ static int l2cap_config_response(u16 handle, u8 rxid, u16 scid)
     cmd_buf[12] = 0xA0;
     cmd_buf[13] = 0x02;
 
-    return L2CAP_Command(handle, 1, cmd_buf, 14);
+    return L2CAP_Command(handle, cmd_buf, 14);
 }
 
 static int l2cap_disconnection_request(u16 handle, u8 rxid, u16 dcid, u16 scid)
@@ -805,7 +804,7 @@ static int l2cap_disconnection_request(u16 handle, u8 rxid, u16 dcid, u16 scid)
     cmd_buf[6] = (u8)(scid & 0xff); // Source CID
     cmd_buf[7] = (u8)(scid >> 8);
 
-    return L2CAP_Command(handle, 1, cmd_buf, 8);
+    return L2CAP_Command(handle, cmd_buf, 8);
 }
 
 static int l2cap_disconnection_response(u16 handle, u8 rxid, u16 scid, u16 dcid)
@@ -821,7 +820,7 @@ static int l2cap_disconnection_response(u16 handle, u8 rxid, u16 scid, u16 dcid)
     cmd_buf[6] = (u8)(scid & 0xff); // Source CID
     cmd_buf[7] = (u8)(scid >> 8);
 
-    return L2CAP_Command(handle, 1, cmd_buf, 8);
+    return L2CAP_Command(handle, cmd_buf, 8);
 }
 
 #define CMD_DELAY 2
@@ -923,7 +922,7 @@ static int L2CAP_event_task(int result, int bytes)
                             ds3pad[pad].oldled[3] = 0;
                             DelayThread(CMD_DELAY);
                             hid_LEDRumbleCommand(ds3pad[pad].oldled, 0, 0, pad);
-                            pad_status_set(DS3BT_STATE_RUNNING, pad);
+                            ds3pad_status_set(DS3BT_STATE_RUNNING, pad);
                             pademu_connect(&padf[pad]);
                         }
                         ds3pad[pad].btn_delay = 0xFF;
@@ -933,10 +932,10 @@ static int L2CAP_event_task(int result, int bytes)
                         DPRINTF("Disconnect Request SCID = 0x%04X \n", (l2cap_buf[12] | (l2cap_buf[13] << 8)));
 
                         if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == control_dcid) {
-                            pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
+                            ds3pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
                             l2cap_disconnection_response(ds3pad[pad].hci_handle, l2cap_buf[9], control_dcid, ds3pad[pad].control_scid);
                         } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == interrupt_dcid) {
-                            pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
+                            ds3pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
                             l2cap_disconnection_response(ds3pad[pad].hci_handle, l2cap_buf[9], interrupt_dcid, ds3pad[pad].interrupt_scid);
                         }
                         break;
@@ -945,10 +944,10 @@ static int L2CAP_event_task(int result, int bytes)
                         DPRINTF("Disconnect Response SCID = 0x%04X \n", (l2cap_buf[12] | (l2cap_buf[13] << 8)));
 
                         if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == ds3pad[pad].control_scid) {
-                            pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
+                            ds3pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
                             hci_disconnect(ds3pad[pad].hci_handle);
                         } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == ds3pad[pad].interrupt_scid) {
-                            pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
+                            ds3pad_status_set(DS3BT_STATE_DISCONNECTING, pad);
                             identifier++;
                             l2cap_disconnection_request(ds3pad[pad].hci_handle, identifier, ds3pad[pad].control_scid, control_dcid);
                         }
@@ -979,15 +978,15 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
     ret = L2CAP_event_task(resultCode, bytes);
 
     if (ret < MAX_PADS) {
-        if (pad_status_check(DS3BT_STATE_RUNNING, ret)) {
-            if (pad_status_check(DS3BT_STATE_DISCONNECT_REQUEST, ret)) {
+        if (ds3pad_status_check(DS3BT_STATE_RUNNING, ret)) {
+            if (ds3pad_status_check(DS3BT_STATE_DISCONNECT_REQUEST, ret)) {
                 if (!ds3pad[ret].isfake) {
                     identifier++;
                     l2cap_disconnection_request(ds3pad[ret].hci_handle, identifier, ds3pad[ret].interrupt_scid, interrupt_dcid);
                 } else {
                     hci_disconnect(ds3pad[ret].hci_handle);
                 }
-                pad_status_clear(DS3BT_STATE_DISCONNECT_REQUEST, ret);
+                ds3pad_status_clear(DS3BT_STATE_DISCONNECT_REQUEST, ret);
             } else if (ds3pad[ret].update_rum) {
                 hid_LEDRumbleCommand(ds3pad[ret].oldled, ds3pad[ret].lrum, ds3pad[ret].rrum, ret);
                 ds3pad[ret].update_rum = 0;
@@ -1006,6 +1005,21 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
 /* HID Commands                                             */
 /************************************************************/
 
+static int HID_command(u16 handle, u16 scid, u8 *data, u8 length)
+{
+    l2cap_cmd_buf[0] = (u8)(handle & 0xff); // HCI handle with PB,BC flag
+    l2cap_cmd_buf[1] = (u8)(((handle >> 8) & 0x0f) | 0x20);
+    l2cap_cmd_buf[2] = (u8)((4 + length) & 0xff); // HCI ACL total data length
+    l2cap_cmd_buf[3] = (u8)((4 + length) >> 8);
+    l2cap_cmd_buf[4] = (u8)(length & 0xff); // L2CAP header: Length
+    l2cap_cmd_buf[5] = (u8)(length >> 8);
+    l2cap_cmd_buf[6] = (u8)(scid & 0xff); // L2CAP header: Channel ID
+    l2cap_cmd_buf[7] = (u8)(scid >> 8);
+    mips_memcpy(&l2cap_cmd_buf[8], data, length);
+    // output on endpoint 2
+    return sceUsbdBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
+}
+
 static int hid_initDS34(int pad)
 {
     u8 init_buf[PS3_F4_REPORT_LEN + 2];
@@ -1019,7 +1033,7 @@ static int hid_initDS34(int pad)
     init_buf[5] = 0x00;
     size += PS3_F4_REPORT_LEN;
 
-    return L2CAP_Command(ds3pad[pad].hci_handle, ds3pad[pad].control_scid, init_buf, size);
+    return HID_command(ds3pad[pad].hci_handle, ds3pad[pad].control_scid, init_buf, size);
 }
 
 /**
@@ -1071,7 +1085,7 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
     ds3pad[pad].oldled[2] = led[2];
     ds3pad[pad].oldled[3] = led[3];
 
-    return L2CAP_Command(ds3pad[pad].hci_handle, ds3pad[pad].control_scid, led_buf, size);
+    return HID_command(ds3pad[pad].hci_handle, ds3pad[pad].control_scid, led_buf, size);
 }
 
 static void hid_readReport(u8 *data, int bytes, int pad_idx)
@@ -1248,12 +1262,12 @@ void ds3bt_reset()
     if (bt_dev.status & DS3BT_STATE_USB_AUTHORIZED) {
         for (pad = 0; pad < MAX_PADS; pad++) {
             WaitSema(bt_dev.hid_sema);
-            pad_status_set(DS3BT_STATE_DISCONNECT_REQUEST, pad);
+            ds3pad_status_set(DS3BT_STATE_DISCONNECT_REQUEST, pad);
             SignalSema(bt_dev.hid_sema);
             while (1) {
                 DelayThread(500);
                 WaitSema(bt_dev.hid_sema);
-                if (!pad_status_check(DS3BT_STATE_RUNNING, pad)) {
+                if (!ds3pad_status_check(DS3BT_STATE_RUNNING, pad)) {
                     SignalSema(bt_dev.hid_sema);
                     break;
                 }

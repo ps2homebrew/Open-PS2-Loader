@@ -12,24 +12,16 @@
 
 static struct pad_funcs *padf[MAX_PORTS];
 
-#ifdef DS3BT
+#ifdef USE_DS3
 
 #include "ds3bt.h"
-#endif
-
-#ifdef DS3USB
-
 #include "ds3usb.h"
 
 #endif
 
-#ifdef DS4BT
+#ifdef USE_DS4
 
 #include "ds4bt.h"
-
-#endif
-
-#ifdef DS4USB
 
 #include "ds4usb.h"
 
@@ -146,16 +138,12 @@ int _start(int argc, char *argv[])
 
     pademu_setup(pad_enable, pad_vibration);
 
-#ifdef DS3BT
+#ifdef USE_DS3
     ds3bt_init(pad_enable, pad_options);
-#endif
-#ifdef DS3USB
     ds3usb_init(pad_enable, pad_options);
 #endif
-#ifdef DS4BT
+#ifdef USE_DS4
     ds4bt_init(pad_enable, pad_options);
-#endif
-#ifdef DS4USB
     ds4usb_init(pad_enable, pad_options);
 #endif
 
@@ -198,16 +186,12 @@ void pademu_disconnect(struct pad_funcs *pf)
 
 void _exit(int mode)
 {
-#ifdef DS3BT
+#ifdef USE_DS3
     ds3bt_reset();
-#endif
-#ifdef DS3USB
     ds3usb_reset();
 #endif
-#ifdef DS4BT
+#ifdef USE_DS4
     ds4bt_reset();
-#endif
-#ifdef DS4USB
     ds4usb_reset();
 #endif
 }

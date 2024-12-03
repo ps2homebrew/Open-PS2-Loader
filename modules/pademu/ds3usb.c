@@ -93,7 +93,7 @@ static int usb_probe(int devId)
         return 1;
     }
 
-    if (device->idVendor == DS34_VID && (device->idProduct == DS3_PID))
+    if (device->idVendor == DS_VID && (device->idProduct == DS3_PID))
         return 1;
 
     return 0;
@@ -146,7 +146,7 @@ static int usb_connect(int devId)
 
     endpoint = (UsbEndpointDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
-    do {
+    while (epCount-- > 0) {
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds3pad[pad].interruptEndp < 0) {
                 ds3pad[pad].interruptEndp = sceUsbdOpenPipe(devId, endpoint);
@@ -159,8 +159,7 @@ static int usb_connect(int devId)
         }
 
         endpoint = (UsbEndpointDescriptor *)((char *)endpoint + endpoint->bLength);
-
-    } while (epCount--);
+    }
 
     if (ds3pad[pad].interruptEndp < 0 || ds3pad[pad].outEndp < 0) {
         usb_release(pad);

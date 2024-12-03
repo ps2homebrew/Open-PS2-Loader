@@ -516,7 +516,7 @@ static void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
         case 0x45: // query model and mode
             mips_memcpy(&out[3], &pademu_data[1], 6);
             out[5] = pad[port].mode;
-            out[3] = padf[port]->get_model(padf[port], port);
+            out[3] = padf[port]->get_model(padf[port]);
             break;
 
         case 0x46: // query act

@@ -38,7 +38,7 @@ static bt_device bt_dev = {-1, -1, -1, -1, -1, -1, DS3BT_STATE_USB_DISCONNECTED}
 static void ds3pad_clear(int pad);
 static void ds3pad_init();
 static int ds3bt_get_status(struct pad_funcs *pf);
-static int ds3bt_get_model(struct pad_funcs *pf, int port);
+static int ds3bt_get_model(struct pad_funcs *pf);
 static int ds3bt_get_data(struct pad_funcs *pf, u8 *dst, int size, int port);
 static void ds3bt_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum);
 static void ds3bt_set_mode(struct pad_funcs *pf, int mode, int lock);
@@ -1220,9 +1220,8 @@ static int ds3bt_get_status(struct pad_funcs *pf)
     return ret;
 }
 
-static int ds3bt_get_model(struct pad_funcs *pf, int port)
+static int ds3bt_get_model(struct pad_funcs *pf)
 {
-    (void)port;
     (void)pf;
     return 3;
 }

@@ -66,7 +66,7 @@ struct pad_funcs
     int (*get_data)(struct pad_funcs *pf, u8 *dst, int size, int port);
     void (*set_rumble)(struct pad_funcs *pf, u8 lrum, u8 rrum);
     void (*set_mode)(struct pad_funcs *pf, int mode, int lock);
-    int (*get_model)(struct pad_funcs *pf, int port);
+    int (*get_model)(struct pad_funcs *pf);
 };
 void pademu_connect(struct pad_funcs *pf);
 void pademu_disconnect(struct pad_funcs *pf);

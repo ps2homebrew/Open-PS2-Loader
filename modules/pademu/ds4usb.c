@@ -1,3 +1,6 @@
+/* based on https://github.com/IonAgorria/Arduino-PSRemote */
+/* and https://github.com/felis/USB_Host_Shield_2.0 */
+
 #include "types.h"
 #include "loadcore.h"
 #include "stdio.h"
@@ -49,7 +52,7 @@ static UsbDriver usb_driver = {NULL, NULL, "ds4usb", usb_probe, usb_connect, usb
 static void readReport(u8 *data, int pad);
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
 
-static int ds4usb_get_model(struct pad_funcs *pf, int port);
+static int ds4usb_get_model(struct pad_funcs *pf);
 static int ds4usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port);
 static void ds4usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum);
 static void ds4usb_set_mode(struct pad_funcs *pf, int mode, int lock);
@@ -422,9 +425,8 @@ static int ds4usb_get_status(struct pad_funcs *pf)
     return ret;
 }
 
-static int ds4usb_get_model(struct pad_funcs *pf, int port)
+static int ds4usb_get_model(struct pad_funcs *pf)
 {
-    (void)port;
     ds4usb_device *pad = pf->priv;
     int ret;
 

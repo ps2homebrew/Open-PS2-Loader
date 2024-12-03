@@ -156,9 +156,9 @@ ifeq ($(PADEMU),1)
   IOP_OBJS += pademu.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
   EE_CFLAGS += -DPADEMU
   EE_INCS += -Imodules/ds34bt/ee -Imodules/ds34usb/ee
-  PADEMU_FLAGS = PADEMU=1
+  PADEMU_FLAGS = PADEMU=1 VMC=1
 else
-  PADEMU_FLAGS = PADEMU=0
+  PADEMU_FLAGS = PADEMU=0 VMC=1
 endif
 
 ifeq ($(DEBUG),1)
@@ -328,7 +328,7 @@ clean:	download_lwNBD
 	echo " -ds34bt"
 	$(MAKE) -C modules/ds34bt clean
 	echo " -pademu"
-	$(MAKE) -C modules/pademu USE_DS3=1 USE_DS4=1 clean
+	$(MAKE) -C modules/pademu USE_DS3=1 USE_DS4=1 VMC=1 clean
 	echo "-pc tools"
 	$(MAKE) -C pc clean
 
@@ -521,7 +521,7 @@ $(EE_ASM_DIR)ds34usb.c: modules/ds34usb/iop/ds34usb.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 modules/pademu/pademu.irx: modules/pademu
-	$(MAKE) USE_DS3=1 USE_DS4=1 -C $< all
+	$(MAKE) USE_DS3=1 USE_DS4=1 VMC=1 -C $< all
 
 $(EE_ASM_DIR)pademu.c: modules/pademu/pademu.irx
 	$(BIN2C) $< $@ $(*F)_irx

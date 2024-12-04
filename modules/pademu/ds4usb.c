@@ -57,7 +57,7 @@ static int ds4usb_get_data(struct pad_funcs *pf, u8 *dst, int size, int port);
 static void ds4usb_set_rumble(struct pad_funcs *pf, u8 lrum, u8 rrum);
 static void ds4usb_set_mode(struct pad_funcs *pf, int mode, int lock);
 
-static ds4usb_device ds34pad[MAX_PADS];
+static ds4usb_device ds4pad[MAX_PADS];
 static struct pad_funcs padf[MAX_PADS];
 
 static int usb_probe(int devId)
@@ -92,7 +92,7 @@ static int usb_connect(int devId)
     DPRINTF("connect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
-        if (ds34pad[pad].devId == -1 && ds34pad[pad].enabled)
+        if (ds4pad[pad].devId == -1 && ds4pad[pad].enabled)
             break;
     }
 
@@ -101,31 +101,31 @@ static int usb_connect(int devId)
         return 1;
     }
 
-    PollSema(ds34pad[pad].sema);
+    PollSema(ds4pad[pad].sema);
 
-    ds34pad[pad].devId = devId;
+    ds4pad[pad].devId = devId;
 
-    ds34pad[pad].status = DS4USB_STATE_AUTHORIZED;
+    ds4pad[pad].status = DS4USB_STATE_AUTHORIZED;
 
-    ds34pad[pad].controlEndp = sceUsbdOpenPipe(devId, NULL);
+    ds4pad[pad].controlEndp = sceUsbdOpenPipe(devId, NULL);
 
     device = (UsbDeviceDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_DEVICE);
     config = (UsbConfigDescriptor *)sceUsbdScanStaticDescriptor(devId, device, USB_DT_CONFIG);
 
-    ds34pad[pad].type = DS4;
+    ds4pad[pad].type = DS4;
     epCount = 20; // ds4 v2 returns interface->bNumEndpoints as 0
 
     endpoint = (UsbEndpointDescriptor *)sceUsbdScanStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
     do {
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
-            if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds34pad[pad].interruptEndp < 0) {
-                ds34pad[pad].interruptEndp = sceUsbdOpenPipe(devId, endpoint);
-                DPRINTF("register Event endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+            if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds4pad[pad].interruptEndp < 0) {
+                ds4pad[pad].interruptEndp = sceUsbdOpenPipe(devId, endpoint);
+                DPRINTF("register Event endpoint id =%i addr=%02X packetSize=%i\n", ds4pad[pad].interruptEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
-            if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && ds34pad[pad].outEndp < 0) {
-                ds34pad[pad].outEndp = sceUsbdOpenPipe(devId, endpoint);
-                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", ds34pad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
+            if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && ds4pad[pad].outEndp < 0) {
+                ds4pad[pad].outEndp = sceUsbdOpenPipe(devId, endpoint);
+                DPRINTF("register Output endpoint id =%i addr=%02X packetSize=%i\n", ds4pad[pad].outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
             }
         }
 
@@ -133,15 +133,15 @@ static int usb_connect(int devId)
 
     } while (epCount--);
 
-    if (ds34pad[pad].interruptEndp < 0 || ds34pad[pad].outEndp < 0) {
+    if (ds4pad[pad].interruptEndp < 0 || ds4pad[pad].outEndp < 0) {
         usb_release(pad);
         return 1;
     }
 
-    ds34pad[pad].status |= DS4USB_STATE_CONNECTED;
+    ds4pad[pad].status |= DS4USB_STATE_CONNECTED;
 
-    sceUsbdSetConfiguration(ds34pad[pad].controlEndp, config->bConfigurationValue, usb_config_set, (void *)pad);
-    SignalSema(ds34pad[pad].sema);
+    sceUsbdSetConfiguration(ds4pad[pad].controlEndp, config->bConfigurationValue, usb_config_set, (void *)pad);
+    SignalSema(ds4pad[pad].sema);
 
     return 0;
 }
@@ -153,7 +153,7 @@ static int usb_disconnect(int devId)
     DPRINTF("disconnect: devId=%i\n", devId);
 
     for (pad = 0; pad < MAX_PADS; pad++) {
-        if (ds34pad[pad].devId == devId)
+        if (ds4pad[pad].devId == devId)
             break;
     }
 
@@ -167,21 +167,21 @@ static int usb_disconnect(int devId)
 
 static void usb_release(int pad)
 {
-    PollSema(ds34pad[pad].sema);
+    PollSema(ds4pad[pad].sema);
 
-    if (ds34pad[pad].interruptEndp >= 0)
-        sceUsbdClosePipe(ds34pad[pad].interruptEndp);
+    if (ds4pad[pad].interruptEndp >= 0)
+        sceUsbdClosePipe(ds4pad[pad].interruptEndp);
 
-    if (ds34pad[pad].outEndp >= 0)
-        sceUsbdClosePipe(ds34pad[pad].outEndp);
+    if (ds4pad[pad].outEndp >= 0)
+        sceUsbdClosePipe(ds4pad[pad].outEndp);
 
-    ds34pad[pad].controlEndp = -1;
-    ds34pad[pad].interruptEndp = -1;
-    ds34pad[pad].outEndp = -1;
-    ds34pad[pad].devId = -1;
-    ds34pad[pad].status = DS4USB_STATE_DISCONNECTED;
+    ds4pad[pad].controlEndp = -1;
+    ds4pad[pad].interruptEndp = -1;
+    ds4pad[pad].outEndp = -1;
+    ds4pad[pad].devId = -1;
+    ds4pad[pad].status = DS4USB_STATE_DISCONNECTED;
 
-    SignalSema(ds34pad[pad].sema);
+    SignalSema(ds4pad[pad].sema);
 }
 
 static int usb_resulCode;
@@ -194,7 +194,7 @@ static void usb_data_cb(int resultCode, int bytes, void *arg)
 
     usb_resulCode = resultCode;
 
-    SignalSema(ds34pad[pad].sema);
+    SignalSema(ds4pad[pad].sema);
 }
 
 static void usb_cmd_cb(int resultCode, int bytes, void *arg)
@@ -203,7 +203,7 @@ static void usb_cmd_cb(int resultCode, int bytes, void *arg)
 
     DPRINTF("usb_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
-    SignalSema(ds34pad[pad].cmd_sema);
+    SignalSema(ds4pad[pad].cmd_sema);
 }
 
 static void usb_config_set(int result, int count, void *arg)
@@ -211,9 +211,9 @@ static void usb_config_set(int result, int count, void *arg)
     int pad = (int)arg;
     u8 led[4];
 
-    PollSema(ds34pad[pad].sema);
+    PollSema(ds4pad[pad].sema);
 
-    ds34pad[pad].status |= DS4USB_STATE_CONFIGURED;
+    ds4pad[pad].status |= DS4USB_STATE_CONFIGURED;
 
     led[0] = rgbled_patterns[pad][1][0];
     led[1] = rgbled_patterns[pad][1][1];
@@ -222,9 +222,9 @@ static void usb_config_set(int result, int count, void *arg)
 
     LEDRumble(led, 0, 0, pad);
 
-    ds34pad[pad].status |= DS4USB_STATE_RUNNING;
+    ds4pad[pad].status |= DS4USB_STATE_RUNNING;
 
-    SignalSema(ds34pad[pad].sema);
+    SignalSema(ds4pad[pad].sema);
 
     pademu_connect(&padf[pad]);
 }
@@ -233,7 +233,7 @@ static void usb_config_set(int result, int count, void *arg)
 
 static void readReport(u8 *data, int pad_idx)
 {
-    ds4usb_device *pad = &ds34pad[pad_idx];
+    ds4usb_device *pad = &ds4pad[pad_idx];
     if (pad->type == GUITAR_GH || pad->type == GUITAR_RB) {
         struct ds3guitarreport *report;
 
@@ -289,7 +289,7 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 {
     int ret = 0;
 
-    PollSema(ds34pad[pad].cmd_sema);
+    PollSema(ds4pad[pad].cmd_sema);
 
     mips_memset(usb_buf, 0, sizeof(usb_buf));
 
@@ -309,12 +309,12 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)
     }
 
-    ret = sceUsbdInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
+    ret = sceUsbdInterruptTransfer(ds4pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
 
-    ds34pad[pad].oldled[0] = led[0];
-    ds34pad[pad].oldled[1] = led[1];
-    ds34pad[pad].oldled[2] = led[2];
-    ds34pad[pad].oldled[3] = led[3];
+    ds4pad[pad].oldled[0] = led[0];
+    ds4pad[pad].oldled[1] = led[1];
+    ds4pad[pad].oldled[2] = led[2];
+    ds4pad[pad].oldled[3] = led[3];
 
     return ret;
 }
@@ -446,37 +446,37 @@ int ds4usb_init(u8 pads, u8 options)
     int pad;
 
     for (pad = 0; pad < MAX_PADS; pad++) {
-        ds34pad[pad].status = 0;
-        ds34pad[pad].devId = -1;
-        ds34pad[pad].oldled[0] = 0;
-        ds34pad[pad].oldled[1] = 0;
-        ds34pad[pad].oldled[2] = 0;
-        ds34pad[pad].oldled[3] = 0;
-        ds34pad[pad].lrum = 0;
-        ds34pad[pad].rrum = 0;
-        ds34pad[pad].update_rum = 1;
-        ds34pad[pad].sema = -1;
-        ds34pad[pad].cmd_sema = -1;
-        ds34pad[pad].controlEndp = -1;
-        ds34pad[pad].interruptEndp = -1;
-        ds34pad[pad].enabled = (pads >> pad) & 1;
-        ds34pad[pad].type = 0;
+        ds4pad[pad].status = 0;
+        ds4pad[pad].devId = -1;
+        ds4pad[pad].oldled[0] = 0;
+        ds4pad[pad].oldled[1] = 0;
+        ds4pad[pad].oldled[2] = 0;
+        ds4pad[pad].oldled[3] = 0;
+        ds4pad[pad].lrum = 0;
+        ds4pad[pad].rrum = 0;
+        ds4pad[pad].update_rum = 1;
+        ds4pad[pad].sema = -1;
+        ds4pad[pad].cmd_sema = -1;
+        ds4pad[pad].controlEndp = -1;
+        ds4pad[pad].interruptEndp = -1;
+        ds4pad[pad].enabled = (pads >> pad) & 1;
+        ds4pad[pad].type = 0;
 
-        ds34pad[pad].data[0] = 0xFF;
-        ds34pad[pad].data[1] = 0xFF;
-        ds34pad[pad].analog_btn = 0;
+        ds4pad[pad].data[0] = 0xFF;
+        ds4pad[pad].data[1] = 0xFF;
+        ds4pad[pad].analog_btn = 0;
 
-        mips_memset(&ds34pad[pad].data[2], 0x7F, 4);
-        mips_memset(&ds34pad[pad].data[6], 0x00, 12);
+        mips_memset(&ds4pad[pad].data[2], 0x7F, 4);
+        mips_memset(&ds4pad[pad].data[6], 0x00, 12);
 
-        ds34pad[pad].sema = CreateMutex(IOP_MUTEX_UNLOCKED);
-        ds34pad[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
+        ds4pad[pad].sema = CreateMutex(IOP_MUTEX_UNLOCKED);
+        ds4pad[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
-        if (ds34pad[pad].sema < 0 || ds34pad[pad].cmd_sema < 0) {
+        if (ds4pad[pad].sema < 0 || ds4pad[pad].cmd_sema < 0) {
             DPRINTF("Failed to allocate I/O semaphore.\n");
             return 0;
         }
-        padf[pad].priv = &ds34pad[pad];
+        padf[pad].priv = &ds4pad[pad];
         padf[pad].get_status = ds4usb_get_status;
         padf[pad].get_model = ds4usb_get_model;
         padf[pad].get_data = ds4usb_get_data;

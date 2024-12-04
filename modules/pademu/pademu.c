@@ -22,7 +22,6 @@ static struct pad_funcs *padf[MAX_PORTS];
 #ifdef USE_DS4
 
 #include "ds4bt.h"
-
 #include "ds4usb.h"
 
 #endif
@@ -63,6 +62,7 @@ PtrRegisterLibraryEntires pRegisterLibraryEntires; /* Pointer to RegisterLibrary
 Sio2McProc pSio2man25, pSio2man51;                 /* Pointers to SIO2MAN routines */
 pad_status_t pad[MAX_PORTS];
 
+static u8 pad_inited = 0;
 static u8 pad_enable = 0;
 static u8 pad_options = 0;
 
@@ -71,18 +71,18 @@ static u8 mtap_inited = 0;
 static u8 mtap_slot = 0;
 static u8 mtap_port = 0;
 
-static int install_sio2hook();
+int install_sio2hook();
 
-static int hookRegisterLibraryEntires(iop_library_t *lib);
-static void hookSio2man25(sio2_transfer_data_t *sd);
-static void hookSio2man51(sio2_transfer_data_t *sd);
-static void InstallSio2manHook(void *exp, int ver);
+int hookRegisterLibraryEntires(iop_library_t *lib);
+void hookSio2man25(sio2_transfer_data_t *sd);
+void hookSio2man51(sio2_transfer_data_t *sd);
+void InstallSio2manHook(void *exp, int ver);
 
-static void pademu_setup(u8 ports, u8 vib);
-static void pademu(sio2_transfer_data_t *td);
-static void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size);
+void pademu_setup(u8 ports, u8 vib);
+void pademu(sio2_transfer_data_t *td);
+void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size);
 
-static void pademu_mtap(sio2_transfer_data_t *td);
+void pademu_mtap(sio2_transfer_data_t *td);
 
 extern struct irx_export_table _exp_pademu;
 
@@ -140,15 +140,6 @@ int _start(int argc, char *argv[])
 
     pademu_setup(pad_enable, pad_vibration);
 
-#ifdef USE_DS3
-    ds3bt_init(pad_enable, pad_options);
-    ds3usb_init(pad_enable, pad_options);
-#endif
-#ifdef USE_DS4
-    ds4bt_init(pad_enable, pad_options);
-    ds4usb_init(pad_enable, pad_options);
-#endif
-
     return MODULE_RESIDENT_END;
 }
 
@@ -198,7 +189,7 @@ void _exit(int mode)
 #endif
 }
 
-static int install_sio2hook()
+int install_sio2hook()
 {
     register void *exp;
 
@@ -224,7 +215,7 @@ static int install_sio2hook()
     return 1;
 }
 
-static void InstallSio2manHook(void *exp, int ver)
+void InstallSio2manHook(void *exp, int ver)
 {
     /* hooking SIO2MAN entry #25 (used by MCMAN and old PADMAN) */
     pSio2man25 = HookExportEntry(exp, 25, hookSio2man25);
@@ -233,7 +224,7 @@ static void InstallSio2manHook(void *exp, int ver)
 }
 
 /* Hook for the LOADCORE's RegisterLibraryEntires call */
-static int hookRegisterLibraryEntires(iop_library_t *lib)
+int hookRegisterLibraryEntires(iop_library_t *lib)
 {
     register int ret;
 
@@ -255,13 +246,13 @@ static int hookRegisterLibraryEntires(iop_library_t *lib)
 }
 
 /* Hook for SIO2MAN entry #25 */
-static void hookSio2man25(sio2_transfer_data_t *sd)
+void hookSio2man25(sio2_transfer_data_t *sd)
 {
     pademu_hookSio2man(sd, pSio2man25);
 }
 
 /* Hook for SIO2MAN entry #51 */
-static void hookSio2man51(sio2_transfer_data_t *sd)
+void hookSio2man51(sio2_transfer_data_t *sd)
 {
     pademu_hookSio2man(sd, pSio2man51);
 }
@@ -327,7 +318,7 @@ void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc)
     sio2proc(td);
 }
 
-static void pademu_setup(u8 ports, u8 vib)
+void pademu_setup(u8 ports, u8 vib)
 {
     u8 i;
 
@@ -360,7 +351,7 @@ static u8 pademu_data[6][6] =
         {0x00, 0x00, 0x02, 0x00, 0x01, 0x00},
         {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
-static void pademu(sio2_transfer_data_t *td)
+void pademu(sio2_transfer_data_t *td)
 {
     int port;
     u8 port1, port2, cmd_size;
@@ -372,6 +363,16 @@ static void pademu(sio2_transfer_data_t *td)
     td->stat6c = 0x1100; //?
     td->stat70 = 0x0F;   //?
 
+    if (!pad_inited) {
+#ifdef USE_DS3
+        pad_inited = ds3bt_init(pad_enable, pad_options);
+        pad_inited = ds3usb_init(pad_enable, pad_options);
+#endif
+#ifdef USE_DS4
+        pad_inited = ds4bt_init(pad_enable, pad_options);
+        pad_inited = ds4usb_init(pad_enable, pad_options);
+#endif
+    }
 
     if (port2 == 1) {
         // find next cmd
@@ -430,7 +431,7 @@ static void pademu(sio2_transfer_data_t *td)
     pademu_cmd(port, in, out, cmd_size);
 }
 
-static void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
+void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 {
     u8 i;
 
@@ -565,12 +566,12 @@ static void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
     }
 }
 
-static u8 mtap_data[] = {
+u8 mtap_data[] = {
     0xff, 0x80, 0x5a, 0x00, 0x00, 0x5a};
 
 #define MAX_SLOT 4
 
-static void pademu_mtap(sio2_transfer_data_t *td)
+void pademu_mtap(sio2_transfer_data_t *td)
 {
     u8 port1;
 

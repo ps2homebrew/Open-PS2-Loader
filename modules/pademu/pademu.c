@@ -146,13 +146,13 @@ int _start(int argc, char *argv[])
 void pademu_connect(struct pad_funcs *pf)
 {
     int i;
-    // DPRINTF("%s\n", __FUNCTION__);
+    DPRINTF("%s\n", __FUNCTION__);
     for (i = 0; i < MAX_PORTS; i++) {
         if (padf[i] == NULL) {
             DPRINTF("connect pad %d\n", i);
             padf[i] = pf;
-            // pad[i].enabled = 1;
-            // padf[i]->set_mode(padf[i], pad[i].mode, pad[i].mode_lock);
+            pad[i].enabled = 1;
+            padf[i]->set_mode(padf[i], pad[i].mode, pad[i].mode_lock);
             break;
         }
     }
@@ -168,7 +168,7 @@ void pademu_disconnect(struct pad_funcs *pf)
         if (padf[i] == pf) {
             DPRINTF("disconnect pad %d\n", i);
             padf[i] = NULL;
-            // pad[i].enabled = 0;
+            pad[i].enabled = 0;
             break;
         }
     }

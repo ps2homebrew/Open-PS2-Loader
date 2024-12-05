@@ -321,17 +321,9 @@ static int HCI_Command(int nbytes, u8 *dataptr)
 
 static int hci_reset()
 {
-    int pad = 0;
     hci_cmd_buf[0] = HCI_OCF_RESET;
     hci_cmd_buf[1] = HCI_OGF_CTRL_BBAND;
     hci_cmd_buf[2] = 0x00; // Parameter Total Length = 0
-
-    padf[pad].priv = &ds4pad[pad];
-    padf[pad].get_status = ds4bt_get_status;
-    padf[pad].get_model = ds4bt_get_model;
-    padf[pad].get_data = ds4bt_get_data;
-    padf[pad].set_rumble = ds4bt_set_rumble;
-    padf[pad].set_mode = ds4bt_set_mode;
 
     return HCI_Command(3, hci_cmd_buf);
 }
@@ -680,6 +672,12 @@ static void ds4pad_clear(int pad)
     ds4pad[pad].data[1] = 0xFF;
     mips_memset(&ds4pad[pad].data[2], 0x7F, 4);
     mips_memset(&ds4pad[pad].data[6], 0x00, 12);
+    padf[pad].priv = &ds4pad[pad];
+    padf[pad].get_status = ds4bt_get_status;
+    padf[pad].get_model = ds4bt_get_model;
+    padf[pad].get_data = ds4bt_get_data;
+    padf[pad].set_rumble = ds4bt_set_rumble;
+    padf[pad].set_mode = ds4bt_set_mode;
 }
 
 static void ds4pad_init()

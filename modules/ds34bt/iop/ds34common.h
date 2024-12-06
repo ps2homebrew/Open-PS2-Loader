@@ -14,27 +14,6 @@
 #define GUITAR_HERO_PS3_PID 0x0100 // PS3 Guitar Hero Guitar
 #define ROCK_BAND_PS3_PID   0x0200 // PS3 Rock Band Guitar
 
-// NOTE: struct member prefixed with "n" means it's active-low (i.e. value of 0 indicates button is pressed, value 1 is released)
-enum DS2ButtonBitNumber {
-    DS2BtnBit_Select = 0,
-    DS2BtnBit_L3 = 1,
-    DS2BtnBit_R3 = 2,
-    DS2BtnBit_Start = 3,
-    DS2BtnBit_Up = 4,
-    DS2BtnBit_Right = 5,
-    DS2BtnBit_Down = 6,
-    DS2BtnBit_Left = 7,
-    DS2BtnBit_L2 = 8,
-    DS2BtnBit_R2 = 9,
-    DS2BtnBit_L1 = 10,
-    DS2BtnBit_R1 = 11,
-    DS2BtnBit_Triangle = 12,
-    DS2BtnBit_Circle = 13,
-    DS2BtnBit_Cross = 14,
-    DS2BtnBit_Square = 15,
-};
-
-
 enum DS2Buttons {
     DS2ButtonSelect = (1 << 0),
     DS2ButtonL3 = (1 << 1),
@@ -281,31 +260,5 @@ struct ds4report
     uint16_t Finger2Y      : 12;
 
 } __attribute__((packed));
-
-/**
- * Translate DS3 pad data into DS2 pad data.
- * @param in DS3 report
- * @param out DS2 report
- * @param pressure_emu set to 1 to extrapolate digital buttons into button pressure
- * NOTE: if set to 0, ds3report must be large enough for that data to be read!
- */
-void translate_pad_ds3(const struct ds3report *in, struct ds2report *out, uint8_t pressure_emu);
-
-/**
- * Translate PS3 Guitar pad data into DS2 Guitar pad data.
- * @param in PS3 Guitar report
- * @param out PS2 Guitar report
- * @param guitar_hero_format set to 1 if this is a guitar hero guitar, set to 0 if this is a rock band guitar
- */
-void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *out, uint8_t guitar_hero_format);
-
-/**
- * Translate DS3 pad data into DS2 pad data.
- * @param in DS4 report
- * @param out DS2 report
- * @param have_touchpad set to 1 if input report has touchpad data
- * NOTE: if set to 1, ds4report must be large enough for that data to be read!
- */
-void translate_pad_ds4(const struct ds4report *in, struct ds2report *out, uint8_t have_touchpad);
 
 #endif

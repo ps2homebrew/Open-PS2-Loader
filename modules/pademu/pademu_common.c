@@ -1,4 +1,4 @@
-#include "ds34common.h"
+#include "pademu_common.h"
 
 #include "loadcore.h"
 #include "sysclib.h"

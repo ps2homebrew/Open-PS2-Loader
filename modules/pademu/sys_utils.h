@@ -32,4 +32,10 @@ void mips_memset(void *, int, unsigned);
 #define mips_memcpy memcpy
 #endif
 
+extern void *GetExportTable(char *libname, int version);
+extern u32 GetExportTableSize(void *table);
+extern void *GetExportEntry(void *table, u32 entry);
+extern void *HookExportEntry(void *table, u32 entry, void *func);
+
+
 #endif /* __MCEMU_UTILS_H */

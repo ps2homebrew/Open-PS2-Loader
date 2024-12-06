@@ -22,6 +22,12 @@ I_SetAlarm
 I_CancelAlarm
 thbase_IMPORTS_end
 
+#ifdef DEBUG
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end
+#endif
+
 usbd_IMPORTS_start
 I_sceUsbdScanStaticDescriptor
 I_sceUsbdOpenPipe

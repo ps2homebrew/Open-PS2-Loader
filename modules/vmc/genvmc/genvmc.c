@@ -32,40 +32,41 @@
 IRX_ID(MODNAME, 1, 1);
 
 // driver ops protypes
-static int genvmc_dummy(void);
 static int genvmc_init(iop_device_t *dev);
 static int genvmc_deinit(iop_device_t *dev);
 static int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen);
+
+IOMANX_RETURN_VALUE_IMPL(EPERM)
 
 // driver ops func tab
 static iop_device_ops_t genvmc_ops = {
     &genvmc_init,
     &genvmc_deinit,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
     &genvmc_devctl,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy,
-    (void *)genvmc_dummy};
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM),
+    IOMANX_RETURN_VALUE(EPERM)};
 
 // driver descriptor
 static iop_device_t genvmc_dev = {
@@ -521,12 +522,6 @@ err_out:
     close(genvmc_fh);
 
     return r;
-}
-
-//--------------------------------------------------------------
-static int genvmc_dummy(void)
-{
-    return -EPERM;
 }
 
 //--------------------------------------------------------------

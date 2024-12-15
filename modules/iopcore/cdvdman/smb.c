@@ -22,16 +22,16 @@
 
 #define USE_CUSTOM_RECV 1
 
-//Round up the erasure amount, so that memset can erase memory word-by-word.
+// Round up the erasure amount, so that memset can erase memory word-by-word.
 #define ZERO_PKT_ALIGNED(hdr, hdrSize) memset((hdr), 0, ((hdrSize) + 3) & ~3)
 
 /* Limit the maximum chunk size of receiving operations, to avoid triggering the congestion avoidance algorithm of the SMB server.
    This is because the IOP cannot clear the received frames fast enough, causing the number of bytes in flight to grow exponentially.
    The TCP congestion avoidence algorithm may induce some latency, causing extremely poor performance.
    The value to use should be smaller than the TCP window size. Right now, it is 10240 (according to lwipopts.h). */
-#define CLIENT_MAX_BUFFER_SIZE 8192      //Allow up to 8192 bytes to be received.
-#define CLIENT_MAX_XMIT_SIZE   USHRT_MAX //Allow up to 65535 bytes to be transmitted.
-#define CLIENT_MAX_RECV_SIZE   8192      //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_BUFFER_SIZE 8192      // Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_XMIT_SIZE   USHRT_MAX // Allow up to 65535 bytes to be transmitted.
+#define CLIENT_MAX_RECV_SIZE   8192      // Allow up to 8192 bytes to be received.
 
 int smb_io_sema = -1;
 
@@ -65,8 +65,8 @@ static int main_socket = -1;
 
 static struct
 {
-    //Direct transport packet header. This is also a NetBIOS session header.
-    u32 sessionHeader; //The lower 24 bytes are the length of the payload in network byte-order, while the upper 8 bits must be set to 0 (Session Message Packet).
+    // Direct transport packet header. This is also a NetBIOS session header.
+    u32 sessionHeader; // The lower 24 bytes are the length of the payload in network byte-order, while the upper 8 bits must be set to 0 (Session Message Packet).
     union
     {
         u8 u8buff[MAX_SMB_BUF + MAX_SMB_BUF_HDR];
@@ -192,14 +192,14 @@ static int GetSMBServerReply(int shdrlen, void *spayload, int rhdrlen)
     totalpkt_size = nb_GetSessionMessageLength() + 4;
 
     if (shdrlen == 0) {
-        //Send the whole message, including the 4-byte direct transport packet header.
+        // Send the whole message, including the 4-byte direct transport packet header.
         rcv_size = SendData(main_socket, (char *)&SMB_buf, totalpkt_size);
         if (rcv_size <= 0)
             return -1;
     } else {
         size = shdrlen + 4;
 
-        //Send the headers, followed by the payload.
+        // Send the headers, followed by the payload.
         rcv_size = SendData(main_socket, (char *)&SMB_buf, size);
         if (rcv_size <= 0)
             return -1;
@@ -209,7 +209,7 @@ static int GetSMBServerReply(int shdrlen, void *spayload, int rhdrlen)
             return -1;
     }
 
-    //Read NetBIOS session message header. Drop NBSS Session Keep alive messages (type == 0x85, with no body), but process session messages (type == 0x00).
+    // Read NetBIOS session message header. Drop NBSS Session Keep alive messages (type == 0x85, with no body), but process session messages (type == 0x00).
     do {
         rcv_size = RecvData(main_socket, (char *)&SMB_buf.sessionHeader, sizeof(SMB_buf.sessionHeader));
         if (rcv_size <= 0)
@@ -218,7 +218,7 @@ static int GetSMBServerReply(int shdrlen, void *spayload, int rhdrlen)
 
     totalpkt_size = nb_GetSessionMessageLength();
 
-    //If rhdrlen is not specified, retrieve the whole packet. Otherwise, retrieve only the headers (caller will retrieve the payload separately).
+    // If rhdrlen is not specified, retrieve the whole packet. Otherwise, retrieve only the headers (caller will retrieve the payload separately).
     size = (rhdrlen == 0) ? totalpkt_size : rhdrlen;
     rcv_size = RecvData(main_socket, (char *)&SMB_buf.smb, size);
     if (rcv_size <= 0)
@@ -228,7 +228,7 @@ static int GetSMBServerReply(int shdrlen, void *spayload, int rhdrlen)
 }
 
 //-------------------------------------------------------------------------
-//These functions will process UTF-16 characters on a byte-level, so that they will be safe for use with byte-alignment.
+// These functions will process UTF-16 characters on a byte-level, so that they will be safe for use with byte-alignment.
 static int asciiToUtf16(char *out, const char *in)
 {
     int len;
@@ -240,7 +240,7 @@ static int asciiToUtf16(char *out, const char *in)
         pOut[1] = '\0';
     }
 
-    pOut[0] = '\0'; //NULL terminate.
+    pOut[0] = '\0'; // NULL terminate.
     pOut[1] = '\0';
     len += 2;
 
@@ -389,7 +389,7 @@ lbl_session_setup:
 
     // NativeOS
     if (useUnicode && ((offset & 1) != 0)) {
-        //If Unicode is used, the field must begin on a 16-bit aligned address.
+        // If Unicode is used, the field must begin on a 16-bit aligned address.
         SSR->ByteField[offset] = '\0';
         offset++;
     }
@@ -397,7 +397,7 @@ lbl_session_setup:
 
     // NativeLanMan
     if (useUnicode && ((offset & 1) != 0)) {
-        //If Unicode is used, the field must begin on a 16-bit aligned address.
+        // If Unicode is used, the field must begin on a 16-bit aligned address.
         SSR->ByteField[offset] = '\0';
         offset++;
     }
@@ -549,7 +549,7 @@ int smb_OpenAndX(char *filename, u8 *FID, int Write)
 }
 
 //-------------------------------------------------------------------------
-//Do not call WaitSema() from this function because it would have been already called.
+// Do not call WaitSema() from this function because it would have been already called.
 int smb_Close(int FID)
 {
     int r;
@@ -623,13 +623,13 @@ static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, i
     nb_SetSessionMessage(sizeof(ReadAndXRequest_t));
 
 #ifdef USE_CUSTOM_RECV
-    //Send the whole message, including the 4-byte direct transport packet header.
+    // Send the whole message, including the 4-byte direct transport packet header.
     r = SendData(main_socket, (char *)&SMB_buf, sizeof(ReadAndXRequest_t) + 4);
     if (r <= 0)
         return -1;
 
-    //offset 49 is the offset of the DataOffset field within the ReadAndXResponse structure.
-    //recvfrom() is a custom function that will receive the reply.
+    // offset 49 is the offset of the DataOffset field within the ReadAndXResponse structure.
+    // recvfrom() is a custom function that will receive the reply.
     do {
         rcv_size = plwip_recvfrom(main_socket, &SMB_buf, 49, readbuf, nbytes, 0, NULL, NULL);
         if (rcv_size <= 0)
@@ -653,7 +653,7 @@ static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, i
     if ((RRsp->smbH.Eclass | (RRsp->smbH.Ecode << 16)) != STATUS_SUCCESS)
         return -EIO;
 
-    //Skip any padding bytes.
+    // Skip any padding bytes.
     padding = RRsp->DataOffset - sizeof(ReadAndXResponse_t);
     if (padding > 0) {
         r = RecvData(main_socket, (char *)(RRsp + 1), padding);
@@ -689,7 +689,7 @@ int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbyt
         if (result <= 0)
             return result;
 
-        //Check for and handle overflow.
+        // Check for and handle overflow.
         if (offsetlow + result < offsetlow)
             offsethigh++;
         offsetlow += result;
@@ -705,7 +705,7 @@ int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbyt
 //-------------------------------------------------------------------------
 static int smb_WriteAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes)
 {
-    const int padding = 1; //1 padding byte, to keep the payload aligned for writing performance.
+    const int padding = 1; // 1 padding byte, to keep the payload aligned for writing performance.
     WriteAndXRequest_t *WR = &SMB_buf.smb.writeAndXRequest;
     WriteAndXResponse_t *WRsp = &SMB_buf.smb.writeAndXResponse;
     int r;
@@ -722,7 +722,7 @@ static int smb_WriteAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf,
     WR->FID = (u16)FID;
     WR->OffsetLow = offsetlow;
     WR->OffsetHigh = offsethigh;
-    WR->WriteMode = 0x0001; //WritethroughMode
+    WR->WriteMode = 0x0001; // WritethroughMode
     WR->DataOffset = sizeof(WriteAndXRequest_t) + padding;
     WR->Remaining = (u16)nbytes;
     WR->DataLengthLow = (u16)nbytes;
@@ -758,7 +758,7 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nb
         if (result <= 0)
             return result;
 
-        //Check for and handle overflow.
+        // Check for and handle overflow.
         if (offsetlow + result < offsetlow)
             offsethigh++;
         offsetlow += result;

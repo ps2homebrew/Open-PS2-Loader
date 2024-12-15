@@ -2,6 +2,7 @@
 #include <sysclib.h>
 #include <loadcore.h>
 #include <ioman.h>
+#include <errno.h>
 
 #define MODNAME "imgdrv"
 IRX_ID(MODNAME, 1, 1);
@@ -10,10 +11,7 @@ unsigned int ioprpimg = 0xDEC1DEC1;
 int ioprpsiz = 0xDEC2DEC2;
 const char name[] = "host";
 
-int dummy_fs()
-{
-    return 0;
-}
+IOMAN_RETURN_VALUE_IMPL(0);
 
 int lseek_fs(iop_file_t *fd, int offset, int whence)
 {
@@ -59,25 +57,25 @@ typedef struct _iop_device_ops_tm
 
 iop_device_ops_t my_device_ops =
     {
-        dummy_fs, // init
-        dummy_fs, // deinit
-        NULL,     // dummy_fs,// format
-        dummy_fs, // open_fs,// open
-        close_fs, // close
-        read_fs,  // read
-        NULL,     // dummy_fs,// write
-        lseek_fs, // lseek
-                  /*
-        dummy_fs, // ioctl
-        dummy_fs, // remove
-        dummy_fs, // mkdir
-        dummy_fs, // rmdir
-        dummy_fs, // dopen
-        dummy_fs, // dclose
-        dummy_fs, // dread
-        dummy_fs, // getstat
-        dummy_fs, // chstat
-                   */
+        IOMAN_RETURN_VALUE(0), // init
+        IOMAN_RETURN_VALUE(0), // deinit
+        IOMAN_RETURN_VALUE(0), // dummy_fs,// format
+        IOMAN_RETURN_VALUE(0), // open_fs,// open
+        close_fs,              // close
+        read_fs,               // read
+        IOMAN_RETURN_VALUE(0), // dummy_fs,// write
+        lseek_fs,              // lseek
+                               /*
+                     dummy_fs, // ioctl
+                     dummy_fs, // remove
+                     dummy_fs, // mkdir
+                     dummy_fs, // rmdir
+                     dummy_fs, // dopen
+                     dummy_fs, // dclose
+                     dummy_fs, // dread
+                     dummy_fs, // getstat
+                     dummy_fs, // chstat
+                                */
 };
 
 iop_device_t my_device = {

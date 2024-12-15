@@ -2,6 +2,7 @@ atad_IMPORTS_start
 I_sceAtaInit
 I_sceAtaExecCmd
 I_sceAtaWaitResult
+I_sceAtaDmaTransfer
 atad_IMPORTS_end
 
 ioman_IMPORTS_start

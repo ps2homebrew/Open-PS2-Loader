@@ -69,6 +69,7 @@ enum GAME_MODE {
     BDM_ILK_MODE,
     BDM_M4S_MODE,
     BDM_USB_MODE,
+    BDM_HDD_MODE,
     ETH_MODE,
     HDD_MODE,
 };

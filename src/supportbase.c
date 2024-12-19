@@ -284,115 +284,86 @@ static int queryISOGameListCache(const struct game_cache_list *cache, base_game_
 
 static int scanForISO(char *path, char type, struct game_list_t **glist)
 {
-    int NameLen, count = 0, format, MountFD, cacheLoaded;
-    struct game_cache_list cache;
+    int count = 0;
+    struct game_cache_list cache = {0, NULL};
     base_game_info_t cachedGInfo;
-    char fullpath[256], startup[GAME_STARTUP_MAX];
+    char fullpath[256];
     struct dirent *dirent;
     DIR *dir;
-    struct stat statbuf;
 
-    cache.games = NULL;
-    cache.count = 0;
-    cacheLoaded = loadISOGameListCache(path, &cache) == 0;
+    int cacheLoaded = loadISOGameListCache(path, &cache) == 0;
 
     if ((dir = opendir(path)) != NULL) {
+        struct stat statbuf;
+
+        size_t base_path_len = strlen(path);
+        strcpy(fullpath, path);
+        fullpath[base_path_len] = '/';
+
         while ((dirent = readdir(dir)) != NULL) {
-            if ((format = isValidIsoName(dirent->d_name, &NameLen)) > 0) {
-                base_game_info_t *game;
+            int NameLen;
+            int format = isValidIsoName(dirent->d_name, &NameLen);
 
-                if (NameLen > ISO_GAME_NAME_MAX)
-                    continue; // Skip files that cannot be supported properly.
+            if (format <= 0 || NameLen > ISO_GAME_NAME_MAX)
+                continue; // Skip files that cannot be supported properly.
 
-                snprintf(fullpath, sizeof(fullpath), "%s/%s", path, dirent->d_name);
+            strcpy(fullpath + base_path_len + 1, dirent->d_name);
 
-                if (format == GAME_FORMAT_OLD_ISO) {
-                    struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
+            struct game_list_t *next = malloc(sizeof(struct game_list_t));
+            if (!next)
+                break; // Out of memory
 
-                    if (next != NULL) {
-                        next->next = *glist;
-                        *glist = next;
+            next->next = *glist;
+            *glist = next;
+            base_game_info_t *game = &next->gameinfo;
+            memset(game, 0, sizeof(base_game_info_t));
 
-                        game = &(*glist)->gameinfo;
-                        memset(game, 0, sizeof(base_game_info_t));
+            if (format == GAME_FORMAT_OLD_ISO) {
+                // old iso format can't be cached
+                strncpy(game->name, &dirent->d_name[GAME_STARTUP_MAX], NameLen);
+                game->name[NameLen] = '\0';
+                strncpy(game->startup, dirent->d_name, GAME_STARTUP_MAX - 1);
+                game->startup[GAME_STARTUP_MAX - 1] = '\0';
+                strncpy(game->extension, &dirent->d_name[GAME_STARTUP_MAX + NameLen], sizeof(game->extension) - 1);
+                game->extension[sizeof(game->extension) - 1] = '\0';
+            } else if (cacheLoaded && queryISOGameListCache(&cache, &cachedGInfo, dirent->d_name) == 0) {
+                // use cached entry
+                memcpy(game, &cachedGInfo, sizeof(base_game_info_t));
+            } else {
+                // need to mount and read SYSTEM.CNF
+                char startup[GAME_STARTUP_MAX];
+                int MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY);
 
-                        strncpy(game->name, &dirent->d_name[GAME_STARTUP_MAX], NameLen);
-                        game->name[NameLen] = '\0';
-                        strncpy(game->startup, dirent->d_name, GAME_STARTUP_MAX - 1);
-                        game->startup[GAME_STARTUP_MAX - 1] = '\0';
-                        strncpy(game->extension, &dirent->d_name[GAME_STARTUP_MAX + NameLen], sizeof(game->extension));
-                        game->extension[sizeof(game->extension) - 1] = '\0';
-                    } else {
-                        // Out of memory.
-                        break;
-                    }
-                } else {
-                    if (queryISOGameListCache(&cache, &cachedGInfo, dirent->d_name) != 0) {
-                        if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
-                            if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {
-                                struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
-
-                                if (next != NULL) {
-                                    next->next = *glist;
-                                    *glist = next;
-
-                                    game = &(*glist)->gameinfo;
-                                    memset(game, 0, sizeof(base_game_info_t));
-
-                                    strcpy(game->startup, startup);
-                                    strncpy(game->name, dirent->d_name, NameLen);
-                                    game->name[NameLen] = '\0';
-                                    strncpy(game->extension, &dirent->d_name[NameLen], sizeof(game->extension));
-                                    game->extension[sizeof(game->extension) - 1] = '\0';
-                                } else {
-                                    // Out of memory.
-                                    fileXioUmount("iso:");
-                                    break;
-                                }
-                            } else {
-                                // Unable to parse SYSTEM.CNF.
-                                fileXioUmount("iso:");
-                                continue;
-                            }
-
-                            fileXioUmount("iso:");
-                        } else {
-                            // Unable to mount game.
-                            continue;
-                        }
-                    } else {
-                        // Entry was found in cache.
-                        struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
-
-                        if (next != NULL) {
-                            next->next = *glist;
-                            *glist = next;
-
-                            game = &(*glist)->gameinfo;
-                            memcpy(game, &cachedGInfo, sizeof(base_game_info_t));
-                        } else {
-                            // Out of memory.
-                            break;
-                        }
-                    }
+                if (MountFD < 0 || GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) != 0) {
+                    fileXioUmount("iso:");
+                    free(next);
+                    *glist = next->next;
+                    continue;
                 }
 
-                game->parts = 1;
-                game->media = type;
-                game->format = format;
+                strcpy(game->startup, startup);
+                strncpy(game->name, dirent->d_name, NameLen);
+                game->name[NameLen] = '\0';
+                strncpy(game->extension, &dirent->d_name[NameLen], sizeof(game->extension) - 1);
+                game->extension[sizeof(game->extension) - 1] = '\0';
 
-                if (stat(fullpath, &statbuf) == 0) {
-                    game->sizeMB = statbuf.st_size >> 20;
-                } else {
-                    game->sizeMB = 0;
-                }
-
-                count++;
+                fileXioUmount("iso:");
             }
+
+            game->parts = 1;
+            game->media = type;
+            game->format = format;
+
+
+            if (stat(fullpath, &statbuf) == 0) {
+                game->sizeMB = statbuf.st_size >> 20;
+            } else {
+                game->sizeMB = 0;
+            }
+
+            count++;
         }
         closedir(dir);
-    } else {
-        count = 0;
     }
 
     if (cacheLoaded) {

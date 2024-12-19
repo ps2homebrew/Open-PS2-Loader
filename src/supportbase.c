@@ -294,8 +294,6 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
     int cacheLoaded = loadISOGameListCache(path, &cache) == 0;
 
     if ((dir = opendir(path)) != NULL) {
-        struct stat statbuf;
-
         size_t base_path_len = strlen(path);
         strcpy(fullpath, path);
         fullpath[base_path_len] = '/';
@@ -353,13 +351,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
             game->parts = 1;
             game->media = type;
             game->format = format;
-
-
-            if (stat(fullpath, &statbuf) == 0) {
-                game->sizeMB = statbuf.st_size >> 20;
-            } else {
-                game->sizeMB = 0;
-            }
+            game->sizeMB = 0;
 
             count++;
         }
@@ -763,9 +755,23 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
 config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const char *sep)
 {
     char path[256];
+    struct stat st;
+
     snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); // Does not matter if the config file could be loaded or not.
+
+    // Get game size if not already set
+    if ((game->sizeMB == 0) && (game->format != GAME_FORMAT_OLD_ISO)) {
+        char gamepath[256];
+
+        snprintf(gamepath, sizeof(gamepath), "%s%s%s%s%s%s", prefix, sep, game->media == SCECdPS2CD ? "CD" : "DVD", sep, game->name, game->extension);
+
+        if (stat(gamepath, &st) == 0)
+            game->sizeMB = st.st_size >> 20;
+        else
+            game->sizeMB = 0;
+    }
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
     configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);

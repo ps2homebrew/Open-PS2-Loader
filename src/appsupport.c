@@ -364,6 +364,18 @@ static void appLaunchItem(item_list_t *itemList, int id, config_set_t *configSet
     // Retrieve configuration set by appGetConfig()
     configGetStrCopy(configSet, CONFIG_ITEM_STARTUP, filename, sizeof(filename));
 
+    // If no device number is specified use mass? to auto find device number
+    const char *oldPrefix = "mass:";
+    const char *newPrefix = "mass?:";
+
+    if (strncmp(filename, oldPrefix, strlen(oldPrefix)) == 0) {
+        size_t oldPrefixLen = strlen(oldPrefix);
+        size_t newPrefixLen = strlen(newPrefix);
+        memmove(filename + newPrefixLen, filename + oldPrefixLen, strlen(filename) - oldPrefixLen + 1);
+
+        memcpy(filename, newPrefix, newPrefixLen);
+    }
+
     // If legacy apps state mass? find the first connected mass device with the corresponding filename and set the unit number for launch.
     if (!strncmp("mass?", filename, 5)) {
         for (int i = 0; i < BDM_MODE4; i++) {

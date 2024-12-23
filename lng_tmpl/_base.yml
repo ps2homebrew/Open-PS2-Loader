@@ -165,9 +165,9 @@ gui_strings:
 - label: BDMMODE
   string: BDM Start Mode
 - label: HDDMODE
-  string: HDD Device Start Mode
+  string: HDD (APA) Start Mode
 - label: ETHMODE
-  string: ETH Device Start Mode
+  string: ETH Start Mode
 - label: APPMODE
   string: Applications Start Mode
 - label: AUTO
@@ -593,13 +593,13 @@ gui_strings:
 - label: INFO_DESCRIPTION
   string: Description
 - label: BLOCKDEVICE_SETTINGS
-  string: Block Devices
+  string: BDM Devices
 - label: CONTROLLER_SETTINGS
   string: Controller Settings
 - label: HINT_BDM_START
   string: Turn on/off Block Device Manager.
 - label: HINT_BLOCK_DEVICES
-  string: Turn on/off Block Devices (e.g. USB).
+  string: Turn on/off BDM Devices (USB/MX4SIO/ILINK/HDD).
 - label: USB_GAMES
   string: USB Games
 - label: ILINK_GAMES
@@ -692,3 +692,5 @@ gui_strings:
   string: 'Files found: %i'
 - label: CHEAT_SELECTION
   string: Cheat Selection
+- label: HDD_HINT
+  string: Only one HDD allowed, enabling locks APA or GPT.

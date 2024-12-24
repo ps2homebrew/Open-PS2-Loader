@@ -55,8 +55,8 @@ static void (*p_dev9_intr_cb)(int flag) = NULL;
 static int dma_lock_sem = -1; /* used to arbitrate DMA */
 
 static s16 eeprom_data[5]; /* 2-byte EEPROM status (0/-1 = invalid, 1 = valid),
-				   6-byte MAC address,
-				   2-byte MAC address checksum.  */
+                   6-byte MAC address,
+                   2-byte MAC address checksum.  */
 
 /* Each driver can register callbacks that correspond to each bit of the
    SMAP interrupt status register (0xbx000028).  */
@@ -81,15 +81,16 @@ static int pcmcia_init(void);
 static void expbay_set_stat(int stat);
 static int expbay_init(void);
 
-static int dev9x_dummy(void) { return 0; }
+IOMANX_RETURN_VALUE_IMPL(0);
+
 static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
 {
     switch (cmd) {
         case DDIOC_MODEL:
             return dev9type;
         case DDIOC_OFF:
-            //Do not let the DEV9 interface to be switched off by other software.
-            //Dev9CardStop();
+            // Do not let the DEV9 interface to be switched off by other software.
+            // Dev9CardStop();
             return 0;
         default:
             return 0;
@@ -98,29 +99,29 @@ static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, in
 
 /* driver ops func tab */
 static iop_device_ops_t dev9x_ops = {
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
+    IOMANX_RETURN_VALUE(0),
     (void *)dev9x_devctl};
 
 /* driver descriptor */
@@ -164,7 +165,7 @@ int dev9d_init(void)
 void SpdRegisterIntrHandler(int intr, dev9_intr_cb_t cb)
 {
 #ifdef HDD_DRIVER
-    //Don't let anything else change the HDD interrupt handlers.
+    // Don't let anything else change the HDD interrupt handlers.
     if (intr < 2) {
         if (atad_inited)
             return;
@@ -599,7 +600,7 @@ static int pcmcia_init(void)
         }
     }
 
-    //The DEV9 interface and SPEED should be already initialized.
+    // The DEV9 interface and SPEED should be already initialized.
     _sw(0xe01a3043, SSBUS_R_1418);
 
     if (dev9_init() != 0)
@@ -642,7 +643,7 @@ static int expbay_init(void)
     _sw(0xe01a3043, SSBUS_R_1418);
     _sw(0xef1a3043, SSBUS_R_141c);
 
-    //The DEV9 interface and SPEED should be already initialized.
+    // The DEV9 interface and SPEED should be already initialized.
 
     if (dev9_init() != 0)
         return 1;

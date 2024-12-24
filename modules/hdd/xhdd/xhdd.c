@@ -18,10 +18,7 @@ static int xhddInit(iop_device_t *device)
     return 0;
 }
 
-static int xhddUnsupported(void)
-{
-    return -1;
-}
+IOMANX_RETURN_VALUE_IMPL(1);
 
 static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsigned int arglen, void *buf, unsigned int buflen)
 {
@@ -45,28 +42,28 @@ static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsi
 
 static iop_device_ops_t xhdd_ops = {
     &xhddInit,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
-    (void *)&xhddUnsupported,
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
+    IOMANX_RETURN_VALUE(1),
     &xhddDevctl,
 };
 

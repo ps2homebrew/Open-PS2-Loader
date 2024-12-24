@@ -102,6 +102,7 @@ atlas_t *atlasNew(size_t width, size_t height, u8 psm)
     atlas->surface.ClutPSM = 0;
     atlas->surface.Clut = NULL;
     atlas->surface.VramClut = 0;
+    atlas->surface.ClutStorageMode = GS_CLUT_STORAGE_CSM1;
 
     // zero out the atlas surface
     memset(atlas->surface.Mem, 0x0, txtsize);

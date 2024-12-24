@@ -71,6 +71,7 @@ static void cacheClearItem(cache_entry_t *item, int freeTxt)
     item->texture.Vram = 0;
     item->texture.Clut = NULL;
     item->texture.VramClut = 0;
+    item->texture.ClutStorageMode = GS_CLUT_STORAGE_CSM1; // Default
     item->qr = NULL;
     item->lastUsed = -1;
     item->UID = 0;

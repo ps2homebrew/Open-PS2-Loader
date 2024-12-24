@@ -145,6 +145,7 @@ void guiInit(void)
     gBackgroundTex.Vram = 0;
     gBackgroundTex.VramClut = 0;
     gBackgroundTex.Clut = NULL;
+    gBackgroundTex.ClutStorageMode = GS_CLUT_STORAGE_CSM1;
 
     // Precalculate the values for the perlin noise plasma
     int i;

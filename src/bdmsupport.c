@@ -712,7 +712,7 @@ int bdmUpdateDeviceData(item_list_t *itemList)
     if (gBDMStartMode == START_MODE_DISABLED)
         return 0;
 
-    //LOG("bdmUpdateDeviceData: %d\n", itemList->mode);
+    // LOG("bdmUpdateDeviceData: %d\n", itemList->mode);
 
     // Get the per-device data and check if the menu item is currently visible.
     bdm_device_data_t *pDeviceData = itemList->priv;
@@ -721,7 +721,7 @@ int bdmUpdateDeviceData(item_list_t *itemList)
     // Format the device path and try to open the device.
     sprintf(path, "mass%d:/", itemList->mode);
     int dir = fileXioDopen(path);
-    //LOG("opendir %s -> %d\n", path, dir);
+    // LOG("opendir %s -> %d\n", path, dir);
 
     // If we opened the device and the menu isn't visible (OR is visible but hasn't been initialized ex: manual device start) initialize device info.
     if (dir >= 0 && (visible == 0 || pDeviceData->bdmPrefix[0] == '\0')) {

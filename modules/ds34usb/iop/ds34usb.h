@@ -66,7 +66,4 @@ enum eHID {
     // }}}
 };
 
-void mips_memcpy(void *, const void *, unsigned);
-void mips_memset(void *, int, unsigned);
-
 #endif

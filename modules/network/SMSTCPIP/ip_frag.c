@@ -50,8 +50,6 @@
 #include <sysclib.h>
 #include <thbase.h>
 
-#include "smsutils.h"
-
 /*
  * Copy len bytes from offset in pbuf to buffer
  *
@@ -68,7 +66,7 @@ static struct pbuf *copy_from_pbuf(
 
     for (; len; p = p->next) {
         l = len < p->len ? len : p->len;
-        mips_memcpy(buffer, p->payload, l);
+        memcpy(buffer, p->payload, l);
         buffer += l;
         len -= l;
     } /* end while */
@@ -127,12 +125,12 @@ ip_reass(struct pbuf *p)
      write the IP header of the fragment into the reassembly
      buffer. The timer is updated with the maximum age. */
     if (ip_reasstmr == 0) {
-        mips_memcpy(iphdr, fraghdr, IP_HLEN);
+        memcpy(iphdr, fraghdr, IP_HLEN);
         ip_reasstmr = IP_REASS_MAXAGE;
         SetAlarm(&s_Clock, ip_reass_timer, &s_Clock);
         ip_reassflags = 0;
         /* Clear the bitmap. */
-        mips_memset(ip_reassbitmap, 0, sizeof(ip_reassbitmap));
+        memset(ip_reassbitmap, 0, sizeof(ip_reassbitmap));
     }
 
     /* Check if the incoming fragment matches the one currently present
@@ -233,8 +231,8 @@ ip_reass(struct pbuf *p)
                     /* Copy enough bytes to fill this pbuf in the chain. The
        available data in the pbuf is given by the q->len
        variable. */
-                    mips_memcpy(q->payload, &ip_reassbuf[i],
-                                q->len > ip_reasslen - i ? ip_reasslen - i : q->len);
+                    memcpy(q->payload, &ip_reassbuf[i],
+                           q->len > ip_reasslen - i ? ip_reasslen - i : q->len);
                     i += q->len;
                 }
             }
@@ -276,7 +274,7 @@ err_t ip_frag(struct pbuf *p, struct netif *netif, struct ip_addr *dest)
 
     /* Copy the IP header in it */
     iphdr = rambuf->payload;
-    mips_memcpy(iphdr, p->payload, IP_HLEN);
+    memcpy(iphdr, p->payload, IP_HLEN);
 
     /* Save original offset */
     tmp = ntohs(IPH_OFFSET(iphdr));

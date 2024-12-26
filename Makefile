@@ -78,7 +78,7 @@ FRONTEND_OBJS = pad.o xparam.o fntsys.o renderman.o menusys.o OSDHistory.o syste
 IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o bdmevent.o \
 		bdm.o bdmfs_fatfs.o usbmass_bd.o iLinkman.o IEEE1394_bd.o mx4sio_bd.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o lwnbdsvr.o \
-		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
+		ps2dev9.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		sio2man.o padman.o mcman.o mcserv.o \
 		httpclient-iop.o netman.o ps2ips.o \
 		bdm_mcemu.o hdd_mcemu.o smb_mcemu.o \
@@ -297,8 +297,6 @@ clean:	download_lwNBD
 	$(MAKE) -C modules/isofs clean
 	echo " -bdmevent"
 	$(MAKE) -C modules/bdmevent clean
-	echo " -SMSUTILS"
-	$(MAKE) -C modules/network/SMSUTILS clean
 	echo " -SMSTCPIP"
 	$(MAKE) -C modules/network/SMSTCPIP clean
 	echo " -in-game SMAP"
@@ -571,12 +569,6 @@ $(EE_ASM_DIR)bdmevent.c: modules/bdmevent/bdmevent.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 $(EE_ASM_DIR)ps2dev9.c: $(PS2SDK)/iop/irx/ps2dev9.irx | $(EE_ASM_DIR)
-	$(BIN2C) $< $@ $(*F)_irx
-
-modules/network/SMSUTILS/SMSUTILS.irx: modules/network/SMSUTILS
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)smsutils.c: modules/network/SMSUTILS/SMSUTILS.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 $(EE_ASM_DIR)ps2ip.c: $(PS2SDK)/iop/irx/ps2ip-nm.irx | $(EE_ASM_DIR)

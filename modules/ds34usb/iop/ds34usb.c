@@ -411,10 +411,10 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
     PollSema(ds34pad[pad].cmd_sema);
 
-    mips_memset(usb_buf, 0, sizeof(usb_buf));
+    memset(usb_buf, 0, sizeof(usb_buf));
 
     if (ds34pad[pad].type == DS3) {
-        mips_memcpy(usb_buf, output_01_report, sizeof(output_01_report));
+        memcpy(usb_buf, output_01_report, sizeof(output_01_report));
 
         usb_buf[1] = 0xFE; // rt
         usb_buf[2] = rrum; // rp
@@ -550,7 +550,7 @@ void ds34usb_get_data(char *dst, int size, int port)
         DPRINTF("DS34USB: ds34usb_get_data usb transfer error %d\n", ret);
     }
 
-    mips_memcpy(dst, ds34pad[port].data, size);
+    memcpy(dst, ds34pad[port].data, size);
 
     SignalSema(ds34pad[port].sema);
 }
@@ -770,8 +770,8 @@ int _start(int argc, char *argv[])
         ds34pad[pad].data[0] = 0xFF;
         ds34pad[pad].data[1] = 0xFF;
 
-        mips_memset(&ds34pad[pad].data[2], 0x7F, 4);
-        mips_memset(&ds34pad[pad].data[6], 0x00, 12);
+        memset(&ds34pad[pad].data[2], 0x7F, 4);
+        memset(&ds34pad[pad].data[6], 0x00, 12);
 
         ds34pad[pad].sema = CreateMutex(IOP_MUTEX_UNLOCKED);
         ds34pad[pad].cmd_sema = CreateMutex(IOP_MUTEX_UNLOCKED);

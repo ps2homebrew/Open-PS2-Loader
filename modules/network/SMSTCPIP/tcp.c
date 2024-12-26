@@ -56,8 +56,6 @@
 
 #include "sysclib.h"
 
-#include "smsutils.h"
-
 #include "thbase.h"
 
 #if LWIP_TCP
@@ -806,7 +804,7 @@ tcp_seg_copy(struct tcp_seg *seg)
     if (cseg == NULL) {
         return NULL;
     }
-    mips_memcpy((char *)cseg, (const char *)seg, sizeof(struct tcp_seg));
+    memcpy((char *)cseg, (const char *)seg, sizeof(struct tcp_seg));
     pbuf_ref(cseg->p);
     return cseg;
 }
@@ -897,7 +895,7 @@ tcp_alloc(u8_t prio)
         }
     }
     if (pcb != NULL) {
-        mips_memset(pcb, 0, sizeof(struct tcp_pcb));
+        memset(pcb, 0, sizeof(struct tcp_pcb));
         pcb->prio = TCP_PRIO_NORMAL;
         pcb->snd_buf = TCP_SND_BUF;
         pcb->snd_queuelen = 0;

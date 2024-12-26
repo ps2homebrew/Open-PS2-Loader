@@ -282,8 +282,6 @@ static int ethLoadModules(void)
         LOG("[NETMAN]:\n");
         if (sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL) >= 0) {
             NetManInit();
-            LOG("[SMSUTILS]:\n");
-            sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
             LOG("[SMAP]:\n");
             if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL) >= 0) {
                 // Before the network stack is loaded, attempt to set the link settings in order to avoid needing double-initialization of the IF.

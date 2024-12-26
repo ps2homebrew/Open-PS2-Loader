@@ -10,8 +10,6 @@
 
 #include "internal.h"
 #include "ioplib_util.h"
-#include "smsutils.h"
-
 typedef struct ModuleStatus
 {
     char name[56];

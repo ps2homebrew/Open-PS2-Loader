@@ -480,7 +480,7 @@ static int hci_link_key_request_reply(u8 *bdaddr)
     hci_cmd_buf[7] = *(bdaddr + 4);
     hci_cmd_buf[8] = *(bdaddr + 5);
 
-    mips_memcpy(&hci_cmd_buf[9], link_key, sizeof(link_key));
+    memcpy(&hci_cmd_buf[9], link_key, sizeof(link_key));
 
     return HCI_Command(9 + sizeof(link_key), hci_cmd_buf);
 }
@@ -647,7 +647,7 @@ static void HCI_event_task(int result)
                     break;
                 }
                 pad = i;
-                mips_memcpy(ds34pad[pad].bdaddr, hci_buf + 2, 6);
+                memcpy(ds34pad[pad].bdaddr, hci_buf + 2, 6);
                 ds34pad[pad].isfake = 0;
                 if (enable_fake) {
                     ds34pad[pad].isfake = 1;                              // fake ds3
@@ -722,7 +722,7 @@ static void ds34pad_clear(int pad)
     ds34pad[pad].hci_handle = 0x0FFF;
     ds34pad[pad].control_scid = 0;
     ds34pad[pad].interrupt_scid = 0;
-    mips_memset(ds34pad[pad].bdaddr, 0, 6);
+    memset(ds34pad[pad].bdaddr, 0, 6);
     ds34pad[pad].status = bt_dev.status;
     ds34pad[pad].status |= DS34BT_STATE_USB_CONFIGURED;
     ds34pad[pad].isfake = 0;
@@ -730,8 +730,8 @@ static void ds34pad_clear(int pad)
     ds34pad[pad].btn_delay = 0;
     ds34pad[pad].data[0] = 0xFF;
     ds34pad[pad].data[1] = 0xFF;
-    mips_memset(&ds34pad[pad].data[2], 0x7F, 4);
-    mips_memset(&ds34pad[pad].data[6], 0x00, 12);
+    memset(&ds34pad[pad].data[2], 0x7F, 4);
+    memset(&ds34pad[pad].data[6], 0x00, 12);
 }
 
 static void ds34pad_init()
@@ -769,7 +769,7 @@ static int L2CAP_Command(u16 handle, u8 *data, u8 length)
     l2cap_cmd_buf[6] = 0x01; // L2CAP header: Channel ID
     l2cap_cmd_buf[7] = 0x00; // L2CAP Signalling channel over ACL-U logical link
 
-    mips_memcpy(&l2cap_cmd_buf[8], data, length);
+    memcpy(&l2cap_cmd_buf[8], data, length);
 
     // output on endpoint 2
     return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
@@ -1104,7 +1104,7 @@ static int HID_command(u16 handle, u16 scid, u8 *data, u8 length, int pad)
     l2cap_cmd_buf[6] = (u8)(scid & 0xff); // L2CAP header: Channel ID
     l2cap_cmd_buf[7] = (u8)(scid >> 8);
 
-    mips_memcpy(&l2cap_cmd_buf[8], data, length);
+    memcpy(&l2cap_cmd_buf[8], data, length);
 
     // output on endpoint 2
     return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
@@ -1152,7 +1152,7 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
         led_buf[1] = PS3_01_REPORT_ID;           // Report ID
 
         u8 *command = &led_buf[size];
-        mips_memset(command, 0, OUTPUT_01_REPORT_SIZE);
+        memset(command, 0, OUTPUT_01_REPORT_SIZE);
 
         if (ds34pad[pad].isfake) {
             if (rrum < 5) {
@@ -1167,7 +1167,7 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
         command[9] = led[0] & 0x1F; // LED Conf
         for (led_bit = 0x10, i = 0; i < 4; i++, led_bit >>= 1) {
             if (led[0] & led_bit) {
-                mips_memcpy(&command[10 + (i * 5)], hid_cmd_payload_led_arguments, sizeof(hid_cmd_payload_led_arguments));
+                memcpy(&command[10 + (i * 5)], hid_cmd_payload_led_arguments, sizeof(hid_cmd_payload_led_arguments));
                 if (led[3]) {
                     command[10 + (i * 5) + 3] = 0x32;
                 }
@@ -1176,7 +1176,7 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
 
         size += OUTPUT_01_REPORT_SIZE;
     } else if (ds34pad[pad].type == DS4) {
-        mips_memset(led_buf, 0, PS3_01_REPORT_LEN + 2);
+        memset(led_buf, 0, PS3_01_REPORT_LEN + 2);
 
         led_buf[0] = HID_THDR_SET_REPORT_OUTPUT; // THdr
         led_buf[1] = PS4_11_REPORT_ID;           // Report ID
@@ -1337,7 +1337,7 @@ int ds34bt_get_data(u8 *dst, int size, int port)
 
     WaitSema(bt_dev.hid_sema);
 
-    mips_memcpy(dst, ds34pad[port].data, size);
+    memcpy(dst, ds34pad[port].data, size);
     ret = ds34pad[port].analog_btn & 1;
 
     SignalSema(bt_dev.hid_sema);

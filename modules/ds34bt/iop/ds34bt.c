@@ -528,7 +528,7 @@ static int hci_link_key_request_reply(u8 *bdaddr)
     hci_cmd_buf[7] = *(bdaddr + 4);
     hci_cmd_buf[8] = *(bdaddr + 5);
 
-    mips_memcpy(&hci_cmd_buf[9], link_key, sizeof(link_key));
+    memcpy(&hci_cmd_buf[9], link_key, sizeof(link_key));
 
     return HCI_Command(9 + sizeof(link_key), hci_cmd_buf);
 }
@@ -555,7 +555,7 @@ static void HCI_event_task(int result)
                     }
                 } else if ((hci_buf[3] == HCI_OCF_READ_BDADDR) && (hci_buf[4] == HCI_OGF_INFO_PARAM)) {
                     if (hci_buf[5] == 0) {
-                        mips_memcpy(bt_bdaddr, &hci_buf[6], 6);
+                        memcpy(bt_bdaddr, &hci_buf[6], 6);
                         hci_read_local_version_information();
                     } else {
                         DelayThread(500);
@@ -563,7 +563,7 @@ static void HCI_event_task(int result)
                     }
                 } else if ((hci_buf[3] == HCI_OCF_READ_VERSION) && (hci_buf[4] == HCI_OGF_INFO_PARAM)) {
                     if (hci_buf[5] == 0) {
-                        mips_memcpy(&bt_version, &hci_buf[6], sizeof(hci_information_t));
+                        memcpy(&bt_version, &hci_buf[6], sizeof(hci_information_t));
                         hci_read_local_supported_features();
                     } else {
                         DelayThread(500);
@@ -571,7 +571,7 @@ static void HCI_event_task(int result)
                     }
                 } else if ((hci_buf[3] == HCI_OCF_READ_FEATURES) && (hci_buf[4] == HCI_OGF_INFO_PARAM)) {
                     if (hci_buf[5] == 0) {
-                        mips_memcpy(bt_features, &hci_buf[6], sizeof(bt_features));
+                        memcpy(bt_features, &hci_buf[6], sizeof(bt_features));
                         hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
                     } else {
                         DelayThread(500);
@@ -723,7 +723,7 @@ static void HCI_event_task(int result)
                     break;
                 }
                 pad = i;
-                mips_memcpy(ds34pad[pad].bdaddr, hci_buf + 2, 6);
+                memcpy(ds34pad[pad].bdaddr, hci_buf + 2, 6);
                 ds34pad[pad].isfake = 0;
                 if (!disable_fake) {
                     ds34pad[pad].isfake = 1;                            // fake ds3
@@ -799,14 +799,14 @@ static void ds34pad_clear(int pad)
     ds34pad[pad].hci_handle = 0x0FFF;
     ds34pad[pad].control_scid = 0;
     ds34pad[pad].interrupt_scid = 0;
-    mips_memset(ds34pad[pad].bdaddr, 0, 6);
+    memset(ds34pad[pad].bdaddr, 0, 6);
     ds34pad[pad].status = bt_dev.status;
     ds34pad[pad].isfake = 0;
     ds34pad[pad].type = 0;
     ds34pad[pad].data[0] = 0xFF;
     ds34pad[pad].data[1] = 0xFF;
-    mips_memset(&ds34pad[pad].data[2], 0x7F, 4);
-    mips_memset(&ds34pad[pad].data[6], 0x00, 12);
+    memset(&ds34pad[pad].data[2], 0x7F, 4);
+    memset(&ds34pad[pad].data[6], 0x00, 12);
 }
 
 static void ds34pad_init()
@@ -844,7 +844,7 @@ static int L2CAP_Command(u16 handle, u8 *data, u8 length)
     l2cap_cmd_buf[6] = 0x01; // L2CAP header: Channel ID
     l2cap_cmd_buf[7] = 0x00; // L2CAP Signalling channel over ACL-U logical link
 
-    mips_memcpy(&l2cap_cmd_buf[8], data, length);
+    memcpy(&l2cap_cmd_buf[8], data, length);
 
     // output on endpoint 2
     return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
@@ -1176,7 +1176,7 @@ static int HID_command(u16 handle, u16 scid, u8 *data, u8 length, int pad)
     l2cap_cmd_buf[6] = (u8)(scid & 0xff); // L2CAP header: Channel ID
     l2cap_cmd_buf[7] = (u8)(scid >> 8);
 
-    mips_memcpy(&l2cap_cmd_buf[8], data, length);
+    memcpy(&l2cap_cmd_buf[8], data, length);
 
     // output on endpoint 2
     return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
@@ -1216,7 +1216,7 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
         led_buf[1] = PS3_01_REPORT_ID; // Report ID
 
-        mips_memcpy(&led_buf[2], output_01_report, sizeof(output_01_report)); // PS3_01_REPORT_LEN);
+        memcpy(&led_buf[2], output_01_report, sizeof(output_01_report)); // PS3_01_REPORT_LEN);
 
         if (ds34pad[pad].isfake) {
             if (rrum < 5)
@@ -1240,7 +1240,7 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
         size += sizeof(output_01_report);
     } else if (ds34pad[pad].type == DS4) {
-        mips_memset(led_buf, 0, PS3_01_REPORT_LEN + 2);
+        memset(led_buf, 0, PS3_01_REPORT_LEN + 2);
 
         led_buf[0] = HID_THDR_SET_REPORT_OUTPUT; // THdr
         led_buf[1] = PS4_11_REPORT_ID;           // Report ID
@@ -1487,7 +1487,7 @@ int ds34bt_get_bdaddr(u8 *data)
     if (!(bt_dev.status & DS34BT_STATE_USB_CONFIGURED))
         return 0;
 
-    mips_memcpy(data, bt_bdaddr, 6);
+    memcpy(data, bt_bdaddr, 6);
 
     return 1;
 }
@@ -1501,7 +1501,7 @@ int ds34bt_get_ver(u8 *data)
     bt_version.pid = bt_dev.pid;
     bt_version.rev = bt_dev.rev;
 
-    mips_memcpy(data, &bt_version, sizeof(hci_information_t));
+    memcpy(data, &bt_version, sizeof(hci_information_t));
 
     return 1;
 }
@@ -1511,7 +1511,7 @@ int ds34bt_get_feat(u8 *data)
     if (!(bt_dev.status & DS34BT_STATE_USB_CONFIGURED))
         return 0;
 
-    mips_memcpy(data, bt_features, sizeof(bt_features));
+    memcpy(data, bt_features, sizeof(bt_features));
 
     return 1;
 }
@@ -1526,7 +1526,7 @@ void ds34bt_get_data(char *dst, int size, int port)
 
     WaitSema(bt_dev.hid_sema);
 
-    mips_memcpy(dst, ds34pad[port].data, size);
+    memcpy(dst, ds34pad[port].data, size);
 
     SignalSema(bt_dev.hid_sema);
 }

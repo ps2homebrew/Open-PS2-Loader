@@ -18,8 +18,6 @@
 #include "smb.h"
 #include "cdvd_config.h"
 
-#include "smsutils.h"
-
 #define USE_CUSTOM_RECV 1
 
 //Round up the erasure amount, so that memset can erase memory word-by-word.

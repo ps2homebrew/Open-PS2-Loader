@@ -73,8 +73,6 @@
 #include <sysclib.h>
 #include <intrman.h>
 
-#include "smsutils.h"
-
 static u8_t pbuf_pool_memory[(PBUF_POOL_SIZE * MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE + sizeof(struct pbuf)))];
 
 #if !SYS_LIGHTWEIGHT_PROT
@@ -767,7 +765,7 @@ pbuf_take(struct pbuf *p)
                     head = q;
                 }
                 /* copy pbuf payload */
-                mips_memcpy(q->payload, p->payload, p->len);
+                memcpy(q->payload, p->payload, p->len);
                 q->tot_len = p->tot_len;
                 q->len = p->len;
                 /* in case p was the first pbuf, it is no longer refered to by

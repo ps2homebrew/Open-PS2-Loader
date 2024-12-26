@@ -6,6 +6,8 @@ I_sceSifRpcLoop
 sifcmd_IMPORTS_end
 
 sysclib_IMPORTS_start
+I_memset
+I_memcpy
 I_memcmp
 sysclib_IMPORTS_end
 

@@ -60,8 +60,6 @@
 
 #include "sysclib.h"
 
-#include "smsutils.h"
-
 #if LWIP_TCP
 
 /* Forward declarations.*/
@@ -161,7 +159,7 @@ err_t tcp_enqueue(
             }
             ++queuelen;
             if (arg != NULL) {
-                mips_memcpy(seg->p->payload, ptr, seglen);
+                memcpy(seg->p->payload, ptr, seglen);
             }
             seg->dataptr = seg->p->payload;
         }
@@ -228,7 +226,7 @@ err_t tcp_enqueue(
             /* Copy options into data portion of segment.
        Options can thus only be sent in non data carrying
        segments such as SYN|ACK. */
-            mips_memcpy(seg->dataptr, optdata, optlen);
+            memcpy(seg->dataptr, optdata, optlen);
         }
 
         left -= seglen;

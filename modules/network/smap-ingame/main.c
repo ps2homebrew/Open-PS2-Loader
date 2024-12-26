@@ -9,7 +9,6 @@
 #include <sysclib.h>
 #include <loadcore.h>
 #include <thbase.h>
-#include "smsutils.h"
 #include <intrman.h>
 
 #include "smstcpip.h"
@@ -59,7 +58,7 @@ SMapLowLevelOutput(NetIF *pNetIF, PBuf *pOutput)
         TotalLength = 0;
         pbuf = pOutput;
         while (pbuf != NULL) {
-            mips_memcpy(&FrameBuffer[TotalLength], pbuf->payload, pbuf->len);
+            memcpy(&FrameBuffer[TotalLength], pbuf->payload, pbuf->len);
             TotalLength += pbuf->len;
             pbuf = pbuf->next;
         }

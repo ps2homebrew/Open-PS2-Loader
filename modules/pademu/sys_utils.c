@@ -20,7 +20,7 @@ void *GetExportTable(char *libname, int version)
         register int i;
         register char *psrc;
 
-        mips_memset(&lib, 0, sizeof(iop_library_t));
+        memset(&lib, 0, sizeof(iop_library_t));
         lib.version = version;
 
         for (i = 0, psrc = libname; (i < 8) && (*psrc); i++, psrc++)

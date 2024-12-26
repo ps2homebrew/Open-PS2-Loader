@@ -3,11 +3,6 @@ loadcore_IMPORTS_start
 I_RegisterLibraryEntries
 loadcore_IMPORTS_end
 
-smsutils_IMPORTS_start
-I_mips_memset
-I_mips_memcpy
-smsutils_IMPORTS_end
-
 intrman_IMPORTS_start
 I_CpuSuspendIntr
 I_CpuResumeIntr
@@ -45,6 +40,8 @@ thsemap_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_strcpy
+I_memset
+I_memcpy
 sysclib_IMPORTS_end
 
 sysmem_IMPORTS_start

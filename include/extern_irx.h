@@ -118,8 +118,6 @@ IMPORT_BIN2C(smbinit_irx);
 
 IMPORT_BIN2C(smbman_irx);
 
-IMPORT_BIN2C(smsutils_irx);
-
 IMPORT_BIN2C(tifinet_irx);
 
 IMPORT_BIN2C(tifinet_ingame_irx);

@@ -196,16 +196,6 @@ DECLARE_EXPORT_TABLE(dev9, 1, 9)
 END_EXPORT_TABLE
 #endif
 
-// smsutils export table
-DECLARE_EXPORT_TABLE(smsutils, 1, 1)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(mips_memcpy)
-	DECLARE_EXPORT(mips_memset)
-END_EXPORT_TABLE
-
 // opl io utils export table
 DECLARE_EXPORT_TABLE(oplutils, 1, 2)
 	DECLARE_EXPORT(_retonly)

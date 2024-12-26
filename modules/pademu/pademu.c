@@ -113,14 +113,14 @@ int _start(int argc, char *argv[])
     pad_enable = 0x03;
 
     if (argc > 1) {
-        mips_memcpy(&PadEmuSettings_local.raw, argv[1], 4);
+        memcpy(&PadEmuSettings_local.raw, argv[1], 4);
         pad_enable = PadEmuSettings_local.pad_enable;
         pad_vibration = PadEmuSettings_local.pad_vibration;
         mtap_enabled = PadEmuSettings_local.mtap_enabled;
         mtap_port = PadEmuSettings_local.mtap_port;
         pad_options = PadEmuSettings_local.pad_options; // enable workaround for fake ds3
         u32 macro_settings = 0xAB;
-        mips_memcpy(&macro_settings, argv[1] + 4, 4);
+        memcpy(&macro_settings, argv[1] + 4, 4);
         padMacroInit(macro_settings);
     }
 
@@ -389,7 +389,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 {
     u8 i;
 
-    mips_memset(out, 0x00, out_size);
+    memset(out, 0x00, out_size);
 
     if (!(PAD_GET_STATUS(port) & PAD_STATE_RUNNING)) {
         pad[port].lrum = 2;
@@ -403,7 +403,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 
     switch (in[1]) {
         case 0x40: // set vref param
-            mips_memcpy(&out[3], &pademu_data[0], 6);
+            memcpy(&out[3], &pademu_data[0], 6);
             break;
 
         case 0x41: // query button mask
@@ -463,21 +463,21 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
             break;
 
         case 0x45: // query model and mode
-            mips_memcpy(&out[3], &pademu_data[1], 6);
+            memcpy(&out[3], &pademu_data[1], 6);
             out[5] = pad[port].mode;
             out[3] = PAD_GET_MODEL(port);
             break;
 
         case 0x46: // query act
             if (in[3] == 0x00)
-                mips_memcpy(&out[3], &pademu_data[2], 6);
+                memcpy(&out[3], &pademu_data[2], 6);
             else
-                mips_memcpy(&out[3], &pademu_data[3], 6);
+                memcpy(&out[3], &pademu_data[3], 6);
 
             break;
 
         case 0x47: // query comb
-            mips_memcpy(&out[3], &pademu_data[4], 6);
+            memcpy(&out[3], &pademu_data[4], 6);
             break;
 
         case 0x4C: // query mode
@@ -489,7 +489,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
             break;
 
         case 0x4D: // set act align
-            mips_memcpy(&out[3], &pademu_data[5], 6);
+            memcpy(&out[3], &pademu_data[5], 6);
 
             for (i = 0; i < 6; i++) { // vibration
                 if (in[3 + i] == 0x00)
@@ -525,7 +525,7 @@ void pademu_mtap(sio2_transfer_data_t *td)
 
     port1 = td->regdata[0] & 0x01;
 
-    mips_memset(td->out, 0x00, td->out_size);
+    memset(td->out, 0x00, td->out_size);
     td->stat6c = 0x0001d100;
 
     if (port1 != mtap_port) {
@@ -534,7 +534,7 @@ void pademu_mtap(sio2_transfer_data_t *td)
 
     switch (td->in[1]) {
         case 0x12: // returns slot number for pad
-            mips_memcpy(td->out, &mtap_data, sizeof(mtap_data));
+            memcpy(td->out, &mtap_data, sizeof(mtap_data));
             td->out[3] = MAX_SLOT;
             td->stat6c = 0x00001100;
             mtap_inited = 1;
@@ -544,7 +544,7 @@ void pademu_mtap(sio2_transfer_data_t *td)
             break;
 
         case 0x21: // changes slot for pad
-            mips_memcpy(td->out, &mtap_data, sizeof(mtap_data));
+            memcpy(td->out, &mtap_data, sizeof(mtap_data));
             mtap_slot = td->out[5] = td->in[2]; // slot
             td->out[6] = 0x5a;
             td->stat6c = 0x00001100;

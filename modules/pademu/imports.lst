@@ -35,15 +35,6 @@ usbd_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_memcmp
-#ifndef USE_SMSUTILS
 I_memset
 I_memcpy
-#endif
 sysclib_IMPORTS_end
-
-#ifdef USE_SMSUTILS
-smsutils_IMPORTS_start
-I_mips_memset
-I_mips_memcpy
-smsutils_IMPORTS_end
-#endif

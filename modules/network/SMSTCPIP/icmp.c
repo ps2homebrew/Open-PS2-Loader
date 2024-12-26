@@ -46,8 +46,6 @@
 
 #include <sysclib.h>
 
-#include "smsutils.h"
-
 void icmp_input(struct pbuf *p, struct netif *inp)
 {
     unsigned char type;
@@ -144,7 +142,7 @@ void icmp_dest_unreach(struct pbuf *p, enum icmp_dur_type t)
     ICMPH_TYPE_SET(idur, ICMP_DUR);
     ICMPH_CODE_SET(idur, t);
 
-    mips_memcpy((char *)q->payload + 8, p->payload, IP_HLEN + 8);
+    memcpy((char *)q->payload + 8, p->payload, IP_HLEN + 8);
 
     /* calculate checksum */
     idur->chksum = 0;
@@ -181,7 +179,7 @@ void icmp_time_exceeded(struct pbuf *p, enum icmp_te_type t)
     ICMPH_CODE_SET(tehdr, t);
 
     /* copy fields from original packet */
-    mips_memcpy((char *)q->payload + 8, (char *)p->payload, IP_HLEN + 8);
+    memcpy((char *)q->payload + 8, (char *)p->payload, IP_HLEN + 8);
 
     /* calculate checksum */
     tehdr->chksum = 0;

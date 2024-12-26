@@ -1,5 +1,5 @@
 IOP_BIN = ds34usb.irx
-IOP_OBJS = ds34usb.o smsutils.o imports.o
+IOP_OBJS = ds34usb.o imports.o
 
 IOP_INCS += -I../../../include/
 

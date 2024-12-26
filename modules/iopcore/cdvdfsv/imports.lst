@@ -59,10 +59,10 @@ I_sceSifSetDma
 I_sceSifDmaStat
 sifman_IMPORTS_end
 
-smsutils_IMPORTS_start
-I_mips_memset
-I_mips_memcpy
-smsutils_IMPORTS_end
+sysclib_IMPORTS_start
+I_memcpy
+I_memset
+sysclib_IMPORTS_end
 
 thbase_IMPORTS_start
 I_CreateThread

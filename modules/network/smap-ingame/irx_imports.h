@@ -7,7 +7,6 @@
 #include <dmacman.h>
 #include <dev9.h>
 #include "smstcpip.h"
-#include "smsutils.h"
 #include <stdio.h>
 #include <sysclib.h>
 #include <thbase.h>

@@ -1,5 +1,5 @@
 IOP_BIN = ds34bt.irx
-IOP_OBJS = ds34bt.o smsutils.o imports.o
+IOP_OBJS = ds34bt.o imports.o
 
 IOP_INCS += -I../../../include/
 

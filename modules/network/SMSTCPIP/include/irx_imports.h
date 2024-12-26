@@ -16,7 +16,6 @@
 #include "irx.h"
 #include "intrman.h"
 #include "loadcore.h"
-#include "smsutils.h"
 #include "stdio.h"
 #include "sysclib.h"
 #include "sysmem.h"

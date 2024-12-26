@@ -18,7 +18,6 @@ ifeq ($(VMC),1)
 IOP_CFLAGS += -DVMC
 endif
 
-IOP_CFLAGS += -DUSE_SMSUTILS
 IOP_INCS += -I../../include/
 
 include $(PS2SDK)/Defs.make

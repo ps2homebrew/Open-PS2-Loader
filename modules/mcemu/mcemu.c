@@ -511,7 +511,7 @@ void Sio2McEmu(Sio2Packet *sd)
                             /* setting memory card flags */
                             rdma[2] = mcd->flags & 0xFF;
                             /* copying memory card spec */
-                            mips_memcpy(&rdma[3], &mcd->cspec, sizeof(McSpec));
+                            memcpy(&rdma[3], &mcd->cspec, sizeof(McSpec));
                             /* calculating EDC for memory card spec data */
                             rdma[11] = CalculateEDC(&rdma[3], sizeof(McSpec));
                             rdma[12] = mcd->tcode;
@@ -547,7 +547,7 @@ void Sio2McEmu(Sio2Packet *sd)
                             else
                                 DPRINTF("skipping read command after I/O error.\n");
                             if (!result)
-                                mips_memset(&rdma[4], 0xFF, length);
+                                memset(&rdma[4], 0xFF, length);
                             rdma[length + 4] = CalculateEDC(&rdma[4], length);
                             rdma[length + 5] = mcd->tcode; /* <- 'f' should be set on error, probably */
                             break;
@@ -580,7 +580,7 @@ void Sio2McEmu(Sio2Packet *sd)
                             break;
                     }
                 } else {
-                    mips_memset(rdma, 0xFF, sd->rdwords * 4);
+                    memset(rdma, 0xFF, sd->rdwords * 4);
                     result = 0;
                 }
             } else {
@@ -645,7 +645,7 @@ int MceEraseBlock(MemoryCard *mcd, int page)
 
     /* creating clear buffer */
     r = (mcd->flags & 0x10) ? 0x0 : 0xFF;
-    mips_memset(mcd->dbufp, r, mcd->cspec.PageSize);
+    memset(mcd->dbufp, r, mcd->cspec.PageSize);
 
     for (i = 0; i < mcd->cspec.BlockSize; i++) {
         r = DeviceWritePage(mcd->mcnum, mcd->dbufp, page + i);
@@ -664,7 +664,7 @@ static int do_read(MemoryCard *mcd)
 {
     int r, i;
     r = (mcd->flags & 0x10) ? 0xFF : 0x0;
-    mips_memset(mcd->cbufp, r, 0x10);
+    memset(mcd->cbufp, r, 0x10);
 
     r = DeviceReadPage(mcd->mcnum, mcd->dbufp, mcd->rpage);
     if (!r) {
@@ -695,7 +695,7 @@ restart:
     DPRINTF("read sector %X size %ld\n", mcd->rpage, size);
     if (mcd->rcoff && !mcd->rdoff) {
         u32 csize = (size < 16) ? size : 16;
-        mips_memcpy(buf, mcd->cbufp, csize);
+        memcpy(buf, mcd->cbufp, csize);
         mcd->rcoff = (csize > 12) ? 0 : (mcd->rcoff - csize);
         buf = (void *)((u8 *)buf + csize);
         size -= csize;
@@ -710,7 +710,7 @@ restart:
         if ((size + mcd->rdoff) > mcd->cspec.PageSize)
             size = mcd->cspec.PageSize - mcd->rdoff;
 
-        mips_memcpy(buf, &mcd->dbufp[mcd->rdoff], size);
+        memcpy(buf, &mcd->dbufp[mcd->rdoff], size);
         mcd->rdoff += size;
         mcd->rcoff += 3;
     }
@@ -757,7 +757,7 @@ restart:
         if ((size + mcd->wroff) > mcd->cspec.PageSize)
             size = mcd->cspec.PageSize - mcd->wroff;
 
-        mips_memcpy(&mcd->dbufp[mcd->wroff], buf, size);
+        memcpy(&mcd->dbufp[mcd->wroff], buf, size);
         mcd->wroff += size;
         mcd->wcoff += 3;
     }

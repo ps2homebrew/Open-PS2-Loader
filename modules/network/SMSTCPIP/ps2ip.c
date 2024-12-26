@@ -22,8 +22,6 @@
 #include <thsemap.h>
 #include <sysmem.h>
 
-#include "smsutils.h"
-
 #include <lwip/memp.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
@@ -101,7 +99,7 @@ int ps2ip_getconfig(char *pszName, t_ip_info *pInfo)
     struct netif *pNetIF = netif_find(pszName);
 
     if (pNetIF == NULL) {
-        mips_memset(pInfo, 0, sizeof(*pInfo));
+        memset(pInfo, 0, sizeof(*pInfo));
         return 0;
     } /* end if */
 
@@ -110,7 +108,7 @@ int ps2ip_getconfig(char *pszName, t_ip_info *pInfo)
     pInfo->ipaddr.s_addr = pNetIF->ip_addr.addr;
     pInfo->netmask.s_addr = pNetIF->netmask.addr;
     pInfo->gw.s_addr = pNetIF->gw.addr;
-    mips_memcpy(pInfo->hw_addr, pNetIF->hwaddr, sizeof(pInfo->hw_addr));
+    memcpy(pInfo->hw_addr, pNetIF->hwaddr, sizeof(pInfo->hw_addr));
 #if LWIP_DHCP
     if (pNetIF->dhcp) {
         pInfo->dhcp_enabled = 1;
@@ -219,7 +217,7 @@ err_t ps2ip_input(struct pbuf *pInput, struct netif *pNetIF)
         pbuf_free(pInput);
         return ERR_OK;
     } /* end if */
-      // Allocate messagequeue entry.
+    // Allocate messagequeue entry.
     pIMSG = &aMSGs[u8LastMSG];
     u8LastMSG = GetNextMSGQueueIndex(u8LastMSG);
     // Initialize the InputMSG.

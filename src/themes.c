@@ -851,6 +851,7 @@ static void drawItemsList(struct menu_list *menu, struct submenu_list *item, con
         submenu_list_t *ps = menu->item->pagestart;
         int others = 0;
         u64 color;
+
         while (ps && (others++ < itemsList->displayedItems)) {
             if (ps == item)
                 color = gTheme->selTextColor;
@@ -868,6 +869,24 @@ static void drawItemsList(struct menu_list *menu, struct submenu_list *item, con
                 fntRenderString(elem->font, elem->posX + DECORATOR_SIZE, posY, elem->aligned, elem->width, elem->height, submenuItemGetText(&ps->item), color);
             } else
                 fntRenderString(elem->font, elem->posX, posY, elem->aligned, elem->width, elem->height, submenuItemGetText(&ps->item), color);
+
+            if (ps->item.favourited) {
+                int favMarkX = posX;
+                int favMarkPosY = elem->aligned ? (posY - 4) : (posY + 5);
+                int textWidth = rmUnScaleX(fntCalcDimensions(elem->font, submenuItemGetText(&ps->item)));
+
+                if (elem->aligned)
+                    favMarkX += ((elem->width - textWidth) >> 1);
+
+                favMarkX += textWidth;
+
+                if (itemsList->decoratorImage)
+                    favMarkX += DECORATOR_SIZE;
+
+                GSTEXTURE *favMark = thmGetTexture(FAV_MARK);
+                if (favMark && favMark->Mem)
+                    rmDrawPixmap(favMark, favMarkX + 2, favMarkPosY, ALIGN_NONE, 8, 8, elem->scaled, gDefaultCol);
+            }
 
             posY += MENU_ITEM_HEIGHT;
             ps = ps->next;

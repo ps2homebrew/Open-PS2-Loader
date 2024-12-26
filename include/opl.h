@@ -119,6 +119,7 @@ extern int gBDMStartMode;
 extern int gHDDStartMode;
 extern int gETHStartMode;
 extern int gAPPStartMode;
+extern int gFAVStartMode;
 extern int bdmCacheSize;
 extern int hddCacheSize;
 extern int smbCacheSize;
@@ -217,6 +218,9 @@ extern char gOPLPart[128];
 void initSupport(item_list_t *itemList, int mode, int force_reinit);
 
 void setDefaultColors(void);
+
+item_list_t *getFavouritesOwnerPointer(short int mode);
+void loadFavourites(void);
 
 #define MENU_ITEM_HEIGHT 19
 

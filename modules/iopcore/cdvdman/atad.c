@@ -32,6 +32,11 @@
 #include <speedregs.h>
 #include <atahw.h>
 
+#ifdef USE_BDM_ATA
+#include <bdm.h>
+#include <errno.h>
+#endif
+
 //#define NETLOG_DEBUG
 
 #ifdef NETLOG_DEBUG
@@ -42,7 +47,7 @@ extern int netlog_inited;
 
 #ifdef DEV9_DEBUG
 #define M_PRINTF(format, args...) \
-    printf(MODNAME ": " format, ##args)
+    printf("atad: " format, ##args)
 #else
 #define M_PRINTF(format, args...) \
     do {                          \
@@ -67,6 +72,14 @@ int ata_io_sema = -1;
 
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
+
+#ifdef USE_BDM_ATA
+static struct block_device g_ata_bd;
+static int ata_bd_read(struct block_device *bd, u64 sector, void *buffer, u16 count);
+static int ata_bd_write(struct block_device *bd, u64 sector, const void *buffer, u16 count);
+static void ata_bd_flush(struct block_device *bd);
+static int ata_bd_stop(struct block_device *bd);
+#endif
 
 /* ATA command info.  */
 typedef struct _ata_cmd_info
@@ -104,6 +117,8 @@ static unsigned int ata_alarm_cb(void *unused);
 
 static void ata_set_dir(int dir);
 static void ata_shutdown_cb(void);
+
+int ata_device_sector_io_internal(int device, void *buf, u64 lba, u32 nsectors, int dir);
 
 /* In v1.04, DMA was enabled in ata_set_dir() instead. */
 static void ata_pre_dma_cb(int bcr, int dir)
@@ -172,6 +187,23 @@ int atad_start(void)
     smp.option = 0;
     smp.attr = SA_THPRI;
     ata_io_sema = CreateSema(&smp);
+
+#ifdef USE_BDM_ATA
+    g_ata_bd.priv = (void *)&atad_devinfo;
+    g_ata_bd.name = "ata";
+    g_ata_bd.devNr = 0;
+    g_ata_bd.parNr = 0;
+    g_ata_bd.parId = 0x00;
+    g_ata_bd.sectorSize = 512;
+    g_ata_bd.sectorOffset = 0;
+    g_ata_bd.sectorCount = 0;
+    g_ata_bd.read = ata_bd_read;
+    g_ata_bd.write = ata_bd_write;
+    g_ata_bd.flush = ata_bd_flush;
+    g_ata_bd.stop = ata_bd_stop;
+    // Let bdm device support handle registering the block device.
+    bdm_connect_bd(&g_ata_bd);
+#endif
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
@@ -577,6 +609,11 @@ int sceAtaFlushCache(int device)
 /* Note: this can only support DMA modes, due to the commands issued. */
 int sceAtaDmaTransfer(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
+    return ata_device_sector_io_internal(device, buf, (u64)lba, nsectors, dir);
+}
+
+int ata_device_sector_io_internal(int device, void *buf, u64 lba, u32 nsectors, int dir)
+{
     USE_SPD_REGS;
     int res = 0, retries;
     u16 sector, lcyl, hcyl, select, command, len;
@@ -584,16 +621,15 @@ int sceAtaDmaTransfer(int device, void *buf, u32 lba, u32 nsectors, int dir)
     WAITIOSEMA(ata_io_sema);
 
     while (res == 0 && nsectors > 0) {
-        /* Variable lba is only 32 bits so no change for lcyl and hcyl.  */
-        lcyl = (lba >> 8) & 0xff;
-        hcyl = (lba >> 16) & 0xff;
-
         if (lba_48bit) {
             /* Setup for 48-bit LBA. */
             len = (nsectors > 65536) ? 65536 : nsectors;
 
             /* Combine bits 24-31 and bits 0-7 of lba into sector.  */
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
+            lcyl = ((lba >> 24) & 0xff00) | ((lba >> 8) & 0xff);
+            hcyl = ((lba >> 32) & 0xff00) | ((lba >> 16) & 0xff);
+
             /* In v1.04, LBA was enabled here.  */
             select = (device << 4) & 0xffff;
             command = (dir == 1) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;
@@ -601,6 +637,9 @@ int sceAtaDmaTransfer(int device, void *buf, u32 lba, u32 nsectors, int dir)
             /* Setup for 28-bit LBA.  */
             len = (nsectors > 256) ? 256 : nsectors;
             sector = lba & 0xff;
+            lcyl = (lba >> 8) & 0xff;
+            hcyl = (lba >> 16) & 0xff;
+
             /* In v1.04, LBA was enabled here.  */
             select = ((device << 4) | ((lba >> 24) & 0xf)) & 0xffff;
             command = (dir == 1) ? ATA_C_WRITE_DMA : ATA_C_READ_DMA;
@@ -670,3 +709,36 @@ static void ata_shutdown_cb(void)
     if (atad_devinfo.exists)
         ata_device_standby_immediate(0);
 }
+
+#ifdef USE_BDM_ATA
+static int ata_bd_io_common(struct block_device *bd, u64 lba, void *buf, u16 nsectors, int dir)
+{
+    return ata_device_sector_io_internal(bd->devNr, buf, lba, nsectors, dir);
+}
+
+//
+// Block device interface
+//
+
+static int ata_bd_read(struct block_device *bd, u64 sector, void *buffer, u16 count)
+{
+    if (ata_bd_io_common(bd, sector, buffer, count, 0) != 0)
+        return -EIO;
+    return count;
+}
+static int ata_bd_write(struct block_device *bd, u64 sector, const void *buffer, u16 count)
+{
+    if (ata_bd_io_common(bd, sector, (void *)buffer, count, 1) != 0)
+        return -EIO;
+    return count;
+}
+static void ata_bd_flush(struct block_device *bd)
+{
+    sceAtaFlushCache(bd->devNr);
+}
+static int ata_bd_stop(struct block_device *bd)
+{
+    ata_device_standby_immediate(bd->devNr);
+    return 0;
+}
+#endif

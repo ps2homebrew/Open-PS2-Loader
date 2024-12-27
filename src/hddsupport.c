@@ -29,7 +29,8 @@ extern u8 IOBuffer[2048];
 
 static unsigned char hddForceUpdate = 0;
 static unsigned char hddHDProKitDetected = 0;
-static unsigned char hddModulesLoaded = 0;
+static unsigned char hddModulesLoadCount = 0;
+static unsigned char hddSupportModulesLoaded = 0;
 
 static char *hddPrefix = "pfs0:";
 static hdl_games_list_t hddGames;
@@ -43,6 +44,7 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
 static void hddInitModules(void)
 {
     hddLoadModules();
+    hddLoadSupportModules();
 
     // update Themes
     char path[256];
@@ -175,26 +177,13 @@ static int hddCreateOPLPartition(const char *name)
 void hddLoadModules(void)
 {
     int ret;
-    static char hddarg[] = "-o"
-                           "\0"
-                           "4"
-                           "\0"
-                           "-n"
-                           "\0"
-                           "20";
 
-    static char pfsarg[] = "\0"
-                           "-o" // max open
-                           "\0"
-                           "10" // Default value: 2
-                           "\0"
-                           "-n" // Number of buffers
-                           "\0"
-                           "40"; // Default value: 8 | Max value: 127
-    LOG("HDDSUPPORT LoadModules\n");
+    LOG("HDDSUPPORT LoadModules %d\n", hddModulesLoadCount);
 
-    if (!hddModulesLoaded) {
-        hddModulesLoaded = 1;
+    if (hddModulesLoadCount == 0) {
+        // Increment the load count as soon as possible to prevent thread scheduling from allowing another thread to
+        // call into here and try to double load modules.
+        hddModulesLoadCount = 1;
 
         // DEV9 must be loaded, as HDD.IRX depends on it. Even if not required by the I/F (i.e. HDPro)
         sysInitDev9();
@@ -213,14 +202,95 @@ void hddLoadModules(void)
             LOG("[XHDD]:\n");
             sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 0, NULL);
         }
+
         if (ret < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_IF_NOT_DETECTED);
             return;
         }
+    } else
+        hddModulesLoadCount++;
 
+    LOG("HDDSUPPORT LoadModules done\n");
+}
+
+// Returns 1 for MBR/GPT, 0 for APA, and -1 if an error occured
+int hddDetectNonSonyFileSystem()
+{
+    int result = -1;
+    // Allocate memory for storing data for the first two sectors.
+    u8 *pSectorData = (u8 *)malloc(512 * 2);
+    if (pSectorData == NULL) {
+        LOG("hddDetectNonSonyFileSystem: failed to allocate scratch memory\n");
+        return -1;
+    }
+
+    // Trying to load the APA/PFS irx modules when a non-sony formatted HDD is connected (ie: MBR/GPT  w/ exFAT) runs
+    // the risk of corrupting the HDD. To avoid that get the first two sectors and perform some sanity checks. If
+    // we reasonably suspect the disk is not APA formatted bail out from loading the sony fs irx modules.
+    result = fileXioDevctl("xhdd0:", ATA_DEVCTL_READ_PARTITION_SECTOR, NULL, 0, pSectorData, 512 * 2);
+    if (result < 0) {
+        LOG("hddDetectNonSonyFileSystem: failed to read data from hdd %d\n", result);
+        free(pSectorData);
+        return -1;
+    }
+
+    // Check for MBR signature.
+    if (pSectorData[0x1FE] == 0x55 && pSectorData[0x1FF] == 0xAA) {
+        // Found MBR partition type.
+        LOG("hddDetectNonSonyFileSystem: found MBR partition data\n");
+        result = 1;
+    } else if (strncmp((const char *)&pSectorData[0x200], "EFI PART", 8) == 0) {
+        // Found GPT partition type.
+        LOG("hddDetectNonSonyFileSystem: found GPT partition data\n");
+        result = 1;
+    } else if (strncmp((const char *)&pSectorData[4], "APA", 3) == 0) {
+        // Found APA partition type.
+        LOG("hddDetectNonSonyFileSystem: found APA partition data\n");
+        result = 0;
+    } else {
+        // Even though we didn't find evidence of non-APA partition data, if we load the APA irx module
+        // it will write to the drive and potentially corrupt any data that might be there.
+        LOG("hddDetectNonSonyFileSystem: partition data not recognized\n");
+        result = -1;
+    }
+
+    // Cleanup and return.
+    free(pSectorData);
+    return result;
+}
+
+void hddLoadSupportModules(void)
+{
+    static char hddarg[] = "-o"
+                           "\0"
+                           "4"
+                           "\0"
+                           "-n"
+                           "\0"
+                           "20";
+    static char pfsarg[] = "\0"
+                           "-o" // max open
+                           "\0"
+                           "10" // Default value: 2
+                           "\0"
+                           "-n" // Number of buffers
+                           "\0"
+                           "40"; // Default value: 8 | Max value: 127
+
+    LOG("HDDSUPPORT LoadSupportModules\n");
+
+    // Check if the drive contains MBR/GPT partition data before we load the APA/PFS modules. If the drive is not
+    // APA then loading the APA irx modules can corrupt the drive as it will try to write APA partition data.
+    if (hddDetectNonSonyFileSystem() != 0) {
+        // Drive is MBR/GPT style, or unknown, bail out or risk corrupting the drive.
+        LOG("HDDSUPPORT LoadSupportModules bailing out early...\n");
+        return;
+    }
+
+    if (!hddSupportModulesLoaded) {
         LOG("[HDD]:\n");
-        ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
+        int ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
         if (ret < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_MODULE_HDD_FAILURE);
@@ -242,6 +312,7 @@ void hddLoadModules(void)
             return;
         }
 
+        hddSupportModulesLoaded = 1;
         LOG("HDDSUPPORT modules loaded\n");
 
         if (gOPLPart[0] == '\0')
@@ -587,10 +658,10 @@ static void hddCleanUp(item_list_t *itemList, int exception)
     }
 
     // UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
-    if (hddModulesLoaded) {
+    if (hddSupportModulesLoaded) {
         fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
 
-        hddModulesLoaded = 0;
+        hddSupportModulesLoaded = 0;
     }
 }
 
@@ -610,18 +681,23 @@ static void hddShutdown(item_list_t *itemList)
     }
 
     // UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
-    if (hddModulesLoaded) {
+    if (hddSupportModulesLoaded) {
         /* Close all files */
         fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
 
-        // DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
-        // The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
-        hddSetIdleImmediate();
+        hddSupportModulesLoaded = 0;
+    }
+
+    if (hddModulesLoadCount > 0) {
+        hddModulesLoadCount -= 1;
+        if (hddModulesLoadCount == 0) {
+            // DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
+            // The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
+            hddSetIdleImmediate();
+        }
 
         // Only shut down dev9 from here, if it was initialized from here before.
         sysShutdownDev9();
-
-        hddModulesLoaded = 0;
     }
 }
 

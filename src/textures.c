@@ -246,17 +246,17 @@ static int texSizeValidate(int width, int height, u8 psm)
 
 static void texPrepare(GSTEXTURE *texture)
 {
-    texture->Width = 0;                 // Must be set by loader
-    texture->Height = 0;                // Must be set by loader
-    texture->PSM = GS_PSM_CT24;         // Must be set by loader
-    texture->ClutPSM = 0;               // Default, can be set by loader
-    texture->TBW = 0;                   // gsKit internal value
-    texture->Mem = NULL;                // Must be allocated by loader
-    texture->Clut = NULL;               // Default, can be set by loader
-    texture->Vram = 0;                  // VRAM allocation handled by texture manager
-    texture->VramClut = 0;              // VRAM allocation handled by texture manager
-    texture->Filter = GS_FILTER_LINEAR; // Default
-
+    texture->Width = 0;                              // Must be set by loader
+    texture->Height = 0;                             // Must be set by loader
+    texture->PSM = GS_PSM_CT24;                      // Must be set by loader
+    texture->ClutPSM = 0;                            // Default, can be set by loader
+    texture->TBW = 0;                                // gsKit internal value
+    texture->Mem = NULL;                             // Must be allocated by loader
+    texture->Clut = NULL;                            // Default, can be set by loader
+    texture->Vram = 0;                               // VRAM allocation handled by texture manager
+    texture->VramClut = 0;                           // VRAM allocation handled by texture manager
+    texture->Filter = GS_FILTER_LINEAR;              // Default
+    texture->ClutStorageMode = GS_CLUT_STORAGE_CSM1; // Default
     // Do not load the texture to VRAM directly, only load it to EE RAM
     texture->Delayed = 1;
 }

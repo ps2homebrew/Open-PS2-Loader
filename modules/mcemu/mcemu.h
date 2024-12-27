@@ -105,7 +105,7 @@ typedef struct _McImageSpec
     int active; /* Activation flag */
 
 #ifdef BDM_DRIVER
-    u32 stsec; /* Vmc file start sector */
+    u64 stsec; /* Vmc file start sector */
 #endif
 
 #ifdef HDD_DRIVER

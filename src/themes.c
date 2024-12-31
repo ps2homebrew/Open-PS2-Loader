@@ -3,7 +3,6 @@
 #include "include/util.h"
 #include "include/gui.h"
 #include "include/renderman.h"
-#include "include/textures.h"
 #include "include/ioman.h"
 #include "include/fntsys.h"
 #include "include/lang.h"

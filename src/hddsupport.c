@@ -1,9 +1,7 @@
-#include "sys/fcntl.h"
 #include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
 #include "include/supportbase.h"
-#include "include/hddsupport.h"
 #include "include/util.h"
 #include "include/themes.h"
 #include "include/textures.h"
@@ -18,6 +16,8 @@
 #include <io_common.h>   // FIO_MT_RDWR
 
 #include <hdd-ioctl.h>
+#include <libcdvd-common.h>
+#include "opl-hdd-ioctl.h"
 
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
 

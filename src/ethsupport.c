@@ -1,8 +1,7 @@
 #include "include/opl.h"
+#include "include/mcemu.h"
 #include "include/lang.h"
 #include "include/gui.h"
-#include "include/supportbase.h"
-#include "include/ethsupport.h"
 #include "include/util.h"
 #include "include/renderman.h"
 #include "include/themes.h"
@@ -12,9 +11,13 @@
 #include "include/extern_irx.h"
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
+#include "include/ethsupport.h"
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioDevctl(ethBase, SMB_***)
+#include <netman.h>
+#include <ps2ips.h>
+#include <ps2smb.h>
 
 #include "include/nbns.h"
 #include "httpclient.h"

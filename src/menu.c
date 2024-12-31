@@ -5,8 +5,7 @@
 */
 
 #include "include/opl.h"
-#include "include/menu.h"
-#include "include/iosupport.h"
+#include "include/dia.h"
 #include "include/renderman.h"
 #include "include/fntsys.h"
 #include "include/lang.h"

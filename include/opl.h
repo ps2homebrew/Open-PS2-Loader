@@ -1,15 +1,9 @@
 #ifndef __OPL_H
 #define __OPL_H
 
-#include <tamtypes.h>
 #include <kernel.h>
 #include <sifrpc.h>
-#include <hdd-ioctl.h>
-#include "opl-hdd-ioctl.h"
-#include <iopcontrol.h>
-#include <iopheap.h>
 #include <string.h>
-#include <loadfile.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -17,33 +11,15 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
-#include <sbv_patches.h>
-#include <libcdvd.h>
-#include <libpad.h>
-#include <libmc.h>
-#include <netman.h>
-#include <ps2ips.h>
-#include <debug.h>
 #include <gsKit.h>
-#include <dmaKit.h>
 #include <malloc.h>
 #include <math.h>
-#include <osd_config.h>
-#include <libpwroff.h>
-#include <usbhdfsd-common.h>
-#include <smod.h>
-#include <smem.h>
-#include <debug.h>
-#include <ps2smb.h>
-#include "config.h"
 
+#include "include/iosupport.h"
+#include "include/mcemu.h"
 #include "include/hddsupport.h"
 #include "include/supportbase.h"
 #include "include/bdmsupport.h"
-
-// Last Played Auto Start
-#include <time.h>
-
 // Master password for disabling the parental lock.
 #define OPL_PARENTAL_LOCK_MASTER_PASS "989765"
 

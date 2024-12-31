@@ -1,8 +1,6 @@
 #include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
-#include "include/supportbase.h"
-#include "include/bdmsupport.h"
 #include "include/util.h"
 #include "include/themes.h"
 #include "include/textures.h"
@@ -14,6 +12,7 @@
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include <usbhdfsd-common.h>
+#include "opl-hdd-ioctl.h"
 
 #include <ps2sdkapi.h>
 #define NEWLIB_PORT_AWARE

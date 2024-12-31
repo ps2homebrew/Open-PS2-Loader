@@ -11,19 +11,16 @@
 #include "include/opl.h"
 #include "include/gui.h"
 #include "include/ethsupport.h"
-#include "include/hddsupport.h"
 #include "include/util.h"
 #include "include/pad.h"
+#include "include/mcemu.h"
 #include "include/system.h"
 #include "include/ioman.h"
 #include "include/ioprp.h"
-#include "include/bdmsupport.h"
 #include "include/OSDHistory.h"
 #include "include/renderman.h"
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
-#include "../ee_core/include/coreconfig.h"
-#include <osd_config.h>
 #include "include/pggsm.h"
 #include "include/cheatman.h"
 #include "include/xparam.h"
@@ -35,6 +32,12 @@
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioInit, fileXioExit, fileXioDevctl
+#include <libpwroff.h>
+#include <sbv_patches.h>
+#include <iopcontrol.h>
+#include <iopheap.h>
+#include <loadfile.h>
+
 
 typedef struct
 {

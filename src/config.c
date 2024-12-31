@@ -8,7 +8,6 @@
 #include "include/util.h"
 #include "include/ioman.h"
 #include "include/sound.h"
-#include <string.h>
 
 // FIXME: We should not need this function.
 //        Use newlib's 'stat' to get GMT time.

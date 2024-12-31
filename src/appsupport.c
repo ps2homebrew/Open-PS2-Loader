@@ -7,10 +7,6 @@
 #include "include/ioman.h"
 #include "include/util.h"
 
-#include "include/bdmsupport.h"
-#include "include/ethsupport.h"
-#include "include/hddsupport.h"
-
 #include <elf-loader.h>
 
 static int appForceUpdate = 1;

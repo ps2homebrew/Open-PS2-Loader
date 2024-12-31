@@ -1,7 +1,6 @@
 #ifndef __HDD_SUPPORT_H
 #define __HDD_SUPPORT_H
 
-#include "include/iosupport.h"
 #include "include/hdd.h"
 
 #define HDD_MODE_UPDATE_DELAY MENU_UPD_DELAY_NOUPDATE
@@ -38,7 +37,6 @@ typedef struct
     u32 length;
 } apa_subs;
 
-#include "include/mcemu.h"
 typedef struct
 {
     int active;                 /* Activation flag */

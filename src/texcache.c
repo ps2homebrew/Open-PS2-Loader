@@ -3,7 +3,6 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/gui.h"
-#include "include/util.h"
 #include "include/renderman.h"
 
 typedef struct

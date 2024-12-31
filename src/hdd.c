@@ -1,3 +1,4 @@
+
 #include "include/opl.h"
 #include "include/hdd.h"
 #include "include/ioman.h"
@@ -5,6 +6,7 @@
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h>
+#include "opl-hdd-ioctl.h"
 
 typedef struct // size = 1024
 {

@@ -5,9 +5,9 @@
  */
 
 #include "include/opl.h"
+#include "include/dialogs.h"
 #include "include/gui.h"
 #include "include/renderman.h"
-#include "include/menu.h"
 #include "include/fntsys.h"
 #include "include/ioman.h"
 #include "include/lang.h"
@@ -23,8 +23,6 @@
 #include "include/sound.h"
 #include "include/guigame.h"
 
-#include <limits.h>
-#include <stdlib.h>
 #include <libvux.h>
 
 // Last Played Auto Start

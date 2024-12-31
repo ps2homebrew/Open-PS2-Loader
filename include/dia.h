@@ -1,8 +1,6 @@
 #ifndef __DIA_H
 #define __DIA_H
 
-#include "include/opl.h"
-
 // UI dialog item definition
 typedef enum {
     // terminates the definition of dialog. Mandatory

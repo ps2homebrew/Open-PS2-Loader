@@ -8,12 +8,7 @@
 #include "include/util.h"
 #include "include/ioman.h"
 #include "include/system.h"
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <malloc.h>
 #include <rom0_info.h>
-
 #include "include/hdd.h"
 
 #include "../modules/isofs/zso.h"

@@ -3,19 +3,16 @@
  Licenced under Academic Free License version 3.0
  Review OpenPS2Loader README & LICENSE files for further details.
  */
-
 #include <audsrv.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #include <vorbis/vorbisfile.h>
+#pragma GCC diagnostic pop
 
 #include "include/sound.h"
 #include "include/opl.h"
 #include "include/ioman.h"
 #include "include/themes.h"
-
-// Silence unused variable warnings from vorbisfile.h
-static ov_callbacks OV_CALLBACKS_NOCLOSE __attribute__((unused));
-static ov_callbacks OV_CALLBACKS_STREAMONLY __attribute__((unused));
-static ov_callbacks OV_CALLBACKS_STREAMONLY_NOCLOSE __attribute__((unused));
 
 /*--    Theme Sound Effects    ----------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------*/

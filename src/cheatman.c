@@ -22,9 +22,10 @@
  * $Id$
  */
 
-#include <unistd.h>
+#include "include/opl.h"
 #include "include/cheatman.h"
 #include "include/ioman.h"
+#include <ctype.h>
 
 static int gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
 static int gCheatMode;   // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user

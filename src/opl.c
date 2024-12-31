@@ -16,7 +16,7 @@
 #include "include/texcache.h"
 #include "include/dia.h"
 #include "include/dialogs.h"
-#include "include/menusys.h"
+#include "include/menu.h"
 #include "include/system.h"
 #include "include/debug.h"
 #include "include/config.h"

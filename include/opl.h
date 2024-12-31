@@ -221,7 +221,8 @@ void setDefaultColors(void);
 
 #define MENU_ITEM_HEIGHT 19
 
-#include "include/menusys.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 
 typedef struct
 {

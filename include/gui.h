@@ -5,7 +5,7 @@
 #include "include/opl.h"
 #include "include/texcache.h"
 #include "include/dialogs.h"
-#include "include/menusys.h"
+#include "include/menu.h"
 
 typedef enum {
     // Informs gui that init is over and main gui can be rendered

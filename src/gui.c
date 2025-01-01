@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <libvux.h>
+#include <string.h>
 
 // Last Played Auto Start
 #include <time.h>
@@ -49,6 +50,8 @@ static int showThmPopup;
 static int showLngPopup;
 
 static clock_t popupTimer;
+
+char g_GameId[32];
 
 // forward decl.
 static void guiShow();
@@ -107,6 +110,75 @@ static int pperm[512];
 static float fadetbl[FADE_SIZE + 1];
 
 static VU_VECTOR pgrad3[12] = {{1, 1, 0, 1}, {-1, 1, 0, 1}, {1, -1, 0, 1}, {-1, -1, 0, 1}, {1, 0, 1, 1}, {-1, 0, 1, 1}, {1, 0, -1, 1}, {-1, 0, -1, 1}, {0, 1, 1, 1}, {0, -1, 1, 1}, {0, 1, -1, 1}, {0, -1, -1, 1}};
+
+// Function to set the game ID, ensuring the first 3 characters are ignored if they are "XX." or "SB."
+void guiSetGameId(const char* GameId) {
+    const char *adjustedGameId = GameId;
+
+    // Check if the GameId starts with "XX." or "SB."
+    if (strncmp(GameId, "XX.", 3) == 0 || strncmp(GameId, "SB.", 3) == 0) {
+        adjustedGameId = GameId + 3;  // Skip the first 3 characters
+    }
+
+    size_t length = strlen(adjustedGameId);
+
+    // Check if the GameId ends with ".ELF" or ".elf" and adjust length
+    if (length > 4 && strcasecmp(adjustedGameId + length - 4, ".elf") == 0) {
+        length -= 4;  // Exclude the ".elf" suffix
+    }
+
+    // Copy only the first 11 characters of the adjusted GameId
+    length = length > 11 ? 11 : length;  // Ensure the length does not exceed 11 characters
+    strncpy(g_GameId, adjustedGameId, length);
+    g_GameId[length] = '\0';  // Null-terminate the string
+}
+
+static uint8_t gameid_calc_crc(uint8_t *data, int len) {
+    uint8_t crc = 0x00;
+    for (int i = 0; i < len; i++) {
+        crc += data[i];
+    }
+    crc = 0x100 - crc;
+    return crc;
+}
+
+static void gameid_draw(char* game_id) {
+    static uint8_t data[64] = { 0 };
+    int gidlen = strlen(game_id);
+
+    int dpos = 0;
+
+    data[dpos++] = 0xA5;  // detect word
+    data[dpos++] = 0x00;  // address offset;
+    dpos++;
+    data[dpos++] = gidlen;
+
+    memcpy(&data[dpos], game_id, gidlen);
+    dpos += gidlen;
+
+    data[dpos++] = 0x00;
+    data[dpos++] = 0xD5;  // end word
+    data[dpos++] = 0x00;  // padding
+
+    int data_len = dpos;
+
+    data[2] = gameid_calc_crc(&data[3], data_len - 3);
+
+    int xstart = (screenWidth / 2) - (data_len * 8);
+    int ystart = screenHeight - (((screenHeight / 8) * 2) + 20);
+    int height = 2;
+
+    for (int i = 0; i < data_len; i++) {
+        for (int ii = 7; ii >= 0; ii--) {
+            rmDrawRect(xstart + (i * 16 + ((7 - ii) * 2)), ystart, 1, height, GS_SETREG_RGBA(0xFF, 0x00, 0xFF, 0x80));
+            if ((data[i] >> ii) & 1) {
+                rmDrawRect(xstart + (i * 16 + ((7 - ii) * 2) + 1), ystart, 1, height, GS_SETREG_RGBA(0x00, 0xFF, 0xFF, 0x80));
+            } else {
+                rmDrawRect(xstart + (i * 16 + ((7 - ii) * 2) + 1), ystart, 1, height, GS_SETREG_RGBA(0xFF, 0xFF, 0x00, 0x80));
+            }
+        }
+    }
+}
 
 void guiReloadScreenExtents()
 {
@@ -1549,6 +1621,9 @@ void guiIntroLoop(void)
 
         guiHandleDeferredOps();
 
+        if (greetingAlpha >= 0x80)
+            gameid_draw("");
+
         guiEndFrame();
 
         if (!screenHandlerTarget && screenHandler)
@@ -1718,6 +1793,10 @@ void guiRenderTextScreen(const char *message)
     fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, message, gTheme->textColor);
 
     guiDrawOverlays();
+
+    if (strlen(g_GameId)) {
+        gameid_draw(g_GameId);
+    }
 
     guiEndFrame();
 }

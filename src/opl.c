@@ -17,7 +17,7 @@
 #include "include/config.h"
 #include "include/util.h"
 #include "include/compatupd.h"
-#include "include/extern_irx.h"
+#include "include/imports.h"
 #include "httpclient.h"
 #include "include/ethsupport.h"
 #include "include/appsupport.h"
@@ -1493,7 +1493,7 @@ static int loadLwnbdSvr(void)
     };
     struct lwnbd_config config;
 
-    // deinit audio lib and background music while nbd server is running
+    // deint audio lib while nbd server is running
     audioEnd();
 
     // block all io ops, wait for the ones still running to finish

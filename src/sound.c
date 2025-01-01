@@ -9,37 +9,11 @@
 #include <vorbis/vorbisfile.h>
 #pragma GCC diagnostic pop
 
+#include "include/imports.h"
 #include "include/sound.h"
 #include "include/opl.h"
 #include "include/ioman.h"
 #include "include/themes.h"
-
-/*--    Theme Sound Effects    ----------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------*/
-
-extern unsigned char boot_adp[];
-extern unsigned int size_boot_adp;
-
-extern unsigned char cancel_adp[];
-extern unsigned int size_cancel_adp;
-
-extern unsigned char confirm_adp[];
-extern unsigned int size_confirm_adp;
-
-extern unsigned char cursor_adp[];
-extern unsigned int size_cursor_adp;
-
-extern unsigned char message_adp[];
-extern unsigned int size_message_adp;
-
-extern unsigned char transition_adp[];
-extern unsigned int size_transition_adp;
-
-extern unsigned char bd_connect_adp[];
-extern unsigned int size_bd_connect_adp;
-
-extern unsigned char bd_disconnect_adp[];
-extern unsigned int size_bd_disconnect_adp;
 
 struct sfxEffect
 {

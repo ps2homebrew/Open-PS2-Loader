@@ -19,7 +19,7 @@
 #include "include/ioprp.h"
 #include "include/OSDHistory.h"
 #include "include/renderman.h"
-#include "include/extern_irx.h"
+#include "include/imports.h"
 #include "../ee_core/include/modules.h"
 #include "include/pggsm.h"
 #include "include/cheatman.h"

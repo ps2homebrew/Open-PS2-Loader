@@ -8,7 +8,7 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
-#include "include/extern_irx.h"
+#include "include/imports.h"
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 #include "include/ethsupport.h"

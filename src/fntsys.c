@@ -11,14 +11,12 @@
 #include "include/utf8.h"
 #include "include/util.h"
 #include "include/atlas.h"
+#include "include/imports.h"
 
 #include <sys/types.h>
 #include <ft2build.h>
 
 #include FT_FREETYPE_H
-
-extern void *poeveticanew_raw;
-extern int size_poeveticanew_raw;
 
 /// Maximal count of atlases per font
 #define ATLAS_MAX    4

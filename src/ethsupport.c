@@ -12,6 +12,7 @@
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 #include "include/ethsupport.h"
+#include "include/sound.h"
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioDevctl(ethBase, SMB_***)
@@ -583,6 +584,8 @@ static void ethLaunchGame(item_list_t *itemList, int id, config_set_t *configSet
     struct cdvdman_settings_smb *settings;
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
+
+    bgmEnd();
 
     if (!gPCShareName[0]) {
         memcpy(gPCShareName, game->name, sizeof(gPCShareName));

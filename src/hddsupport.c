@@ -10,6 +10,7 @@
 #include "include/imports.h"
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
+#include "include/sound.h"
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioFormat, fileXioMount, fileXioUmount, fileXioDevctl
@@ -425,6 +426,8 @@ void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     char filename[32];
     hdl_game_info_t *game;
     struct cdvdman_settings_hdd *settings;
+
+    bgmEnd();
 
     if (gAutoLaunchGame == NULL)
         game = &hddGames.games[id];

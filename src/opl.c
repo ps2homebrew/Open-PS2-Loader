@@ -1155,7 +1155,7 @@ void applyConfig(int themeID, int langID, int skipDeviceRefresh)
 
     int changed = rmSetMode(0);
     if (changed) {
-        bgmMute();
+        bgmIsMuted(1);
         // reinit the graphics...
         thmReloadScreenExtents();
         guiReloadScreenExtents();
@@ -1186,7 +1186,7 @@ void applyConfig(int themeID, int langID, int skipDeviceRefresh)
         }
     }
 
-    bgmUnMute();
+    bgmIsMuted(0);
 
 #ifdef __DEBUG
     debugApplyConfig();
@@ -1493,8 +1493,9 @@ static int loadLwnbdSvr(void)
     };
     struct lwnbd_config config;
 
-    // deint audio lib while nbd server is running
+    // deinit audio lib and background music while nbd server is running
     audioEnd();
+    bgmEnd();
 
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
@@ -1627,6 +1628,7 @@ void deinit(int exception, int modeSelected)
     deinitAllSupport(exception, modeSelected);
 
     audioEnd();
+    bgmEnd();
     ioEnd();
     guiEnd();
     menuEnd();

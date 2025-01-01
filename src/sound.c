@@ -1,5 +1,5 @@
 /*
- Copyright 2022, Thanks to SP193
+ Copyright 2022-2025, Thanks to SP193 and KrahJohilto
  Licenced under Academic Free License version 3.0
  Review OpenPS2Loader README & LICENSE files for further details.
  */
@@ -223,7 +223,8 @@ extern void *_gp;
 
 static int bgmThreadID, bgmIoThreadID;
 static int outSema, inSema;
-static unsigned char terminateFlag, bgmIsPlaying;
+static unsigned char terminateFlag;
+static int bgmIsPlaying;
 static unsigned char rdPtr, wrPtr;
 static char bgmBuffer[BGM_RING_BUFFER_COUNT][BGM_RING_BUFFER_SIZE];
 static volatile unsigned char bgmThreadRunning, bgmIoThreadRunning;
@@ -477,22 +478,23 @@ void bgmStop(void)
 
 int isBgmPlaying(void)
 {
-    int ret = (int)bgmIsPlaying;
-
-    return ret;
+    return bgmIsPlaying ? 1 : 0;
 }
 
 // HACK: BGM stutters while perfroming certain tasks, mute during these operations and unmute once completed.
-void bgmMute(void)
+int bgmIsMuted(int muted)
 {
-    if (audio_initialized)
-        audsrv_set_volume(0);
+    return audio_initialized ? audsrv_set_volume(muted ? 0 : gBGMVolume) : -1;
 }
 
-void bgmUnMute(void)
+void bgmEnd(void)
 {
-    if (audio_initialized)
-        audsrv_set_volume(gBGMVolume);
+    if (audio_initialized) {
+        if (gEnableBGM && isBgmPlaying()) {
+            gEnableBGM = 0;
+            bgmStop();
+        }
+    }
 }
 
 /*--    General Audio    ------------------------------------------------------------------------------------------------------
@@ -516,9 +518,6 @@ void audioEnd(void)
         LOG("AUDIO: %s: ERROR: not initialized!\n", __FUNCTION__);
         return;
     }
-
-    if (gEnableBGM && isBgmPlaying())
-        bgmStop();
 
     audsrv_quit();
     audio_initialized = 0;

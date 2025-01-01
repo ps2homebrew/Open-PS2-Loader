@@ -326,6 +326,8 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
 
     bdm_device_data_t *pDeviceData = NULL;
 
+    bgmEnd();
+
     if (gAutoLaunchBDMGame == NULL) {
         pDeviceData = (bdm_device_data_t *)itemList->priv;
         game = &pDeviceData->bdmGames[id];

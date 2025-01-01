@@ -1953,14 +1953,13 @@ static void autoLaunchBDMGame(char *argv[])
     gAutoLaunchDeviceData = malloc(sizeof(bdm_device_data_t));
     memset(gAutoLaunchDeviceData, 0, sizeof(bdm_device_data_t));
 
-    int dir = -1;
     char apaDevicePrefix[8] = {0};
     delay(8);
     snprintf(apaDevicePrefix, sizeof(apaDevicePrefix), "mass0:");
     // Loop through mass0: to mass4:
     for (int i = 0; i <= 4; i++) {
         snprintf(path, sizeof(path), "mass%d:", i);
-        dir = fileXioDopen(path);
+        int dir = fileXioDopen(path);
 
         if (dir >= 0) {
             fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &gAutoLaunchDeviceData->bdmDriver, sizeof(gAutoLaunchDeviceData->bdmDriver) - 1);

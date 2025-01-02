@@ -50,11 +50,7 @@ static int fsys_pid = 0;
 // static iop_device_t fsys_driver;
 
 ////////////////////////////////////////////////////////////////////////
-static int dummy5()
-{
-    printf("dummy function called\n");
-    return -5;
-}
+IOMAN_RETURN_VALUE_IMPL(5);
 
 ////////////////////////////////////////////////////////////////////////
 static void fsysInit(iop_device_t *driver)
@@ -303,12 +299,12 @@ static int fsysDclose(int fd)
     return ret;
 }
 
-iop_device_ops_t fsys_functarray = {(void *)fsysInit, (void *)fsysDestroy, (void *)dummy5,
+iop_device_ops_t fsys_functarray = {(void *)fsysInit, (void *)fsysDestroy, IOMAN_RETURN_VALUE(5),
                                     (void *)fsysOpen, (void *)fsysClose, (void *)fsysRead,
-                                    (void *)fsysWrite, (void *)fsysLseek, (void *)dummy5,
+                                    (void *)fsysWrite, (void *)fsysLseek, IOMAN_RETURN_VALUE(5),
                                     (void *)fsysRemove, (void *)fsysMkdir, (void *)fsysRmdir,
                                     (void *)fsysDopen, (void *)fsysDclose, (void *)fsysDread,
-                                    (void *)dummy5, (void *)dummy5};
+                                    IOMAN_RETURN_VALUE(5), IOMAN_RETURN_VALUE(5)};
 
 iop_device_t fsys_driver = {fsname, 16, 1, "fsys driver",
                             &fsys_functarray};

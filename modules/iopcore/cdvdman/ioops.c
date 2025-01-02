@@ -26,8 +26,6 @@ static u8 cdvdman_fs_buf[CDVDMAN_FS_SECTORS * 2048 + CDVDFSV_ALIGNMENT];
 #define CIOCSTREAMSTAT   0x630F
 
 // driver ops protypes
-static int cdrom_dummy(void);
-static s64 cdrom_dummy64(void);
 static int cdrom_init(iop_device_t *dev);
 static int cdrom_deinit(iop_device_t *dev);
 static int cdrom_open(iop_file_t *f, const char *filename, int mode);
@@ -40,35 +38,37 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent);
 static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
 static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
 static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen);
+IOMAN_RETURN_VALUE_IMPL(EPERM);
+
 
 // driver ops func tab
 static struct _iop_ext_device_ops cdrom_ops = {
     &cdrom_init,
     &cdrom_deinit,
-    (void *)&cdrom_dummy,
+    IOMAN_RETURN_VALUE(EPERM),
     &cdrom_open,
     &cdrom_close,
     &cdrom_read,
-    (void *)&cdrom_dummy,
+    IOMAN_RETURN_VALUE(EPERM),
     &cdrom_lseek,
     &cdrom_ioctl,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
     &cdrom_dopen,
     &cdrom_close, // dclose -> close
     &cdrom_dread,
     &cdrom_getstat,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy64,
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE_S64(EPERM),
     (void *)&cdrom_devctl,
-    (void *)&cdrom_dummy,
-    (void *)&cdrom_dummy,
+    IOMAN_RETURN_VALUE(EPERM),
+    IOMAN_RETURN_VALUE(EPERM),
     &cdrom_ioctl2};
 
 // driver descriptor
@@ -182,17 +182,6 @@ static int cdrom_purifyPath(char *path)
     }
 
     return 1;
-}
-
-//--------------------------------------------------------------
-static int cdrom_dummy(void)
-{
-    return -EPERM;
-}
-
-static s64 cdrom_dummy64(void)
-{
-    return -EPERM;
 }
 
 //--------------------------------------------------------------

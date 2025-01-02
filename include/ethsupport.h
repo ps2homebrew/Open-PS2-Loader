@@ -1,11 +1,8 @@
 #ifndef __ETH_SUPPORT_H
 #define __ETH_SUPPORT_H
 
-#include "include/iosupport.h"
-
 #define ETH_MODE_UPDATE_DELAY 300
 
-#include "include/mcemu.h"
 typedef struct
 {
     int active;       /* Activation flag */

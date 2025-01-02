@@ -6,10 +6,7 @@
 #include "include/system.h"
 #include "include/ioman.h"
 #include "include/util.h"
-
-#include "include/bdmsupport.h"
-#include "include/ethsupport.h"
-#include "include/hddsupport.h"
+#include "include/sound.h"
 
 #include <elf-loader.h>
 
@@ -360,6 +357,8 @@ static void appLaunchItem(item_list_t *itemList, int id, config_set_t *configSet
     int fd;
     char filename[256];
     const char *argv1;
+
+    bgmEnd();
 
     // Retrieve configuration set by appGetConfig()
     configGetStrCopy(configSet, CONFIG_ITEM_STARTUP, filename, sizeof(filename));

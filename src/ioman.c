@@ -1,10 +1,5 @@
 #include "include/opl.h"
 #include "include/ioman.h"
-#include <kernel.h>
-#include <string.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <unistd.h>
 #ifdef __EESIO_DEBUG
 #include <sio.h>
 #endif

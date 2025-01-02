@@ -13,18 +13,13 @@
 #include <fcntl.h>
 #include <malloc.h>
 #include <rom0_info.h>
-
+#include "include/imports.h"
 #include "include/hdd.h"
 
 #include "../modules/isofs/zso.h"
 
 extern int probed_fd;
 extern u32 probed_lba;
-
-extern void *icon_sys;
-extern int size_icon_sys;
-extern void *icon_icn;
-extern int size_icon_icn;
 
 static int mcID = -1;
 

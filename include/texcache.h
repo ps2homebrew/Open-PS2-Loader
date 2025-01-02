@@ -1,8 +1,6 @@
 #ifndef __TEX_CACHE_H
 #define __TEX_CACHE_H
 
-#include "include/iosupport.h"
-
 /// A single cache entry...
 typedef struct
 {

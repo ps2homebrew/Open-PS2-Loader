@@ -1,11 +1,7 @@
 #ifndef __BDM_SUPPORT_H
 #define __BDM_SUPPORT_H
 
-#include "include/iosupport.h"
-
 #define BDM_MODE_UPDATE_DELAY MENU_UPD_DELAY_GENREFRESH
-
-#include "include/mcemu.h"
 
 typedef struct
 {

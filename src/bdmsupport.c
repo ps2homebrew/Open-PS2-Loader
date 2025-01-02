@@ -1,19 +1,18 @@
 #include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
-#include "include/supportbase.h"
-#include "include/bdmsupport.h"
 #include "include/util.h"
 #include "include/themes.h"
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
-#include "include/extern_irx.h"
+#include "include/imports.h"
 #include "include/cheatman.h"
 #include "include/sound.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include <usbhdfsd-common.h>
+#include "opl-hdd-ioctl.h"
 
 #include <ps2sdkapi.h>
 #define NEWLIB_PORT_AWARE
@@ -326,6 +325,8 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     unsigned short int layer1_part;
 
     bdm_device_data_t *pDeviceData = NULL;
+
+    bgmEnd();
 
     if (gAutoLaunchBDMGame == NULL) {
         pDeviceData = (bdm_device_data_t *)itemList->priv;

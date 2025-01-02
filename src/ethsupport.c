@@ -1,20 +1,24 @@
 #include "include/opl.h"
+#include "include/mcemu.h"
 #include "include/lang.h"
 #include "include/gui.h"
-#include "include/supportbase.h"
-#include "include/ethsupport.h"
 #include "include/util.h"
 #include "include/renderman.h"
 #include "include/themes.h"
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
-#include "include/extern_irx.h"
+#include "include/imports.h"
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
+#include "include/ethsupport.h"
+#include "include/sound.h"
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioDevctl(ethBase, SMB_***)
+#include <netman.h>
+#include <ps2ips.h>
+#include <ps2smb.h>
 
 #include "include/nbns.h"
 #include "httpclient.h"
@@ -580,6 +584,8 @@ static void ethLaunchGame(item_list_t *itemList, int id, config_set_t *configSet
     struct cdvdman_settings_smb *settings;
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
+
+    bgmEnd();
 
     if (!gPCShareName[0]) {
         memcpy(gPCShareName, game->name, sizeof(gPCShareName));

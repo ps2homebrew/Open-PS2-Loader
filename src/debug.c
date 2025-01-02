@@ -8,7 +8,7 @@
 #include "include/ethsupport.h"
 #include "include/system.h"
 #include "include/ioman.h"
-#include "include/extern_irx.h"
+#include "include/imports.h"
 
 static u8 modulesLoaded = 0;
 

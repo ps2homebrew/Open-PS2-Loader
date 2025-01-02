@@ -3,19 +3,16 @@
 #include "include/util.h"
 #include "include/gui.h"
 #include "include/renderman.h"
-#include "include/textures.h"
 #include "include/ioman.h"
 #include "include/fntsys.h"
 #include "include/lang.h"
 #include "include/pad.h"
 #include "include/sound.h"
+#include "include/imports.h"
 
 #define MENU_POS_V     50
 #define HINT_HEIGHT    32
 #define DECORATOR_SIZE 20
-
-extern const char conf_theme_OPL_cfg;
-extern u16 size_conf_theme_OPL_cfg;
 
 theme_t *gTheme;
 
@@ -1273,7 +1270,7 @@ static void thmLoad(const char *themePath)
     if (!themePath) {
         // No theme specified. Prepare and load the default theme.
         themeConfig = configAlloc(0, NULL, NULL);
-        configReadBuffer(themeConfig, &conf_theme_OPL_cfg, size_conf_theme_OPL_cfg);
+        configReadBuffer(themeConfig, (const char *)&conf_theme_OPL_cfg, size_conf_theme_OPL_cfg);
     } else {
         snprintf(path, sizeof(path), "%sconf_theme.cfg", themePath);
         themeConfig = configAlloc(0, NULL, path);

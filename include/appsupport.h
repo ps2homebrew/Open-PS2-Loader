@@ -1,8 +1,6 @@
 #ifndef __APP_SUPPORT_H
 #define __APP_SUPPORT_H
 
-#include "include/iosupport.h"
-
 #define APP_MODE_UPDATE_DELAY 240
 
 #define APP_TITLE_MAX 128

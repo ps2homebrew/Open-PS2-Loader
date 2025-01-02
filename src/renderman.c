@@ -4,8 +4,6 @@
   Review OpenUsbLd README & LICENSE files for further details.
 */
 
-#include <stdio.h>
-#include <kernel.h>
 
 #include "include/opl.h"
 #include "include/renderman.h"

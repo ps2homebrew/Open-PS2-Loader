@@ -1,6 +1,8 @@
 #ifndef __HDD_H
 #define __HDD_H
 
+#include <hdd-ioctl.h>
+
 typedef struct
 {
     u32 start;  // Sector address

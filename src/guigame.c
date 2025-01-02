@@ -4,12 +4,11 @@
 */
 
 #include "include/opl.h"
+#include "include/dialogs.h"
 #include "include/gui.h"
 #include "include/ioman.h"
 #include "include/lang.h"
 #include "include/pad.h"
-#include "include/config.h"
-#include "include/ethsupport.h"
 #include "include/compatupd.h"
 #include "include/cheatman.h"
 #include "include/system.h"

@@ -1,23 +1,24 @@
-#include "sys/fcntl.h"
 #include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
 #include "include/supportbase.h"
-#include "include/hddsupport.h"
 #include "include/util.h"
 #include "include/themes.h"
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
-#include "include/extern_irx.h"
+#include "include/imports.h"
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
+#include "include/sound.h"
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioFormat, fileXioMount, fileXioUmount, fileXioDevctl
 #include <io_common.h>   // FIO_MT_RDWR
 
 #include <hdd-ioctl.h>
+#include <libcdvd-common.h>
+#include "opl-hdd-ioctl.h"
 
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
 
@@ -425,6 +426,8 @@ void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     char filename[32];
     hdl_game_info_t *game;
     struct cdvdman_settings_hdd *settings;
+
+    bgmEnd();
 
     if (gAutoLaunchGame == NULL)
         game = &hddGames.games[id];

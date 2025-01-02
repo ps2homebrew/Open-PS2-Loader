@@ -7,17 +7,10 @@
 
     However, OPL does not need any of that, so it can be made simpler.    */
 
-#include <errno.h>
-#include <kernel.h>
+
 #include <libcdvd.h>
-#include <limits.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/fcntl.h>
-#include <sys/unistd.h>
 #include <libmc.h>
-#include <libmc-common.h>
+#include "include/opl.h"
 
 #include "include/util.h"
 #include "include/OSDHistory.h"

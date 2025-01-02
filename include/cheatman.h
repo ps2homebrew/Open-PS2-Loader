@@ -25,15 +25,6 @@
 #ifndef _CHEATMAN_H_
 #define _CHEATMAN_H_
 
-#include "opl.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <fcntl.h>
-#include <malloc.h>
-#include <ctype.h>
-#include <string.h>
-
 #define CHEAT_VERSION "0.5.3.7"
 
 #define MAX_HOOKS      5

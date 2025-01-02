@@ -1850,7 +1850,7 @@ static void miniInit(int mode)
         gEnableMX4SIO = 1;
         gEnableBdmHDD = 1;
         bdmLoadModules();
-        delay(6); // Wait for the device to be detected.
+
     } else if (mode == HDD_MODE) {
         hddLoadModules();
         hddLoadSupportModules();
@@ -1953,25 +1953,46 @@ static void autoLaunchBDMGame(char *argv[])
     gAutoLaunchDeviceData = malloc(sizeof(bdm_device_data_t));
     memset(gAutoLaunchDeviceData, 0, sizeof(bdm_device_data_t));
 
-    snprintf(path, sizeof(path), "mass0:");
-    int dir = fileXioDopen(path);
-    if (dir >= 0) {
-        fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &gAutoLaunchDeviceData->bdmDriver, sizeof(gAutoLaunchDeviceData->bdmDriver) - 1);
-        fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &gAutoLaunchDeviceData->massDeviceIndex, sizeof(gAutoLaunchDeviceData->massDeviceIndex));
+    char apaDevicePrefix[8] = {0};
+    delay(8);
+    snprintf(apaDevicePrefix, sizeof(apaDevicePrefix), "mass0:");
+    // Loop through mass0: to mass4:
+    for (int i = 0; i <= 4; i++) {
+        snprintf(path, sizeof(path), "mass%d:", i);
+        int dir = fileXioDopen(path);
 
-        if (!strcmp(gAutoLaunchDeviceData->bdmDriver, "ata") && strlen(gAutoLaunchDeviceData->bdmDriver) == 3)
-            bdmResolveLBA_UDMA(gAutoLaunchDeviceData);
+        if (dir >= 0) {
+            fileXioIoctl2(dir, USBMASS_IOCTL_GET_DRIVERNAME, NULL, 0, &gAutoLaunchDeviceData->bdmDriver, sizeof(gAutoLaunchDeviceData->bdmDriver) - 1);
+            fileXioIoctl2(dir, USBMASS_IOCTL_GET_DEVICE_NUMBER, NULL, 0, &gAutoLaunchDeviceData->massDeviceIndex, sizeof(gAutoLaunchDeviceData->massDeviceIndex));
 
-        fileXioDclose(dir);
+            if (!strcmp(gAutoLaunchDeviceData->bdmDriver, "ata") && strlen(gAutoLaunchDeviceData->bdmDriver) == 3) {
+                bdmResolveLBA_UDMA(gAutoLaunchDeviceData);
+                snprintf(apaDevicePrefix, sizeof(apaDevicePrefix), "mass%d:", i);
+                fileXioDclose(dir);
+                break; // Exit the loop if "ata" device is found
+            }
+
+            fileXioDclose(dir);
+        } else {
+            // Retry for mass0: only
+            if (i == 0) {
+                delay(6);
+                i--;
+            } else {
+                break;
+            }
+        }
+        delay(6);
     }
 
     if (gBDMPrefix[0] != '\0') {
-        snprintf(path, sizeof(path), "mass0:%s/CFG/%s.cfg", gBDMPrefix, gAutoLaunchBDMGame->startup);
-        snprintf(gAutoLaunchDeviceData->bdmPrefix, sizeof(gAutoLaunchDeviceData->bdmPrefix), "mass0:%s/", gBDMPrefix);
+        snprintf(path, sizeof(path), "%s%s/CFG/%s.cfg", apaDevicePrefix, gBDMPrefix, gAutoLaunchBDMGame->startup);
+        snprintf(gAutoLaunchDeviceData->bdmPrefix, sizeof(gAutoLaunchDeviceData->bdmPrefix), "%s%s/", apaDevicePrefix, gBDMPrefix);
     } else {
-        snprintf(path, sizeof(path), "mass0:CFG/%s.cfg", gAutoLaunchBDMGame->startup);
-        snprintf(gAutoLaunchDeviceData->bdmPrefix, sizeof(gAutoLaunchDeviceData->bdmPrefix), "mass0:");
+        snprintf(path, sizeof(path), "%sCFG/%s.cfg", apaDevicePrefix, gAutoLaunchBDMGame->startup);
+        snprintf(gAutoLaunchDeviceData->bdmPrefix, sizeof(gAutoLaunchDeviceData->bdmPrefix), "%s", apaDevicePrefix);
     }
+
 
     configSet = configAlloc(0, NULL, path);
     configRead(configSet);

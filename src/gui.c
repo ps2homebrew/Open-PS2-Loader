@@ -20,6 +20,7 @@
 #include "include/compatupd.h"
 #include "include/pggsm.h"
 #include "include/cheatman.h"
+#include "include/audio.h"
 #include "include/sound.h"
 #include "include/guigame.h"
 
@@ -882,7 +883,7 @@ static void guiSetAudioSettingsState(void)
     diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
     diaGetInt(diaAudioConfig, CFG_BGM_VOLUME, &gBGMVolume);
     diaGetString(diaAudioConfig, CFG_DEFAULT_BGM_PATH, gDefaultBGMPath, sizeof(gDefaultBGMPath));
-    audioSetVolume();
+    audioSetVolume(SFX_COUNT);
 
     if (gEnableBGM && !isBgmPlaying())
         bgmStart();

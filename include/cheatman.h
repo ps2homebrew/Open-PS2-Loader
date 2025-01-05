@@ -62,7 +62,7 @@ extern cheat_entry_t gCheats[MAX_CODES];
 
 void InitCheatsConfig(config_set_t *configSet);
 int GetCheatsEnabled(void);
-const u32 *GetCheatsList(void);
+u32 *GetCheatsList(void);
 int load_cheats(const char *cheatfile);
 void set_cheats_list(void);
 

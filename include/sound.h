@@ -14,10 +14,6 @@ enum SFX {
     SFX_COUNT
 };
 
-void audioInit(void);
-void audioEnd(void);
-void audioSetVolume(void);
-
 int sfxInit(int bootSnd);
 int sfxGetSoundDuration(int id);
 void sfxPlay(int id);

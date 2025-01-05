@@ -1,6 +1,6 @@
 /*
   Copyright 2009, Ifcaro & volca
-  Copyright 2024-2025, André Guilherme
+  Copyright 2024-2025, André Guilherme(Wolf3s)
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 */

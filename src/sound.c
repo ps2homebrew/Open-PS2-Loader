@@ -10,6 +10,7 @@
 #pragma GCC diagnostic pop
 
 #include "include/imports.h"
+#include "include/audio.h"
 #include "include/sound.h"
 #include "include/opl.h"
 #include "include/ioman.h"
@@ -37,6 +38,29 @@ static struct sfxEffect sfx_files[SFX_COUNT] = {
 
 static struct audsrv_adpcm_t sfx[SFX_COUNT];
 static int audio_initialized = 0;
+
+/*--    Theme Background Music    -------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------*/
+
+#define BGM_RING_BUFFER_COUNT 16
+#define BGM_RING_BUFFER_SIZE  4096
+#define BGM_THREAD_BASE_PRIO  0x40
+#define BGM_THREAD_STACK_SIZE 0x1000
+
+extern void *_gp;
+
+static int bgmThreadID, bgmIoThreadID;
+static int outSema, inSema;
+static unsigned char terminateFlag;
+static int bgmIsPlaying;
+static unsigned char rdPtr, wrPtr;
+static char bgmBuffer[BGM_RING_BUFFER_COUNT][BGM_RING_BUFFER_SIZE];
+static volatile unsigned char bgmThreadRunning, bgmIoThreadRunning;
+
+static u8 bgmThreadStack[BGM_THREAD_STACK_SIZE] __attribute__((aligned(16)));
+static u8 bgmIoThreadStack[BGM_THREAD_STACK_SIZE] __attribute__((aligned(16)));
+
+static OggVorbis_File *vorbisFile;
 
 // Returns 0 if the specified file was read. The sfxEffect structure will not be updated unless the file is successfully read.
 static int sfxRead(const char *full_path, struct sfxEffect *sfx)
@@ -148,7 +172,7 @@ int sfxInit(int bootSnd)
 
     audsrv_adpcm_init();
     sfxInitDefaults();
-    audioSetVolume();
+    audioSetVolume(SFX_COUNT);
 
     // Check default theme is not current theme
     int themeID = thmGetGuiValue();
@@ -210,29 +234,6 @@ void sfxPlay(int id)
         audsrv_ch_play_adpcm(id, &sfx[id]);
     }
 }
-
-/*--    Theme Background Music    -------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------*/
-
-#define BGM_RING_BUFFER_COUNT 16
-#define BGM_RING_BUFFER_SIZE  4096
-#define BGM_THREAD_BASE_PRIO  0x40
-#define BGM_THREAD_STACK_SIZE 0x1000
-
-extern void *_gp;
-
-static int bgmThreadID, bgmIoThreadID;
-static int outSema, inSema;
-static unsigned char terminateFlag;
-static int bgmIsPlaying;
-static unsigned char rdPtr, wrPtr;
-static char bgmBuffer[BGM_RING_BUFFER_COUNT][BGM_RING_BUFFER_SIZE];
-static volatile unsigned char bgmThreadRunning, bgmIoThreadRunning;
-
-static u8 bgmThreadStack[BGM_THREAD_STACK_SIZE] __attribute__((aligned(16)));
-static u8 bgmIoThreadStack[BGM_THREAD_STACK_SIZE] __attribute__((aligned(16)));
-
-static OggVorbis_File *vorbisFile;
 
 static void bgmThread(void *arg)
 {
@@ -495,46 +496,4 @@ void bgmEnd(void)
             bgmStop();
         }
     }
-}
-
-/*--    General Audio    ------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------*/
-
-void audioInit(void)
-{
-    if (!audio_initialized) {
-        if (audsrv_init() != 0) {
-            LOG("AUDIO: Failed to initialize audsrv\n");
-            LOG("AUDIO: Audsrv returned error string: %s\n", audsrv_get_error_string());
-            return;
-        }
-        audio_initialized = 1;
-    }
-}
-
-void audioEnd(void)
-{
-    if (!audio_initialized) {
-        LOG("AUDIO: %s: ERROR: not initialized!\n", __FUNCTION__);
-        return;
-    }
-
-    audsrv_quit();
-    audio_initialized = 0;
-}
-
-void audioSetVolume(void)
-{
-    int i;
-
-    if (!audio_initialized) {
-        LOG("AUDIO: %s: ERROR: not initialized!\n", __FUNCTION__);
-        return;
-    }
-
-    for (i = 1; i < SFX_COUNT; i++)
-        audsrv_adpcm_set_volume(i, gSFXVolume);
-
-    audsrv_adpcm_set_volume(0, gBootSndVolume);
-    audsrv_set_volume(gBGMVolume);
 }

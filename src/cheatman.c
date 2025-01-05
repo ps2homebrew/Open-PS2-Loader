@@ -59,7 +59,7 @@ int GetCheatsEnabled(void)
     return gEnableCheat;
 }
 
-const u32 *GetCheatsList(void)
+u32 *GetCheatsList(void)
 {
     return gCheatList;
 }

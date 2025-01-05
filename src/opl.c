@@ -23,6 +23,7 @@
 #include "include/appsupport.h"
 
 #include "include/cheatman.h"
+#include "include/audio.h"
 #include "include/sound.h"
 #include "include/xparam.h"
 

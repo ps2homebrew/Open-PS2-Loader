@@ -37,14 +37,35 @@ typedef struct
     u8 unknown2[10];                // Always zero
 } USBExtreme_game_entry_t;
 
+typedef struct
+{
+    int fd;
+    int mode;
+    char *buffer;
+    unsigned int size;
+    unsigned int available;
+    char *lastPtr;
+    short allocResult;
+} file_buffer_t;
+
+extern base_game_info_t *gAutoLaunchBDMGame;
+
 int isValidIsoName(char *name, int *pNameLen);
+int sbGetmcID(void);
+void sbCheckMCFolder(void);
+
 int sbIsSameSize(const char *prefix, int prevSize);
+int sbGetFileSize(int fd);
 int sbCreateSemaphore(void);
 int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gamecount);
+int sbListDir(char *path, const char *separator, int maxElem, int (*readEntry)(int index, const char *path, const char *separator, const char *name, unsigned char d_type));
 int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman, void **cdvdman_irx, int *patchindex);
 void sbUnprepare(void *pCommon);
 void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, int excludeID);
+int sbCheckFile(char *path, int mode);
 void sbCreatePath(const base_game_info_t *game, char *path, const char *prefix, const char *sep, int part);
+int sbOpenFile(char *path, int mode);
+void *sbReadFile(char *path, int align, int *size);
 void sbDelete(base_game_info_t **list, const char *prefix, const char *sep, int gamecount, int id);
 void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int gamecount, int id, char *newname);
 config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const char *sep);
@@ -56,5 +77,21 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset);
 int sbProbeISO9660_64(const char *path, base_game_info_t *game, u32 layer1_offset);
 
 int sbLoadCheats(const char *path, const char *file);
+
+/* File buffer IO functions */
+
+/* size will be the maximum line size possible */
+file_buffer_t *sbOpenFileBuffer(char *fpath, int mode, short allocResult, unsigned int size);
+
+/* size will be the maximum line size possible */
+file_buffer_t *sbOpenFileBufferBuffer(short allocResult, const void *buffer, unsigned int size);
+
+int sbReadFileBuffer(file_buffer_t *fileBuffer, char **outBuf);
+
+void sbWriteFileBuffer(file_buffer_t *fileBuffer, char *inBuf, int size);
+
+void sbCloseFileBuffer(file_buffer_t *fileBuffer);
+
+int sbDeleteFolder(const char *folder);
 
 #endif

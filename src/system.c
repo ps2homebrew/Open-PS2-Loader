@@ -9,7 +9,11 @@
 #endif
 
 #include "include/opl.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/gui.h"
+#include "include/supportbase.h"
+#include "include/bdmsupport.h"
 #include "include/ethsupport.h"
 #include "include/util.h"
 #include "include/pad.h"
@@ -37,7 +41,7 @@
 #include <iopcontrol.h>
 #include <iopheap.h>
 #include <loadfile.h>
-
+#include <hdd-ioctl.h>
 
 typedef struct
 {

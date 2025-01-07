@@ -3,6 +3,7 @@
 
 void audioInit(void);
 void audioEnd(void);
-void audioSetVolume(int sfx);
+void audioSetVolume();
+void audioSetSfxVolume(int sfx);
 
 #endif

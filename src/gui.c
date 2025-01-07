@@ -5,6 +5,9 @@
  */
 
 #include "include/opl.h"
+#include "include/submenu.h"
+#include "include/menu.h"
+#include "include/dia.h"
 #include "include/dialogs.h"
 #include "include/gui.h"
 #include "include/renderman.h"
@@ -33,6 +36,7 @@ static int gScheduledOps;
 static int gCompletedOps;
 static int gTerminate;
 static int gInitComplete;
+
 
 static gui_callback_t gFrameHook;
 
@@ -713,6 +717,7 @@ reselect_video_mode:
 
         applyConfig(themeID, langID, 1);
         sfxInit(0);
+        audioInit();
 
         if (gEnableBGM && !isBgmPlaying())
             bgmStart();
@@ -883,7 +888,8 @@ static void guiSetAudioSettingsState(void)
     diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
     diaGetInt(diaAudioConfig, CFG_BGM_VOLUME, &gBGMVolume);
     diaGetString(diaAudioConfig, CFG_DEFAULT_BGM_PATH, gDefaultBGMPath, sizeof(gDefaultBGMPath));
-    audioSetVolume(SFX_COUNT);
+
+    audioSetVolume();
 
     if (gEnableBGM && !isBgmPlaying())
         bgmStart();

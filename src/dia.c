@@ -5,7 +5,10 @@
 */
 
 #include "include/opl.h"
+#include "include/dia.h"
 #include "include/dialogs.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/gui.h"
 #include "include/lang.h"
 #include "include/pad.h"

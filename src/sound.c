@@ -37,7 +37,7 @@ static struct sfxEffect sfx_files[SFX_COUNT] = {
 };
 
 static struct audsrv_adpcm_t sfx[SFX_COUNT];
-static int audio_initialized = 0;
+int audio_initialized = 0;
 
 /*--    Theme Background Music    -------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------*/
@@ -165,14 +165,8 @@ int sfxInit(int bootSnd)
     int thmSfxEnabled = 0;
     int i = 1;
 
-    if (!audio_initialized) {
-        LOG("SFX: %s: ERROR: not initialized!\n", __FUNCTION__);
-        return -1;
-    }
-
-    audsrv_adpcm_init();
     sfxInitDefaults();
-    audioSetVolume(SFX_COUNT);
+    audioSetSfxVolume(SFX_COUNT);
 
     // Check default theme is not current theme
     int themeID = thmGetGuiValue();

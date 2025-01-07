@@ -6,6 +6,7 @@
 */
 
 #include "include/opl.h"
+#include "submenu.h"
 #include "include/lang.h"
 #include "include/themes.h"
 

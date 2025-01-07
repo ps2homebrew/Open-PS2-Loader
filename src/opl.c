@@ -6,12 +6,15 @@
 
 #include "include/opl.h"
 #include "include/ioman.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/gui.h"
 #include "include/guigame.h"
 #include "include/renderman.h"
 #include "include/lang.h"
 #include "include/themes.h"
 #include "include/pad.h"
+#include "include/dia.h"
 #include "include/dialogs.h"
 #include "include/system.h"
 #include "include/config.h"
@@ -19,9 +22,13 @@
 #include "include/compatupd.h"
 #include "include/imports.h"
 #include "httpclient.h"
+#include "include/supportbase.h"
 #include "include/ethsupport.h"
 #include "include/appsupport.h"
-
+#include "include/bdmsupport.h"
+#include "include/hdd.h"
+#include "include/hddsupport.h"
+#include "include/supportbase.h"
 #include "include/cheatman.h"
 #include "include/audio.h"
 #include "include/sound.h"
@@ -107,7 +114,7 @@ static unsigned int frameCounter;
 
 static char errorMessage[256];
 
-static opl_io_module_t list_support[MODE_COUNT];
+opl_io_module_t list_support[MODE_COUNT];
 
 // Global data
 char *gBaseMCDir;
@@ -183,9 +190,6 @@ unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];
 unsigned char gDefaultSelTextColor[3];
 unsigned char gDefaultUITextColor[3];
-hdl_game_info_t *gAutoLaunchGame;
-base_game_info_t *gAutoLaunchBDMGame;
-bdm_device_data_t *gAutoLaunchDeviceData;
 char gOPLPart[128];
 char *gHDDPrefix;
 char gExportName[32];
@@ -434,216 +438,6 @@ static void deinitAllSupport(int exception, int modeSelected)
     }
 }
 
-// For resolving the mode, given an app's path
-int oplPath2Mode(const char *path)
-{
-    char appsPath[64];
-    const char *blkdevnameend;
-    int i, blkdevnamelen;
-    item_list_t *listSupport;
-
-    for (i = 0; i < MODE_COUNT; i++) {
-        listSupport = list_support[i].support;
-        if ((listSupport != NULL) && (listSupport->itemGetPrefix != NULL)) {
-            char *prefix = listSupport->itemGetPrefix(listSupport);
-            snprintf(appsPath, sizeof(appsPath), "%sAPPS", prefix);
-
-            blkdevnameend = strchr(appsPath, ':');
-            if (blkdevnameend != NULL) {
-                blkdevnamelen = (int)(blkdevnameend - appsPath);
-
-                if (strncmp(path, appsPath, blkdevnamelen) == 0)
-                    return listSupport->mode;
-            }
-        }
-    }
-
-    return -1;
-}
-
-int oplGetAppImage(const char *device, char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
-{
-    int i, remaining, elfbootmode;
-    char priority;
-    item_list_t *listSupport;
-
-    elfbootmode = -1;
-    if (device != NULL) {
-        elfbootmode = oplPath2Mode(device);
-        if (elfbootmode >= 0) {
-            listSupport = list_support[elfbootmode].support;
-
-            if ((listSupport != NULL) && (listSupport->enabled)) {
-                if (listSupport->itemGetImage(listSupport, folder, isRelative, value, suffix, resultTex, psm) >= 0)
-                    return 0;
-            }
-        }
-    }
-
-    // We search on ever devices from fatest to slowest.
-    for (remaining = MODE_COUNT, priority = 0; remaining > 0 && priority < 4; priority++) {
-        for (i = 0; i < MODE_COUNT; i++) {
-            listSupport = list_support[i].support;
-
-            if (i == elfbootmode)
-                continue;
-
-            if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->appsPriority == priority)) {
-                if (listSupport->itemGetImage(listSupport, folder, isRelative, value, suffix, resultTex, psm) >= 0)
-                    return 0;
-                remaining--;
-            }
-        }
-    }
-
-    return -1;
-}
-
-static int scanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg, char *appsPath, int exception)
-{
-    struct dirent *pdirent;
-    DIR *pdir;
-    int count, ret;
-    config_set_t *appConfig;
-    char dir[128];
-    char path[128];
-
-    count = 0;
-    if ((pdir = opendir(appsPath)) != NULL) {
-        while ((pdirent = readdir(pdir)) != NULL) {
-            if (exception && strchr(pdirent->d_name, '_') == NULL)
-                continue;
-
-            if (strcmp(pdirent->d_name, ".") == 0 || strcmp(pdirent->d_name, "..") == 0)
-                continue;
-
-            snprintf(dir, sizeof(dir), "%s/%s", appsPath, pdirent->d_name);
-            if (pdirent->d_type != DT_DIR)
-                continue;
-
-            snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
-            appConfig = configAlloc(0, NULL, path);
-            if (appConfig != NULL) {
-                configRead(appConfig);
-
-                ret = callback(dir, appConfig, arg);
-                configFree(appConfig);
-
-                if (ret == 0)
-                    count++;
-                else if (ret < 0) { // Stopped because of unrecoverable error.
-                    break;
-                }
-            }
-        }
-
-        closedir(pdir);
-    } else
-        LOG("APPS failed to open dir %s\n", appsPath);
-
-    return count;
-}
-
-int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg)
-{
-    int i, count;
-    item_list_t *listSupport;
-    char appsPath[64];
-
-    count = 0;
-    for (i = 0; i < MODE_COUNT; i++) {
-        listSupport = list_support[i].support;
-        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetPrefix != NULL)) {
-            char *prefix = listSupport->itemGetPrefix(listSupport);
-            snprintf(appsPath, sizeof(appsPath), "%sAPPS", prefix);
-            count += scanApps(callback, arg, appsPath, 0);
-        }
-    }
-
-    for (i = 0; i < 2; i++) {
-        snprintf(appsPath, sizeof(appsPath), "mc%d:", i);
-        count += scanApps(callback, arg, appsPath, 1);
-    }
-
-    return count;
-}
-
-int oplShouldAppsUpdate(void)
-{
-    int result;
-
-    result = (int)shouldAppsUpdate;
-    shouldAppsUpdate = 0;
-
-    return result;
-}
-
-config_set_t *oplGetLegacyAppsConfig(void)
-{
-    int i, fd;
-    item_list_t *listSupport;
-    config_set_t *appConfig;
-    char appsPath[128];
-
-    snprintf(appsPath, sizeof(appsPath), "mc?:OPL/conf_apps.cfg");
-    fd = openFile(appsPath, O_RDONLY);
-    if (fd >= 0) {
-        appConfig = configAlloc(CONFIG_APPS, NULL, appsPath);
-        close(fd);
-        return appConfig;
-    }
-
-    for (i = MODE_COUNT - 1; i >= 0; i--) {
-        listSupport = list_support[i].support;
-        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetPrefix != NULL)) {
-            char *prefix = listSupport->itemGetPrefix(listSupport);
-            snprintf(appsPath, sizeof(appsPath), "%sconf_apps.cfg", prefix);
-
-            fd = openFile(appsPath, O_RDONLY);
-            if (fd >= 0) {
-                appConfig = configAlloc(CONFIG_APPS, NULL, appsPath);
-                close(fd);
-                return appConfig;
-            }
-        }
-    }
-
-    /* Apps config not found on any device, go with last tested device.
-       Does not matter if the config file could be loaded or not */
-    appConfig = configAlloc(CONFIG_APPS, NULL, appsPath);
-
-    return appConfig;
-}
-
-config_set_t *oplGetLegacyAppsInfo(char *name)
-{
-    int i, fd;
-    item_list_t *listSupport;
-    config_set_t *appConfig;
-    char appsPath[128];
-
-    for (i = MODE_COUNT - 1; i >= 0; i--) {
-        listSupport = list_support[i].support;
-        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetPrefix != NULL)) {
-            char *prefix = listSupport->itemGetPrefix(listSupport);
-            snprintf(appsPath, sizeof(appsPath), "%sCFG%s%s.cfg", prefix, i == ETH_MODE ? "\\" : "/", name);
-
-            fd = openFile(appsPath, O_RDONLY);
-            if (fd >= 0) {
-                appConfig = configAlloc(0, NULL, appsPath);
-                close(fd);
-                return appConfig;
-            }
-        }
-    }
-
-    /* Apps config not found on any device, go with last tested device.
-       Does not matter if the config file could be loaded or not */
-    appConfig = configAlloc(0, NULL, appsPath);
-
-    return appConfig;
-}
-
 // ----------------------------------------------------------
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
@@ -771,47 +565,6 @@ void setErrorMessage(int strId)
 static int lscstatus = CONFIG_ALL;
 static int lscret = 0;
 
-static int checkLoadConfigBDM(int types)
-{
-    char path[64];
-    int value;
-
-    // check USB
-    if (bdmFindPartition(path, "conf_opl.cfg", 0)) {
-        configEnd();
-        configInit(path);
-        value = configReadMulti(types);
-        config_set_t *configOPL = configGetByType(CONFIG_OPL);
-        configSetInt(configOPL, CONFIG_OPL_BDM_MODE, START_MODE_AUTO);
-        return value;
-    }
-
-    return 0;
-}
-
-static int checkLoadConfigHDD(int types)
-{
-    int value;
-    char path[64];
-
-    hddLoadModules();
-    hddLoadSupportModules();
-
-    snprintf(path, sizeof(path), "%sconf_opl.cfg", gHDDPrefix);
-    value = open(path, O_RDONLY);
-    if (value >= 0) {
-        close(value);
-        configEnd();
-        configInit(gHDDPrefix);
-        value = configReadMulti(types);
-        config_set_t *configOPL = configGetByType(CONFIG_OPL);
-        configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
-        return value;
-    }
-
-    return 0;
-}
-
 // When this function is called, the current device for loading/saving config is the memory card.
 static int tryAlternateDevice(int types)
 {
@@ -823,29 +576,26 @@ static int tryAlternateDevice(int types)
 
     // First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
-        if ((value = checkLoadConfigBDM(types)) != 0)
+        if ((value = configCheckBDM(types)) != 0)
             return value;
     } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
-        if ((value = checkLoadConfigHDD(types)) != 0)
+        if ((value = configCheckHDD(types)) != 0)
             return value;
     }
 
     // Config was not found on the boot device. Check all supported devices.
     //  Check USB device
-    if ((value = checkLoadConfigBDM(types)) != 0)
+    if ((value = configCheckBDM(types)) != 0)
         return value;
     // Check HDD
-    if ((value = checkLoadConfigHDD(types)) != 0)
+    if ((value = configCheckHDD(types)) != 0)
         return value;
 
     // At this point, the user has no loadable config files on any supported device, so try to find a device to save on.
     // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
     // Check for a memory card inserted.
-    if (sysCheckMC() >= 0) {
-        configPrepareNotifications(gBaseMCDir);
-        showCfgPopup = 0;
-        return 0;
-    }
+    configCheckMC(types);
+
     // No memory cards? Try a USB device...
     dir = opendir("mass0:");
     if (dir != NULL) {
@@ -989,37 +739,6 @@ static void _loadConfig()
     showCfgPopup = 1;
 }
 
-static int trySaveConfigBDM(int types)
-{
-    char path[64];
-
-    // check USB
-    if (bdmFindPartition(path, "conf_opl.cfg", 1)) {
-        configSetMove(path);
-        return configWriteMulti(types);
-    }
-
-    return -ENOENT;
-}
-
-static int trySaveConfigHDD(int types)
-{
-    hddLoadModules();
-    // Check that the formatted & usable HDD is connected.
-    if (hddCheck() == 0) {
-        configSetMove(gHDDPrefix);
-        return configWriteMulti(types);
-    }
-
-    return -ENOENT;
-}
-
-static int trySaveConfigMC(int types)
-{
-    configSetMove(NULL);
-    return configWriteMulti(types);
-}
-
 static int trySaveAlternateDevice(int types)
 {
     char pwd[8];
@@ -1029,24 +748,24 @@ static int trySaveAlternateDevice(int types)
 
     // First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
-        if ((value = trySaveConfigBDM(types)) > 0)
+        if ((value = configCheckBDM(types)) > 0)
             return value;
     } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
-        if ((value = trySaveConfigHDD(types)) > 0)
+        if ((value = configCheckHDD(types)) > 0)
             return value;
     }
 
     // Config was not saved to the boot device. Try all supported devices.
     // Try memory cards
     if (sysCheckMC() >= 0) {
-        if ((value = trySaveConfigMC(types)) > 0)
+        if ((value = configCheckMC(types)) > 0)
             return value;
     }
     // Try a USB device
-    if ((value = trySaveConfigBDM(types)) > 0)
+    if ((value = configCheckBDM(types)) > 0)
         return value;
     // Try the HDD
-    if ((value = trySaveConfigHDD(types)) > 0)
+    if ((value = configCheckHDD(types)) > 0)
         return value;
 
     // We tried everything, but...
@@ -1135,7 +854,7 @@ static void _saveConfig()
 
     char *path = configGetDir();
     if (!strncmp(path, "mc", 2)) {
-        checkMCFolder();
+        sbCheckMCFolder();
         configPrepareNotifications(gBaseMCDir);
     }
 
@@ -1860,9 +1579,9 @@ static void miniInit(int mode)
     if (CONFIG_ALL & CONFIG_OPL) {
         if (!(ret & CONFIG_OPL)) {
             if (mode == BDM_MODE)
-                ret = checkLoadConfigBDM(CONFIG_ALL);
+                ret = configCheckBDM(CONFIG_ALL);
             else if (mode == HDD_MODE)
-                ret = checkLoadConfigHDD(CONFIG_ALL);
+                ret = configCheckHDD(CONFIG_ALL);
         }
 
         if (ret & CONFIG_OPL) {
@@ -1913,6 +1632,8 @@ static void autoLaunchHDDGame(char *argv[])
 
     hddLaunchGame(NULL, -1, configSet);
 }
+
+static item_list_t *itemLaunchBDM;
 
 static void autoLaunchBDMGame(char *argv[])
 {
@@ -1974,7 +1695,7 @@ static void autoLaunchBDMGame(char *argv[])
     configSet = configAlloc(0, NULL, path);
     configRead(configSet);
 
-    bdmLaunchGame(NULL, -1, configSet);
+    itemLaunchBDM->itemLaunch(NULL, -1, configSet);
 }
 
 // --------------------- Main --------------------

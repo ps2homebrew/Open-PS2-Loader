@@ -1,6 +1,9 @@
 #include "include/opl.h"
+#include "include/supportbase.h"
 #include "include/mcemu.h"
 #include "include/lang.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/gui.h"
 #include "include/util.h"
 #include "include/renderman.h"
@@ -161,6 +164,22 @@ static int ethSMBDisconnect(void)
 
     return 0;
 }
+
+int ethGetDHCPStatus(void)
+{
+    t_ip_info ip_info;
+    int result;
+
+    if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
+        if (ip_info.dhcp_enabled) {
+            result = (ip_info.dhcp_status == DHCP_STATE_BOUND || (ip_info.dhcp_status == DHCP_STATE_OFF));
+        } else
+            result = -1;
+    }
+
+    return result;
+}
+
 
 static void EthStatusCheckCb(s32 alarm_id, u16 time, void *common)
 {
@@ -921,21 +940,6 @@ static int ethApplyIPConfig(void)
         } else
             result = 0;
 #pragma GCC diagnostic pop
-    }
-
-    return result;
-}
-
-int ethGetDHCPStatus(void)
-{
-    t_ip_info ip_info;
-    int result;
-
-    if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
-        if (ip_info.dhcp_enabled) {
-            result = (ip_info.dhcp_status == DHCP_STATE_BOUND || (ip_info.dhcp_status == DHCP_STATE_OFF));
-        } else
-            result = -1;
     }
 
     return result;

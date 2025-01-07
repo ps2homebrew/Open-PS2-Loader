@@ -6,6 +6,9 @@
 
 #include "include/opl.h"
 #include "include/dia.h"
+#include "include/submenu.h"
+#include "include/menu.h"
+#include "include/supportbase.h"
 #include "include/renderman.h"
 #include "include/fntsys.h"
 #include "include/lang.h"

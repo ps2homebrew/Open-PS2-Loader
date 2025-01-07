@@ -9,6 +9,7 @@
 #include "include/renderman.h"
 #include "include/ioman.h"
 #include "include/utf8.h"
+#include "include/supportbase.h"
 #include "include/util.h"
 #include "include/atlas.h"
 #include "include/imports.h"
@@ -236,7 +237,7 @@ static int fntLoadSlot(font_t *font, char *path, int fontSize)
     fntInitSlot(font);
 
     if (path) {
-        buffer = readFile(path, -1, &bufferSize);
+        buffer = sbReadFile(path, -1, &bufferSize);
         if (!buffer) {
             LOG("FNTSYS Font file loading failed: %s\n", path);
             return FNT_ERROR;

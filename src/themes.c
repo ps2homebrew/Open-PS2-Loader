@@ -1,6 +1,6 @@
 #include "include/opl.h"
 #include "include/themes.h"
-#include "include/util.h"
+#include "include/supportbase.h"
 #include "include/gui.h"
 #include "include/renderman.h"
 #include "include/ioman.h"
@@ -1406,7 +1406,7 @@ int thmAddElements(char *path, const char *separator, int forceRefresh)
 {
     int result, i;
 
-    result = listDir(path, separator, THM_MAX_FILES - nThemes, &thmReadEntry);
+    result = sbListDir(path, separator, THM_MAX_FILES - nThemes, &thmReadEntry);
     nThemes += result;
     thmRebuildGuiNames();
 

@@ -1,5 +1,11 @@
 #include "include/opl.h"
+#include "include/hdd.h"
+#include "include/hddsupport.h"
+#include "include/supportbase.h"
+#include "include/bdmsupport.h"
 #include "include/lang.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/gui.h"
 #include "include/util.h"
 #include "include/themes.h"
@@ -18,14 +24,34 @@
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
 
+#define MAX_BDM_DEVICES 5
+
+#define BDM_TYPE_UNKNOWN -1
+#define BDM_TYPE_USB     0
+#define BDM_TYPE_ILINK   1
+#define BDM_TYPE_SDC     2
+#define BDM_TYPE_ATA     3
+
+#define BDM_MODE_UPDATE_DELAY MENU_UPD_DELAY_GENREFRESH
+
+typedef struct
+{
+    int active;       /* Activation flag */
+    u64 start_sector; /* Start sector of vmc file */
+    int flags;        /* Card flag */
+    vmc_spec_t specs; /* Card specifications */
+} bdm_vmc_infos_t;
+
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
 static int hddModLoaded = 0;
 static s32 bdmLoadModuleLock;
-int bdmDeviceModeStarted;
+static int bdmDeviceModeStarted;
 
 static item_list_t bdmDeviceList[MAX_BDM_DEVICES];
 static int bdmDeviceListInitialized = 0;
+
+bdm_device_data_t *gAutoLaunchDeviceData;
 
 void bdmInitDevicesData();
 int bdmUpdateDeviceData(item_list_t *itemList);

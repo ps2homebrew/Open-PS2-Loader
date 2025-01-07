@@ -3,6 +3,7 @@
 
 #include "include/textures.h"
 #include "include/texcache.h"
+#include "include/submenu.h"
 #include "include/menu.h"
 
 #define THM_MAX_FILES 64

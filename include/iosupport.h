@@ -1,8 +1,6 @@
 #ifndef __IOSUPPORT_H
 #define __IOSUPPORT_H
 
-#include "include/config.h"
-
 #define IO_MODE_SELECTED_NONE -1
 #define IO_MODE_SELECTED_ALL  MODE_COUNT
 

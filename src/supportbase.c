@@ -1,4 +1,6 @@
 #include "include/opl.h"
+#include "include/hdd.h"
+#include "include/supportbase.h"
 #include "include/util.h"
 #include "include/system.h"
 #include "include/ioman.h"
@@ -6,7 +8,11 @@
 #include "include/cheatman.h"
 #include "include/pggsm.h"
 #include "include/ps2cnf.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/gui.h"
+#include "include/imports.h"
+
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioMount("iso:", ***), fileXioUmount("iso:")
@@ -14,6 +20,8 @@
 #include <ps2sdkapi.h>   // lseek64
 
 #include "../modules/isofs/zso.h"
+
+base_game_info_t *gAutoLaunchBDMGame;
 
 /// internal linked list used to populate the list from directory listing
 struct game_list_t
@@ -28,19 +36,127 @@ struct game_cache_list
     base_game_info_t *games;
 };
 
+static int mcID = -1;
+
+static int checkMC()
+{
+    int mc0_is_ps2card, mc1_is_ps2card;
+    int mc0_has_folder, mc1_has_folder;
+
+    if (mcID == -1) {
+        mc0_is_ps2card = 0;
+        DIR *mc0_root_dir = opendir("mc0:/");
+        if (mc0_root_dir != NULL) {
+            closedir(mc0_root_dir);
+            mc0_is_ps2card = 1;
+        }
+
+        mc1_is_ps2card = 0;
+        DIR *mc1_root_dir = opendir("mc1:/");
+        if (mc1_root_dir != NULL) {
+            closedir(mc1_root_dir);
+            mc1_is_ps2card = 1;
+        }
+
+        mc0_has_folder = 0;
+        DIR *mc0_opl_dir = opendir("mc0:OPL/");
+        if (mc0_opl_dir != NULL) {
+            closedir(mc0_opl_dir);
+            mc0_has_folder = 1;
+        }
+
+        mc1_has_folder = 0;
+        DIR *mc1_opl_dir = opendir("mc1:OPL/");
+        if (mc1_opl_dir != NULL) {
+            closedir(mc1_opl_dir);
+            mc1_has_folder = 1;
+        }
+
+        if (mc0_has_folder) {
+            mcID = '0';
+            return mcID;
+        }
+
+        if (mc1_has_folder) {
+            mcID = '1';
+            return mcID;
+        }
+
+        if (mc0_is_ps2card) {
+            mcID = '0';
+            return mcID;
+        }
+
+        if (mc1_is_ps2card) {
+            mcID = '1';
+            return mcID;
+        }
+    }
+    return mcID;
+}
+
+int sbGetmcID(void)
+{
+    return mcID;
+}
+
+void sbCheckMCFolder(void)
+{
+    char path[32];
+    int fd;
+
+    if (checkMC() < 0) {
+        return;
+    }
+
+    snprintf(path, sizeof(path), "mc%d:OPL/", mcID & 1);
+    mkdir(path, 0777);
+
+    snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID & 1);
+    fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        fd = sbOpenFile(path, O_WRONLY | O_CREAT | O_TRUNC);
+        if (fd >= 0) {
+            write(fd, &icon_icn, size_icon_icn);
+            close(fd);
+        }
+    } else {
+        close(fd);
+    }
+
+    snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID & 1);
+    fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        fd = sbOpenFile(path, O_WRONLY | O_CREAT | O_TRUNC);
+        if (fd >= 0) {
+            write(fd, icon_sys, size_icon_sys);
+            close(fd);
+        }
+    } else {
+        close(fd);
+    }
+}
+
 int sbIsSameSize(const char *prefix, int prevSize)
 {
     int size = -1;
     char path[256];
     snprintf(path, sizeof(path), "%sul.cfg", prefix);
 
-    int fd = openFile(path, O_RDONLY);
+    int fd = sbOpenFile(path, O_RDONLY);
     if (fd >= 0) {
-        size = getFileSize(fd);
+        size = sbGetFileSize(fd);
         close(fd);
     }
 
     return size == prevSize;
+}
+
+int sbGetFileSize(int fd)
+{
+    int size = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+    return size;
 }
 
 int sbCreateSemaphore(void)
@@ -391,13 +507,13 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
 
     // count and process games in ul.cfg
     snprintf(path, sizeof(path), "%sul.cfg", prefix);
-    fd = openFile(path, O_RDONLY);
+    fd = sbOpenFile(path, O_RDONLY);
     if (fd >= 0) {
         USBExtreme_game_entry_t GameEntry;
 
         if (count < 0)
             count = 0;
-        size = getFileSize(fd);
+        size = sbGetFileSize(fd);
         *fsize = size;
         count += size / sizeof(USBExtreme_game_entry_t);
 
@@ -464,6 +580,27 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
         *gamecount = count;
 
     return count;
+}
+
+int sbListDir(char *path, const char *separator, int maxElem,
+              int (*readEntry)(int index, const char *path, const char *separator, const char *name, unsigned char d_type))
+{
+    int index = 0;
+    char filename[128];
+
+    if (sbCheckFile(path, O_RDONLY)) {
+        DIR *dir = opendir(path);
+        struct dirent *dirent;
+        if (dir != NULL) {
+            while (index < maxElem && (dirent = readdir(dir)) != NULL) {
+                snprintf(filename, 128, "%s/%s", path, dirent->d_name);
+                index = readEntry(index, path, separator, dirent->d_name, dirent->d_type);
+            }
+
+            closedir(dir);
+        }
+    }
+    return index;
 }
 
 extern int probed_fd;
@@ -714,6 +851,80 @@ void sbCreatePath(const base_game_info_t *game, char *path, const char *prefix, 
     sbCreatePath_name(game, path, prefix, sep, part, game->name);
 }
 
+int sbCheckFile(char *path, int mode)
+{
+    // check if it is mc
+    if (strncmp(path, "mc", 2) == 0) {
+
+        // if user didn't explicitly asked for a MC (using '?' char)
+        if (path[2] == 0x3F) {
+
+            // Use default detected card
+            if (checkMC() >= 0)
+                path[2] = mcID;
+            else
+                return 0;
+        }
+
+        // in create mode, we check that the directory exist, or create it
+        if (mode & O_CREAT) {
+            char dirPath[256];
+            char *pos = strrchr(path, '/');
+            if (pos) {
+                memcpy(dirPath, path, (pos - path));
+                dirPath[(pos - path)] = '\0';
+                DIR *dir = opendir(dirPath);
+                if (dir == NULL) {
+                    int res = mkdir(dirPath, 0777);
+                    if (res != 0)
+                        return 0;
+                } else
+                    closedir(dir);
+            }
+        }
+    }
+    return 1;
+}
+
+int sbOpenFile(char *path, int mode)
+{
+    if (sbCheckFile(path, mode))
+        return open(path, mode, 0666);
+    else
+        return -1;
+}
+
+void *sbReadFile(char *path, int align, int *size)
+{
+    void *buffer = NULL;
+
+    int fd = sbOpenFile(path, O_RDONLY);
+    if (fd >= 0) {
+        unsigned int realSize = sbGetFileSize(fd);
+
+        if ((*size > 0) && (*size != realSize)) {
+            LOG("UTIL Invalid filesize, expected: %d, got: %d\n", *size, realSize);
+            close(fd);
+            return NULL;
+        }
+
+        if (align > 0)
+            buffer = memalign(64, realSize); // The allocation is aligned to aid the DMA transfers
+        else
+            buffer = malloc(realSize);
+
+        if (!buffer) {
+            LOG("UTIL ReadFile: Failed allocation of %d bytes", realSize);
+            *size = 0;
+        } else {
+            read(fd, buffer, realSize);
+            close(fd);
+            *size = realSize;
+        }
+    }
+    return buffer;
+}
+
 void sbDelete(base_game_info_t **list, const char *prefix, const char *sep, int gamecount, int id)
 {
     int part;
@@ -829,4 +1040,266 @@ int sbLoadCheats(const char *path, const char *file)
     }
 
     return cheatMode;
+}
+
+/* size will be the maximum line size possible */
+file_buffer_t *sbOpenFileBuffer(char *fpath, int mode, short allocResult, unsigned int size)
+{
+    file_buffer_t *fileBuffer = NULL;
+    unsigned char bom[3];
+
+    int fd = sbOpenFile(fpath, mode);
+    if (fd >= 0) {
+        fileBuffer = (file_buffer_t *)malloc(sizeof(file_buffer_t));
+        fileBuffer->size = size;
+        fileBuffer->available = 0;
+        fileBuffer->buffer = (char *)malloc(size * sizeof(char));
+        if (mode == O_RDONLY) {
+            fileBuffer->lastPtr = NULL;
+
+            // Check for and skip the UTF-8 BOM sequence.
+            if ((read(fd, bom, sizeof(bom)) != 3) ||
+                (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF)) {
+                // Not BOM, so rewind.
+                lseek(fd, 0, SEEK_SET);
+            }
+        } else
+            fileBuffer->lastPtr = fileBuffer->buffer;
+        fileBuffer->allocResult = allocResult;
+        fileBuffer->fd = fd;
+        fileBuffer->mode = mode;
+    }
+
+    return fileBuffer;
+}
+
+/* size will be the maximum line size possible */
+file_buffer_t *sbOpenFileBufferBuffer(short allocResult, const void *buffer, unsigned int size)
+{
+    file_buffer_t *fileBuffer = NULL;
+
+    fileBuffer = (file_buffer_t *)malloc(sizeof(file_buffer_t));
+    fileBuffer->size = size;
+    fileBuffer->available = size;
+    fileBuffer->buffer = (char *)malloc((size + 1) * sizeof(char));
+    fileBuffer->lastPtr = fileBuffer->buffer; // O_RDONLY, but with the data in the buffer.
+    fileBuffer->allocResult = allocResult;
+    fileBuffer->fd = -1;
+    fileBuffer->mode = O_RDONLY;
+
+    memcpy(fileBuffer->buffer, buffer, size);
+    fileBuffer->buffer[size] = '\0';
+
+    return fileBuffer;
+}
+
+int sbReadFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
+{
+    int lineSize = 0, readSize, length;
+    char *posLF = NULL;
+
+    while (1) {
+        // if lastPtr is set, then we continue the read from this point as reference
+        if (fileBuffer->lastPtr) {
+            // Calculate the remaining chars to the right of lastPtr
+            lineSize = fileBuffer->available - (fileBuffer->lastPtr - fileBuffer->buffer);
+            /* LOG("##### Continue read, position: %X (total: %d) line size (\\0 not inc.): %d end: %x\n",
+                fileBuffer->lastPtr - fileBuffer->buffer, fileBuffer->available, lineSize, fileBuffer->lastPtr[lineSize]); */
+            posLF = strchr(fileBuffer->lastPtr, '\n');
+        }
+
+        if (!posLF) { // We can come here either when the buffer is empty, or if the remaining chars don't have a LF
+
+            // if available, we shift the remaining chars to the left ...
+            if (lineSize) {
+                // LOG("##### LF not found, Shift %d characters from end to beginning\n", lineSize);
+                memmove(fileBuffer->buffer, fileBuffer->lastPtr, lineSize);
+            }
+
+            // ... and complete the buffer if we're not at EOF
+            if (fileBuffer->fd >= 0) {
+
+                // Load as many characters necessary to fill the buffer
+                length = fileBuffer->size - lineSize - 1;
+                // LOG("##### Asking for %d characters to complete buffer\n", length);
+                readSize = read(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
+                fileBuffer->buffer[lineSize + readSize] = '\0';
+
+                // Search again (from the lastly added chars only), the result will be "analyzed" in next if
+                posLF = strchr(fileBuffer->buffer + lineSize, '\n');
+
+                // Now update read context info
+                lineSize = lineSize + readSize;
+                // LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
+
+                // If buffer not full it means we are at EOF
+                if (fileBuffer->size != lineSize + 1) {
+                    // LOG("##### Reached EOF\n");
+                    close(fileBuffer->fd);
+                    fileBuffer->fd = -1;
+                }
+            }
+
+            fileBuffer->lastPtr = fileBuffer->buffer;
+            fileBuffer->available = lineSize;
+        }
+
+        if (posLF)
+            lineSize = posLF - fileBuffer->lastPtr;
+
+        // Check the previous char (on Windows there are CR/LF instead of single linux LF)
+        if (lineSize)
+            if (*(fileBuffer->lastPtr + lineSize - 1) == '\r')
+                lineSize--;
+
+        fileBuffer->lastPtr[lineSize] = '\0';
+        *outBuf = fileBuffer->lastPtr;
+
+        // LOG("##### Result line is \"%s\" size: %d avail: %d pos: %d\n", fileBuffer->lastPtr, lineSize, fileBuffer->available, fileBuffer->lastPtr - fileBuffer->buffer);
+
+        // If we are at EOF and no more chars available to scan, then we are finished
+        if (!lineSize && !fileBuffer->available && fileBuffer->fd == -1)
+            return 0;
+
+        if (fileBuffer->lastPtr[0] == '#') { // '#' for comment lines
+            if (posLF)
+                fileBuffer->lastPtr = posLF + 1;
+            else
+                fileBuffer->lastPtr = NULL;
+            continue;
+        }
+
+        if (lineSize && fileBuffer->allocResult) {
+            *outBuf = (char *)malloc((lineSize + 1) * sizeof(char));
+            memcpy(*outBuf, fileBuffer->lastPtr, lineSize + 1);
+        }
+
+        // Either move the pointer to next chars, or set it to null to force a whole buffer read (if possible)
+        if (posLF)
+            fileBuffer->lastPtr = posLF + 1;
+        else {
+            fileBuffer->lastPtr = NULL;
+        }
+
+        return 1;
+    }
+}
+
+void sbWriteFileBuffer(file_buffer_t *fileBuffer, char *inBuf, int size)
+{
+    LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
+    if (fileBuffer->available && fileBuffer->available + size > fileBuffer->size) {
+        LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
+        write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+        fileBuffer->lastPtr = fileBuffer->buffer;
+        fileBuffer->available = 0;
+    }
+
+    if (size > fileBuffer->size) {
+        LOG("writeFileBuffer direct write: %d\n", size);
+        write(fileBuffer->fd, inBuf, size);
+    } else {
+        memcpy(fileBuffer->lastPtr, inBuf, size);
+        fileBuffer->lastPtr += size;
+        fileBuffer->available += size;
+
+        LOG("writeFileBuffer lastPrt: %d\n", (fileBuffer->lastPtr - fileBuffer->buffer));
+    }
+}
+
+void sbCloseFileBuffer(file_buffer_t *fileBuffer)
+{
+    if (fileBuffer->fd >= 0) {
+        if (fileBuffer->mode != O_RDONLY && fileBuffer->available) {
+            // LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
+            write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+        }
+        close(fileBuffer->fd);
+    }
+    free(fileBuffer->buffer);
+    free(fileBuffer);
+}
+
+struct DirentToDelete
+{
+    struct DirentToDelete *next;
+    char *filename;
+};
+
+int sbDeleteFolder(const char *folder)
+{
+    int result;
+    char *path;
+    struct dirent *dirent;
+    DIR *dir;
+    struct DirentToDelete *head, *start;
+
+    result = 0;
+    start = head = NULL;
+    if ((dir = opendir(folder)) != NULL) {
+        /* Generate a list of files in the directory. */
+        while ((dirent = readdir(dir)) != NULL) {
+            if ((strcmp(dirent->d_name, ".") == 0) || ((strcmp(dirent->d_name, "..") == 0)))
+                continue;
+
+            path = malloc(strlen(folder) + strlen(dirent->d_name) + 2);
+            sprintf(path, "%s/%s", folder, dirent->d_name);
+
+            if (dirent->d_type == DT_DIR) {
+                /* Recursive, delete all subfolders */
+                result = sbDeleteFolder(path);
+                free(path);
+            } else {
+                free(path);
+                if (start == NULL) {
+                    head = malloc(sizeof(struct DirentToDelete));
+                    if (head == NULL)
+                        break;
+                    start = head;
+                } else {
+                    if ((head->next = malloc(sizeof(struct DirentToDelete))) == NULL)
+                        break;
+
+                    head = head->next;
+                }
+
+                head->next = NULL;
+
+                if ((head->filename = malloc(strlen(dirent->d_name) + 1)) != NULL)
+                    strcpy(head->filename, dirent->d_name);
+                else
+                    break;
+            }
+        }
+
+        closedir(dir);
+    } else
+        result = 0;
+
+    if (result >= 0) {
+        /* Delete the files. */
+        for (head = start; head != NULL; head = start) {
+            if (head->filename != NULL) {
+                if ((path = malloc(strlen(folder) + strlen(head->filename) + 2)) != NULL) {
+                    sprintf(path, "%s/%s", folder, head->filename);
+                    result = unlink(path);
+                    if (result < 0)
+                        LOG("sysDeleteFolder: failed to remove %s: %d\n", path, result);
+
+                    free(path);
+                }
+                free(head->filename);
+            }
+
+            start = head->next;
+            free(head);
+        }
+
+        if (result >= 0) {
+            result = rmdir(folder);
+            LOG("sysDeleteFolder: failed to rmdir %s: %d\n", folder, result);
+        }
+    }
+
+    return result;
 }

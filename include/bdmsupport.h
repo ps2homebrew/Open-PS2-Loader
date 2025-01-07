@@ -1,24 +1,6 @@
 #ifndef __BDM_SUPPORT_H
 #define __BDM_SUPPORT_H
 
-#define BDM_MODE_UPDATE_DELAY MENU_UPD_DELAY_GENREFRESH
-
-typedef struct
-{
-    int active;       /* Activation flag */
-    u64 start_sector; /* Start sector of vmc file */
-    int flags;        /* Card flag */
-    vmc_spec_t specs; /* Card specifications */
-} bdm_vmc_infos_t;
-
-#define MAX_BDM_DEVICES 5
-
-#define BDM_TYPE_UNKNOWN -1
-#define BDM_TYPE_USB     0
-#define BDM_TYPE_ILINK   1
-#define BDM_TYPE_SDC     2
-#define BDM_TYPE_ATA     3
-
 typedef struct
 {
     int massDeviceIndex; // Underlying device index backing the mass fs partition, ex: usb0 = 0, usb1 = 1, etc.
@@ -38,10 +20,10 @@ typedef struct
     unsigned char ForceRefresh;
 } bdm_device_data_t;
 
-void bdmInit();
+extern bdm_device_data_t *gAutoLaunchDeviceData;
+
 int bdmFindPartition(char *target, const char *name, int write);
 void bdmLoadModules(void);
-void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet);
 
 void bdmInitSemaphore();
 void bdmEnumerateDevices();

@@ -1,6 +1,8 @@
 #include "include/opl.h"
 #include "include/texcache.h"
 #include "include/textures.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/ioman.h"
 #include "include/gui.h"
 #include "include/renderman.h"

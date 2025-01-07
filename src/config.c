@@ -5,9 +5,16 @@
 */
 
 #include "include/opl.h"
+#include "include/submenu.h"
+#include "include/menu.h"
+#include "include/supportbase.h"
 #include "include/util.h"
+#include "include/hdd.h"
+#include "include/hddsupport.h"
+#include "include/bdmsupport.h"
 #include "include/ioman.h"
 #include "include/sound.h"
+#include "include/system.h"
 
 // FIXME: We should not need this function.
 //        Use newlib's 'stat' to get GMT time.
@@ -25,6 +32,8 @@ static const char *configFilenames[CONFIG_INDEX_COUNT] = {
     "conf_network.cfg",
     "conf_game.cfg",
 };
+
+static u8 isLoaded = 0;
 
 static int strToColor(const char *string, unsigned char *color)
 {
@@ -164,7 +173,7 @@ static char cfgDevice[8];
 char *configGetDir(void)
 {
     if (!strncmp(cfgDevice, "mc", 2)) {
-        cfgDevice[2] = getmcID();
+        cfgDevice[2] = sbGetmcID();
     }
 
     char *path = cfgDevice;
@@ -410,10 +419,10 @@ static int configReadLegacyIP(void)
     config_set_t *configSet;
     char temp[16];
 
-    int fd = openFile(legacyNetConfigPath, O_RDONLY);
+    int fd = sbOpenFile(legacyNetConfigPath, O_RDONLY);
     if (fd >= 0) {
         char ipconfig[256];
-        int size = getFileSize(fd);
+        int size = sbGetFileSize(fd);
         read(fd, &ipconfig, size);
         close(fd);
 
@@ -472,7 +481,7 @@ static int configReadFileBuffer(file_buffer_t *fileBuffer, config_set_t *configS
     char prefix[CONFIG_KEY_NAME_LEN];
     memset(prefix, 0, sizeof(prefix));
 
-    while (readFileBuffer(fileBuffer, &line)) {
+    while (sbReadFileBuffer(fileBuffer, &line)) {
         lineno++;
 
         char key[CONFIG_KEY_NAME_LEN], val[CONFIG_KEY_VALUE_LEN];
@@ -509,7 +518,7 @@ static int configReadFileBuffer(file_buffer_t *fileBuffer, config_set_t *configS
 int configReadBuffer(config_set_t *configSet, const void *buffer, int size)
 {
     int ret;
-    file_buffer_t *fileBuffer = openFileBufferBuffer(0, buffer, size);
+    file_buffer_t *fileBuffer = sbOpenFileBufferBuffer(0, buffer, size);
     if (!fileBuffer) {
         configSet->modified = 0;
         return 0;
@@ -517,14 +526,14 @@ int configReadBuffer(config_set_t *configSet, const void *buffer, int size)
 
     ret = configReadFileBuffer(fileBuffer, configSet);
 
-    closeFileBuffer(fileBuffer);
+    sbCloseFileBuffer(fileBuffer);
     return ret;
 }
 
 int configRead(config_set_t *configSet)
 {
     int ret;
-    file_buffer_t *fileBuffer = openFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
+    file_buffer_t *fileBuffer = sbOpenFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
     if (!fileBuffer) {
         LOG("CONFIG No file %s.\n", configSet->filename);
         configSet->modified = 0;
@@ -533,30 +542,30 @@ int configRead(config_set_t *configSet)
 
     ret = configReadFileBuffer(fileBuffer, configSet);
 
-    closeFileBuffer(fileBuffer);
+    sbCloseFileBuffer(fileBuffer);
     return ret;
 }
 
 int configWrite(config_set_t *configSet)
 {
     if (configSet->modified) {
-        file_buffer_t *fileBuffer = openFileBuffer(configSet->filename, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
+        file_buffer_t *fileBuffer = sbOpenFileBuffer(configSet->filename, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
         if (fileBuffer) {
+            bgmIsMuted(1);
             char line[512];
 
-            bgmIsMuted(1);
             struct config_value_t *cur = configSet->head;
             while (cur) {
                 if ((cur->key[0] != '\0') && (cur->key[0] != '#')) {
                     snprintf(line, sizeof(line), "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
-                    writeFileBuffer(fileBuffer, line, strlen(line));
+                    sbWriteFileBuffer(fileBuffer, line, strlen(line));
                 }
 
                 // and advance
                 cur = cur->next;
             }
 
-            closeFileBuffer(fileBuffer);
+            sbCloseFileBuffer(fileBuffer);
             configSet->modified = 0;
             bgmIsMuted(0);
             return 1;
@@ -644,4 +653,77 @@ void configRemoveVMC(config_set_t *configSet, int slot)
     char gkey[CONFIG_KEY_NAME_LEN];
     snprintf(gkey, sizeof(gkey), "%s_%d", CONFIG_ITEM_VMC, slot);
     configRemoveKey(configSet, gkey);
+}
+
+int configCheckBDM(int types)
+{
+    char path[64];
+    int value;
+
+    // check USB
+    if (bdmFindPartition(path, "conf_opl.cfg", 0)) {
+        if (!isLoaded) {
+            configEnd();
+            configInit(path);
+            value = configReadMulti(types);
+            config_set_t *configOPL = configGetByType(CONFIG_OPL);
+            configSetInt(configOPL, CONFIG_OPL_BDM_MODE, START_MODE_AUTO);
+            return value;
+        } else {
+            configSetMove(path);
+            return configWriteMulti(types);
+        }
+    }
+
+    return -ENOENT;
+}
+
+int configCheckHDD(int types)
+{
+    int value;
+    char path[64];
+
+    hddLoadModules();
+    if (!isLoaded) {
+        hddLoadSupportModules();
+
+        snprintf(path, sizeof(path), "%sconf_opl.cfg", gHDDPrefix);
+        value = open(path, O_RDONLY);
+        if (value >= 0) {
+            close(value);
+            configEnd();
+            configInit(gHDDPrefix);
+            value = configReadMulti(types);
+            config_set_t *configOPL = configGetByType(CONFIG_OPL);
+            configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
+            return value;
+        }
+    } else {
+        // Check that the formatted & usable HDD is connected.
+        if (hddCheck() == 0) {
+            configSetMove(gHDDPrefix);
+            return configWriteMulti(types);
+        }
+    }
+
+    return -ENOENT;
+}
+
+int configCheckMC(int types)
+{
+    if (!isLoaded) {
+        // At this point, the user has no loadable config files on any supported device, so try to find a device to save on.
+        // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
+        // Check for a memory card inserted.
+        if (sysCheckMC() >= 0) {
+            configPrepareNotifications(gBaseMCDir);
+            showCfgPopup = 0;
+            return 0;
+        }
+    } else {
+        configSetMove(NULL);
+        return configWriteMulti(types);
+    }
+
+    return -ENOENT;
 }

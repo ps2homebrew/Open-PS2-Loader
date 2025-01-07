@@ -1,5 +1,8 @@
 #include "include/opl.h"
+
 #include "include/lang.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/gui.h"
 #include "include/supportbase.h"
 #include "include/util.h"
@@ -20,7 +23,11 @@
 #include <libcdvd-common.h>
 #include "opl-hdd-ioctl.h"
 
+#include "include/hdd.h"
+#include "include/hddsupport.h"
+
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
+#define HDD_MODE_UPDATE_DELAY       MENU_UPD_DELAY_NOUPDATE
 
 #include "../modules/isofs/zso.h"
 

@@ -3,23 +3,21 @@
 
 #include <kernel.h>
 #include <sifrpc.h>
-#include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <errno.h>
-#include <limits.h>
 #include <gsKit.h>
 #include <malloc.h>
 #include <math.h>
 
+#include "include/config.h"
 #include "include/iosupport.h"
+#include "include/submenu.h"
+#include "include/menu.h"
 #include "include/mcemu.h"
-#include "include/hddsupport.h"
-#include "include/supportbase.h"
-#include "include/bdmsupport.h"
 // Master password for disabling the parental lock.
 #define OPL_PARENTAL_LOCK_MASTER_PASS "989765"
 
@@ -37,13 +35,6 @@
 #define OPL_COMPAT_UPDATE_STAT_ABORTED    -3
 
 #define OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS 10000
-
-int oplPath2Mode(const char *path);
-int oplGetAppImage(const char *device, char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm);
-int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg);
-int oplShouldAppsUpdate(void);
-config_set_t *oplGetLegacyAppsConfig(void);
-config_set_t *oplGetLegacyAppsInfo(char *name);
 
 void setErrorMessage(int strId);
 void setErrorMessageWithCode(int strId, int error);
@@ -185,9 +176,6 @@ extern unsigned char gDefaultSelTextColor[3];
 extern unsigned char gDefaultUITextColor[3];
 
 // Launching games with args
-extern hdl_game_info_t *gAutoLaunchGame;
-extern base_game_info_t *gAutoLaunchBDMGame;
-extern bdm_device_data_t *gAutoLaunchDeviceData;
 extern char *gHDDPrefix;
 extern char gOPLPart[128];
 
@@ -196,9 +184,6 @@ void initSupport(item_list_t *itemList, int mode, int force_reinit);
 void setDefaultColors(void);
 
 #define MENU_ITEM_HEIGHT 19
-
-#include "include/submenu.h"
-#include "include/menu.h"
 
 typedef struct
 {
@@ -211,11 +196,4 @@ typedef struct
     submenu_list_t *subMenu;
 } opl_io_module_t;
 
-/*
-BLURT output char blurttext[128];
-#define BLURT                                                                           \
-    snprintf(blurttext, sizeof(blurttext), "%s\\%s(%d)", __FILE__, __func__, __LINE__); \
-    delay(10);
-#define BLURT snprintf(blurttext, sizeof(blurttext), "%s(%d)", blurttext, __LINE__);
-*/
 #endif

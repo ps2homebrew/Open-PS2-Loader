@@ -1,6 +1,6 @@
 #include "include/opl.h"
 #include "include/lang.h"
-#include "include/util.h"
+#include "include/supportbase.h"
 #include "include/fntsys.h"
 #include "include/ioman.h"
 #include "include/themes.h"
@@ -56,17 +56,17 @@ static int lngLoadFromFile(char *path, char *name)
 {
     char dir[128];
 
-    file_buffer_t *fileBuffer = openFileBuffer(path, O_RDONLY, 1, 1024);
+    file_buffer_t *fileBuffer = sbOpenFileBuffer(path, O_RDONLY, 1, 1024);
     if (fileBuffer) {
         // file exists, try to read it and load the custom lang
         char **curL = lang_strs;
         char **newL = (char **)calloc(LANG_STR_COUNT, sizeof(char *));
 
         int strId = 0;
-        while (strId < LANG_STR_COUNT && readFileBuffer(fileBuffer, &newL[strId])) {
+        while (strId < LANG_STR_COUNT && sbReadFileBuffer(fileBuffer, &newL[strId])) {
             strId++;
         }
-        closeFileBuffer(fileBuffer);
+        sbCloseFileBuffer(fileBuffer);
 
         LOG("LANG Loaded %d entries\n", strId);
 
@@ -154,7 +154,7 @@ int lngAddLanguages(char *path, const char *separator, int mode)
 {
     int result;
 
-    result = listDir(path, separator, MAX_LANGUAGE_FILES - nLanguages, &lngReadEntry);
+    result = sbListDir(path, separator, MAX_LANGUAGE_FILES - nLanguages, &lngReadEntry);
     nLanguages += result;
     lngRebuildLangNames();
 

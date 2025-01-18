@@ -22,10 +22,15 @@ jobs:
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
         git fetch --prune --unshallow
 
+    - name: make ISO (8mb IOP RAM support)
+      run: |
+          cd labs/opltestiso/
+          make clean iso SUPPORT_8MB_IOP_RAM=1 ISO=TEST_OPL.00.OPLtester_v0.5_IOPRAM_8mb.iso
+      
     - name: make ISO
       run: |
           cd labs/opltestiso/
-          make iso
+          make clean iso
 
     - name: Upload release artifact ISO
       uses: actions/upload-artifact@v3

@@ -779,6 +779,8 @@ static int checkLoadConfigBDM(int types)
     char path[64];
     int value;
 
+    hddLoadModules();
+
     // check USB
     if (bdmFindPartition(path, "conf_opl.cfg", 0)) {
         configEnd();
@@ -996,6 +998,7 @@ static int trySaveConfigBDM(int types)
 {
     char path[64];
 
+    hddLoadModules();
     // check USB
     if (bdmFindPartition(path, "conf_opl.cfg", 1)) {
         configSetMove(path);

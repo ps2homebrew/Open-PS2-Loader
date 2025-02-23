@@ -7,11 +7,29 @@
 */
 
 #include "include/opl.h"
+#include "include/util.h"
 #include "include/xparam.h"
 
-char params_DCACHE_OFF[] = {'0', 'x', '1', '0', 0, '0', 0};
-char params_CPU_DELAY[] = {'0', 'x', '6', 0, '0', 'x', '7', '8', '0', 0};
+typedef struct _xparam_payload
+{
+    int param;
+    u32 value;
+} xparam_payload;
 
+xparam_payload params_DCACHE_OFF = {0x10, 0x00};
+xparam_payload params_CPU_DELAY = {0x6, 0x780};
+xparam_payload params_RESET_PARAM_SET = {0xffffffff, 0x0}; //rom0:XPARAM performs this thing before parsing argv
+#define XPARAM_PARAM_ADDR *((uint32_t *)0xFFFE01A0)
+#define XPARAM_VALUE_ADDR *((uint32_t *)0xFFFE01A4)
+
+void SetXparamInRAM(xparam_payload T)
+{
+    XPARAM_PARAM_ADDR = params_RESET_PARAM_SET.param;
+    XPARAM_VALUE_ADDR = params_RESET_PARAM_SET.value;
+    delay(1); //just to be sure?
+    XPARAM_PARAM_ADDR = T.param;
+    XPARAM_VALUE_ADDR = T.value;
+}
 
 int CheckSpecialDiscXParamTitle(const char *title)
 {
@@ -76,8 +94,7 @@ void ApplyExtraXParamTitle(const char *title, char *params)
 
     if (result) {
         // All of them are new added ones and all use 0x10 0 (DCACHE OFF )
-        memcpy(&params[12], params_DCACHE_OFF, 7);
-        SifLoadModule("rom0:XPARAM", 19, params);
+        SetXparamInRAM(params_DCACHE_OFF);
         return;
     }
 
@@ -94,8 +111,7 @@ void ApplyExtraXParamTitle(const char *title, char *params)
     result |= !strncmp("SLUS_210.59", title, 11);
 
     if (result) {
-        memcpy(&params[12], params_CPU_DELAY, 10);
-        SifLoadModule("rom0:XPARAM", 22, params);
+        SetXparamInRAM(params_CPU_DELAY);
         return;
     }
 
@@ -106,11 +122,8 @@ void ApplyExtraXParamTitle(const char *title, char *params)
         Tekken 5 (Australia)
         Tekken 5 would have the cache off but not the CPU delay, however, this regional release for the first bios of 750xx had neither the cache nor the delay making it run worse.
         */
-        memcpy(&params[12], params_DCACHE_OFF, 7);
-        SifLoadModule("rom0:XPARAM", 19, params);
-
-        memcpy(&params[12], params_CPU_DELAY, 10);
-        SifLoadModule("rom0:XPARAM", 22, params);
+        SetXparamInRAM(params_DCACHE_OFF);
+        SetXparamInRAM(params_CPU_DELAY);
     }
 }
 
@@ -129,20 +142,7 @@ void ResetDeckardXParams()
     if ((*GM_IF & GM_IOP_TYPE) == 0)
         return;
 
-    int fd;
-    char params[30];
-    memset(params, 0, 30);
-    strncpy(params, "SLPS_123.45", 11);
-    params[11] = 0; // Terminate param string.
-
-    // For PS3/4 emu we skip default.
-    fd = open("rom0:XPARAM2", O_RDONLY);
-    if (fd >= 0) {
-        close(fd);
-        return;
-    }
-
-    u32 default_values[] = {
+    const u32 default_values[] = {
         0x01F4, // PARAM_MDEC_DELAY_CYCLE
         0x07D0, // PARAM_SPU_INT_DELAY_LIMIT
         0x0023, // PARAM_SPU_INT_DELAY_PPC_COEFF
@@ -162,20 +162,13 @@ void ResetDeckardXParams()
         0x0001, // PARAM_MIPS_DCACHE_ON
         0x0090  // PARAM_CACHE_FLASH_CHANNELS
     };
-
-    fd = open("rom0:XPARAM", O_RDONLY);
-    if (fd >= 0) {
-        close(fd);
-
-        // Reset all the params to default.
-        int i;
-        for (i = 0; i < 0x12; i++) {
-            sprintf(&params[12], "0X%02X", i);
-            params[16] = 0;
-            sprintf(&params[17], "0X%08X", default_values[i]);
-            params[27] = 0;
-            SifLoadModule("rom0:XPARAM", 28, params);
-        }
+    // Reset all the params to default.
+    int i;
+    xparam_payload T;
+    for (i = 0; i < 0x12; i++) {
+        T.param = i;
+        T.value = default_values[i];
+        SetXparamInRAM(T);
     }
 }
 
@@ -221,13 +214,12 @@ void ApplyDeckardXParam(const char *title)
 
         if (CheckSpecialDiscXParamTitle(title)) {
             // All of them use 0x10 0 (DCACHE OFF)
-            // Params are sent as direct string null separated.
-            memcpy(&params[12], params_DCACHE_OFF, 7);
-            SifLoadModule("rom0:XPARAM", 19, params);
+            SetXparamInRAM(params_DCACHE_OFF);
             return;
         }
 
-        // Load the default configs found in the XPARAM module.
+        // Here we call rom0:XPARAM so it parses its own database.
+        // Saving us the trouble of having a copy of that DB on our code
         SifLoadModule("rom0:XPARAM", 12, params);
 
         /*

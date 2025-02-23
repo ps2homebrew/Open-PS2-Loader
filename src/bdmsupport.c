@@ -766,9 +766,13 @@ void bdmResolveLBA_UDMA(bdm_device_data_t *pDeviceData)
 
     // Query the drive for the highest UDMA mode.
     pDeviceData->ataHighestUDMAMode = fileXioDevctl("xhdd0:", ATA_DEVCTL_GET_HIGHEST_UDMA_MODE, NULL, 0, NULL, 0);
-    if (pDeviceData->ataHighestUDMAMode < 0 || pDeviceData->ataHighestUDMAMode > 7) {
+    if (pDeviceData->ataHighestUDMAMode < 0) {
         // Failed to query highest UDMA mode supported.
-        LOG("Mass device %d is backed by ATA but failed to get highest UDMA mode %d\n", pDeviceData->ataHighestUDMAMode);
+        LOG("Mass device %d is backed by ATA but failed to get highest UDMA mode %d\n", pDeviceData->massDeviceIndex, pDeviceData->ataHighestUDMAMode);
+        pDeviceData->ataHighestUDMAMode = 4;
+    } else if (pDeviceData->ataHighestUDMAMode > 4) {
+        // Limit max UDMA mode to 4 to avoid compatibility issues
+        LOG("Mass device %d supports up to UDMA mode %d, limiting to UDMA 4\n", pDeviceData->massDeviceIndex, pDeviceData->ataHighestUDMAMode);
         pDeviceData->ataHighestUDMAMode = 4;
     }
 

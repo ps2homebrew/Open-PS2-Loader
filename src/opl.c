@@ -790,7 +790,7 @@ static int checkLoadConfigBDM(int types)
         if (bdm_result)
             is_hdd = 1;
     }
-  
+
     if (bdm_result) {
         configEnd();
         configInit(path);
@@ -1019,7 +1019,7 @@ static int trySaveConfigBDM(int types)
         hddLoadModules();
         bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
     }
-    
+
     if (bdm_result) {
         configSetMove(path);
         return configWriteMulti(types);

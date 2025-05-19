@@ -30,7 +30,7 @@ int read_fs(iop_file_t *fd, void *buffer, int size)
     return size;
 }
 
-int close_fs()
+int close_fs(iop_file_t *fd)
 {
     DelDrv(name);
     return 0;
@@ -57,27 +57,29 @@ typedef struct _iop_device_ops_tm
     int (*lseek)(iop_file_t *, unsigned long, int);
 } iop_device_ops_tm_t;
 
+IOMAN_RETURN_VALUE_IMPL(0);
+
 iop_device_ops_t my_device_ops =
     {
-        dummy_fs, // init
-        dummy_fs, // deinit
-        NULL,     // dummy_fs,// format
-        dummy_fs, // open_fs,// open
-        close_fs, // close
-        read_fs,  // read
-        NULL,     // dummy_fs,// write
-        lseek_fs, // lseek
-                  /*
-        dummy_fs, // ioctl
-        dummy_fs, // remove
-        dummy_fs, // mkdir
-        dummy_fs, // rmdir
-        dummy_fs, // dopen
-        dummy_fs, // dclose
-        dummy_fs, // dread
-        dummy_fs, // getstat
-        dummy_fs, // chstat
-                   */
+        IOMAN_RETURN_VALUE(0), // init
+        IOMAN_RETURN_VALUE(0), // deinit
+        NULL,                  // dummy_fs,// format
+        IOMAN_RETURN_VALUE(0), // open_fs,// open
+        close_fs,              // close
+        read_fs,               // read
+        NULL,                  // dummy_fs,// write
+        lseek_fs,              // lseek
+                               /*
+                       dummy_fs, // ioctl
+                       dummy_fs, // remove
+                       dummy_fs, // mkdir
+                       dummy_fs, // rmdir
+                       dummy_fs, // dopen
+                       dummy_fs, // dclose
+                       dummy_fs, // dread
+                       dummy_fs, // getstat
+                       dummy_fs, // chstat
+                       */
 };
 
 iop_device_t my_device = {

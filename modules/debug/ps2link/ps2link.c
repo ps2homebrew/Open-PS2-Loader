@@ -28,7 +28,7 @@ extern int naplinkRpcInit(void);
 int _start(int argc, char **argv)
 {
     FlushDcache();
-    CpuEnableIntr(0);
+    CpuEnableIntr();
 
     sceCdInit(1);
     sceCdStop();

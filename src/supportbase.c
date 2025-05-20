@@ -334,8 +334,8 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
 
                 if (MountFD < 0 || GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) != 0) {
                     fileXioUmount("iso:");
-                    free(next);
                     *glist = next->next;
+                    free(next);
                     continue;
                 }
 

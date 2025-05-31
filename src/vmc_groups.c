@@ -62,7 +62,7 @@ static const char *titles_XEBP_100_03[] = {
 static const size_t count_XEBP_100_03 = sizeof(titles_XEBP_100_03) / sizeof(titles_XEBP_100_03[0]);
 
 static const char *titles_XEBP_100_04[] = {
-    "SCES_502.94"
+    "SCES_502.94",
     "PBPX_956.01",
     "SCAJ_300.06",
     "SCAJ_300.07",

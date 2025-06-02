@@ -1,6 +1,12 @@
 
 #include "include/vmc_groups.h"
 #include <string.h>
+typedef struct
+{
+    const char *groupId;   // The group ID string (e.g., "XEBP_100.01")
+    const char **titleIds; // Pointer to an array of title ID strings
+    size_t titleCount;     // Number of title IDs in the 'titleIds' array
+} MemoryCardGroup;
 
 // --- Embedded Dictionary Data ---
 

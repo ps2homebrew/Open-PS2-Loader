@@ -214,7 +214,7 @@ static int guiGameShowVMCConfig(int id, item_list_t *support, char *VMCName, int
             return 1; // nothing to validate if no user input
 
         char *startup = support->itemGetStartup(support, id);
-        const char* vmcTitle = getGroupIdForTitleId(startup);
+        const char *vmcTitle = getGroupIdForTitleId(startup);
         snprintf(vmc, sizeof(vmc), "%s_%d", vmcTitle, slot);
     }
 

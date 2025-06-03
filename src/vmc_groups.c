@@ -1,6 +1,7 @@
 
 #include "include/vmc_groups.h"
 #include <string.h>
+// Structure to hold a single Memory Card Group and its associated Title IDs
 typedef struct
 {
     const char *groupId;   // The group ID string (e.g., "XEBP_100.01")

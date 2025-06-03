@@ -1,7 +1,6 @@
 #ifndef VMC_GROUPS_H
 #define VMC_GROUPS_H
 
-// Structure to hold a single Memory Card Group and its associated Title IDs
 
 /**
  * @brief Finds the Group ID associated with a given Title ID.

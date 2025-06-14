@@ -1006,14 +1006,15 @@ static void guiHandleOp(struct gui_update_t *item)
             break;
 
         case GUI_OP_APPEND_MENU:
-            result = submenuAppendItem(item->menu.subMenu, item->submenu.icon_id,
-                                       item->submenu.text, item->submenu.id, item->submenu.text_id);
-
+            result = submenuAppendItem(item->menu.subMenu, item->submenu.icon_id, item->submenu.text, item->submenu.id, item->submenu.text_id);
             if (!item->menu.menu->submenu) { // first subitem in list
                 item->menu.menu->submenu = result;
-                item->menu.menu->current = result;
-                item->menu.menu->pagestart = result;
-            } else if (item->submenu.selected) { // remember last played game feature
+                if (!item->submenu.selected) {
+                    item->menu.menu->current = result;
+                    item->menu.menu->pagestart = result;
+                }
+            }
+            if (item->submenu.selected) { // remember last played game feature
                 item->menu.menu->current = result;
                 item->menu.menu->pagestart = result;
                 item->menu.menu->remindLast = 1;

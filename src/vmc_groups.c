@@ -1275,6 +1275,11 @@ static const char *titles_XEBP_000_17[] = {
     "SLPS_200.19"};
 static const size_t count_XEBP_000_17 = sizeof(titles_XEBP_000_17) / sizeof(titles_XEBP_000_17[0]);
 
+static const char *titles_XEBP_000_18[] = {
+    "SLUS_208.37",
+    "SLUS_209.14"};
+static const size_t count_XEBP_000_18 = sizeof(titles_XEBP_000_18) / sizeof(titles_XEBP_000_18[0]);
+
 static const MemoryCardGroup allMemoryCardGroups[] = {
     {"XEBP_100.01", titles_XEBP_100_01, count_XEBP_100_01},
     {"XEBP_100.02", titles_XEBP_100_02, count_XEBP_100_02},
@@ -1363,7 +1368,8 @@ static const MemoryCardGroup allMemoryCardGroups[] = {
     {"XEBP_000.14", titles_XEBP_000_14, count_XEBP_000_14},
     {"XEBP_000.15", titles_XEBP_000_15, count_XEBP_000_15},
     {"XEBP_000.16", titles_XEBP_000_16, count_XEBP_000_16},
-    {"XEBP_000.17", titles_XEBP_000_17, count_XEBP_000_17}};
+    {"XEBP_000.17", titles_XEBP_000_17, count_XEBP_000_17},
+    {"XEBP_000.18", titles_XEBP_000_18, count_XEBP_000_18}};
 
 static const size_t NUM_MEMORY_CARD_GROUPS = sizeof(allMemoryCardGroups) / sizeof(allMemoryCardGroups[0]);
 const char *getGroupIdForTitleId(const char *titleId)

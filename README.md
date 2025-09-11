@@ -116,7 +116,7 @@ that contains the preferred partition name (for example `__common`).
 
 For internal HDDs above 2TB you are able to format drives with the exFAT filesystem.
 In order for the exFAT configuration to operate successfully, there must not be any fragmentation with the files.
-Files should be added contiguously or sychronously to avoid fragmentation.  On Windows, this is the default behavior when copying files to another location.  On Linux, you may have to specify a flag when you mount the drive to achieve synchronous behavior.
+Files should be added contiguously or synchronously to avoid fragmentation.  On Windows, this is the default behavior when copying files to another location.  On Linux, you may have to specify a flag when you mount the drive to achieve synchronous behavior.
 Please make note of this caveat when you are troubleshooting any issues.
 	
 When formatting drives for the exFAT filesystem, if you are using Windows please make sure the `Allocation unit size` is set to `Default`.  The drive must also have a device specific 512-byte sector size.

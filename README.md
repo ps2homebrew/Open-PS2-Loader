@@ -72,6 +72,8 @@ OPL will automatically create the above directory structure the first time you l
 For HDD users, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
 If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
 All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
+	
+
 
 </p>
 </details>
@@ -107,12 +109,18 @@ are supported using the folder structure above.
   <summary> <b> HDD </b> </summary>
 <p>
 
-In the latest release for PS2, 48-bit LBA internal HDDs up to 2TB are supported. HDD should be
+For 48-bit LBA internal HDDs 2TB and under, the HDD should be
 formatted with the APA partition scheme. OPL will create the `+OPL` partition on the HDD.
 To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
 that contains the preferred partition name (for example `__common`).
 
-In the current pre-release, support has been added for internal HDDs formatted with the exFAT filesystem.
+For internal HDDs above 2TB you are able to format drives with the exFAT filesystem.
+In order for the exFAT configuration to operate successfully, there must not be any fragmentation with the files.
+Files should be added contiguously or sychronously to avoid fragmentation.  On Windows, this is the default behavior when copying files to another location.  On Linux, you may have to specify a flag when you mount the drive to achieve synchronous behavior.
+Please make note of this caveat when you are troubleshooting any issues.
+	
+When formatting drives for the exFAT filesystem, if you are using Windows please make sure the `Allocation unit size` is set to `Default`.  The drive must also have a device specific 512-byte sector size.
+The sector size can be specified using Linux with a program called `mkfs.exfat` and is the ideal way to format the drive with the exFAT configuration.
 
 </p>
 </details>

@@ -107,10 +107,12 @@ are supported using the folder structure above.
   <summary> <b> HDD </b> </summary>
 <p>
 
-For PS2, 48-bit LBA internal HDDs up to 2TB are supported. HDD should be
+In the latest release for PS2, 48-bit LBA internal HDDs up to 2TB are supported. HDD should be
 formatted with the APA partition scheme. OPL will create the `+OPL` partition on the HDD.
 To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
 that contains the preferred partition name (for example `__common`).
+
+In the current pre-release, support has been added for internal HDDs formatted with the exFAT filesystem.
 
 </p>
 </details>

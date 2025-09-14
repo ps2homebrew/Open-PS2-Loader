@@ -69,11 +69,11 @@ USB modes:
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
-For HDD users, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
+For HDDs formatted with the APA partition scheme, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
 If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
 All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
 	
-
+HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please see below in the `HDD` section for more details on this configuration.
 
 </p>
 </details>
@@ -114,7 +114,7 @@ formatted with the APA partition scheme. OPL will create the `+OPL` partition on
 To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
 that contains the preferred partition name (for example `__common`).
 
-For internal HDDs above 2TB you are able to format drives with the exFAT filesystem.
+You are able to format drives with the exFAT filesystem if you would like to avoid the 2TB limitation.
 In order for the exFAT configuration to operate successfully, there must not be any fragmentation with the files.
 Files should be added contiguously or synchronously to avoid fragmentation.  
 On Windows, this is the default behavior when copying files to another location.  On Linux, you may have to specify a flag when you mount the drive to achieve synchronous behavior.

@@ -1,4 +1,4 @@
-# Open PS2 Loader
+githu# Open PS2 Loader
 
 Copyright 2013, Ifcaro & jimmikaelkael
 Licensed under Academic Free License version 3.0
@@ -108,19 +108,14 @@ are supported using the folder structure above.
 <details>
   <summary> <b> HDD </b> </summary>
 <p>
-
-For 48-bit LBA internal HDDs 2TB and under, the HDD should be
-formatted with the APA partition scheme. OPL will create the `+OPL` partition on the HDD.
-To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
-that contains the preferred partition name (for example `__common`).
-
-You are able to format drives with the exFAT filesystem if you would like to avoid the 2TB limitation.
-In order for the exFAT configuration to operate successfully, there must not be any fragmentation with the files.
-Files should be added contiguously or synchronously to avoid fragmentation.  
-On Windows, this is the default behavior when copying files to another location.  On Linux, you may have to specify a flag when you mount the drive to achieve synchronous behavior.
-Please make note of this caveat when you are troubleshooting any issues.
 	
-When formatting drives for the exFAT filesystem, if you are using Windows please make sure the `Allocation unit size` is set to `Default` and the partition style is set to `GPT`.
+For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
+
+* APA partitioning with PFS filesystem (up to 2TB)
+- OPL will create the `+OPL` partition on the HDD.  To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
+* MBR partitioning (up to 2TB) or GPT partitioning (unlimited) with the exFAT filesystem
+- Files should be added contiguously or synchronously to avoid fragmentation. For example, drag and drop files one at a time, or ensure that files are added sequentially.
+- When formatting drives for the exFAT filesystem, please make sure the `Allocation unit size` is set to `Default`.
 
 </p>
 </details>

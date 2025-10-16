@@ -69,9 +69,11 @@ USB modes:
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
-For HDD users, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
+For HDDs formatted with the APA partition scheme, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
 If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
 All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
+	
+HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please see below in the `HDD` section for more details on this configuration.
 
 </p>
 </details>
@@ -106,11 +108,14 @@ are supported using the folder structure above.
 <details>
   <summary> <b> HDD </b> </summary>
 <p>
+	
+For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
 
-For PS2, 48-bit LBA internal HDDs up to 2TB are supported. HDD should be
-formatted with the APA partition scheme. OPL will create the `+OPL` partition on the HDD.
-To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
-that contains the preferred partition name (for example `__common`).
+- APA partitioning with PFS filesystem (up to 2TB)
+	- OPL will create the `+OPL` partition on the HDD.  To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
+- MBR partitioning (up to 2TB) or GPT partitioning (unlimited) with the exFAT filesystem
+	- Files should be added contiguously or synchronously to avoid fragmentation. For example, drag and drop files one at a time, or ensure that files are added sequentially.
+	- When formatting drives for the exFAT filesystem, please make sure the `Allocation unit size` is set to `Default`.
 
 </p>
 </details>

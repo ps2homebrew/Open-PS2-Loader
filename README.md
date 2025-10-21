@@ -80,15 +80,18 @@ HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please
 
 <details>
   <summary> <b> USB/MX4SIO/iLink </b> </summary>
+<p>
 
+Supported file systems:
+FAT32 and EXFAT (since OPL v1.2.0 - rev1880), both use the MBR partition table
 
-Game files should be *ideally* defragmented either file by file or by whole drive,
-and games larger than 4gb must use USBExtreme format if device uses FAT32 format (see OPLUtil or USBUtil programs).
-We do **not** recommend using any defrag programs. The best way for defragmenting - copy all files to pc, format USB, copy all files back.
-Repeat it once you faced defragmenting problem again.
-
+Game files should be *ideally* defragmented either file by file or by whole drive.
 > NOTE: partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 - rev1893
 
+If you choose to use the FAT32 file system, games larger than 4gb must use USBExtreme format (see OPLUtil or USBUtil programs).
+
+We do **not** recommend using any defrag programs. The best way for defragmenting - copy all files to pc, format USB, copy all files back.
+Repeat it once you faced defragmenting problem again.
 
 </p>
 </details>

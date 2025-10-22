@@ -1,5 +1,7 @@
 # Open PS2 Loader
 
+![logo](https://github.com/ps2homebrew/Open-PS2-Loader/blob/master/gfx/logo.png)
+
 Copyright 2013, Ifcaro & jimmikaelkael
 Licensed under Academic Free License version 3.0
 Review the LICENSE file for further details.
@@ -12,29 +14,30 @@ Review the LICENSE file for further details.
 ## Introduction
 
 Open PS2 Loader (OPL) is a 100% Open source game and application loader for
-the PS2 and PS3 units. It supports five categories of devices:
-- USB mass storage devices;
-- MX4SIO (SD card connected to memory card port via adapter);
-- iLink (SBP2 compliant storage devices via IEE1394);
-- SMBv1 shares;
-- The PlayStation 2 HDD unit.
+the PS2 and PS3 units.
 
-USB/SMB/MX4SIO/iLink support both USBExtreme and \*.ISO formats;
-PS2 HDD supports HDLoader format;
-All devices also support ZSO format (compressed ISO). It's now the most compatible homebrew loader.
+It supports five categories of devices:
+1. USB mass storage devices;
+2. MX4SIO (SD card connected to memory card port via adapter);
+3. iLink (SBP2 compliant storage devices via IEE1394);
+4. SMBv1 shares;
+5. The PlayStation 2 HDD unit.
+
+>[!NOTE]
+>USB/SMB/MX4SIO/iLink support both USBExtreme and \*.ISO formats.\
+>PS2 HDD supports HDLoader format.\
+>All devices also support ZSO format (compressed ISO).\
+>It's now the most compatible homebrew loader.
 
 OPL is developed continuously - anyone can contribute improvements to the project due to its open-source nature.
 
-You can visit the Open PS2 Loader forum at:
-
+You can visit the Open PS2 Loader forum at:\
 <https://www.psx-place.com/forums/open-ps2-loader-opl.77/>
 
-You can report compatibility game problems at:
-
+You can report compatibility game problems at:\
 <https://www.psx-place.com/threads/open-ps2-loader-game-bug-reports.19401/>
 
-For an updated compatibility list, you can visit the OPL-CL site at:
-
+For an updated compatibility list, you can visit the OPL-CL site at:\
 <http://sx.sytes.net/oplcl/games.aspx>
 
 <details>
@@ -92,7 +95,8 @@ Supported file systems:
 FAT32 and EXFAT (since OPL v1.2.0 - rev1880), both use the MBR partition table
 
 Game files should be *ideally* defragmented either file by file or by whole drive.
-> NOTE: partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 - rev1893
+
+> NOTE: Partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 - rev1893
 
 If you choose to use the FAT32 file system, games larger than 4gb must use USBExtreme format (see OPLUtil or USBUtil programs).
 

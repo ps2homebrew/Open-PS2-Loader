@@ -16,12 +16,12 @@ the PS2 and PS3 units. It supports five categories of devices:
 - USB mass storage devices;
 - MX4SIO (SD card connected to memory card port via adapter);
 - iLink (SBP2 compliant storage devices via IEE1394);
-- SMBv1 shares and the PlayStation 2;
-- HDD unit.
+- SMBv1 shares;
+- The PlayStation 2 HDD unit.
 
-- USB/SMB/MX4SIO/iLink support both USBExtreme and \*.ISO formats;
-- PS2 HDD supports HDLoader format;
-- All devices also support ZSO format (compressed ISO). It's now the most compatible homebrew loader.
+USB/SMB/MX4SIO/iLink support both USBExtreme and \*.ISO formats;
+PS2 HDD supports HDLoader format;
+All devices also support ZSO format (compressed ISO). It's now the most compatible homebrew loader.
 
 OPL is developed continuously - anyone can contribute improvements to the project due to its open-source nature.
 

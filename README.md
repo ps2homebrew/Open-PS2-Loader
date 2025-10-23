@@ -17,6 +17,7 @@ Open PS2 Loader (OPL) is a 100% Open source game and application loader for
 the PS2 and PS3 units.
 
 It supports five categories of devices:
+
 1. USB mass storage devices;
 2. MX4SIO (SD card connected to memory card port via adapter);
 3. iLink (SBP2 compliant storage devices via IEE1394);

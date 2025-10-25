@@ -25,6 +25,7 @@ It supports five categories of devices:
 5. ATA/IDE HDDs.
 
 All of the devices mentioned above support multiple file formats, including:
+
 - ISO;
 - ZSO (Compressed ISO);
 - USB Extreme (ul);
@@ -145,13 +146,14 @@ For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
 
 There are two methods to add apps to OPL.
 
-### conf_apps.cfg method (Legacy):
+### conf_apps.cfg method (Legacy)
 
 Composed of two parts separated by an "=" sign\
 Where, the first part consists of the name that will appear in your OPL apps list.\
 And the second part consists of the path to the ELF.
 
 To begin:
+
 1. Create a text file called `conf_apps.cfg`.
 2. In this file, put the name you want to appear in the list of apps, followed by the "=" sign.
 3. Put the device identifier
@@ -176,18 +178,19 @@ the conf_apps.cfg file must be in the OPL folder, on your MemoryCard.\
 Or at the root of the storage device
 
 
-### title.cfg method:
+### title.cfg method
 
 Also composed of two parts, or to be more exact, two lines
 Where, in the first line we put the name that will appear in the list of apps, and in the second line we put the ELF
 
 To begin:
+
 1. In the APPS folder, create a folder with the name of the ELF you want to add
 2. In that folder, place the ELF
 3. Create a text file called `title.cfg` and in that file, put the following instructions:\
 ```
 title=My App Name
-boot=MY APP.ELF
+boot=MYAPP.ELF
 ```
 
 Using OPL again as an example:

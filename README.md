@@ -187,9 +187,9 @@ Where, in the first line we put the name that will appear in the list of apps, a
 
 To begin:
 
-1. In the APPS folder, create a folder with the name of the ELF you want to add
-2. In that folder, place the ELF
-3. Create a text file called `title.cfg` and in that file, put the following instructions:
+1. In the APPS folder, create a new folder with the name of the ELF you want to add
+2. In this new folder, place the ELF and create also a text file called `title.cfg`.
+3. In that file, add the following instructions:
 
 ```
 title=My App Name

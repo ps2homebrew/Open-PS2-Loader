@@ -163,11 +163,13 @@ And finally path to the desired ELF
 > NOTE: Be careful to enter the exact path, OPL is case sensitive
 
 The structure should look like this:
+
 ```
 My App Name=mass:APPS/MYAPP.ELF
 ```
 
 let's use OPL itself as an example:
+
 ```
 OPL=mass:APPS/OPNPS2LD.ELF
 ```
@@ -187,7 +189,8 @@ To begin:
 
 1. In the APPS folder, create a folder with the name of the ELF you want to add
 2. In that folder, place the ELF
-3. Create a text file called `title.cfg` and in that file, put the following instructions:\
+3. Create a text file called `title.cfg` and in that file, put the following instructions:
+
 ```
 title=My App Name
 boot=MYAPP.ELF

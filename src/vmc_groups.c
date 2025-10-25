@@ -1260,7 +1260,7 @@ static const char *titles_XEBP_000_10[] = {
     "SLPM_659.76",
     "SLPM_859.76",
     "SLUS_213.34",
-    "SLUS_213.35"};
+    "SLUS_213.45"};
 static const size_t count_XEBP_000_10 = sizeof(titles_XEBP_000_10) / sizeof(titles_XEBP_000_10[0]);
 
 static const char *titles_XEBP_000_11[] = {

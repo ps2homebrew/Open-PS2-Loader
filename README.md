@@ -145,46 +145,57 @@ For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
 
 There are two methods to add apps to OPL.
 
-### `conf_apps.cfg` method (Legacy):
+### conf_apps.cfg method (Legacy):
 
 Composed of two parts separated by an "=" sign\
 Where, the first part consists of the name that will appear in your OPL apps list.\
 And the second part consists of the path to the ELF.
 
 To begin:
-1. Create a text file called "conf_apps.cfg".
+1. Create a text file called `conf_apps.cfg`.
 2. In this file, put the name you want to appear in the list of apps, followed by the "=" sign.
 3. Put the device identifier
-(for a USB device it would be "mass:", for MemoryCard it would be "mc:", and so on for other devices)\ and finally path to the desired ELF
+(for a USB device it would be `mass:`, for MemoryCard it would be `mc:`, and so on for other devices)\
+And finally path to the desired ELF
 
 > NOTE: Be careful to enter the exact path, OPL is case sensitive
 
-The structure should look like this:\
-My App Name=mass:APPS/MYAPP.ELF\
+The structure should look like this:
+```
+My App Name=mass:APPS/MYAPP.ELF
+```
 
-let's use OPL itself as an example:\
+let's use OPL itself as an example:
+```
 OPL=mass:APPS/OPNPS2LD.ELF
+```
 
 With this method the ELFs don't need to be in the APPS folder, but keeping them there helps keep everything organized.
 
 the conf_apps.cfg file must be in the OPL folder, on your MemoryCard.\
 Or at the root of the storage device
 
-### `title.cfg` method:\
+
+### title.cfg method:
 
 Also composed of two parts, or to be more exact, two lines
 Where, in the first line we put the name that will appear in the list of apps, and in the second line we put the ELF
 
-To begin:\
-1. In the APPS folder, create a folder with the name of the ELF you want to add\
+To begin:
+1. In the APPS folder, create a folder with the name of the ELF you want to add
 2. In that folder, place the ELF
-3. Create a text file called "title.cfg" and in that file, put the following instructions:\
-title= My App Name\
+3. Create a text file called `title.cfg` and in that file, put the following instructions:\
+```
+title=My App Name
 boot=MY APP.ELF
+```
 
-Using OPL again as an example:\
-title=Open PS2 Loader\
+Using OPL again as an example:
+
+```
+title=Open PS2 Loader
 boot=OPNPS2LD.ELF
+```
 
 I would like to emphasize that in this method it is necessary that the ELF file and the title.cfg file must be in a folder, within the APPS folder.
 

@@ -22,14 +22,18 @@ It supports five categories of devices:
 2. MX4SIO (SD card connected to memory card port via adapter);
 3. iLink (SBP2 compliant storage devices via IEE1394);
 4. SMBv1 shares;
-5. The PlayStation 2 HDD unit.
+5. ATA/IDE HDDs.
+
+All of the devices mentioned above support multiple file formats, including:
+- ISO;
+- ZSO (Compressed ISO);
+- USB Extreme (ul);
+- Homebrews (Apps)in ELF format;
+- HDDs support the HDLoader format.
+
+It's now the most compatible homebrew loader.
 
 >[!NOTE]
->USB/SMB/MX4SIO/iLink support both USBExtreme and \*.ISO formats.\
->PS2 HDD supports HDLoader format.\
->All devices also support ZSO format (compressed ISO).\
->It's now the most compatible homebrew loader.
-
 OPL is developed continuously - anyone can contribute improvements to the project due to its open-source nature.
 
 You can visit the Open PS2 Loader forum at:\
@@ -93,11 +97,11 @@ HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please
 <p>
 
 Supported file systems:
-FAT32 and EXFAT (since OPL v1.2.0 - rev1880), both use the MBR partition table
+EXFAT (since OPL v1.2.0 beta - rev1880) and FAT32, both use the MBR partition table
 
 Game files should be *ideally* defragmented either file by file or by whole drive.
 
-> NOTE: Partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 - rev1893
+> NOTE: Partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 beta - rev1893
 
 If you choose to use the FAT32 file system, games larger than 4gb must use USBExtreme format (see OPLUtil or USBUtil programs).
 

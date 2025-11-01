@@ -133,7 +133,7 @@ For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
 
 - APA partitioning with PFS filesystem (up to 2TB)
 	- OPL will create the `+OPL` partition on the HDD.  To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
-- MBR partitioning (up to 2TB) or GPT partitioning (unlimited) with the exFAT filesystem
+- MBR partitioning (up to 2TB) or GPT partitioning (unlimited) with the FAT32 or exFAT filesystem
 	- Files should be added contiguously or synchronously to avoid fragmentation. For example, drag and drop files one at a time, or ensure that files are added sequentially.
 	- When formatting drives for the exFAT filesystem, please make sure the `Allocation unit size` is set to `Default`.
 

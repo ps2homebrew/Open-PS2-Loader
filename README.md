@@ -22,17 +22,17 @@ It supports five categories of devices:
 2. MX4SIO (SD card connected to memory card port via adapter);
 3. iLink (SBP2 compliant storage devices via IEE1394);
 4. SMBv1 shares;
-5. ATA/IDE HDDs.
+5. ATA/IDE or SATA internal HDDs/SSDs/SSHDs.
 
 All of the devices mentioned above support multiple file formats, including:
 
 - ISO;
-- ZSO (Compressed ISO);
+- ZSO (compressed ISO);
 - USB Extreme (ul);
-- Homebrews (Apps) in ELF format;
-- HDDs support the HDLoader format.
+- Homebrew (Apps) in ELF format;
+- HDDs/SSDs/SSHDs support the HDLoader format.
 
-It's now the most compatible homebrew loader.
+It's now the most compatible homebrew loader along with Neutrino.
 
 >[!NOTE]
 OPL is developed continuously - anyone can contribute improvements to the project due to its open-source nature.
@@ -58,7 +58,7 @@ types come with more or fewer features included.
 | `Release`                   | Regular OPL release with GSM, IGS, PADEMU, VMC, PS2RD Cheat Engine & Parental Controls. |
 | `DTL_T10000`                | OPL for TOOLs (DevKit PS2)                                                              |
 | `IGS`                       | OPL with InGame Screenshot feature.                                                     |
-| `PADEMU`                    | OPL with Pad Emulation for DS3 & DS4.                                                   |
+| `PADEMU`                    | OPL with Pad Emulation for DualShock 3 & DualShock4.                                                   |
 | `RTL`                       | OPL with the right to left language support.                                            |
 
 </p>
@@ -68,13 +68,13 @@ types come with more or fewer features included.
   <summary> <b> How to use </b> </summary>
 <p>
 
-OPL uses the following directory tree structure across HDD, SMB, and
+OPL uses the following directory tree structure across HDD/SSD/SSHD, SMB, and
 USB modes:
 
 | Folder | Description                                          | Modes       |
 | ------ | ---------------------------------------------------- | ----------- |
 | `CD`   | for games on CD media - i.e. blue-bottom discs       | USB and SMB |
-| `DVD`  | for DVD5 and DVD9 images (if filesystem supports +4gb files) | USB and SMB |
+| `DVD`  | for DVD5 and DVD9 images (if filesystem supports +4GB files) | USB and SMB |
 | `VMC`  | for Virtual Memory Card images - from 8MB up to 64MB | all         |
 | `CFG`  | for saving per-game configuration files              | all         |
 | `ART`  | for game art images                                  | all         |
@@ -85,11 +85,11 @@ USB modes:
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
-For HDDs formatted with the APA partition scheme, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
+For HDDs/SSDs/SSHDs formatted with the APA partition scheme, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
 If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
-All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
+All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF/wLaunchELF at a larger size if needed).
 	
-HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please see below in the `HDD` section for more details on this configuration.
+HDDs/SSDs/SSHDs are also able to be formatted as exFAT to avoid the 2TB limitation. Please see below in the `HDD` section for more details on this configuration.
 
 </p>
 </details>
@@ -99,15 +99,15 @@ HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please
 <p>
 
 Supported file systems:
-EXFAT (since OPL v1.2.0 beta - rev1880) and FAT32, both use the MBR partition table
+EXFAT (since OPL 1.2.0 Beta commit 1880) and FAT32. Both use the MBR partition table
 
 Game files should be *ideally* defragmented either file by file or by whole drive.
 
-> NOTE: Partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 beta - rev1893
+> NOTE: Partial file fragmentation is supported (up to 64 fragments!) since OPL 1.2.0 Beta commit 1893.
 
-If you choose to use the FAT32 file system, games larger than 4gb must use USBExtreme format (see OPLUtil or USBUtil programs).
+If you choose to use the FAT32 file system, games larger than 4GB must use USBExtreme format (see OPLUtil or USBUtil programs).
 
-We do **not** recommend using any defrag programs. The best way for defragmenting - copy all files to pc, format USB, copy all files back.
+We do **not** recommend using any defrag programs. The best way for defragmenting - copy all files to pc, format USB and copy all files back.
 Repeat it once you faced defragmenting problem again.
 
 </p>
@@ -126,14 +126,14 @@ are supported using the folder structure above.
 </details>
 
 <details>
-  <summary> <b> HDD </b> </summary>
+  <summary> <b> HDD/SSD/SSHD </b> </summary>
 <p>
 	
-For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
+For PS2, 28-bit/48-bit LBA internal HDDs/SSDs/SSHDs are supported. The HDD/SSD/SSHD can be formatted as:
 
 - APA partitioning with PFS filesystem (up to 2TB)
-	- OPL will create the `+OPL` partition on the HDD.  To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
-- MBR partitioning (up to 2TB) or GPT partitioning (unlimited) with the exFAT filesystem
+	- OPL will create the `+OPL` partition on the HDD/SSD/SSHD. To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
+- MBR partitioning (up to 2TB) or GPT partitioning (almost unlimited) with the FAT32 or exFAT filesystems (only the latest OPL Beta versions support this)
 	- Files should be added contiguously or synchronously to avoid fragmentation. For example, drag and drop files one at a time, or ensure that files are added sequentially.
 	- When formatting drives for the exFAT filesystem, please make sure the `Allocation unit size` is set to `Default`.
 
@@ -245,7 +245,7 @@ OPL currently only supports exporting (sharing out) the PS2's drive.
 
 You can use `hdl-dump`, `pfs-shell`, or even directly edit the disk in a hex editor.
 
-For example, to use `hdl_dump` to install a game to the HDD:
+For example, to use `hdl_dump` to install a game to the HDD/SSD/SSHD:
 
   * Connect with your choosen client (OS specific)
   * Run `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO`
@@ -361,7 +361,7 @@ python ziso.py -c 0 "input.zso" "output.iso"
 ```
 
 You can copy ZSO files to the same folder as your ISOs and they will be detected by OPL.
-To install onto internal HDD, you can use the latest version of HDL-Dump.
+To install onto internal HDD/SSD/SSHD, you can use the latest version of HDL-Dump.
 
 </p>
 </details>

@@ -2,8 +2,8 @@
 
 ![logo](https://github.com/ps2homebrew/Open-PS2-Loader/blob/master/gfx/logo.png)
 
-Copyright 2013, Ifcaro & jimmikaelkael
-Licensed under Academic Free License version 3.0
+Copyright 2013, Ifcaro & jimmikaelkael\
+Licensed under Academic Free License version 3.0\
 Review the LICENSE file for further details.
 
 [![CI](https://github.com/ps2homebrew/Open-PS2-Loader/actions/workflows/compilation.yml/badge.svg?branch=master)](https://github.com/ps2homebrew/Open-PS2-Loader/actions/workflows/compilation.yml)
@@ -13,14 +13,14 @@ Review the LICENSE file for further details.
 
 ## Introduction
 
-Open PS2 Loader (OPL) is a 100% Open source game and application loader for
-the PS2 and PS3 units.
+Open PS2 Loader (OPL) is a 100% open-source game and application loader for
+the PS2 and PS3.
 
 It supports five categories of devices:
 
 1. USB mass storage devices;
 2. MX4SIO (SD card connected to memory card port via adapter);
-3. iLink (SBP2 compliant storage devices via IEE1394);
+3. iLink (SBP2 compliant storage devices via IEEE1394);
 4. SMBv1 shares;
 5. ATA/IDE HDDs.
 
@@ -40,7 +40,7 @@ OPL is developed continuously - anyone can contribute improvements to the projec
 You can visit the Open PS2 Loader forum at:\
 <https://www.psx-place.com/forums/open-ps2-loader-opl.77/>
 
-You can report compatibility game problems at:\
+You can report game compatibility problems at:\
 <https://www.psx-place.com/threads/open-ps2-loader-game-bug-reports.19401/>
 
 For an updated compatibility list, you can visit the OPL-CL site at:\
@@ -50,16 +50,16 @@ For an updated compatibility list, you can visit the OPL-CL site at:\
   <summary> <b> Release types </b> </summary>
 <p>
 
-Open PS2 Loader bundle included several types of the same OPL version. These
+Open PS2 Loader bundle includes several types of the same OPL version. These
 types come with more or fewer features included.
 
 | Type (can be a combination) | Description                                                                             |
 | --------------------------- | --------------------------------------------------------------------------------------- |
-| `Release`                   | Regular OPL release with GSM, IGS, PADEMU, VMC, PS2RD Cheat Engine & Parental Controls. |
-| `DTL_T10000`                | OPL for TOOLs (DevKit PS2)                                                              |
-| `IGS`                       | OPL with InGame Screenshot feature.                                                     |
-| `PADEMU`                    | OPL with Pad Emulation for DS3 & DS4.                                                   |
-| `RTL`                       | OPL with the right to left language support.                                            |
+| `Release`                   | Regular OPL release with GSM, IGS, PADEMU, VMC, PS2RD Cheat Engine and Parental Controls. |
+| `DTL_T10000`                | OPL for TOOLs (DevKit PS2).                                                             |
+| `IGS`                       | OPL with In Game Screenshot feature.                                                    |
+| `PADEMU`                    | OPL with Pad Emulation for DS3 and DS4.                                                 |
+| `RTL`                       | OPL with right-to-left language support.                                                |
 
 </p>
 </details>
@@ -86,7 +86,7 @@ USB modes:
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
 For HDDs formatted with the APA partition scheme, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
-If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
+If a config file is not found, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
 All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
 	
 HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please see below in the `HDD` section for more details on this configuration.
@@ -98,8 +98,10 @@ HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please
   <summary> <b> USB/MX4SIO/iLink </b> </summary>
 <p>
 
-Supported file systems:
-EXFAT (since OPL v1.2.0 beta - rev1880) and FAT32, both use the MBR partition table
+Supported file systems, both using the MBR partition table:
+
+- exFAT (since OPL v1.2.0 beta - rev1880)
+- FAT32
 
 Game files should be *ideally* defragmented either file by file or by whole drive.
 
@@ -107,8 +109,8 @@ Game files should be *ideally* defragmented either file by file or by whole driv
 
 If you choose to use the FAT32 file system, games larger than 4gb must use USBExtreme format (see OPLUtil or USBUtil programs).
 
-We do **not** recommend using any defrag programs. The best way for defragmenting - copy all files to pc, format USB, copy all files back.
-Repeat it once you faced defragmenting problem again.
+We do **not** recommend using any defrag programs. The best way for defragmenting - copy all files to PC, format USB, copy all files back.
+Repeat this when you face fragmentation problems again.
 
 </p>
 </details>
@@ -117,7 +119,7 @@ Repeat it once you faced defragmenting problem again.
   <summary> <b> SMB </b> </summary>
 <p>
 
-For loading games by SMB protocol, you need to share a folder (ex: PS2SMB)
+For loading games by SMB protocol, you need to share a folder (e.g. PS2SMB)
 on the host machine or NAS device and make sure that it has full read and
 write permissions. USB Advance/Extreme format is optional - \*.ISO images
 are supported using the folder structure above.
@@ -148,9 +150,9 @@ There are two methods to add apps to OPL.
 
 ### conf_apps.cfg method (Legacy)
 
-Composed of two parts separated by an "=" sign\
-Where, the first part consists of the name that will appear in your OPL apps list.\
-And the second part consists of the path to the ELF.
+Composed of two parts separated by an "=" sign, where:
+- the first part consists of the name that will appear in your OPL apps list
+- the second part consists of the path to the ELF.
 
 To begin:
 
@@ -168,7 +170,7 @@ The structure should look like this:
 My App Name=mass:APPS/MYAPP.ELF
 ```
 
-let's use OPL itself as an example:
+Using OPL itself as an example:
 
 ```
 OPL=mass:APPS/OPNPS2LD.ELF
@@ -176,14 +178,15 @@ OPL=mass:APPS/OPNPS2LD.ELF
 
 With this method the ELFs don't need to be in the APPS folder, but keeping them there helps keep everything organized.
 
-the conf_apps.cfg file must be in the OPL folder, on your MemoryCard.\
-Or at the root of the storage device
+The conf_apps.cfg file must be in the OPL folder, on your MemoryCard.\
+Or at the root of the storage device.
 
 
 ### title.cfg method
 
-Also composed of two parts, or to be more exact, two lines
-Where, in the first line we put the name that will appear in the list of apps, and in the second line we put the ELF
+Also composed of two parts, or to be more exact, two lines, where:
+- in the first line we put the name that will appear in the list of apps
+- in the second line we put the ELF.
 
 To begin:
 
@@ -205,7 +208,7 @@ boot=OPNPS2LD.ELF
 
 I would like to emphasize that in this method it is necessary that the ELF file and the title.cfg file must be in a folder, within the APPS folder.
 
-> NOTE: In both methods, it is necessary attention to the file names, because, as already mentioned: OPL is case sensitive.
+> NOTE: In both methods, it is necessary to pay attention to the file names, because, as already mentioned: OPL is case sensitive.
 
 </p>
 </details>
@@ -216,9 +219,9 @@ I would like to emphasize that in this method it is necessary that the ELF file 
 
 OPL accepts `.cht` files in PS2RD format. Each cheat file corresponds to a specific game and must be stored in the `CHT` directory on your device.
 Cheats are structured as hexadecimal codes, with proper headers as descriptions to identify their function.
-You can activate cheats via OPL's graphical interface. Navigate to a games settings, enable cheats and select the desired mode.
+You can activate cheats via OPL's graphical interface. Navigate to a game's settings, enable cheats, and select the desired mode.
 
-### cheat modes
+### Cheat modes
 
   * Auto Select Cheats:  
 This mode will enable and apply all cheat codes in your `.cht` file to your game automatically.
@@ -236,7 +239,7 @@ When enabled a cheat selection menu will appear when you launch a game. You can 
 OPL now uses an [NBD](https://en.wikipedia.org/wiki/Network_block_device) server to share the internal hard drive, instead of HDL server.
 NBD is [formally documented](https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md) and developed as a collaborative open standard.
 
-The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD), go there to contribute on the NBD code itself.
+The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD). Go there to contribute to the NBD code itself.
 
 The main advantage of using NBD is that the client will expose the drive to your operating system in a similar way as a directly attached drive.
 This means that any utility that worked with the drive when it was directly attached should work the same way with NBD.
@@ -265,45 +268,45 @@ Supported: Linux, [Windows with WSL and custom kernel](https://github.com/micros
 nbd-client requires nbd kernel support. If it isn't loaded,
 `sudo modprobe nbd` will do.
 
-list available export:
+List available export:
 
 ```sh
 nbd-client -l 192.168.1.45
 ```
 
-connect:
+Connect:
 
 ```sh
 nbd-client 192.168.1.45 /dev/nbd1
 ```
 
-disconnect:
+Disconnect:
 
 ```sh
 nbd-client -d /dev/nbd1
 ```
 
 You'll generally need sudo to run this commands in root or
-add your user to the right group usually "disk".
+add your user to the right group, usually "disk".
 
 ### nbdfuse
 
 Supported: Linux, Windows with WSL2
 
-list available export:
+List available export:
 
 ```sh
 nbdinfo --list nbd://192.168.1.45
 ```
 
-connect:
+Connect:
 
 ```sh
 mkdir ps2
 nbdfuse ps2/ nbd://192.168.1.45 &
 ```
 
-disconnect:
+Disconnect:
 
 ```sh
 umount ps2
@@ -316,19 +319,19 @@ Supported: Windows
 [WNBD client](https://cloudbase.it/ceph-for-windows/).
 Install, reboot, open elevated (with Administrator rights) [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/starting-windows-powershell?view=powershell-7.1#how-to-start-windows-powershell-on-earlier-versions-of-windows)
 
-connect:
+Connect:
 
 ```sh
 wnbd-client.exe map hdd0 192.168.1.22
 ```
 
-disconnect:
+Disconnect:
 
 ```sh
 wnbd-client.exe unmap hdd0
 ```
 
-### Mac OS
+### macOS
 
 Not supported.
 
@@ -339,7 +342,7 @@ Not supported.
   <summary> <b> ZSO Format </b> </summary>
 <p>
 
-As of version 1.2.0, compressed ISO files in ZSO format is supported by OPL.
+As of version 1.2.0, compressed ISO files in ZSO format are supported by OPL.
 
 To handle ZSO files, a python script (ziso.py) is included in the pc folder of this repository.
 It requires Python 3 and the LZ4 library:
@@ -390,7 +393,7 @@ Open PS2 Loader needs the [**latest PS2SDK**](https://github.com/ps2dev/ps2sdk)
   <summary> <b> OPL Archive </b> </summary>
 <p>
 
-Since 05/07/2021 every OPL build dispatched to the release section of this repository will be uploaded to a [mega account](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A). You can access the archive by clicking the mega badge on top of this readme
+Since 05/07/2021 every OPL build dispatched to the release section of this repository will be uploaded to a [mega account](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A). You can access the archive by clicking the mega badge on top of this readme.
 
 </p>
 </details>
@@ -402,12 +405,12 @@ Since 05/07/2021 every OPL build dispatched to the release section of this repos
 ### OPL Freezes on logo or grey screen
 
  Sometimes OPL freezes when loading config files made by older OPL builds.
-> hold __`START`__ while OPL initializes to make it skip the config loading, then, you can save your own settings.
+> hold __`START`__ while OPL initializes to make it skip the config loading, then you can save your own settings,
 > fixing the issue.
 
 ### Game freezes on white screen
 
-> Main game executable could not be found. Either game is fragmented or image is corrupted
+> Main game executable could not be found. Either game is fragmented or image is corrupted.
 
 ### OPL does not display anything on boot
 

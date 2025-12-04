@@ -1425,7 +1425,7 @@ static const MemoryCardGroup allMemoryCardGroups[] = {
     {"XEBP_100.73", titles_XEBP_100_73, count_XEBP_100_73},
     {"XEBP_100.74", titles_XEBP_100_74, count_XEBP_100_74},
     {"XEBP_100.75", titles_XEBP_100_75, count_XEBP_100_75},
-    {"XEBP_000.01", titles_XEBP_000_01, count_XEBP_000_01},//Group 76
+    {"XEBP_000.01", titles_XEBP_000_01, count_XEBP_000_01}, //Group 76
     {"XEBP_000.02", titles_XEBP_000_02, count_XEBP_000_02},
     {"XEBP_000.03", titles_XEBP_000_03, count_XEBP_000_03},
     {"XEBP_000.04", titles_XEBP_000_04, count_XEBP_000_04},

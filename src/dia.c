@@ -318,6 +318,15 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
         rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
         rmDrawRect(x + 5, y + 5, 60, 60, dcol);
 
+        // Show hexadecimal color code below the swatch (e.g. "#RRGGBB")
+        {
+            char hex[8];
+            snprintf(hex, sizeof(hex), "#%02X%02X%02X", col[0], col[1], col[2]);
+            int hexW = rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], hex));
+            int hexX = x + (70 - hexW) / 2;
+            fntRenderString(gTheme->fonts[0], hexX, y + 80, ALIGN_NONE, 0, 0, hex, gTheme->textColor);
+        }
+
         guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_OK, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
         guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 
@@ -360,8 +369,6 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
     padRestoreSettings(colPadSettings);
     return ret;
 }
-
-
 
 // ----------------------------------------------------------------------------
 // --------------------------- Dialogue handling ------------------------------

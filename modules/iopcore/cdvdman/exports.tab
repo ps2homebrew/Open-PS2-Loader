@@ -1,12 +1,3 @@
-void _retonly(void) {}
-
-int _ret0(void) {
-	return 0;
-}
-
-int _dummy(void) {
-	return 1;
-}
 
 // cdvdman export table
 DECLARE_EXPORT_TABLE(cdvdman, 1, 1)
@@ -238,3 +229,13 @@ DECLARE_EXPORT_TABLE(oplsmb, 1, 1)
 	DECLARE_EXPORT(smb_NegotiateProt)
 END_EXPORT_TABLE
 #endif
+
+void _retonly(void) {}
+
+int _ret0(void) {
+	return 0;
+}
+
+int _dummy(void) {
+	return 1;
+}

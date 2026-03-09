@@ -22,7 +22,7 @@
 #define CLOCKS_PER_MILISEC 147456
 
 // 200 ms per repeat
-#define DEFAULT_PAD_DELAY 200
+#define DEFAULT_PAD_DELAY 1
 
 struct pad_data_t
 {

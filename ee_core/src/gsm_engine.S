@@ -1184,6 +1184,7 @@ Enable_GSBreakpoint:
 
     li      $a2, 0x8000
     mtbpc   $a2                                     # All breakpoints off (BED = 1)
+    sync.l                                          # Synchronize pipeline after mtbpc; ensures COP0 breakpoint configuration is fully committed before further instructions (required for PS2 EE hardware).
 
     sync.p                                          # Await instruction completion
 
@@ -1198,7 +1199,7 @@ Enable_GSBreakpoint:
     li      $a2, 0x60280000                         # Data read & write breakpoint on (DRE, DWE, DUE, DKE = 1). Syscalls are run in kernel mode, for the EE.
     mtbpc   $a2
 
-    sync.p                                          # Await instruction completion
+    sync.l                                          # Synchronize pipeline after mtbpc; ensures COP0 breakpoint configuration is fully committed before further instructions (required for PS2 EE hardware).
 
     jr      $ra
     nop
@@ -1212,6 +1213,7 @@ Disable_GSBreakpoint:
 
     li      $a2, 0x8000
     mtbpc   $a2                                     # All breakpoints off (BED = 1)
+    sync.l                                          # Synchronize pipeline after mtbpc; ensures COP0 breakpoint configuration is fully committed before further instructions (required for PS2 EE hardware).
     sync.p                                          # Await instruction completion
 
     jr      $ra

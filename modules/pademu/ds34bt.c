@@ -892,7 +892,7 @@ static int l2cap_disconnection_response(u16 handle, u8 rxid, u16 scid, u16 dcid)
     return L2CAP_Command(handle, cmd_buf, 8);
 }
 
-#define CMD_DELAY 2
+#define CMD_DELAY 1
 
 static int L2CAP_event_task(int result, int bytes)
 {

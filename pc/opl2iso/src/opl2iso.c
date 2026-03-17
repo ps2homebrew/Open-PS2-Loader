@@ -266,7 +266,6 @@ int exportGame(const char *gameid)
                 return EXIT_FAILURE;
             }
         }
-        
         fclose(fsrc);
     }
 

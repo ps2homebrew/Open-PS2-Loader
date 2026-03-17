@@ -967,7 +967,7 @@ static int l2cap_disconnection_response(u16 handle, u8 rxid, u16 scid, u16 dcid)
     return L2CAP_Command(handle, cmd_buf, 8);
 }
 
-#define CMD_DELAY 2
+#define CMD_DELAY 1
 
 static int L2CAP_event_task(int result, int bytes)
 {
@@ -1080,7 +1080,7 @@ static int L2CAP_event_task(int result, int bytes)
                                 ds34pad[pad].oldled[3] = 0;
                             }
                             DelayThread(CMD_DELAY);
-                            hid_LEDRumble(ds34pad[pad].oldled, 0, 0, pad);
+                            //hid_LEDRumble(ds34pad[pad].oldled, 0, 0, pad);
                             pad_status_set(DS34BT_STATE_RUNNING, pad);
                         }
                         break;

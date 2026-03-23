@@ -42,7 +42,7 @@ typedef struct
     unsigned char ForceRefresh;
 } bdm_device_data_t;
 
-void bdmInit();
+void bdmInit(item_list_t *itemList);
 int bdmFindPartition(char *target, const char *name, int write);
 void bdmLoadModules(void);
 void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet);

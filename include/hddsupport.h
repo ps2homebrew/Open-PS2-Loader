@@ -59,7 +59,7 @@ void hddFreeHDLGamelist(hdl_games_list_t *game_list);
 int hddSetHDLGameInfo(hdl_game_info_t *ginfo);
 int hddDeleteHDLGame(hdl_game_info_t *ginfo);
 
-void hddInit();
+void hddInit(item_list_t *itemList);
 item_list_t *hddGetObject(int initOnly);
 void hddLoadModules(void);
 void hddLoadSupportModules(void);

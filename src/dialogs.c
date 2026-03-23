@@ -834,7 +834,7 @@ struct UIItem diaPadMacroConfig[] = {
     {UI_BOOL, PADMACRO_INVERT_LY, 1, 1, _STR_HINT_PADMACRO_INVERT_AXIS, -10, 0, {.intvalue = {0, 0}}},
     {UI_LABEL, 0, 1, 1, -1, -10, 0, {.label = {"RX:", -1}}},
     {UI_BOOL, PADMACRO_INVERT_RX, 1, 1, _STR_HINT_PADMACRO_INVERT_AXIS, -10, 0, {.intvalue = {0, 0}}},
-    {UI_LABEL, 0, 1, 1, -1, -10, 0, {.label = {"LY:", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, -10, 0, {.label = {"RY:", -1}}},
     {UI_BOOL, PADMACRO_INVERT_RY, 1, 1, _STR_HINT_PADMACRO_INVERT_AXIS, -10, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
     {UI_BREAK},

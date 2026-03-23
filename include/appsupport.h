@@ -25,7 +25,7 @@ typedef struct
     u8 legacy;
 } app_info_t;
 
-void appInit();
+void appInit(item_list_t *itemList);
 item_list_t *appGetObject(int initOnly);
 void appPostUpdateCallback(int mode);
 

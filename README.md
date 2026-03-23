@@ -1,5 +1,7 @@
 # Open PS2 Loader
 
+![logo](https://github.com/ps2homebrew/Open-PS2-Loader/blob/master/gfx/logo.png)
+
 Copyright 2013, Ifcaro & jimmikaelkael
 Licensed under Academic Free License version 3.0
 Review the LICENSE file for further details.
@@ -12,23 +14,36 @@ Review the LICENSE file for further details.
 ## Introduction
 
 Open PS2 Loader (OPL) is a 100% Open source game and application loader for
-the PS2 and PS3 units. It supports five categories of devices: USB mass
-storage devices, MX4SIO (SD card connected to memory card port via adapter), iLink (SBP2 compliant storage devices via IEE1394), SMBv1 shares and the PlayStation 2 HDD unit.
-USB/SMB/MX4SIO/iLink support both USBExtreme and \*.ISO formats while PS2 HDD supports HDLoader format,
-all devices also support ZSO format (compressed ISO). It's now the most compatible homebrew loader.
+the PS2 and PS3 units.
 
+It supports five categories of devices:
+
+1. USB mass storage devices;
+2. MX4SIO (SD card connected to memory card port via adapter);
+3. iLink (SBP2 compliant storage devices via IEE1394);
+4. SMBv1 shares;
+5. ATA/IDE HDDs.
+
+All of the devices mentioned above support multiple file formats, including:
+
+- ISO;
+- ZSO (Compressed ISO);
+- USB Extreme (ul);
+- Homebrews (Apps) in ELF format;
+- HDDs support the HDLoader format.
+
+It's now the most compatible homebrew loader.
+
+>[!NOTE]
 OPL is developed continuously - anyone can contribute improvements to the project due to its open-source nature.
 
-You can visit the Open PS2 Loader forum at:
-
+You can visit the Open PS2 Loader forum at:\
 <https://www.psx-place.com/forums/open-ps2-loader-opl.77/>
 
-You can report compatibility game problems at:
-
+You can report compatibility game problems at:\
 <https://www.psx-place.com/threads/open-ps2-loader-game-bug-reports.19401/>
 
-For an updated compatibility list, you can visit the OPL-CL site at:
-
+For an updated compatibility list, you can visit the OPL-CL site at:\
 <http://sx.sytes.net/oplcl/games.aspx>
 
 <details>
@@ -66,27 +81,34 @@ USB modes:
 | `THM`  | for themes support                                   | all         |
 | `LNG`  | for translation support                              | all         |
 | `CHT`  | for cheats files                                     | all         |
+| `APPS`  | for ELF files                                       | all         |
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
-For HDD users, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
+For HDDs formatted with the APA partition scheme, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
 If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
 All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
+	
+HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please see below in the `HDD` section for more details on this configuration.
 
 </p>
 </details>
 
 <details>
   <summary> <b> USB/MX4SIO/iLink </b> </summary>
+<p>
 
+Supported file systems:
+EXFAT (since OPL v1.2.0 beta - rev1880) and FAT32, both use the MBR partition table
 
-Game files should be *ideally* defragmented either file by file or by whole drive,
-and games larger than 4gb must use USBExtreme format if device uses FAT32 format (see OPLUtil or USBUtil programs).
+Game files should be *ideally* defragmented either file by file or by whole drive.
+
+> NOTE: Partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 beta - rev1893
+
+If you choose to use the FAT32 file system, games larger than 4gb must use USBExtreme format (see OPLUtil or USBUtil programs).
+
 We do **not** recommend using any defrag programs. The best way for defragmenting - copy all files to pc, format USB, copy all files back.
 Repeat it once you faced defragmenting problem again.
-
-> NOTE: partial file fragmentation is supported (up to 64 fragments!) since OPL v1.2.0 - rev1893
-
 
 </p>
 </details>
@@ -106,11 +128,84 @@ are supported using the folder structure above.
 <details>
   <summary> <b> HDD </b> </summary>
 <p>
+	
+For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
 
-For PS2, 48-bit LBA internal HDDs up to 2TB are supported. HDD should be
-formatted with the APA partition scheme. OPL will create the `+OPL` partition on the HDD.
-To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
-that contains the preferred partition name (for example `__common`).
+- APA partitioning with PFS filesystem (up to 2TB)
+	- OPL will create the `+OPL` partition on the HDD.  To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
+- MBR partitioning (up to 2TB) or GPT partitioning (unlimited) with the exFAT filesystem
+	- Files should be added contiguously or synchronously to avoid fragmentation. For example, drag and drop files one at a time, or ensure that files are added sequentially.
+	- When formatting drives for the exFAT filesystem, please make sure the `Allocation unit size` is set to `Default`.
+
+</p>
+</details>
+
+<details>
+  <summary> <b> APPS </b> </summary>
+<p>
+
+There are two methods to add apps to OPL.
+
+### conf_apps.cfg method (Legacy)
+
+Composed of two parts separated by an "=" sign\
+Where, the first part consists of the name that will appear in your OPL apps list.\
+And the second part consists of the path to the ELF.
+
+To begin:
+
+1. Create a text file called `conf_apps.cfg`.
+2. In this file, put the name you want to appear in the list of apps, followed by the "=" sign.
+3. Put the device identifier
+(for a USB device it would be `mass:`, for MemoryCard it would be `mc:`, and so on for other devices)\
+And finally path to the desired ELF
+
+> NOTE: Be careful to enter the exact path, OPL is case sensitive
+
+The structure should look like this:
+
+```
+My App Name=mass:APPS/MYAPP.ELF
+```
+
+let's use OPL itself as an example:
+
+```
+OPL=mass:APPS/OPNPS2LD.ELF
+```
+
+With this method the ELFs don't need to be in the APPS folder, but keeping them there helps keep everything organized.
+
+the conf_apps.cfg file must be in the OPL folder, on your MemoryCard.\
+Or at the root of the storage device
+
+
+### title.cfg method
+
+Also composed of two parts, or to be more exact, two lines
+Where, in the first line we put the name that will appear in the list of apps, and in the second line we put the ELF
+
+To begin:
+
+1. In the APPS folder, create a new folder with the name of the ELF you want to add
+2. In this new folder, place the ELF and create also a text file called `title.cfg`.
+3. In that file, add the following instructions:
+
+```
+title=My App Name
+boot=MYAPP.ELF
+```
+
+Using OPL again as an example:
+
+```
+title=Open PS2 Loader
+boot=OPNPS2LD.ELF
+```
+
+I would like to emphasize that in this method it is necessary that the ELF file and the title.cfg file must be in a folder, within the APPS folder.
+
+> NOTE: In both methods, it is necessary attention to the file names, because, as already mentioned: OPL is case sensitive.
 
 </p>
 </details>

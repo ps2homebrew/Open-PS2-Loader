@@ -173,7 +173,7 @@ void *ziso_alloc(u32 size)
 int DeviceReadSectorsCached(u64 lsn, void *buffer, unsigned int sectors)
 {
     if (sectors < MAX_SECTOR_CACHE) { // if MAX_SECTOR_CACHE is 0 then it will act as disabled and passthrough
-        if (cur_sector == 0xffffffffffff || lsn < cur_sector || (lsn + sectors) - cur_sector > MAX_SECTOR_CACHE) {
+        if (cur_sector == 0xffffffffffffffff || lsn < cur_sector || (lsn + sectors) - cur_sector > MAX_SECTOR_CACHE) {
             DeviceReadSectors(lsn, sector_cache, MAX_SECTOR_CACHE);
             cur_sector = lsn;
         }
@@ -356,14 +356,13 @@ static int cdvdman_read(u32 lsn, u32 sectors, u16 sector_size, void *buf)
     cdvdman_stat.status = SCECdStatRead;
     buf = (void *)PHYSADDR(buf);
 
-#if defined(HDD_DRIVER) || defined(USE_BDM_ATA) // As of now, only the ATA interface requires this. We do this here to share cdvdman_buf.
     // OPL only has 2048 bytes no matter what. For other sizes we have to copy to the offset and prepoluate the sector header data (the extra bytes.)
     u32 offset = 0;
 
     if (sector_size == 2340)
         offset = 12; // head - sub - data(2048) -- edc-ecc
 
-    if ((u32)(buf)&3) {
+    if ((u32)(buf)&3 || (sector_size != 2048)) {
         // For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.
         WaitSema(cdvdman_searchfilesema);
 
@@ -409,17 +408,11 @@ static int cdvdman_read(u32 lsn, u32 sectors, u16 sector_size, void *buf)
                 header[6] = header[10] = 0x8;
                 header[7] = header[11] = 0;
             }
-
             buf = (void *)((u8 *)buf + nbytes);
         }
-
         SignalSema(cdvdman_searchfilesema);
-    } else {
-#endif
+    } else
         cdvdman_read_sectors(lsn, sectors, buf);
-#if defined(HDD_DRIVER) || defined(USE_BDM_ATA)
-    }
-#endif
 
     ReadPos = 0; /* Reset the buffer offset indicator. */
 

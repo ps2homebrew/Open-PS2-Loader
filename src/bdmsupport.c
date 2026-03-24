@@ -18,6 +18,7 @@
 #include <ps2sdkapi.h>
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
+#include <delaythread.h>
 
 static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
@@ -857,4 +858,38 @@ int bdmUpdateDeviceData(item_list_t *itemList)
     if (dir >= 0)
         fileXioDclose(dir);
     return 0;
+}
+
+int bdmWaitForDevice(int deviceId, u32 timeoutMs)
+{
+    const int RETRY_DELAY = 100;
+    char path[16];
+
+    u32 start = GetTimerSystemTime();
+    sprintf(path, "mass%d:/", deviceId);
+
+    while (1) {
+        int dir = fileXioDopen(path);
+
+        if (dir >= 0) {
+            fileXioDclose(dir);
+            return 1; // ready
+        }
+
+        u32 now = GetTimerSystemTime();
+        u32 elapsed_ms = (now - start) / (kBUSCLK / 1000);
+
+        if (elapsed_ms > timeoutMs) {
+            return 0; // timeout
+        }
+
+        DelayThread(RETRY_DELAY * 1000);
+    }
+}
+
+int bdmHDDIsPresent()
+{
+    // the only thing that currently uses ata_device_identify is ATA_DEVCTL_GET_HIGHEST_UDMA_MODE, so this is the best method to check for presence via xhdd (for now anyways)
+    // ideally, we'd only have ata_device_identify
+    return fileXioDevctl("xhdd0:", ATA_DEVCTL_GET_HIGHEST_UDMA_MODE, NULL, 0, NULL, 0) >= 0;
 }

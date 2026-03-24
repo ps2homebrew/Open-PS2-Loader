@@ -786,6 +786,11 @@ static int checkLoadConfigBDM(int types)
     // if not on USB, check BDM HDD
     if (bdm_result == 0) {
         hddLoadModules();
+        // we can safely assume mass0 in this instance because this should be the only device if the previous checks failed...
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (!bdmWaitForDevice(0, 5000))
+            LOG("checkLoadConfigBDM: HDD check timeout!");
+
         bdm_result = bdmFindPartition(path, "conf_opl.cfg", 0);
         if (bdm_result)
             is_hdd = 1;
@@ -1017,6 +1022,11 @@ static int trySaveConfigBDM(int types)
     // if not on USB, check BDM HDD
     if (bdm_result == 0) {
         hddLoadModules();
+        // we can safely assume mass0 in this instance because this should be the only device if the previous checks failed...
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (!bdmWaitForDevice(0, 5000))
+            LOG("trySaveConfigBDM: HDD check timeout!");
+
         bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
     }
 

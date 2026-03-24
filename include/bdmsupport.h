@@ -51,5 +51,6 @@ void bdmInitSemaphore();
 void bdmEnumerateDevices();
 
 void bdmResolveLBA_UDMA(bdm_device_data_t *pDeviceData);
+int bdmWaitForDevice(int deviceId, u32 timeoutMs);
 
 #endif

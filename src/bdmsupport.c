@@ -886,3 +886,10 @@ int bdmWaitForDevice(int deviceId, u32 timeoutMs)
         DelayThread(RETRY_DELAY * 1000);
     }
 }
+
+int bdmHDDIsPresent()
+{
+    // the only thing that currently uses ata_device_identify is ATA_DEVCTL_GET_HIGHEST_UDMA_MODE, so this is the best method to check for presence via xhdd (for now anyways)
+    // ideally, we'd only have ata_device_identify
+    return fileXioDevctl("xhdd0:", ATA_DEVCTL_GET_HIGHEST_UDMA_MODE, NULL, 0, NULL, 0) >= 0;
+}

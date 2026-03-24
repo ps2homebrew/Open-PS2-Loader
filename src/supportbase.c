@@ -547,6 +547,17 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
     return result;
 }
 
+// Known game-specific default compat settings.
+// Returns compatmask to use when no per-game config exists.
+static int sbGetDefaultCompatForGame(const char *gameid)
+{
+    // Pro Evolution Soccer 2 (Europe) - audio streaming issues need Accurate Reads
+    if (!strncmp("SLES_511.14", gameid, 11))
+        return COMPAT_MODE_1; // Accurate Reads
+
+    return 0;
+}
+
 static const struct cdvdman_settings_common cdvdman_settings_common_sample = CDVDMAN_SETTINGS_DEFAULT_COMMON;
 
 int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman, void **cdvdman_irx, int *patchindex)
@@ -559,6 +570,13 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
 
     char gameid[5];
     configGetDiscIDBinary(configSet, gameid);
+
+    // Apply known defaults for specific games when no per-game config exists.
+    if (compatmask == 0) {
+        int defaultCompat = sbGetDefaultCompatForGame(gameid);
+        if (defaultCompat != 0)
+            compatmask = defaultCompat;
+    }
 
     for (i = 0, settings = NULL; i < size_cdvdman; i += 4) {
         if (!memcmp((void *)((u8 *)cdvdman_irx + i), &cdvdman_settings_common_sample, sizeof(cdvdman_settings_common_sample))) {

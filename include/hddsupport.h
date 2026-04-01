@@ -48,6 +48,15 @@ typedef struct
     vmc_spec_t specs;           /* Card specifications */
 } hdd_vmc_infos_t;
 
+typedef enum {
+    HDD_LOADMODULES_STATUS_ERROR = -2,
+    HDD_LOADMODULES_STATUS_UNK = -1,
+    HDD_LOADMODULES_STATUS_NOERROR,
+    HDD_LOADMODULES_STATUS_ALREADYLOADED,
+    HDD_LOADMODULES_STATUS_BUSYLOADING,
+    HDD_LOADMODULES_STATUS_COUNT,
+} hdd_loadmodules_status;
+
 int hddCheck(void);
 u32 hddGetTotalSectors(void);
 int hddIs48bit(void);
@@ -61,7 +70,7 @@ int hddDeleteHDLGame(hdl_game_info_t *ginfo);
 
 void hddInit(item_list_t *itemList);
 item_list_t *hddGetObject(int initOnly);
-void hddLoadModules(void);
+int hddLoadModules(void);
 void hddLoadSupportModules(void);
 void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet);
 

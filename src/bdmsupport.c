@@ -887,6 +887,20 @@ int bdmWaitForDevice(int deviceId, u32 timeoutMs)
     }
 }
 
+int bdmDeviceIsPresent(int deviceId)
+{
+    char path[16];
+    sprintf(path, "mass%d:/", deviceId);
+    int dir = fileXioDopen(path);
+
+    if (dir >= 0) {
+        fileXioDclose(dir);
+        return 1; // ready
+    }
+
+    return 0;
+}
+
 int bdmHDDIsPresent()
 {
     // the only thing that currently uses ata_device_identify is ATA_DEVCTL_GET_HIGHEST_UDMA_MODE, so this is the best method to check for presence via xhdd (for now anyways)

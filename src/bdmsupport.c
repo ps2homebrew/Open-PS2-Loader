@@ -974,7 +974,6 @@ int bdmHDDIsPresent(u32 timeoutMs)
         // if we haven't timed out already, then we need to wait for the devices to wake up... wait for the timeout...
         LOG("bdmHDDIsPresent: waiting for timeout before scanning again...\n", hdd_id);
         DelayThread(timeoutMs * 1000);
-        timedout = 1;
     }
 
     return bdmGetATADeviceId() >= 0;

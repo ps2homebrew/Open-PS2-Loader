@@ -780,25 +780,13 @@ static int checkLoadConfigBDM(int types)
     int value;
     int bdm_result;
     int is_hdd = 0;
-    int hdd_id = BDM_TYPE_ATA;
 
     // check USB
     bdm_result = bdmFindPartition(path, "conf_opl.cfg", 0);
     // if not on USB, check BDM HDD
     if (bdm_result == 0) {
-        // find the first inaccessible device - this one should be the HDD once it's mounted (we don't have access to device data at this point yet!)
-        for (int i = 0; i < MAX_BDM_DEVICES; i++) {
-            if (!bdmDeviceIsPresent(i)) {
-                hdd_id = i;
-                break;
-            }
-        }
-
-        if (hddLoadModules() >= 0 && bdmHDDIsPresent()) {
-            // wait for up to 5 seconds for the HDD to spin up and become accessible...
-            if (!bdmWaitForDevice(hdd_id, 5000))
-                LOG("checkLoadConfigBDM: HDD check timeout!");
-
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (hddLoadModules() >= 0 && bdmHDDIsPresent(5000)) {
             bdm_result = bdmFindPartition(path, "conf_opl.cfg", 0);
             if (bdm_result)
                 is_hdd = 1;
@@ -1025,25 +1013,13 @@ static int trySaveConfigBDM(int types)
 {
     char path[64];
     int bdm_result;
-    int hdd_id = BDM_TYPE_ATA;
 
     // check USB
     bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
     // if not on USB, check BDM HDD
     if (bdm_result == 0) {
-        // find the first inaccessible device - this one should be the HDD once it's mounted (we don't have access to device data at this point yet!)
-        for (int i = 0; i < MAX_BDM_DEVICES; i++) {
-            if (!bdmDeviceIsPresent(i)) {
-                hdd_id = i;
-                break;
-            }
-        }
-
-        if (hddLoadModules() >= 0 && bdmHDDIsPresent()) {
-            // wait for up to 5 seconds for the HDD to spin up and become accessible...
-            if (!bdmWaitForDevice(hdd_id, 5000))
-                LOG("trySaveConfigBDM: HDD check timeout!");
-
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (hddLoadModules() >= 0 && bdmHDDIsPresent(5000)) {
             bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
         }
     }

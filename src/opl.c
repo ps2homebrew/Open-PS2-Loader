@@ -785,12 +785,8 @@ static int checkLoadConfigBDM(int types)
     bdm_result = bdmFindPartition(path, "conf_opl.cfg", 0);
     // if not on USB, check BDM HDD
     if (bdm_result == 0) {
-        if (hddLoadModules() >= 0 && bdmHDDIsPresent()) {
-            // we can safely assume mass0 in this instance because this should be the only device if the previous checks failed...
-            // wait for up to 5 seconds for the HDD to spin up and become accessible...
-            if (!bdmWaitForDevice(0, 5000))
-                LOG("checkLoadConfigBDM: HDD check timeout!");
-
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (hddLoadModules() >= 0 && bdmHDDIsPresent(5000)) {
             bdm_result = bdmFindPartition(path, "conf_opl.cfg", 0);
             if (bdm_result)
                 is_hdd = 1;
@@ -1022,12 +1018,8 @@ static int trySaveConfigBDM(int types)
     bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
     // if not on USB, check BDM HDD
     if (bdm_result == 0) {
-        if (hddLoadModules() >= 0 && bdmHDDIsPresent()) {
-            // we can safely assume mass0 in this instance because this should be the only device if the previous checks failed...
-            // wait for up to 5 seconds for the HDD to spin up and become accessible...
-            if (!bdmWaitForDevice(0, 5000))
-                LOG("trySaveConfigBDM: HDD check timeout!");
-
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (hddLoadModules() >= 0 && bdmHDDIsPresent(5000)) {
             bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
         }
     }

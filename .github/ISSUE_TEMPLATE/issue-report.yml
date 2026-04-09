@@ -65,6 +65,25 @@ body:
         - HDD
         - iLink
         - MX4SIO
+        
+  - type: dropdown
+    id: extra-features
+    attributes:
+      label: "Which extra features are enabled?"
+      multiple: true
+      options:
+        - VMC
+        - PADEMU
+        - GSM
+
+  - type: input
+    id: compat-modes
+    attributes:
+      label: Compatibility modes
+      description: Which compatibility modes were tested.
+      placeholder: "eg: mode 6, 6+3, 1+3+6..."
+    validations:
+      required: false
 
   - type: textarea
     id: context-and-data

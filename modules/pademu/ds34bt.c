@@ -328,7 +328,7 @@ static u8 GenuineMacAddress[][3] =
 #define HCI_COMMAND_REQ 0
 
 #define MAX_PADS  4
-#define MAX_DELAY 10
+#define MAX_DELAY 1
 
 static u8 hci_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 static u8 l2cap_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
@@ -502,14 +502,14 @@ static void HCI_event_task(int result)
                     if (hci_buf[5] == 0) {
                         hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
                     } else {
-                        DelayThread(500);
+                        DelayThread(50);
                         hci_reset();
                     }
                 } else if ((hci_buf[3] == HCI_OCF_WRITE_SCAN_ENABLE) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
                     if (hci_buf[5] == 0) {
                         bt_dev.status |= DS34BT_STATE_USB_CONFIGURED;
                     } else {
-                        DelayThread(500);
+                        DelayThread(50);
                         hci_reset();
                     }
                 }
@@ -892,7 +892,7 @@ static int l2cap_disconnection_response(u16 handle, u8 rxid, u16 scid, u16 dcid)
     return L2CAP_Command(handle, cmd_buf, 8);
 }
 
-#define CMD_DELAY 2
+#define CMD_DELAY 1
 
 static int L2CAP_event_task(int result, int bytes)
 {
@@ -1081,7 +1081,7 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
             }
         } else {
             if (!ds34pad[ret].isfake && ds34pad[ret].type == DS3)
-                DelayThread(42000); // fix for some bt adapters
+                DelayThread(50); // fix for some bt adapters
         }
     }
 
@@ -1410,7 +1410,7 @@ void ds34bt_reset()
             pad_status_set(DS34BT_STATE_DISCONNECT_REQUEST, pad);
             SignalSema(bt_dev.hid_sema);
             while (1) {
-                DelayThread(500);
+                DelayThread(50);
                 WaitSema(bt_dev.hid_sema);
                 if (!pad_status_check(DS34BT_STATE_RUNNING, pad)) {
                     SignalSema(bt_dev.hid_sema);

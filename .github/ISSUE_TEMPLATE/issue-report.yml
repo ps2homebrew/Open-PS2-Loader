@@ -65,6 +65,7 @@ body:
         - HDD
         - iLink
         - MX4SIO
+    validations:
       required: true
 
   - type: dropdown
@@ -76,6 +77,7 @@ body:
         - VMC
         - PADEMU
         - GSM
+    validations:
       required: true
 
   - type: input

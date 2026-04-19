@@ -40,7 +40,7 @@ body:
     id: console
     attributes:
       label: Console model
-      description: you can see it on the console sticker or inside OSDSYS (press triangle on main menú)
+      description: you can see it on the console sticker or inside OSDSYS (press triangle on main menu)
       placeholder: SCPH-?????
     validations:
       required: true
@@ -50,7 +50,7 @@ body:
     attributes:
       label: "OPL version / revision"
       description: "you can see it on the About option from the settings menu (press start in game list)"
-      placeholder: "e.g. OPL stable 1.0.0 | OPL beta 1.1.0 1732"
+      placeholder: "e.g. OPL Beta 1.2.0 2241 (Note: 'Latest Version' is not a valid answer)"
     validations:
       required: true
 

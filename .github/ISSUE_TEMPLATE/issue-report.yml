@@ -40,7 +40,7 @@ body:
     id: console
     attributes:
       label: Console model
-      description: you can see it on the console sticker or inside OSDSYS (press triangle on main menu)
+      description: You can see it on the console sticker or inside OSDSYS (press triangle on main menu)
       placeholder: SCPH-?????
     validations:
       required: true

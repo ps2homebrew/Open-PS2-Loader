@@ -778,14 +778,31 @@ static int checkLoadConfigBDM(int types)
 {
     char path[64];
     int value;
+    int bdm_result;
+    int is_hdd = 0;
 
     // check USB
-    if (bdmFindPartition(path, "conf_opl.cfg", 0)) {
+    bdm_result = bdmFindPartition(path, "conf_opl.cfg", 0);
+    // if not on USB, check BDM HDD
+    if (bdm_result == 0) {
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (hddLoadModules() >= 0 && bdmHDDIsPresent(5000)) {
+            bdm_result = bdmFindPartition(path, "conf_opl.cfg", 0);
+            if (bdm_result)
+                is_hdd = 1;
+        }
+    }
+
+    if (bdm_result) {
         configEnd();
         configInit(path);
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_BDM_MODE, START_MODE_AUTO);
+        if (is_hdd != 0) {
+            gEnableBdmHDD = 1;
+            configSetInt(configOPL, CONFIG_OPL_ENABLE_BDMHDD, gEnableBdmHDD);
+        }
         return value;
     }
 
@@ -995,9 +1012,19 @@ static void _loadConfig()
 static int trySaveConfigBDM(int types)
 {
     char path[64];
+    int bdm_result;
 
     // check USB
-    if (bdmFindPartition(path, "conf_opl.cfg", 1)) {
+    bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
+    // if not on USB, check BDM HDD
+    if (bdm_result == 0) {
+        // wait for up to 5 seconds for the HDD to spin up and become accessible...
+        if (hddLoadModules() >= 0 && bdmHDDIsPresent(5000)) {
+            bdm_result = bdmFindPartition(path, "conf_opl.cfg", 1);
+        }
+    }
+
+    if (bdm_result) {
         configSetMove(path);
         return configWriteMulti(types);
     }

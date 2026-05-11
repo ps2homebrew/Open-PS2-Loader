@@ -266,10 +266,10 @@ int exportGame(const char *gameid)
                 return EXIT_FAILURE;
             }
         }
+        fclose(fsrc);
     }
 
     fclose(fdest);
-    fclose(fsrc);
 
     printf("* All parts processed...\n");
 

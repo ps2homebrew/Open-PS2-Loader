@@ -56,6 +56,7 @@ enum UI_ITEMS {
     CFG_PARENLOCK_PASSWORD,
 
     CFG_SFX,
+    /// @brief. Cdn reset enable verify,verify"
     CFG_BOOT_SND,
     CFG_BGM,
     CFG_SFX_VOLUME,

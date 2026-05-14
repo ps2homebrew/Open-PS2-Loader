@@ -425,11 +425,11 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 
             pad[port].mode_cfg = in[3];
         case 0x42: // read data
-            if (in[1] == 0x42) {
-                if (pad[port].vibration) { // disable/enable vibration
-                    PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
-                }
-            }
+            //if (in[1] == 0x42) {
+              //  if (pad[port].vibration) { // disable/enable vibration
+                //    PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
+                //}
+            //}
 
             i = PAD_GET_DATA(&out[3], out_size - 3, port);
 

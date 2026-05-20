@@ -68,8 +68,8 @@ types come with more or fewer features included.
   <summary> <b> How to use </b> </summary>
 <p>
 
-OPL uses the following directory tree structure across HDD, SMB, and
-USB modes:
+OPL uses the following directory tree structure across HDD, SMB and
+USB modes for PS2 games in ISO and ZSO formats:
 
 | Folder | Description                                          | Modes       |
 | ------ | ---------------------------------------------------- | ----------- |

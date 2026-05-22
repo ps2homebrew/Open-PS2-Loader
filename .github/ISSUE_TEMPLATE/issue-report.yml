@@ -19,7 +19,7 @@ body:
       description: "Check before posting"
       options:
         - label: I have checked existing [__OPL issues__](https://github.com/ps2homebrew/Open-PS2-Loader/issues) for duplicates and found none
-        - label: I am using either OPL [latest stable version](https://github.com/ps2homebrew/Open-PS2-Loader/releases/latest), or [archived version](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A) or [__OPL beta version__](https://github.com/ps2homebrew/open-ps2-loader/releases)
+        - label: I am using the [latest version released](https://github.com/ps2homebrew/Open-PS2-Loader/releases).
 
   - type: textarea
     id: explanation
@@ -49,7 +49,7 @@ body:
     id: oplver
     attributes:
       label: "OPL version / revision"
-      description: "you can see it on the About option from the settings menu (press start in game list)"
+      description: "Open OPL, press START and look for the About option; the version number will be at the top."
       placeholder: "e.g. OPL Beta 1.2.0 2241 (Note: 'Latest Version' is not a valid answer)"
     validations:
       required: true
@@ -99,3 +99,8 @@ body:
       placeholder: "game affected is Kingdom Hearts: II Final Mix [SLPM_666.75], http://redump.org/disc/7733/"
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        You could also test it on other versions, such as: the [Stable Version](https://github.com/ps2homebrew/Open-PS2-Loader/releases/tag/v1.1.0) or other beta versions available in the [MEGA repository](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A)

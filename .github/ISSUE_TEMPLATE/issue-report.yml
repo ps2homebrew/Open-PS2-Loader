@@ -19,7 +19,7 @@ body:
       description: "Check before posting"
       options:
         - label: I have checked existing [__OPL issues__](https://github.com/ps2homebrew/Open-PS2-Loader/issues) for duplicates and found none
-        - label: I am using either OPL [latest stable version](https://github.com/ps2homebrew/Open-PS2-Loader/releases/latest), or [archived version](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A) or [__OPL beta version__](https://github.com/ps2homebrew/open-ps2-loader/releases)
+        - label: I am using the [latest version released](https://github.com/ps2homebrew/Open-PS2-Loader/releases).
 
   - type: textarea
     id: explanation
@@ -40,7 +40,7 @@ body:
     id: console
     attributes:
       label: Console model
-      description: you can see it on the console sticker or inside OSDSYS (press triangle on main menú)
+      description: You can see it on the console sticker or inside OSDSYS (press triangle on main menu)
       placeholder: SCPH-?????
     validations:
       required: true
@@ -49,8 +49,8 @@ body:
     id: oplver
     attributes:
       label: "OPL version / revision"
-      description: "you can see it on the About option from the settings menu (press start in game list)"
-      placeholder: "eg: OPL stable 1.0.0 | OPL beta 1.1.0 1732"
+      description: "Open OPL, press START and look for the About option; the version number will be at the top."
+      placeholder: "e.g. OPL Beta 1.2.0 2241 (Note: 'Latest Version' is not a valid answer)"
     validations:
       required: true
 
@@ -60,30 +60,36 @@ body:
       label: "In which device(s) have you experienced this issue?"
       multiple: true
       options:
+        - Neither
         - USB
         - SMB
         - HDD
         - iLink
         - MX4SIO
-        
+    validations:
+      required: true
+
   - type: dropdown
     id: extra-features
     attributes:
       label: "Which extra features are enabled?"
       multiple: true
       options:
+        - Neither
         - VMC
         - PADEMU
         - GSM
+    validations:
+      required: true
 
   - type: input
     id: compat-modes
     attributes:
       label: Compatibility modes
-      description: Which compatibility modes were tested.
-      placeholder: "eg: mode 6, 6+3, 1+3+6..."
+      description: Which compatibility modes were tested?
+      placeholder: "e.g. mode 6, 6+3, 1+3+6..."
     validations:
-      required: false
+      required: true
 
   - type: textarea
     id: context-and-data
@@ -92,4 +98,9 @@ body:
       description: Information about affected games (Game name, [Game ID], link to redump.org) and expected behavior
       placeholder: "game affected is Kingdom Hearts: II Final Mix [SLPM_666.75], http://redump.org/disc/7733/"
     validations:
-      required: false
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        You could also test it on other versions, such as: the [Stable Version](https://github.com/ps2homebrew/Open-PS2-Loader/releases/tag/v1.1.0) or other beta versions available in the [MEGA repository](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A)

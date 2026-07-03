@@ -173,6 +173,7 @@ int gScrollSpeed;
 char gExitPath[256];
 int gEnableDebug;
 int gPS2Logo;
+int gEnableAnnounce;
 int gDefaultDevice;
 int gEnableWrite;
 char gBDMPrefix[32];
@@ -963,6 +964,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, &gBootSndVolume);
             configGetInt(configOPL, CONFIG_OPL_BGM_VOLUME, &gBGMVolume);
             configGetStrCopy(configOPL, CONFIG_OPL_DEFAULT_BGM_PATH, gDefaultBGMPath, sizeof(gDefaultBGMPath));
+            configGetInt(configOPL, CONFIG_OPL_ANNOUNCE_GAMES, &gEnableAnnounce);
         }
     }
 
@@ -1135,6 +1137,7 @@ static void _saveConfig()
         configSetStr(configOPL, CONFIG_OPL_DEFAULT_BGM_PATH, gDefaultBGMPath);
         configSetInt(configOPL, CONFIG_OPL_XSENSITIVITY, gXSensitivity);
         configSetInt(configOPL, CONFIG_OPL_YSENSITIVITY, gYSensitivity);
+        configSetInt(configOPL, CONFIG_OPL_ANNOUNCE_GAMES, gEnableAnnounce);
 
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
@@ -1740,6 +1743,7 @@ static void setDefaults(void)
     gAutoRefresh = 0;
     gEnableDebug = 0;
     gPS2Logo = 0;
+    gEnableAnnounce = 0;
     gHDDGameListCache = 0;
     gEnableWrite = 0;
     gRememberLastPlayed = 0;
@@ -1898,6 +1902,7 @@ static void miniInit(int mode)
             config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
+            configGetInt(configOPL, CONFIG_OPL_ANNOUNCE_GAMES, &gEnableAnnounce);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
             configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
             if (mode == BDM_MODE) {

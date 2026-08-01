@@ -43,6 +43,9 @@ struct pad_data_t
 /// current time in miliseconds (last update time)
 static u32 curtime = 0;
 static u32 time_since_last = 0;
+static u32 lastticks = 0;
+static u32 tickrem = 0;
+static int padTicksSeeded = 0;
 
 static unsigned short pad_count;
 static struct pad_data_t pad_data[MAX_PADS];
@@ -50,6 +53,15 @@ static struct pad_data_t pad_data[MAX_PADS];
 // gathered pad data
 static u32 paddata;
 static u32 oldpaddata;
+
+static u32 edgedata;
+static u32 oldedgedata;
+static int edgeBaselineFrozen = 0;
+
+void padFreezeEdgeBaseline(int freeze)
+{
+    edgeBaselineFrozen = freeze;
+}
 
 static int delaycnt[16];
 static int paddelay[16];
@@ -302,6 +314,7 @@ static int readPad(struct pad_data_t *pad)
 
         // merge into the global vars
         paddata |= pad->paddata;
+        edgedata |= pad->paddata;
     }
 
     return rcode;
@@ -330,10 +343,20 @@ int readPads()
     oldpaddata = paddata;
     paddata = 0;
 
-    // in ms.
-    u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
-    time_since_last = newtime - curtime;
-    curtime = newtime;
+    if (!edgeBaselineFrozen)
+        oldedgedata = edgedata;
+    edgedata = 0;
+
+    u32 nowticks = cpu_ticks();
+    if (!padTicksSeeded) {
+        lastticks = nowticks;
+        padTicksSeeded = 1;
+    }
+    u32 dticks = (nowticks - lastticks) + tickrem;
+    lastticks = nowticks;
+    time_since_last = dticks / CLOCKS_PER_MILISEC;
+    tickrem = dticks % CLOCKS_PER_MILISEC;
+    curtime += time_since_last;
 
     int rslt = 0;
 
@@ -396,7 +419,7 @@ int getKeyOn(int id)
     // old v.s. new pad data
     int keyid = keyToPad[id];
 
-    return (paddata & keyid) && (!(oldpaddata & keyid));
+    return (edgedata & keyid) && (!(oldedgedata & keyid));
 }
 
 /** Detects key-off event. Returns true if the button was pressed the last frame but is not pressed this frame.
@@ -411,7 +434,7 @@ int getKeyOff(int id)
     // old v.s. new pad data
     int keyid = keyToPad[id];
 
-    return (!(paddata & keyid)) && (oldpaddata & keyid);
+    return (!(edgedata & keyid)) && (oldedgedata & keyid);
 }
 
 /** Returns true (nonzero) if the button is currently pressed
@@ -420,6 +443,9 @@ int getKeyOff(int id)
  */
 int getKeyPressed(int id)
 {
+    if ((id <= 0) || (id >= 17))
+        return 0;
+
     // old v.s. new pad data
     int keyid = keyToPad[id];
 

@@ -3,6 +3,8 @@
 
 #include "include/opl.h"
 
+#define DIA_SCROLL_MIN_MS 200
+
 // UI dialog item definition
 typedef enum {
     // terminates the definition of dialog. Mandatory

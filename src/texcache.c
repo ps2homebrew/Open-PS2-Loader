@@ -141,6 +141,15 @@ GSTEXTURE *cacheGetTexture(image_cache_t *cache, item_list_t *list, int *cacheId
     if (guiInactiveFrames < list->delay)
         return NULL;
 
+    // Defer interactive cover reads strictly while the user is actively scrolling on MMCE (SIO2 bus)
+    // HDD, UDPFS, ATA/exFAT, UDPBD, USB, and SMB remain 100% unthrottled with full background pre-warming.
+    if (list != NULL && list->mode == MMCE_MODE) {
+        if (getKeyPressed(KEY_LEFT) || getKeyPressed(KEY_RIGHT) || getKeyPressed(KEY_UP) ||
+            getKeyPressed(KEY_DOWN) || getKeyPressed(KEY_L1) || getKeyPressed(KEY_R1)) {
+            return NULL;
+        }
+    }
+
     cache_entry_t *currEntry, *oldestEntry = NULL;
     int i, rtime = guiFrameId;
 

@@ -1472,6 +1472,8 @@ static void guiDrawOverlays()
 
 static void guiReadPads()
 {
+    padFreezeEdgeBaseline(screenHandlerTarget != NULL);
+
     if (readPads())
         guiInactiveFrames = 0;
     else
@@ -1724,6 +1726,11 @@ void guiRenderTextScreen(const char *message)
 
 void guiWarning(const char *text, int count)
 {
+    if (gTheme == NULL) {
+        LOG("guiWarning (pre-GUI): %s\n", text);
+        return;
+    }
+
     guiStartFrame();
 
     guiShow();

@@ -842,6 +842,18 @@ static void diaRestoreScrollSpeed(void)
     padRestoreSettings(diaPadSettings);
 }
 
+static int diaScrollDelay(void)
+{
+    int delay = 500 - gScrollSpeed * 200;
+
+    if (delay < DIA_SCROLL_MIN_MS)
+        delay = DIA_SCROLL_MIN_MS;
+    if (delay > 500)
+        delay = 500;
+
+    return delay;
+}
+
 static struct UIItem *diaFindByID(struct UIItem *ui, int id)
 {
     while (ui->type != UI_TERMINATOR) {
@@ -866,7 +878,7 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
         cur = diaGetFirstControl(ui);
 
     // what? no controllable item? Exit!
-    if (cur == ui)
+    if (!diaIsControllable(cur))
         return -1;
 
     int haveFocus = 0, modified;
@@ -874,8 +886,10 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
     diaStoreScrollSpeed();
 
     // slower controls for dialogs
-    setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
-    setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
+    setButtonDelay(KEY_UP, diaScrollDelay());
+    setButtonDelay(KEY_DOWN, diaScrollDelay());
+
+    diaScrollOffset = 0; // start each dialog scrolled to the top
 
     // okay, we have the first selectable item
     // we can proceed with rendering etc. etc.
@@ -891,8 +905,8 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
             haveFocus = diaHandleInput(cur, &modified);
 
             if (!haveFocus) {
-                setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
-                setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
+                setButtonDelay(KEY_UP, diaScrollDelay());
+                setButtonDelay(KEY_DOWN, diaScrollDelay());
             }
         } else {
             modified = 0;
@@ -954,8 +968,10 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
 
         if (updater) {
             int updResult = updater(modified);
-            if (updResult)
+            if (updResult) {
+                diaRestoreScrollSpeed();
                 return updResult;
+            }
         }
     }
 }

@@ -22,6 +22,7 @@
 
 int startPads();
 int readPads();
+void padFreezeEdgeBaseline(int freeze);
 void unloadPads();
 
 int getKey(int num);

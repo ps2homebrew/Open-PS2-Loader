@@ -362,6 +362,12 @@ static void RnC3_UYA_patches(void *address)
 
     word1 = JAL((unsigned int)&RnC3_AlwaysAllocMem);
     switch (config->GameMode) {
+#ifndef _DTL_T10000
+        case ETH_MODE:
+            /* SMB's IOP module layout requires one fewer compensating shift. */
+            word2 = 0x00021840; // sll $v1, $v0, 1
+            break;
+#endif
         default:
 #ifdef _DTL_T10000
             word2 = 0x00021903; // sra $v1, $v0, 4    For DTL-T10000.

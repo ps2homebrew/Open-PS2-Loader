@@ -267,7 +267,8 @@ static void itemExecSelect(struct menu_item *curMenu)
         if (support->enabled) {
             if (curMenu->current) {
                 config_set_t *configSet = menuLoadConfig();
-                support->itemLaunch(support, curMenu->current->item.id, configSet);
+                if (menuCheckGameParentalLock(configSet) == 0)
+                    support->itemLaunch(support, curMenu->current->item.id, configSet);
             }
         } else {
             // If we're trying to enable BDM support we need to enable it for all BDM menu slots.

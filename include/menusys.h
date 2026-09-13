@@ -120,5 +120,10 @@ void menuRemoveHints(menu_item_t *menu);
 
 int menuSetParentalLockCheckState(int enabled);
 int menuCheckParentalLock(void);
+// Returns 1 if a parental lock password is configured, 0 otherwise.
+int menuIsParentalLockPasswordSet(void);
+// Checks whether the game's config marks it as parentally locked and, if so, prompts for the password.
+// Returns 0 if the game may be started, EACCES otherwise.
+int menuCheckGameParentalLock(config_set_t *configSet);
 
 #endif

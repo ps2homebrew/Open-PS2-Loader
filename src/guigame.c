@@ -1086,6 +1086,17 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
     else
         configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 
+    /// Parental lock ///
+    int parentalLock = 0;
+    diaGetInt(diaCompatConfig, COMPAT_PARENTAL_LOCK, &parentalLock);
+    if (parentalLock != 0) {
+        result = configSetInt(configSet, CONFIG_ITEM_PARENTAL_LOCK, 1);
+        // The lock is only enforced while a parental lock password exists, so warn instead of silently saving a lock that does nothing.
+        if (!menuIsParentalLockPasswordSet())
+            guiMsgBox(_l(_STR_PARENLOCK_GAME_NO_PASSWORD), 0, NULL);
+    } else
+        configRemoveKey(configSet, CONFIG_ITEM_PARENTAL_LOCK);
+
     /// VMC ///
     configSetVMC(configSet, vmc1, 0);
     configSetVMC(configSet, vmc2, 1);
@@ -1133,6 +1144,7 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
         configRemoveKey(configSet, CONFIG_ITEM_DNAS);
         configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
+        configRemoveKey(configSet, CONFIG_ITEM_PARENTAL_LOCK);
 
         // GSM
         configRemoveKey(configSet, CONFIG_ITEM_GSMSOURCE);
@@ -1479,6 +1491,11 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     altStartup[0] = '\0';
     configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup, sizeof(altStartup));
     diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
+
+    /// Parental lock ///
+    int parentalLock = 0;
+    configGetInt(configSet, CONFIG_ITEM_PARENTAL_LOCK, &parentalLock);
+    diaSetInt(diaCompatConfig, COMPAT_PARENTAL_LOCK, parentalLock ? 1 : 0);
 
     /// VMC ///
     vmc1[0] = '\0';

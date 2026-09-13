@@ -405,6 +405,11 @@ struct UIItem diaCompatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ALTSTARTUP}}},
     {UI_SPACER},
     {UI_STRING, COMPAT_ALTSTARTUP, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiGameAltStartupNameHandler}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_PARENLOCK_GAME}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_PARENTAL_LOCK, 1, 1, _STR_PARENLOCK_GAME_HINT, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     // buttons

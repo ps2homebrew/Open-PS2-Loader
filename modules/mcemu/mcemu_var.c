@@ -54,8 +54,8 @@ MemoryCard memcards[MCEMU_PORTS] = {{0}, {0}};                                  
 void *pFastBuf = NULL;                                                               /* Pointer to Fast I/O buffer */
 
 PtrRegisterLibraryEntires pRegisterLibraryEntires; /* Pointer to RegisterLibraryEntires routine */
-Sio2McProc pSio2man25, pSio2man51;                 /* Pointers to SIO2MAN routines */
-Sio2McProc2 psio2_mc_transfer_init, psio2_transfer_reset;
+Sio2McProc pSio2man25[2], pSio2man51[2];           /* Pointers to SIO2MAN routines */
+Sio2McProc2 psio2_mc_transfer_init[2], psio2_transfer_reset[2];
 void (*pSio2man67)();
 
 u8 mceccbuf[MCEMU_PORTS][0x20]; /* ECC buffers */

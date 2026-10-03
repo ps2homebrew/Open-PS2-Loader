@@ -71,20 +71,25 @@ void *GetExportEntry(void *table, u32 entry)
 /* Replaces an entry in the export table */
 void *HookExportEntry(void *table, u32 entry, void *func)
 {
-    if (entry < GetExportTableSize(table)) {
+    u32 table_size;
+
+    table_size = GetExportTableSize(table);
+    if (entry < table_size) {
         int oldstate;
-        register void **exp, *temp;
+        void *oldfunc;
+        register void **exp;
+        unsigned int i;
 
         exp = (void **)table;
-        exp = &exp[entry];
 
         CpuSuspendIntr(&oldstate);
-        temp = *exp;
-        *exp = func;
-        func = temp;
+        oldfunc = exp[entry];
+        for (i = 0; i < table_size; i += 1)
+            if (exp[i] == oldfunc)
+                exp[i] = func;
         CpuResumeIntr(oldstate);
 
-        return func;
+        return oldfunc;
     }
 
     return NULL;

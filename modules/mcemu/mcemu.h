@@ -147,8 +147,6 @@ int DummySecrAuthCard(int port, int slot, int cnum);
 void Sio2McEmu(Sio2Packet *sd);
 
 int hookSecrAuthCard(int port, int slot, int cnum);
-void hookSio2man25(Sio2Packet *sd);
-void hookSio2man51(Sio2Packet *sd);
 u32 *hookSio2man67();
 void hookSio2man(Sio2Packet *sd, Sio2McProc sio2proc);
 int hookRegisterLibraryEntires(iop_library_t *lib);
@@ -208,8 +206,8 @@ extern MemoryCard memcards[MCEMU_PORTS];
 extern void *pFastBuf;
 
 extern PtrRegisterLibraryEntires pRegisterLibraryEntires;
-extern Sio2McProc pSio2man25, pSio2man51;
-extern Sio2McProc2 psio2_mc_transfer_init, psio2_transfer_reset;
+extern Sio2McProc pSio2man25[2], pSio2man51[2];
+extern Sio2McProc2 psio2_mc_transfer_init[2], psio2_transfer_reset[2];
 extern void (*pSio2man67)();
 
 extern u8 mceccbuf[MCEMU_PORTS][0x20];

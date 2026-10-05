@@ -133,58 +133,255 @@ static void t_loadElf(void)
     Exit(0);
 }
 
+// Wake the polling IGR thread at approximately one-frame intervals.
+// SetAlarm() uses horizontal-sync ticks; 256 is close to one frame
+// for both NTSC and PAL.
+static void IGR_Poll_Alarm(s32 alarm_id, u16 time, void *common)
+{
+    (void)alarm_id;
+    (void)time;
+
+    iWakeupThread(*(int *)common);
+}
+
 // In Game Reset Thread
 static void IGR_Thread(void *arg)
 {
     USE_LOCAL_EECORE_CONFIG;
+
     u32 Cop0_Perf;
+    u32 dmaEnableR;
+    int i;
+    int alarm_id;
 
-    // Place our IGR thread in WAIT state
-    // It will be woken up by our IGR interrupt handler
-    SleepThread();
+    u8 pad_pos_state;
+    u8 pad_pos_frame;
+    u8 pad_pos_combo1;
+    u8 pad_pos_combo2;
 
-    DPRINTF("IGR thread woken up!\n");
+    (void)arg;
 
-    if (EnableDebug)
-        DBGCOL(0xFFFFFF, IGR, "Thread WakeUp");
+    /*
+     * Battle Archives 2 conflicts with OPL registering a handler on
+     * VBLANK_END, even when that handler has an empty body.
+     *
+     * Poll the same controller buffer from an ordinary EE thread instead.
+     */
+    for (;;) {
+        if (Pad_Data.pad_buf != NULL) {
+            // Read through the uncached segment to obtain live pad data.
+            pad_pos_state =
+                ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))
+                    [Pad_Data.pos_state];
 
-    // Re-Init RPC & CMD
+            pad_pos_frame =
+                ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))
+                    [Pad_Data.pos_frame];
+
+            pad_pos_combo1 =
+                ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))
+                    [Pad_Data.pos_combo1];
+
+            pad_pos_combo2 =
+                ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))
+                    [Pad_Data.pos_combo2];
+
+            // Check for the stable state used by the detected libpad.
+            if (((Pad_Data.libpad == IGR_LIBPAD) &&
+                 (pad_pos_state == IGR_PAD_STABLE_V1)) ||
+                ((Pad_Data.libpad == IGR_LIBPAD2) &&
+                 (pad_pos_state == IGR_PAD_STABLE_V2))) {
+
+                /*
+                 * Check periodically whether the captured pad buffer is
+                 * still active. This preserves the original VBLANK
+                 * handler's pad-hook recovery behaviour.
+                 */
+                if (Pad_Data.vb_count++ >= 10) {
+                    if (pad_pos_frame != Pad_Data.prev_frame) {
+                        padOpen_hooked = 1;
+                        Pad_Data.prev_frame = pad_pos_frame;
+                    } else {
+                        padOpen_hooked = 0;
+                    }
+
+                    Pad_Data.vb_count = 0;
+                }
+
+                // R1 + L1 + R2 + L2
+                if (pad_pos_combo1 == IGR_COMBO_R1_L1_R2_L2) {
+                    // Start + Select: reset to configured exit path.
+                    if (pad_pos_combo2 == IGR_COMBO_START_SELECT) {
+                        Pad_Data.combo_type = pad_pos_combo2;
+                    }
+                    // R3 + L3: power off.
+                    else if (pad_pos_combo2 == IGR_COMBO_R3_L3) {
+                        Pad_Data.combo_type = pad_pos_combo2;
+                    }
+#ifdef IGS
+                    // Up: in-game screenshot when GSM/IGS is active.
+                    else if ((pad_pos_combo2 == IGR_COMBO_UP) &&
+                             config->EnableGSMOp) {
+                        Pad_Data.combo_type = pad_pos_combo2;
+                    }
+#endif
+                }
+            }
+        }
+
+        /*
+         * Preserve the original power-button monitoring.
+         * These registers require kernel mode.
+         */
+        ee_kmode_enter();
+
+        if ((*CDVD_R_NDIN & 0x20) &&
+            (*CDVD_R_POFF & 0x04)) {
+            Power_Button.press++;
+
+            // Cancel immediate poweroff to allow double-press detection.
+            *CDVD_R_SDIN = 0x00;
+            *CDVD_R_SCMD = 0x1B;
+        }
+
+        if (Power_Button.press) {
+            if (Power_Button.vb_count++ >= 50) {
+                if (Power_Button.press == 1) {
+                    Pad_Data.combo_type = IGR_COMBO_R3_L3;
+                } else {
+                    Pad_Data.combo_type = IGR_COMBO_START_SELECT;
+                }
+            }
+        }
+
+        ee_kmode_exit();
+
+        if (Pad_Data.combo_type != 0x00) {
+            break;
+        }
+
+        /*
+         * Sleep until an EE alarm wakes this thread.
+         * This avoids a permanent busy loop and does not use VBLANK.
+         */
+        alarm_id = SetAlarm(
+            256,
+            IGR_Poll_Alarm,
+            &IGR_Thread_ID);
+
+        if (alarm_id >= 0) {
+            SleepThread();
+        } else {
+            /*
+             * An alarm slot should normally be available. Fall back to
+             * a low-priority delay rather than sleeping forever.
+             */
+            nopdelay();
+        }
+    }
+
+    DPRINTF("IGR combination detected by polling thread.\n");
+
+    /*
+     * Raise this thread to the priority previously assigned by the
+     * interrupt handler before waking the old IGR worker.
+     */
+    ChangeThreadPriority(TH_SELF, 0);
+
+    /*
+     * Perform the shutdown preparation that the original VBLANK
+     * handler performed before waking IGR_Thread().
+     */
+
+    // Wait for preceding loads and stores.
+    asm volatile("sync.l\n");
+
+    // Stop all DMA except SIF0, SIF1 and SIF2.
+    dmaEnableR = *R_EE_D_ENABLER;
+
+    *R_EE_D_ENABLEW = dmaEnableR | 0x10000;
+
+    *R_EE_D_CTRL;
+    *R_EE_D_STAT;
+
+    *R_EE_D0_CHCR = 0;
+    *R_EE_D1_CHCR = 0;
+    *R_EE_D2_CHCR = 0;
+    *R_EE_D3_CHCR = 0;
+    *R_EE_D4_CHCR = 0;
+    *R_EE_D8_CHCR = 0;
+    *R_EE_D9_CHCR = 0;
+
+    *R_EE_D_ENABLEW = dmaEnableR;
+
+    asm volatile("sync.l\n");
+
+    // Reset the GS.
+    *R_EE_GS_CSR = 0x100;
+
+    asm volatile("sync.l\n");
+
+    while (*R_EE_GS_CSR & 0x100) {
+    }
+
+    /*
+     * We are now in normal thread context, not interrupt context,
+     * so use ResetEE rather than OPL's interrupt-only iResetEE wrapper.
+     */
+    ResetEE(0x7F);
+
+    // Suspend every game thread except this IGR polling thread.
+    for (i = 1; i < 256; i++) {
+        if (i != IGR_Thread_ID) {
+            SuspendThread(i);
+        }
+    }
+
+    DPRINTF("IGR polling thread beginning shutdown.\n");
+
+    if (EnableDebug) {
+        DBGCOL(0xFFFFFF, IGR, "Thread Poll Trigger");
+    }
+
+    // Reinitialize RPC and CMD.
     SifInitRpc(0);
 
-    // If Pad Combo is Start + Select then Return to Home, else if Pad Combo is UP then take IGS
+    /*
+     * Start + Select returns to the configured exit ELF.
+     * IGS Up follows the same reset path.
+     */
     if ((Pad_Data.combo_type == IGR_COMBO_START_SELECT)
 #ifdef IGS
-        || ((Pad_Data.combo_type == IGR_COMBO_UP) && (config->EnableGSMOp))
+        || ((Pad_Data.combo_type == IGR_COMBO_UP) &&
+            config->EnableGSMOp)
 #endif
     ) {
-
-        if (EnableDebug)
+        if (EnableDebug) {
             DBGCOL(0xFF8000, IGR, "oplIGRShutdown()");
+        }
 
         oplIGRShutdown(0);
 
-        if (EnableDebug)
+        if (EnableDebug) {
             DBGCOL(0x0000FF, IGR, "Reset IOP");
-
-        // Reset IO Processor
-        while (!Reset_Iop("", 0)) {
-            ;
         }
 
-        // Remove kernel hooks
+        // Reset the IOP.
+        while (!Reset_Iop("", 0)) {
+        }
+
+        // Remove OPL's kernel hooks.
         Remove_Kernel_Hooks();
 
-        // Initialize Translation Look-Aside Buffer, like the updated ExecPS2() library function does.
-        // Some game (GT4, GTA) modify memory map
-        // A re-init is needed to properly access memory
+        /*
+         * Some games alter the memory map, so restore the TLB before
+         * loading the configured exit ELF.
+         */
         InitializeTLB();
 
-        // Check Performance Counter
-        // Some game (GT4) start performance counter
-        // When counter overflow, an exception occur, so stop them
         Cop0_Perf = GetCop0(25);
 
-        // Stop Performance Counter
+        // Stop an active performance counter.
         if (Cop0_Perf & 0x80000000) {
             __asm__ __volatile__(
                 " mfc0  $3, $25;"
@@ -196,60 +393,78 @@ static void IGR_Thread(void *arg)
         }
 
         if (config->EnableGSMOp) {
-            if (EnableDebug)
+            if (EnableDebug) {
                 DBGCOL(0x00FF00, IGR, "Stopping GSM");
+            }
+
             DPRINTF("Stopping GSM...\n");
             DisableGSM();
         }
 
         if (config->gCheatList) {
-            if (EnableDebug)
+            if (EnableDebug) {
                 DBGCOL(0xFF0000, IGR, "Stopping CheatEngine");
+            }
+
             DPRINTF("Stopping PS2RD Cheat Engine...\n");
             DisableCheats();
         }
 
-        if (EnableDebug)
+        if (EnableDebug) {
             DBGCOL(0x00FFFF, IGR, "Waiting for IOP Reboot");
-
-        while (!SifIopSync()) {
-            ;
         }
 
-        if (EnableDebug)
-            DBGCOL(0xFF80FF, IGR, "Initializing RPC and services");
+        while (!SifIopSync()) {
+        }
 
-        // Init RPC & CMD
+        if (EnableDebug) {
+            DBGCOL(
+                0xFF80FF,
+                IGR,
+                "Initializing RPC and services");
+        }
+
         SifInitRpc(0);
         SifInitIopHeap();
         LoadFileInit();
         sbv_patch_enable_lmb();
 
-        if (EnableDebug)
+        if (EnableDebug) {
             DBGCOL(0x800000, IGR, "Execute RESETSPU.IRX");
+        }
 
-        // Reset SPU - do it after the IOP reboot, so nothing will compete with the EE for it.
-        LoadOPLModule(OPL_MODULE_ID_RESETSPU, 0, 0, NULL);
+        /*
+         * Reset SPU after the IOP reboot so no IOP module competes
+         * with the EE for the sound hardware.
+         */
+        LoadOPLModule(
+            OPL_MODULE_ID_RESETSPU,
+            0,
+            0,
+            NULL);
 
 #ifdef IGS
-        if ((Pad_Data.combo_type == IGR_COMBO_UP) && (config->EnableGSMOp))
+        if ((Pad_Data.combo_type == IGR_COMBO_UP) &&
+            config->EnableGSMOp) {
             InGameScreenshot();
+        }
 #endif
 
-        if (EnableDebug)
+        if (EnableDebug) {
             DBGCOL(0x008000, IGR, "Exiting services");
+        }
 
-        // Exit services
         SifExitIopHeap();
         LoadFileExit();
         SifExitRpc();
 
         IGR_Exit(0);
     } else {
-        if (EnableDebug)
+        if (EnableDebug) {
             DBGCOL(0x0000FF, IGR, "oplIGRShutdown(1)");
+        }
 
-        // If combo is R3 + L3, Poweroff PS2
+        // R3 + L3 powers off the PS2.
         oplIGRShutdown(1);
     }
 }
@@ -421,39 +636,60 @@ static void Set_libpad_Params(void *addr)
     EI();
 }
 
-// Install IGR thread, and Pad interrupt handler
+// Install the polling IGR thread.
+// Do not register anything on VBLANK_END.
 void Install_IGR(void)
 {
     ee_thread_t thread_param;
 
-    // Reset power button data
+    // Reset power-button state.
     Power_Button.press = 0;
-    Pad_Data.pad_buf = NULL;
     Power_Button.vb_count = 0;
 
-    // Init runtime Pad_Data information
+    // The pad-open hook will supply the live pad-buffer address.
+    Pad_Data.pad_buf = NULL;
+
+    // Reset runtime IGR state.
     Pad_Data.vb_count = 0;
     Pad_Data.combo_type = 0x00;
     Pad_Data.prev_frame = 0x00;
 
-    // Do not install the IGR thread or interrupt handler more than once.
+    // Do not create the polling thread more than once.
     if (IGR_Thread_ID < 0) {
-        // Create and start IGR thread
         thread_param.gp_reg = &_gp;
         thread_param.func = IGR_Thread;
         thread_param.stack = (void *)IGR_Stack;
         thread_param.stack_size = IGR_STACK_SIZE;
+
+        /*
+         * Keep OPL's original low priority. The alarm wakes the thread
+         * periodically, and it raises itself to priority 0 only after
+         * detecting an IGR combination.
+         */
         thread_param.initial_priority = 127;
+
         IGR_Thread_ID = CreateThread(&thread_param);
 
-        StartThread(IGR_Thread_ID, NULL);
+        if (IGR_Thread_ID >= 0) {
+            StartThread(IGR_Thread_ID, NULL);
+        }
     }
 
-    if (IGR_Intc_ID < 0) {
-        // Create IGR interrupt handler
-        IGR_Intc_ID = AddIntcHandler(kINTC_VBLANK_END, IGR_Intc_Handler, 0);
-        EnableIntc(kINTC_VBLANK_END);
-    }
+    /*
+     * Deliberately do not call:
+     *
+     *   AddIntcHandler(kINTC_VBLANK_END, ...)
+     *   EnableIntc(kINTC_VBLANK_END)
+     *
+     * Merely registering that handler causes Battle Archives 2 to
+     * black-screen, even when its body is empty.
+     *
+     * Keep a compile-time reference to the existing function so that
+     * it may remain in the source without an unused-function warning.
+     */
+    (void)IGR_Intc_Handler;
+
+    IGR_Intc_ID = -1;
 }
 
 void Reset_Padhook(void)

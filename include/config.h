@@ -114,6 +114,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_DEFAULT_BGM_PATH     "default_bgm_path"
 #define CONFIG_OPL_XSENSITIVITY         "x_sensitivity"
 #define CONFIG_OPL_YSENSITIVITY         "y_sensitivity"
+#define CONFIG_OPL_ANNOUNCE_GAMES       "announce_games"
 
 // Network config keys
 #define CONFIG_NET_ETH_LINKM          "eth_linkmode"

@@ -10,6 +10,7 @@
 #include "include/system.h"
 #include "include/extern_irx.h"
 #include "include/cheatman.h"
+#include "include/announce.h"
 #include "include/sound.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
@@ -547,6 +548,8 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
         hddSetIdleTimeout(gHDDSpindown * 12);
         settings->hddIsLBA48 = pDeviceData->bdmHddIsLBA48;
     }
+
+    announceGameLaunch(game->startup, game->name);
 
     if (gAutoLaunchBDMGame == NULL)
         deinit(NO_EXCEPTION, itemList->mode); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed

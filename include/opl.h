@@ -197,6 +197,9 @@ extern char gETHPrefix[32];
 
 extern int gRememberLastPlayed;
 
+// Announce game launches over the network (PS2RichPresence protocol)
+extern int gEnableAnnounce;
+
 // Last Played Auto Start
 extern int KeyPressedOnce;
 extern int gAutoStartLastPlayed;

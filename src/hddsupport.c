@@ -11,6 +11,7 @@
 #include "include/system.h"
 #include "include/extern_irx.h"
 #include "include/cheatman.h"
+#include "include/announce.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
 #define NEWLIB_PORT_AWARE
@@ -604,6 +605,8 @@ void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
         // For compressed images the partition size does not match the media size.
         settings->common.mediaLsnCount = ziso_total_block;
     }
+
+    announceGameLaunch(game->startup, game->name);
 
     if (gAutoLaunchGame == NULL)
         deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed

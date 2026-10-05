@@ -103,7 +103,7 @@ static const patchlist_t patch_list[] = {
     {"SCUS_973.53", ALL_MODE, {PATCH_RNC_UYA, 0x0084c645, 0x00000000}},            // Ratchet and Clank: Up Your Arsenal NTSC
     {"SCES_524.56", ALL_MODE, {PATCH_RNC_UYA, 0x0084c726, 0x00000000}},            // Ratchet and Clank: Up Your Arsenal PAL
     {"SCPS_150.84", ALL_MODE, {PATCH_RNC_UYA, 0x00851883, 0x00000000}},            // Ratchet and Clank: Up Your Arsenal JAP
-    {"SCKA_200.37", ALL_MORE, {PATCH_RNC_UYA, 0x0086cf08, 0x00000000}},            // Ratchet and Clank: Up Your Arsenal KOR
+    {"SCKA_200.37", ALL_MODE, {PATCH_RNC_UYA, 0x0086cf08, 0x00000000}},            // Ratchet and Clank: Up Your Arsenal KOR
     {"SLES_533.98", ALL_MODE, {PATCH_ZOMBIE_ZONE, 0x001b2c08, 0x00000000}},        // Zombie Zone
     {"SLES_544.61", ALL_MODE, {PATCH_ZOMBIE_ZONE, 0x001b3e20, 0x00000000}},        // Zombie Hunters
     {"SLPM_625.25", ALL_MODE, {PATCH_ZOMBIE_ZONE, 0x001b1dc0, 0x00000000}},        // Simple 2000 Series Vol. 61: The Oneechanbara

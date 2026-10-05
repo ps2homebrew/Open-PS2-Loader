@@ -694,3 +694,12 @@ gui_strings:
   string: Cheat Selection
 - label: HDD_HINT
   string: Only one HDD allowed, enabling locks APA or GPT.
+- comment: Label for the per-game parental lock toggle in the compatibility settings dialog.
+  label: PARENLOCK_GAME
+  string: Parental Lock
+- comment: Hint for the per-game parental lock toggle.
+  label: PARENLOCK_GAME_HINT
+  string: Require the parental lock password to start this game.
+- comment: Warning shown when saving a per-game parental lock while no parental lock password is set.
+  label: PARENLOCK_GAME_NO_PASSWORD
+  string: Set a parental lock password, or this game will not be locked.

@@ -38,6 +38,9 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_DNAS         "$DNAS"
 #define CONFIG_ITEM_CONFIGSOURCE "$ConfigSource"
 
+// Per-game parental lock. When set, the parental lock password must be entered to start the game.
+#define CONFIG_ITEM_PARENTAL_LOCK "$ParentalLock"
+
 #define CONFIG_ITEM_OSD_SETTINGS_LANGID "$CustomLanguageValue"
 #define CONFIG_ITEM_OSD_SETTINGS_SOURCE "$CustomLanguageSource"
 #define CONFIG_ITEM_OSD_SETTINGS_ENABLE "$OSDSettingsEnable"

@@ -9,6 +9,12 @@
 
 static int readyToGo = -1;
 void StartNow(void *param);
+
+static void hookSio2man25_1(Sio2Packet *sd);
+static void hookSio2man25_2(Sio2Packet *sd);
+static void hookSio2man51_1(Sio2Packet *sd);
+static void hookSio2man51_2(Sio2Packet *sd);
+
 #ifdef PADEMU
 void no_pademu(Sio2Packet *sd, Sio2McProc sio2proc)
 {
@@ -78,12 +84,21 @@ void StartNow(void *param)
     pRegisterLibraryEntires = (PtrRegisterLibraryEntires)HookExportEntry(exp, 6, hookRegisterLibraryEntires);
 
     /* searching for a SIO2MAN export table */
-    exp = GetExportTable("sio2man", 0x201);
+    exp = GetExportTable("sio2man", 0x100);
+    if (exp != NULL) {
+        /* hooking SIO2MAN's routines */
+        InstallSio2manHook(exp, 0);
+    } else {
+        DPRINTF("SIO2MAN V1 exports not found.\n");
+    }
+
+    /* searching for a SIO2MAN export table */
+    exp = GetExportTable("sio2man", 0x200);
     if (exp != NULL) {
         /* hooking SIO2MAN's routines */
         InstallSio2manHook(exp, 1);
     } else {
-        DPRINTF("SIO2MAN exports not found.\n");
+        DPRINTF("SIO2MAN V2 exports not found.\n");
     }
 
     /* searching for a SECRMAN export table */
@@ -122,14 +137,17 @@ void InstallSecrmanHook(void *exp)
 /* Installs handlers for SIO2MAN's routine for enabled virtual memory cards */
 void InstallSio2manHook(void *exp, int ver)
 {
-    psio2_mc_transfer_init = GetExportEntry(exp, 24);
-    psio2_transfer_reset = GetExportEntry(exp, 26);
+    psio2_mc_transfer_init[ver] = GetExportEntry(exp, 24);
+    psio2_transfer_reset[ver] = GetExportEntry(exp, 26);
 
     /* hooking SIO2MAN entry #25 (used by MCMAN and old PADMAN) */
-    pSio2man25 = HookExportEntry(exp, 25, hookSio2man25);
+    pSio2man25[ver] = HookExportEntry(exp, 25, ver ? hookSio2man25_2 : hookSio2man25_1);
     /* hooking SIO2MAN entry #51 (used by MC2_* modules and PADMAN) */
-    pSio2man51 = HookExportEntry(exp, 49 + (ver * 2), hookSio2man51);
-    pSio2man67 = HookExportEntry(exp, 67, hookSio2man67);
+    pSio2man51[ver] = HookExportEntry(exp, 49 + (ver * 2), ver ? hookSio2man51_2 : hookSio2man51_1);
+    if (pSio2man51[ver] == (ver ? hookSio2man25_2 : hookSio2man25_1))
+        pSio2man51[ver] = pSio2man25[ver];
+    if (ver)
+        pSio2man67 = HookExportEntry(exp, 67, hookSio2man67);
 }
 //------------------------------
 // endfunc
@@ -291,18 +309,34 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
 //------------------------------
 // endfunc
 //---------------------------------------------------------------------------
-/* Hook for SIO2MAN entry #25 (called by MCMAN) */
-void hookSio2man25(Sio2Packet *sd)
+/* Hook for SIO2MAN V2 entry #25 */
+static void hookSio2man25_1(Sio2Packet *sd)
 {
-    hookSio2man(sd, pSio2man25);
+    hookSio2man(sd, pSio2man25[0]);
 }
 //------------------------------
 // endfunc
 //---------------------------------------------------------------------------
-/* Hook for SIO2MAN entry #51 (called by MC2* and PADMAN) */
-void hookSio2man51(Sio2Packet *sd)
+/* Hook for SIO2MAN V2 entry #25 */
+static void hookSio2man25_2(Sio2Packet *sd)
 {
-    hookSio2man(sd, pSio2man51);
+    hookSio2man(sd, pSio2man25[1]);
+}
+//------------------------------
+// endfunc
+//---------------------------------------------------------------------------
+/* Hook for SIO2MAN V2 entry #51 */
+static void hookSio2man51_1(Sio2Packet *sd)
+{
+    hookSio2man(sd, pSio2man51[0]);
+}
+//------------------------------
+// endfunc
+//---------------------------------------------------------------------------
+/* Hook for SIO2MAN V2 entry #51 */
+static void hookSio2man51_2(Sio2Packet *sd)
+{
+    hookSio2man(sd, pSio2man51[1]);
 }
 //------------------------------
 // endfunc
@@ -466,7 +500,7 @@ void Sio2McEmu(Sio2Packet *sd)
      * Unlock SIO2 access for MX4SIO
      * NOTE: we are assuming MC's are only accessed when LOCKED
      */
-    psio2_transfer_reset();
+    (psio2_transfer_reset[1] ? psio2_transfer_reset[1] : psio2_transfer_reset[0])();
 
     if ((sd->ctrl[0] & 0xF0) == 0x70) {
         register u32 ddi, *pctl, result, length;
@@ -605,7 +639,7 @@ void Sio2McEmu(Sio2Packet *sd)
      * Lock SIO2 access again as the user expects it
      * NOTE: we are assuming MC's are only accessed when LOCKED
      */
-    psio2_mc_transfer_init();
+    (psio2_mc_transfer_init[1] ? psio2_mc_transfer_init[1] : psio2_mc_transfer_init[0])();
 }
 //------------------------------
 // endfunc

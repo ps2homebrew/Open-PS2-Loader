@@ -123,6 +123,8 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
         LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=2,3");
     }
 
+    LoadOPLModule(OPL_MODULE_ID_SIO2MAN, 0, 0, NULL);
+
     switch (config->GameMode) {
         case BDM_USB_MODE:
             LoadOPLModule(OPL_MODULE_ID_USBMASSBD, 0, 0, NULL);

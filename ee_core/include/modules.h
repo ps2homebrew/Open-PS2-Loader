@@ -5,6 +5,9 @@ enum OPL_MODULE_ID {
     OPL_MODULE_ID_IMGDRV,
     OPL_MODULE_ID_RESETSPU,
 
+    // SIO2 modules (for mcemu/pademu/mx4sio)
+    OPL_MODULE_ID_SIO2MAN,
+
     // USB mode modules
     OPL_MODULE_ID_USBD,
     OPL_MODULE_ID_USBMASSBD,

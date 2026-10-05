@@ -504,6 +504,10 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 #else
 #define PADEMU_ARG
 #endif
+    if (modules & (CORE_IRX_MX4SIO | CORE_IRX_VMC) PADEMU_ARG) {
+        irxptr_tab[modcount].info = size_sio2man_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SIO2MAN);
+        irxptr_tab[modcount++].ptr = (void *)&sio2man_irx;
+    }
     if ((modules & CORE_IRX_USB) PADEMU_ARG) {
         irxptr_tab[modcount].info = size_usbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
         irxptr_tab[modcount++].ptr = (void *)&usbd_irx;

@@ -1,3 +1,4 @@
+#include "include/cheatconfig.h"
 /*
  Copyright 2010, Volca
  Licenced under Academic Free License version 3.0
@@ -1845,7 +1846,7 @@ int guiGameShowRemoveSettings(config_set_t *configSet, config_set_t *configGame)
     return 1;
 }
 
-void guiManageCheats(void)
+void guiManageCheats(config_set_t *configSet)
 {
     int offset = 0;
     int terminate = 0;
@@ -1875,7 +1876,7 @@ void guiManageCheats(void)
         }
 
         if (getKeyOn(gSelectButton)) {
-            if (!(strncasecmp(gCheats[selectedCheat].name, "mastercode", 10) == 0 || strncasecmp(gCheats[selectedCheat].name, "master code", 11) == 0))
+            if (!cheatConfigIsMasterCode(gCheats[selectedCheat].name))
                 gCheats[selectedCheat].enabled = !gCheats[selectedCheat].enabled;
         }
 
@@ -1896,7 +1897,6 @@ void guiManageCheats(void)
                 continue;
 
             int enabled = gCheats[i].enabled;
-
             int boxX = 50;
             int boxY = 100 + (renderedCheats * 30);
             int boxWidth = rmWideScale(25);
@@ -1909,15 +1909,15 @@ void guiManageCheats(void)
 
             u32 textColour = (i == selectedCheat) ? gTheme->selTextColor : gTheme->textColor;
             fntRenderString(gTheme->fonts[0], boxX + 35, boxY + 3, ALIGN_LEFT, 0, 0, gCheats[i].name, textColour);
-
             renderedCheats++;
         }
 
         guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_SELECT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
         guiDrawIconAndText(START_ICON, _STR_RUN, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
-
         guiEndFrame();
     }
 
+    cheatConfigSaveSelections(configSet);
+    configWrite(configSet);
     sfxPlay(SFX_CONFIRM);
 }

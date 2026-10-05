@@ -500,7 +500,7 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     // adjust ZSO cache
     settings->common.zso_cache = bdmCacheSize;
 
-    if ((result = sbLoadCheats(pDeviceData->bdmPrefix, game->startup)) < 0) {
+    if ((result = sbLoadCheats(pDeviceData->bdmPrefix, game->startup, configSet)) < 0) {
         if (gAutoLaunchBDMGame == NULL) {
             switch (result) {
                 case -ENOENT:

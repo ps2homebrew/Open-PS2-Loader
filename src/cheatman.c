@@ -1,3 +1,4 @@
+#include "include/cheatconfig.h"
 /*
  * Manage cheat codes
  *
@@ -285,7 +286,7 @@ static int parse_buf(const char *buf)
                         cheat_index++; // Move to the next cheat entry
                         strncpy(gCheats[cheat_index].name, temp_name, CHEAT_NAME_MAX);
                         gCheats[cheat_index].name[CHEAT_NAME_MAX] = NUL;
-                        gCheats[cheat_index].enabled = 1; // Set cheat as enabled
+                        gCheats[cheat_index].enabled = (gCheatMode == 0) || cheatConfigIsMasterCode(gCheats[cheat_index].name); // Auto mode enables all; select mode enables required code only
                         temp_name[0] = NUL;               // Clear temp_name after use
                     }
                     // Add the cheat code to the current cheat entry

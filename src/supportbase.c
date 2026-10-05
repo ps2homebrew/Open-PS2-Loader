@@ -11,6 +11,7 @@
 #include "include/cheatman.h"
 #include "include/ps2cnf.h"
 #include "include/gui.h"
+#include "include/cheatconfig.h"
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioMount("iso:", ***), fileXioUmount("iso:")
@@ -849,7 +850,7 @@ void sbCreateFolders(const char *path, int createDiscImgFolders)
         sbCreateFoldersFromList(path, discImgFolders);
 }
 
-int sbLoadCheats(const char *path, const char *file)
+int sbLoadCheats(const char *path, const char *file, config_set_t *configSet)
 {
     char cheatfile[64];
     int cheatMode = 0;
@@ -862,8 +863,10 @@ int sbLoadCheats(const char *path, const char *file)
             LOG("Error: failed to load cheats\n");
         else {
             LOG("Cheats found\n");
-            if ((gAutoLaunchGame == NULL) && (gAutoLaunchBDMGame == NULL) && (cheatMode == 1))
-                guiManageCheats();
+            if (cheatMode == 1) {
+                cheatConfigLoadSelections(configSet);
+                guiManageCheats(configSet);
+            }
         }
     }
 

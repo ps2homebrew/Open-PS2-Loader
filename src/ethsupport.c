@@ -638,7 +638,7 @@ static void ethLaunchGame(item_list_t *itemList, int id, config_set_t *configSet
 
     compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, smb_cdvdman_irx, &i);
 
-    if ((result = sbLoadCheats(ethPrefix, game->startup)) < 0) {
+    if ((result = sbLoadCheats(ethPrefix, game->startup, configSet)) < 0) {
         switch (result) {
             case -ENOENT:
                 guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);

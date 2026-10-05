@@ -318,6 +318,7 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     int i, fd, iop_fd, index, compatmask = 0;
     int EnablePS2Logo = 0;
     int result;
+    u64 isoTotalBytes = 0;
     u64 startingLBA;
     unsigned int startCluster;
     char partname[256], filename[32];
@@ -459,6 +460,8 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
         iso_frag->frag_count += iFragCount;
         iTotalFragCount += iFragCount;
 
+        isoTotalBytes += lseek64(fd, 0, SEEK_END);
+
         if ((gPS2Logo) && (i == 0))
             EnablePS2Logo = CheckPS2Logo(fd, 0);
 
@@ -468,6 +471,11 @@ void bdmLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     // Initialize layer 1 information.
     sbCreatePath(game, partname, pDeviceData->bdmPrefix, "/", 0);
     layer1_start = sbGetISO9660MaxLBA(partname);
+
+    // Real media size, for CDVDMAN's out-of-bounds read emulation. The ISO9660 PVD
+    // cannot be trusted for this: badly mastered discs understate it and read data
+    // past the end of the volume by raw LBA.
+    settings->common.mediaLsnCount = sbGetMediaLsnCount(partname, isoTotalBytes);
 
     switch (game->format) {
         case GAME_FORMAT_USBLD:

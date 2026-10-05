@@ -518,6 +518,26 @@ u32 sbGetISO9660MaxLBA(const char *path)
     return maxLBA;
 }
 
+u32 sbGetMediaLsnCount(const char *path, u64 totalBytes)
+{
+    u32 lsnCount;
+    int fd;
+
+    // For compressed images the file size does not match the media size, so use
+    // the uncompressed sector count from the ZISO header instead.
+    lsnCount = 0;
+    if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
+        if (ProbeZISO(fd))
+            lsnCount = ziso_total_block;
+        close(fd);
+    }
+
+    if (lsnCount == 0)
+        lsnCount = (u32)(totalBytes / 2048);
+
+    return lsnCount;
+}
+
 int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
 {
     int result = -1, fd;
@@ -576,6 +596,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         settings->media = game->media;
     }
     settings->flags = 0;
+    settings->mediaLsnCount = 0;
 
     if (compatmask & COMPAT_MODE_1) {
         settings->flags |= IOPCORE_COMPAT_ACCU_READS;

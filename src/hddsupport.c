@@ -578,6 +578,11 @@ void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
     // patch start_sector
     settings->lba_start = game->start_sector;
 
+    // Real media size, for CDVDMAN's out-of-bounds read emulation. The ISO9660 PVD
+    // cannot be trusted for this: badly mastered discs understate it and read data
+    // past the end of the volume by raw LBA.
+    settings->common.mediaLsnCount = game->total_size_in_kb / 2;
+
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
 
@@ -596,6 +601,8 @@ void hddLaunchGame(item_list_t *itemList, int id, config_set_t *configSet)
         if (maxLBA > 0 && maxLBA < ziso_total_block) {   // dual layer check
             settings->common.layer1_start = maxLBA - 16; // adjust second layer start
         }
+        // For compressed images the partition size does not match the media size.
+        settings->common.mediaLsnCount = ziso_total_block;
     }
 
     if (gAutoLaunchGame == NULL)

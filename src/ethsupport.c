@@ -15,6 +15,7 @@
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioDevctl(ethBase, SMB_***)
+#include <ps2sdkapi.h>   // lseek64
 
 #include "include/nbns.h"
 #include "httpclient.h"
@@ -668,6 +669,18 @@ static void ethLaunchGame(item_list_t *itemList, int id, config_set_t *configSet
     strcpy(settings->smb_user, gPCUserName);
     strcpy(settings->smb_password, gPCPassword);
 
+    // Sum the size of all parts, for CDVDMAN's out-of-bounds read emulation.
+    u64 isoTotalBytes = 0;
+    int part;
+    for (part = 0; part < game->parts; part++) {
+        sbCreatePath(game, partname, ethPrefix, "\\", part);
+        int fd = open(partname, O_RDONLY, 0666);
+        if (fd >= 0) {
+            isoTotalBytes += lseek64(fd, 0, SEEK_END);
+            close(fd);
+        }
+    }
+
     // Initialize layer 1 information.
     sbCreatePath(game, partname, ethPrefix, "\\", 0);
 
@@ -680,6 +693,10 @@ static void ethLaunchGame(item_list_t *itemList, int id, config_set_t *configSet
     }
 
     layer1_start = sbGetISO9660MaxLBA(partname);
+
+    // Real media size; the ISO9660 PVD cannot be trusted for this (badly mastered
+    // discs understate it and read data past the end of the volume by raw LBA).
+    settings->common.mediaLsnCount = sbGetMediaLsnCount(partname, isoTotalBytes);
 
     switch (game->format) {
         case GAME_FORMAT_USBLD:

@@ -263,4 +263,13 @@ void cdvdman_searchfile_init(void)
             DPRINTF("cdvdman_searchfile_init DVD9 mediaLsnCount=%d\n", mediaLsnCount);
         }
     }
+
+    // The PVD Volume Space Size only describes the ISO9660 volume, not the whole disc.
+    // Badly mastered discs (e.g. SLES_533.98) keep data past the end of the volume and
+    // read it by raw LBA, which works on real hardware. Prefer the real media sector
+    // count measured by the loader whenever it was provided.
+    if (cdvdman_settings.common.mediaLsnCount) {
+        mediaLsnCount = cdvdman_settings.common.mediaLsnCount;
+        DPRINTF("cdvdman_searchfile_init loader-provided mediaLsnCount=%d\n", mediaLsnCount);
+    }
 }

@@ -7,6 +7,7 @@
 
 #define DS3 0
 #define DS4 1
+#define DS5 2 // DualSense (PS5)
 
 #define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
 
@@ -30,6 +31,8 @@ typedef struct _usb_ds34
         u8 data[18];
     };
     u8 type;
+    u8 hid_intf;     // HID interface number (DualSense is a composite audio+HID device, HID is not interface 0)
+    u8 ds5_lb_setup; // DualSense: default lightbar animation already released
 } ds34usb_device;
 
 enum eDS34USBStatus {

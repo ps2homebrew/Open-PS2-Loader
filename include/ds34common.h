@@ -11,6 +11,8 @@
 #define DS3_PID             0x0268 // PS3 Controller
 #define DS4_PID             0x05C4 // PS4 Controller
 #define DS4_PID_SLIM        0x09CC // PS4 Slim Controller
+#define DS5_PID             0x0CE6 // PS5 DualSense Controller
+#define DS5_EDGE_PID        0x0DF2 // PS5 DualSense Edge Controller
 #define GUITAR_HERO_PS3_PID 0x0100 // PS3 Guitar Hero Guitar
 #define ROCK_BAND_PS3_PID   0x0200 // PS3 Rock Band Guitar
 

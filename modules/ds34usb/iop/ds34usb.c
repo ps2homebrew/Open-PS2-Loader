@@ -92,6 +92,9 @@ int usb_probe(int devId)
     if (device->idVendor == DS34_VID && (device->idProduct == DS3_PID || device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
         return 1;
 
+    if (device->idVendor == DS34_VID && (device->idProduct == DS5_PID || device->idProduct == DS5_EDGE_PID))
+        return 1;
+
     return 0;
 }
 
@@ -127,7 +130,40 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    if (device->idProduct == DS3_PID) {
+    ds34pad[pad].hid_intf = 0;
+
+    if (device->idProduct == DS5_PID || device->idProduct == DS5_EDGE_PID) {
+        /* DualSense: composite device (audio interfaces first). Walk the whole configuration
+         * descriptor, find the HID interface and take its interrupt endpoints. */
+        u8 *desc = (u8 *)config;
+        u8 *end = desc + config->wTotalLength;
+        int in_hid = 0;
+
+        ds34pad[pad].type = DS5;
+        ds34pad[pad].ds5_lb_setup = 0;
+
+        while (desc + 2 <= end && desc[0] != 0) {
+            if (desc[1] == USB_DT_INTERFACE) {
+                interface = (UsbInterfaceDescriptor *)desc;
+                in_hid = (interface->bInterfaceClass == 0x03); // HID
+                if (in_hid)
+                    ds34pad[pad].hid_intf = interface->bInterfaceNumber;
+            } else if (desc[1] == USB_DT_ENDPOINT && in_hid) {
+                endpoint = (UsbEndpointDescriptor *)desc;
+                if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
+                    if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds34pad[pad].interruptEndp < 0)
+                        ds34pad[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
+                    if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && ds34pad[pad].outEndp < 0)
+                        ds34pad[pad].outEndp = UsbOpenEndpointAligned(devId, endpoint);
+                }
+            }
+            desc += desc[0];
+        }
+
+        DPRINTF("DS34USB: DualSense HID interface %d, in %d, out %d\n", ds34pad[pad].hid_intf, ds34pad[pad].interruptEndp, ds34pad[pad].outEndp);
+
+        epCount = -1; // endpoints already opened, skip the generic scan below
+    } else if (device->idProduct == DS3_PID) {
         ds34pad[pad].type = DS3;
         epCount = interface->bNumEndpoints - 1;
     } else {
@@ -137,7 +173,7 @@ int usb_connect(int devId)
 
     endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
-    do {
+    if (epCount >= 0) do {
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && ds34pad[pad].interruptEndp < 0) {
                 ds34pad[pad].interruptEndp = UsbOpenEndpointAligned(devId, endpoint);
@@ -238,7 +274,7 @@ static void usb_config_set(int result, int count, void *arg)
         DelayThread(10000);
         led[0] = led_patterns[pad][1];
         led[3] = 0;
-    } else if (ds34pad[pad].type == DS4) {
+    } else if (ds34pad[pad].type == DS4 || ds34pad[pad].type == DS5) {
         led[0] = rgbled_patterns[pad][1][0];
         led[1] = rgbled_patterns[pad][1][1];
         led[2] = rgbled_patterns[pad][1][2];
@@ -263,8 +299,31 @@ static void DS3USB_init(int pad)
     UsbControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF4, 0, 4, usb_buf, NULL, NULL);
 }
 
+static void ds5_usb_to_ds4(u8 *data)
+{
+    /* DualSense USB input report 0x01: id, LX, LY, RX, RY, L2, R2, seq, buttons[3], ...
+     * DS4 layout expected below:     id, LX, LY, RX, RY, buttons[3], L2, R2, ... */
+    u8 tmp[9];
+
+    mips_memcpy(tmp, &data[1], 4);     // sticks
+    mips_memcpy(tmp + 4, &data[8], 3); // buttons
+    tmp[7] = data[5];                  // L2
+    tmp[8] = data[6];                  // R2
+    tmp[6] &= ~0x02;                   // ignore touchpad click (no touch data is converted)
+
+    mips_memset(data, 0, sizeof(struct ds4report));
+    data[0] = 0x01;
+    mips_memcpy(&data[1], tmp, 9);
+}
+
 static void readReport(u8 *data, int pad)
 {
+    if (ds34pad[pad].type == DS5) {
+        if (data[0] != 0x01)
+            return;
+        ds5_usb_to_ds4(data);
+    }
+
     if (data[0]) {
 
         if (ds34pad[pad].type == DS3) {
@@ -305,7 +364,7 @@ static void readReport(u8 *data, int pad)
             else
                 ds34pad[pad].oldled[3] = 0;
 
-        } else if (ds34pad[pad].type == DS4) {
+        } else if (ds34pad[pad].type == DS4 || ds34pad[pad].type == DS5) {
             struct ds4report *report;
             u8 up = 0, down = 0, left = 0, right = 0;
 
@@ -448,6 +507,28 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         }
 
         ret = UsbInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
+    } else if (ds34pad[pad].type == DS5) {
+        u8 *c = &usb_buf[1]; // common part of the output report (same layout as over Bluetooth)
+
+        usb_buf[0] = 0x02;  // USB output report id
+        c[0] = 0x03;        // valid_flag0: compatible vibration + haptics select
+        c[1] = 0x04 | 0x10; // valid_flag1: lightbar + player indicator control
+        c[2] = rrum;
+        c[3] = lrum;
+        c[38] = 0x04;       // valid_flag2: compatible vibration v2 (newer firmware)
+
+        if (!ds34pad[pad].ds5_lb_setup) { // release the default blue lightbar animation once
+            c[38] |= 0x02;
+            c[41] = 0x02;
+            ds34pad[pad].ds5_lb_setup = 1;
+        }
+
+        c[43] = 0x04 << 0; // player LED: centre dot
+        c[44] = led[0];
+        c[45] = led[1];
+        c[46] = led[2];
+
+        ret = UsbInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 48, usb_cmd_cb, (void *)pad);
     }
 
     ds34pad[pad].oldled[0] = led[0];
@@ -585,6 +666,20 @@ int ds34usb_get_bdaddr(u8 *data, int port)
             DPRINTF("DS34USB: ds3usb_get_bdaddr usb transfer error %d\n", ret);
             ret = 0;
         }
+    } else if (ds34pad[port].type == DS5) {
+        // Pairing info (0x09): bytes 1-6 pad address, bytes 10-15 paired host address (same layout as DS4 0x12)
+        ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x09, ds34pad[port].hid_intf, 20, usb_buf, usb_cmd_cb, (void *)port);
+
+        if (ret == USB_RC_OK) {
+            TransferWait(ds34pad[port].cmd_sema);
+
+            for (i = 0; i < 6; i++)
+                data[5 - i] = usb_buf[15 - i];
+
+            ret = 1;
+        } else {
+            ret = 0;
+        }
     } else {
         ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x12, 0, 16, usb_buf, usb_cmd_cb, (void *)port);
 
@@ -626,6 +721,18 @@ void ds34usb_set_bdaddr(u8 *data, int port)
             usb_buf[i + 2] = data[5 - i];
 
         ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF5, 0, 8, usb_buf, usb_cmd_cb, (void *)port);
+    } else if (ds34pad[port].type == DS5) {
+        // Set host address + link key (0x0A, same layout as DS4 0x13)
+        mips_memset(usb_buf, 0, 27);
+        usb_buf[0] = 0x0A;
+
+        for (i = 0; i < 6; i++)
+            usb_buf[i + 1] = data[i];
+
+        for (i = 0; i < sizeof(link_key); i++)
+            usb_buf[i + 7] = link_key[i];
+
+        ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x0A, ds34pad[port].hid_intf, 27, usb_buf, usb_cmd_cb, (void *)port);
     } else {
         usb_buf[0] = 0x13;
 
@@ -766,6 +873,8 @@ int _start(int argc, char *argv[])
         ds34pad[pad].outEndp = -1;
         ds34pad[pad].enabled = (enable >> pad) & 1;
         ds34pad[pad].type = 0;
+        ds34pad[pad].hid_intf = 0;
+        ds34pad[pad].ds5_lb_setup = 0;
 
         ds34pad[pad].data[0] = 0xFF;
         ds34pad[pad].data[1] = 0xFF;

@@ -1267,6 +1267,12 @@ static int hid_DS5Output(u8 *led, u8 lrum, u8 rrum, int pad)
     r[DS5_OUTPUT_REPORT_LEN - 2] = (u8)(crc >> 16);
     r[DS5_OUTPUT_REPORT_LEN - 1] = (u8)(crc >> 24);
 
+    {
+        static u32 ds5_out_count = 0;
+        if ((ds5_out_count++ % 20) == 0)
+            DPRINTF("DS5 output #%u pad=%d rgb=%02X%02X%02X rum=%02X/%02X crc=%08X\n", (unsigned)ds5_out_count, pad, led[0], led[1], led[2], lrum, rrum, (unsigned)crc);
+    }
+
     return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].interrupt_scid, buf, sizeof(buf), pad);
 }
 

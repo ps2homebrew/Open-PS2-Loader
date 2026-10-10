@@ -893,6 +893,26 @@ static int l2cap_connection_response(u16 handle, u8 rxid, u16 dcid, u16 scid, u8
     return L2CAP_Command(handle, cmd_buf, 12);
 }
 
+static int l2cap_connection_refuse(u16 handle, u8 rxid, u16 scid)
+{
+    u8 cmd_buf[12];
+
+    cmd_buf[0] = L2CAP_CMD_CONNECTION_RESPONSE; // Code
+    cmd_buf[1] = rxid;                          // Identifier
+    cmd_buf[2] = 0x08;                          // Length
+    cmd_buf[3] = 0x00;
+    cmd_buf[4] = 0x00; // Destination CID: none
+    cmd_buf[5] = 0x00;
+    cmd_buf[6] = (u8)(scid & 0xff); // Source CID (remote)
+    cmd_buf[7] = (u8)(scid >> 8);
+    cmd_buf[8] = 0x02; // Result: connection refused - PSM not supported
+    cmd_buf[9] = 0x00;
+    cmd_buf[10] = 0x00; // Status
+    cmd_buf[11] = 0x00;
+
+    return L2CAP_Command(handle, cmd_buf, 12);
+}
+
 static int l2cap_config_request(u16 handle, u8 rxid, u16 dcid)
 {
     u8 cmd_buf[12];
@@ -1027,6 +1047,10 @@ static int L2CAP_event_task(int result, int bytes)
                             DelayThread(CMD_DELAY);
                             identifier++;
                             l2cap_config_request(ds34pad[pad].hci_handle, identifier, ds34pad[pad].interrupt_scid);
+                        } else {
+                            // Any other channel (e.g. the SDP request the DualSense sends on connect):
+                            // refuse it explicitly, otherwise the pending request makes the pad drop the link after ~30 s
+                            l2cap_connection_refuse(ds34pad[pad].hci_handle, l2cap_buf[9], l2cap_buf[14] | (l2cap_buf[15] << 8));
                         }
                         break;
 

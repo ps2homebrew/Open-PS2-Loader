@@ -7,6 +7,10 @@
 
 #define DS3 0
 #define DS4 1
+#define DS5 2 // DualSense (PS5)
+
+// DS4 and DualSense share the same Bluetooth connection flow
+#define IS_DS4_LIKE(t) ((t) == DS4 || (t) == DS5)
 
 #define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
 
@@ -246,6 +250,9 @@ enum eHID {
     PS4_02_REPORT_ID = 0x02,
     PS4_11_REPORT_ID = 0x11,
     PS4_11_REPORT_LEN = 0x4D,
+
+    PS5_01_REPORT_ID = 0x01, // DualSense simple BT report (default mode)
+    PS5_31_REPORT_ID = 0x31, // DualSense full BT report
 
     // }}}
 };

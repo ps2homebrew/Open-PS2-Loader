@@ -673,7 +673,11 @@ static void HCI_event_task(int result)
                     if (i >= MAX_PADS) {
                         break;
                     }
-                    if (memcmp(hci_buf + 9, "Wireless Controller", 19) == 0) {
+                    if (memcmp(hci_buf + 9, "DualSense", 9) == 0) { // "DualSense Wireless Controller" / "DualSense Edge Wireless Controller"
+                        ds34pad[i].type = DS5;
+                        ds34pad[i].isfake = 0;
+                        DPRINTF("\t Type: DualSense \n");
+                    } else if (memcmp(hci_buf + 9, "Wireless Controller", 19) == 0) {
                         ds34pad[i].type = DS4;
                         ds34pad[i].isfake = 0;
                         DPRINTF("\t Type: Dualshock 4 \n");
@@ -682,7 +686,7 @@ static void HCI_event_task(int result)
                         DPRINTF("\t Type: Dualshock 3 \n");
                     }
                     hci_change_connection_type(ds34pad[i].hci_handle);
-                    if (ds34pad[i].type == DS4) {
+                    if (IS_DS4_LIKE(ds34pad[i].type)) {
                         identifier++;
                         l2cap_connection_request(ds34pad[i].hci_handle, identifier, 0x0070, L2CAP_PSM_CTRL);
                     }
@@ -987,7 +991,7 @@ static int L2CAP_event_task(int result, int bytes)
         }
 
         if (l2cap_handle_ok(ds34pad[pad].hci_handle)) {
-            if (ds34pad[pad].type == DS4) {
+            if (IS_DS4_LIKE(ds34pad[pad].type)) {
                 control_dcid = 0x0070;
                 interrupt_dcid = 0x0071;
             }
@@ -1073,7 +1077,7 @@ static int L2CAP_event_task(int result, int bytes)
                             if (ds34pad[pad].type == DS3) {
                                 ds34pad[pad].oldled[0] = led_patterns[pad][1];
                                 ds34pad[pad].oldled[3] = 0;
-                            } else if (ds34pad[pad].type == DS4) {
+                            } else if (IS_DS4_LIKE(ds34pad[pad].type)) {
                                 ds34pad[pad].oldled[0] = rgbled_patterns[pad][1][0];
                                 ds34pad[pad].oldled[1] = rgbled_patterns[pad][1][1];
                                 ds34pad[pad].oldled[2] = rgbled_patterns[pad][1][2];
@@ -1138,7 +1142,7 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
         if (pad_status_check(DS34BT_STATE_RUNNING, ret)) {
             if (pad_status_check(DS34BT_STATE_DISCONNECT_REQUEST, ret)) {
                 if (!ds34pad[ret].isfake) {
-                    if (ds34pad[ret].type == DS4) {
+                    if (IS_DS4_LIKE(ds34pad[ret].type)) {
                         interrupt_dcid = 0x0071;
                     }
                     identifier++;
@@ -1187,6 +1191,9 @@ static int hid_initDS34(int pad)
     u8 init_buf[PS3_F4_REPORT_LEN + 2];
     u8 size = 2;
 
+    if (ds34pad[pad].type == DS5) // DualSense: no init, keep the simple 0x01 input report
+        return 0;
+
     if (ds34pad[pad].type == DS3) {
         init_buf[0] = HID_THDR_SET_REPORT_FEATURE; // THdr
         init_buf[1] = PS3_F4_REPORT_ID;            // Report ID
@@ -1207,6 +1214,9 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 {
     u8 led_buf[PS4_11_REPORT_LEN + 2];
     u8 size = 2;
+
+    if (ds34pad[pad].type == DS5) // TODO: DualSense LED/rumble (output report 0x31 with CRC32)
+        return 0;
 
     if (ds34pad[pad].type == DS3) {
         if (ds34pad[pad].isfake)
@@ -1273,8 +1283,42 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
     return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, led_buf, size, pad);
 }
 
+/*
+ * Rewrite a DualSense input report in place into the DS4 0x11 layout
+ * (report starts at data[11]), so the DS4 code path can parse it.
+ * Returns 0 if the report must be ignored.
+ */
+static int ds5_to_ds4_report(u8 *data, int bytes)
+{
+    u8 tmp[9];
+
+    if (data[9] == PS5_01_REPORT_ID && bytes >= 19) {
+        // LX LY RX RY, Hat+Face, L1..R3, PS/TPad, L2, R2 (same order as DS4)
+        mips_memcpy(tmp, &data[10], 9);
+    } else if (data[9] == PS5_31_REPORT_ID && bytes >= 21) {
+        // seq, LX LY RX RY, L2, R2, counter, Hat+Face, L1..R3, PS/TPad/Mute
+        mips_memcpy(tmp, &data[11], 4);
+        mips_memcpy(tmp + 4, &data[18], 3);
+        tmp[7] = data[15];
+        tmp[8] = data[16];
+    } else {
+        return 0;
+    }
+
+    mips_memset(&data[11], 0, sizeof(struct ds4report));
+    mips_memcpy(&data[12], tmp, 9);
+    data[9] = PS4_11_REPORT_ID;
+    return 1;
+}
+
 static void hid_readReport(u8 *data, int bytes, int pad)
 {
+    if (data[8] == HID_THDR_DATA_INPUT && ds34pad[pad].type == DS5) {
+        if (!ds5_to_ds4_report(data, bytes))
+            return;
+        bytes = 21; // no touchpad data
+    }
+
     if (data[8] == HID_THDR_DATA_INPUT) {
         if (data[9] == PS3_01_REPORT_ID) {
             struct ds3report *report;

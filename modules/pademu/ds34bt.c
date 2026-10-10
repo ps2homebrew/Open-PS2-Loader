@@ -1114,13 +1114,82 @@ static int HID_command(u16 handle, u16 scid, u8 *data, u8 length, int pad)
     return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
 }
 
+/*
+ * DualSense (PS5) Bluetooth output report 0x31: lightbar, player LED and rumble.
+ * Sent on the HID interrupt channel with transaction header 0xA2. The last 4 bytes
+ * are a CRC32 over the header byte 0xA2 followed by the report (except the CRC).
+ * Receiving output reports also keeps the DualSense from dropping the link.
+ */
+#define DS5_OUTPUT_REPORT_LEN 78
+
+static u8 ds5_out_seq = 0;
+static u8 ds5_lightbar_setup_done[MAX_PADS];
+static const u8 ds5_player_leds[] = {0x04, 0x0A, 0x15, 0x1B};
+
+static u32 ds5_crc32(const u8 *data, int len)
+{
+    u32 crc = 0xFFFFFFFF;
+    int i, j;
+
+    for (i = 0; i < len; i++) {
+        crc ^= data[i];
+        for (j = 0; j < 8; j++)
+            crc = (crc >> 1) ^ (0xEDB88320 & (-(s32)(crc & 1)));
+    }
+
+    return ~crc;
+}
+
+static int hid_DS5Output(u8 *led, u8 lrum, u8 rrum, int pad)
+{
+    u8 buf[1 + DS5_OUTPUT_REPORT_LEN];
+    u8 *r = &buf[1];
+    u8 *c = &r[3]; // common part of the output report
+    u32 crc;
+
+    mips_memset(buf, 0, sizeof(buf));
+
+    buf[0] = 0xA2;                   // HIDP: DATA | OUTPUT
+    r[0] = 0x31;                     // report id
+    r[1] = (ds5_out_seq++ & 0x0F) << 4; // sequence number
+    r[2] = 0x10;                     // tag
+
+    c[0] = 0x03;        // valid_flag0: compatible vibration + haptics select
+    c[1] = 0x04 | 0x10; // valid_flag1: lightbar + player indicator control
+    c[2] = rrum;        // right (small) motor
+    c[3] = lrum;        // left (big) motor
+
+    if (!ds5_lightbar_setup_done[pad]) { // release the default blue lightbar animation once
+        c[38] = 0x02;                    // valid_flag2: lightbar setup control
+        c[41] = 0x02;                    // lightbar setup: light out
+        ds5_lightbar_setup_done[pad] = 1;
+    }
+
+    c[43] = ds5_player_leds[pad & 3];
+    c[44] = led[0]; // r
+    c[45] = led[1]; // g
+    c[46] = led[2]; // b
+
+    crc = ds5_crc32(buf, sizeof(buf) - 4);
+    r[DS5_OUTPUT_REPORT_LEN - 4] = (u8)(crc);
+    r[DS5_OUTPUT_REPORT_LEN - 3] = (u8)(crc >> 8);
+    r[DS5_OUTPUT_REPORT_LEN - 2] = (u8)(crc >> 16);
+    r[DS5_OUTPUT_REPORT_LEN - 1] = (u8)(crc >> 24);
+
+    return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].interrupt_scid, buf, sizeof(buf), pad);
+}
+
 static int hid_initDS34(int pad)
 {
     u8 init_buf[PS3_F4_REPORT_LEN + 2];
     u8 size = 2;
 
-    if (ds34pad[pad].type == DS5) // DualSense: no init, keep the simple 0x01 input report
-        return 0;
+    if (ds34pad[pad].type == DS5) { // DualSense: read calibration (feature 0x05), switches to full 0x31 reports
+        init_buf[0] = HID_THDR_GET_REPORT_FEATURE;
+        init_buf[1] = PS5_05_REPORT_ID;
+        ds5_lightbar_setup_done[pad] = 0;
+        return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, init_buf, size, pad);
+    }
 
     if (ds34pad[pad].type == DS3) {
         init_buf[0] = HID_THDR_SET_REPORT_FEATURE; // THdr
@@ -1153,8 +1222,15 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
     u8 led_buf[PS4_11_REPORT_LEN + 2];
     u8 size = 2;
 
-    if (ds34pad[pad].type == DS5) // TODO: DualSense LED/rumble (output report 0x31 with CRC32)
-        return 0;
+    if (ds34pad[pad].type == DS5) {
+        ds34pad[pad].oldled[0] = led[0];
+        ds34pad[pad].oldled[1] = led[1];
+        ds34pad[pad].oldled[2] = led[2];
+        ds34pad[pad].oldled[3] = led[3];
+        ds34pad[pad].lrum = lrum;
+        ds34pad[pad].rrum = rrum;
+        return hid_DS5Output(led, lrum, rrum, pad);
+    }
     u8 led_bit, i;
 
     if (ds34pad[pad].type == DS3) {
@@ -1239,6 +1315,13 @@ static void hid_readReport(u8 *data, int bytes, int pad_idx)
         }
 
         translate_pad_ds4(&ds5, &pad->ds2, 0);
+        {
+            static u16 ds5_keepalive[MAX_PADS];
+            if (++ds5_keepalive[pad_idx] >= 250) { // refresh LED/rumble state regularly so the link stays active
+                ds5_keepalive[pad_idx] = 0;
+                pad->update_rum = 1;
+            }
+        }
         padMacroPerform(&pad->ds2, ds5.PSButton);
 
         if (ds5.PSButton && ds5.Share && (pad->btn_delay == MAX_DELAY)) { // PS + Create: toggle analog

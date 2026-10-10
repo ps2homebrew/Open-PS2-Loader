@@ -252,6 +252,7 @@ enum eHID {
     PS4_11_REPORT_LEN = 0x4D,
 
     PS5_01_REPORT_ID = 0x01, // DualSense simple BT report (default mode)
+    PS5_05_REPORT_ID = 0x05, // DualSense calibration feature report
     PS5_31_REPORT_ID = 0x31, // DualSense full BT report
 
     // }}}

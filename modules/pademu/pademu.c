@@ -125,6 +125,9 @@ int _start(int argc, char *argv[])
         padMacroInit(macro_settings);
     }
 
+    DPRINTF("PADEMU: start argc=%d pad_enable=0x%02X vib=0x%02X mtap=%d mtap_port=%d options=%d\n",
+            argc, pad_enable, pad_vibration, mtap_enabled, mtap_port, pad_options);
+
     if (RegisterLibraryEntries(&_exp_pademu) != 0) {
         return MODULE_NO_RESIDENT_END;
     }
@@ -245,6 +248,13 @@ static void hookSio2man51_2(sio2_transfer_data_t *sd)
 void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc)
 {
     register u32 ctrl, port1, port2;
+
+    {
+        static u32 hook_calls = 0;
+        if ((hook_calls++ % 600) == 0)
+            DPRINTF("PADEMU: sio2 hook #%u in0=0x%02X ctrl=0x%02X port1=%d en=%d/%d\n", (unsigned)hook_calls, td->in[0],
+                    (unsigned)(td->regdata[0] & 0xFF), (int)(td->regdata[0] & 0x03), pad[0].enabled, pad[1].enabled);
+    }
 
     ctrl = td->regdata[0];
     port1 = td->regdata[0] & 0x03;

@@ -782,6 +782,7 @@ void sysPrintEECoreConfig(struct EECoreConfig_t *config)
     LOG("GSM = %s\n", config->EnableGSMOp == 0 ? "Disabled" : "Enabled");
 
     LOG("PADEMU = %s\n", config->EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
+    LOG("PADEMU settings = 0x%08X (modo %s, puertos 0x%02X)\n", (unsigned)gPadEmuSettings, (gPadEmuSettings & 0xFF) ? "BT" : "USB", (unsigned)((gPadEmuSettings >> 8) & 0xFF));
 
     LOG("enforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
 

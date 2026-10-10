@@ -37,8 +37,7 @@
 #error "must define mode"
 #endif
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+#define DPRINTF(x...) printf(x)
 
 typedef struct
 {
@@ -351,6 +350,7 @@ void pademu(sio2_transfer_data_t *td)
 
     if (!pad_inited) {
         pad_inited = PAD_INIT(pad_enable, pad_options);
+        DPRINTF("PADEMU: init driver -> %d (pad_enable=0x%02X options=0x%02X)\n", pad_inited, pad_enable, pad_options);
     }
 
     if (port2 == 1) {

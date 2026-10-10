@@ -47,3 +47,7 @@ I_mips_memset
 I_mips_memcpy
 smsutils_IMPORTS_end
 #endif
+
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end

@@ -15,8 +15,7 @@
 #include "sys_utils.h"
 #include "padmacro.h"
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+#define DPRINTF(x...) printf(x)
 
 static int bt_probe(int devId);
 static int bt_connect(int devId);
@@ -1406,6 +1405,13 @@ static void hid_readReport(u8 *data, int bytes, int pad_idx)
             return;
         }
 
+        {
+            static u32 ds5_reports = 0;
+            if ((ds5_reports++ % 250) == 0)
+                DPRINTF("DS5 report #%u id=0x%02X LX=%02X LY=%02X RX=%02X RY=%02X B=%02X %02X %02X\n",
+                        (unsigned)ds5_reports, data[9], ((u8 *)&ds5)[1], ((u8 *)&ds5)[2], ((u8 *)&ds5)[3], ((u8 *)&ds5)[4],
+                        ((u8 *)&ds5)[5], ((u8 *)&ds5)[6], ((u8 *)&ds5)[7]);
+        }
         translate_pad_ds4(&ds5, &pad->ds2, 0);
         {
             static u16 ds5_keepalive[MAX_PADS];

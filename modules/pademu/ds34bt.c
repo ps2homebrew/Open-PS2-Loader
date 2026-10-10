@@ -1389,12 +1389,62 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
     return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, led_buf, size, pad);
 }
 
+/* DEBUG: latency measurement. Compares the DualSense's own sensor clock (0.33 us units, in
+ * report 0x31) with the IOP clock. If reports pile up somewhere, lag = IOP elapsed - DS5 elapsed grows. */
+static u32 dbg_calls, dbg_dups, dbg_short, dbg_last_ts, dbg_first_ds5, dbg_t0_us, dbg_last_print_us;
+static int dbg_started;
+
+static u32 dbg_now_us(void)
+{
+    iop_sys_clock_t clk;
+    u32 sec, usec;
+    GetSystemTime(&clk);
+    SysClock2USec(&clk, &sec, &usec);
+    return sec * 1000000 + usec;
+}
+
+static void dbg_ds5_stats(u8 *data, int bytes)
+{
+    u32 now = dbg_now_us();
+    u32 ts, ds5_us;
+
+    dbg_calls++;
+    if (bytes < 20)
+        dbg_short++;
+    if (data[9] != 0x31 || bytes < 11 + 31)
+        return;
+
+    ts = data[11 + 27] | (data[11 + 28] << 8) | (data[11 + 29] << 16) | ((u32)data[11 + 30] << 24);
+    if (ts == dbg_last_ts)
+        dbg_dups++;
+    dbg_last_ts = ts;
+    ds5_us = ts / 3;
+
+    if (!dbg_started) {
+        dbg_started = 1;
+        dbg_first_ds5 = ds5_us;
+        dbg_t0_us = now;
+        dbg_last_print_us = now;
+        return;
+    }
+
+    if (now - dbg_last_print_us >= 1000000) {
+        DPRINTF("LAT iop_ms=%u ds5_ms=%u calls=%u dups=%u short=%u bytes=%d\n",
+                (unsigned)((now - dbg_t0_us) / 1000), (unsigned)((ds5_us - dbg_first_ds5) / 1000),
+                (unsigned)dbg_calls, (unsigned)dbg_dups, (unsigned)dbg_short, bytes);
+        dbg_calls = dbg_dups = dbg_short = 0;
+        dbg_last_print_us = now;
+    }
+}
+
 static void hid_readReport(u8 *data, int bytes, int pad_idx)
 {
     ds34bt_pad_t *pad = &ds34pad[pad_idx];
     if (data[8] == HID_THDR_DATA_INPUT && pad->type == DS5) {
         struct ds4report ds5;
         const u8 *in;
+
+        dbg_ds5_stats(data, bytes);
 
         if (data[9] == PS5_01_REPORT_ID && bytes >= 19) {
             // Simple report: LX LY RX RY, Hat+Face, L1..R3, PS/TPad, L2, R2 (same as DS4 simple report)
@@ -1411,13 +1461,6 @@ static void hid_readReport(u8 *data, int bytes, int pad_idx)
             return;
         }
 
-        {
-            static u32 ds5_reports = 0;
-            if ((ds5_reports++ % 250) == 0)
-                DPRINTF("DS5 report #%u id=0x%02X LX=%02X LY=%02X RX=%02X RY=%02X B=%02X %02X %02X\n",
-                        (unsigned)ds5_reports, data[9], ((u8 *)&ds5)[1], ((u8 *)&ds5)[2], ((u8 *)&ds5)[3], ((u8 *)&ds5)[4],
-                        ((u8 *)&ds5)[5], ((u8 *)&ds5)[6], ((u8 *)&ds5)[7]);
-        }
         translate_pad_ds4(&ds5, &pad->ds2, 0);
         {
             static u16 ds5_keepalive[MAX_PADS];

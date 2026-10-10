@@ -17,6 +17,8 @@ thbase_IMPORTS_start
 I_DelayThread
 I_SetAlarm
 I_CancelAlarm
+I_GetSystemTime
+I_SysClock2USec
 thbase_IMPORTS_end
 
 intrman_IMPORTS_start

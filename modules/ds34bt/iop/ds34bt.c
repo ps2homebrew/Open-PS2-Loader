@@ -1321,8 +1321,10 @@ static int hid_DS5Output(u8 *led, u8 lrum, u8 rrum, int pad)
     c[2] = rrum;        // right (small) motor
     c[3] = lrum;        // left (big) motor
 
+    c[38] = 0x04; // valid_flag2: compatible vibration v2 (needed by newer firmware; older firmware uses valid_flag0)
+
     if (!ds5_lightbar_setup_done[pad]) { // release the default blue lightbar animation once
-        c[38] = 0x02;                    // valid_flag2: lightbar setup control
+        c[38] |= 0x02;                   // valid_flag2: lightbar setup control
         c[41] = 0x02;                    // lightbar setup: light out
         ds5_lightbar_setup_done[pad] = 1;
     }

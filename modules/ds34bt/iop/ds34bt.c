@@ -369,6 +369,10 @@ static int hid_initDS34(int pad);
 static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
 static void hid_readReport(u8 *data, int bytes, int pad);
 
+#define SDP_LOCAL_CID 0x0050 // our CID for the SDP channel opened by the DualSense
+static u16 sdp_remote_cid[MAX_PADS];
+static void sdp_handle_request(int pad);
+
 static int l2cap_connection_request(u16 handle, u8 rxid, u16 scid, u16 psm);
 static int hci_reset();
 
@@ -1047,9 +1051,14 @@ static int L2CAP_event_task(int result, int bytes)
                             DelayThread(CMD_DELAY);
                             identifier++;
                             l2cap_config_request(ds34pad[pad].hci_handle, identifier, ds34pad[pad].interrupt_scid);
+                        } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == L2CAP_PSM_SDP) {
+                            // SDP channel opened by the DualSense: accept it and answer its query (see sdp_handle_request)
+                            sdp_remote_cid[pad] = l2cap_buf[14] | (l2cap_buf[15] << 8);
+                            l2cap_connection_response(ds34pad[pad].hci_handle, l2cap_buf[9], SDP_LOCAL_CID, sdp_remote_cid[pad], SUCCESSFUL);
+                            identifier++;
+                            l2cap_config_request(ds34pad[pad].hci_handle, identifier, sdp_remote_cid[pad]);
                         } else {
-                            // Any other channel (e.g. the SDP request the DualSense sends on connect):
-                            // refuse it explicitly, otherwise the pending request makes the pad drop the link after ~30 s
+                            // Any other channel: refuse it explicitly instead of leaving the request pending
                             l2cap_connection_refuse(ds34pad[pad].hci_handle, l2cap_buf[9], l2cap_buf[14] | (l2cap_buf[15] << 8));
                         }
                         break;
@@ -1083,6 +1092,8 @@ static int L2CAP_event_task(int result, int bytes)
                             l2cap_config_response(ds34pad[pad].hci_handle, l2cap_buf[9], ds34pad[pad].control_scid);
                         } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == interrupt_dcid) {
                             l2cap_config_response(ds34pad[pad].hci_handle, l2cap_buf[9], ds34pad[pad].interrupt_scid);
+                        } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == SDP_LOCAL_CID) {
+                            l2cap_config_response(ds34pad[pad].hci_handle, l2cap_buf[9], sdp_remote_cid[pad]);
                         }
                         break;
 
@@ -1122,6 +1133,8 @@ static int L2CAP_event_task(int result, int bytes)
                         } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == interrupt_dcid) {
                             pad_status_set(DS34BT_STATE_DISCONNECTING, pad);
                             l2cap_disconnection_response(ds34pad[pad].hci_handle, l2cap_buf[9], interrupt_dcid, ds34pad[pad].interrupt_scid);
+                        } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == SDP_LOCAL_CID) {
+                            l2cap_disconnection_response(ds34pad[pad].hci_handle, l2cap_buf[9], sdp_remote_cid[pad], SDP_LOCAL_CID);
                         }
                         break;
 
@@ -1141,6 +1154,9 @@ static int L2CAP_event_task(int result, int bytes)
                     default:
                         break;
                 }
+            } else if ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == SDP_LOCAL_CID) {
+                sdp_handle_request(pad);
+                pad = MAX_PADS;
             } else if (l2cap_interrupt_channel) {
                 hid_readReport(l2cap_buf, bytes, pad);
             } else if (l2cap_command_channel) {
@@ -1208,6 +1224,56 @@ static int HID_command(u16 handle, u16 scid, u8 *data, u8 length, int pad)
 
     // output on endpoint 2
     return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
+}
+
+/*
+ * Minimal SDP server. Right after connecting, the DualSense opens an SDP channel
+ * (PSM 0x0001) and asks for the host's service records. If the request is left
+ * unanswered it drops the link after ~30 s, and if the channel is refused it
+ * disconnects at once. An empty answer is enough: it closes the channel and stays connected.
+ */
+static void sdp_handle_request(int pad)
+{
+    u8 *req = &l2cap_buf[8]; // SDP PDU: id, transaction id (2), parameter length (2), parameters
+    u8 rsp[10];
+    u8 len;
+
+    rsp[0] = req[0] + 1; // response PDU id
+    rsp[1] = req[1];     // transaction id
+    rsp[2] = req[2];
+
+    switch (req[0]) {
+        case 0x02:          // ServiceSearchRequest -> no records
+            rsp[5] = 0x00;  // total record count
+            rsp[6] = 0x00;
+            rsp[7] = 0x00;  // current record count
+            rsp[8] = 0x00;
+            rsp[9] = 0x00;  // no continuation
+            len = 5;
+            break;
+        case 0x04:          // ServiceAttributeRequest
+        case 0x06:          // ServiceSearchAttributeRequest -> empty attribute list
+            rsp[5] = 0x00;  // attribute list byte count
+            rsp[6] = 0x02;
+            rsp[7] = 0x35;  // data element sequence...
+            rsp[8] = 0x00;  // ...of length 0
+            rsp[9] = 0x00;  // no continuation
+            len = 5;
+            break;
+        default:            // anything else -> ErrorResponse: invalid request syntax
+            rsp[0] = 0x01;
+            rsp[5] = 0x00;
+            rsp[6] = 0x03;
+            len = 2;
+            break;
+    }
+
+    rsp[3] = 0x00; // parameter length
+    rsp[4] = len;
+
+    DPRINTF("SDP request 0x%02X answered with 0x%02X\n", req[0], rsp[0]);
+
+    HID_command(ds34pad[pad].hci_handle, sdp_remote_cid[pad], rsp, 5 + len, pad);
 }
 
 /*

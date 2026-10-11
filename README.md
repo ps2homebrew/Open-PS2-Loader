@@ -27,7 +27,7 @@ You need a **USB Bluetooth dongle** plugged into the PS2 (see [Compatibility](#c
 
 Then set:
 - `Pad Emulator` → **On**
-- `Pad Emulator Mode` → **DualShock3/4 BT**
+- `Pad Emulator Mode` → **DS3/DS4/DS5 BT**
 - `Settings For Port` → pick the port (1P, 2P...) and turn on `Emulation` (and `Vibration` if you want rumble)
 
 Don't forget `Save Changes`. If you skip it, the game launches without the emulator and you'll swear the pad is broken (been there).

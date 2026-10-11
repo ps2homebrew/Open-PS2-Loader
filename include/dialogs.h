@@ -178,6 +178,14 @@ enum UI_ITEMS {
     PADCFG_PADEMU_MTAP_PORT,
     PADCFG_PADEMU_WORKAROUND,
     PADCFG_PADEMU_WORKAROUND_STR,
+    PADCFG_BTSEARCH,
+    PADCFG_BTSEARCH_STR,
+    PADCFG_BTS_STATUS,
+    PADCFG_BTS_DEV0,
+    PADCFG_BTS_DEV1,
+    PADCFG_BTS_DEV2,
+    PADCFG_BTS_DEV3,
+    PADCFG_BTS_AGAIN,
 
     PADMACRO_GLOBAL_BUTTON,
     PADMACRO_CFG_SOURCE,
@@ -209,6 +217,7 @@ enum UI_ITEMS {
 extern struct UIItem diaPadEmuConfig[];
 extern struct UIItem diaPadMacroConfig[];
 extern struct UIItem diaPadEmuInfo[];
+extern struct UIItem diaPadEmuBtSearch[];
 #endif
 
 extern struct UIItem diaNetConfig[];

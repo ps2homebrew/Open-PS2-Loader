@@ -157,6 +157,47 @@ enum eHCI {
     // }}}
 };
 
+/* Wireless search and Secure Simple Pairing */
+#define HCI_OCF_INQUIRY               0x01 // OGF = 0x01
+#define HCI_OCF_CREATE_CONNECTION     0x05 // OGF = 0x01
+#define HCI_OCF_LINK_KEY_NEG_REPLY    0x0C // OGF = 0x01
+#define HCI_OCF_AUTH_REQUESTED        0x11 // OGF = 0x01
+#define HCI_OCF_SET_CONN_ENCRYPTION   0x13 // OGF = 0x01
+#define HCI_OCF_IO_CAPABILITY_REPLY   0x2B // OGF = 0x01
+#define HCI_OCF_USER_CONFIRM_REPLY    0x2C // OGF = 0x01
+#define HCI_OCF_SET_EVENT_MASK        0x01 // OGF = 0x03
+#define HCI_OCF_WRITE_SSP_MODE        0x56 // OGF = 0x03
+
+#define HCI_OPCODE(ogf, ocf) ((u16)(((ogf) << 8) | (ocf))) // ogf as in HCI_OGF_* (already shifted by 2)
+
+#define HCI_EVENT_INQUIRY_COMPLETE     0x01
+#define HCI_EVENT_INQUIRY_RESULT       0x02
+#define HCI_EVENT_LINK_KEY_NOTIFY      0x18
+#define HCI_EVENT_INQUIRY_RESULT_RSSI  0x22
+#define HCI_EVENT_IO_CAPABILITY_REQ    0x31
+#define HCI_EVENT_USER_CONFIRM_REQ     0x33
+#define HCI_EVENT_SIMPLE_PAIRING_DONE  0x36
+
+enum eDS34BTSearch {
+    BT_SEARCH_IDLE = 0,
+    BT_SEARCH_INQUIRY,
+    BT_SEARCH_NAMES,
+    BT_SEARCH_DONE,
+    BT_SEARCH_ERROR,
+};
+
+enum eDS34BTPair {
+    BT_PAIR_IDLE = 0,
+    BT_PAIR_CONNECTING,
+    BT_PAIR_AUTHENTICATING,
+    BT_PAIR_ENCRYPTING,
+    BT_PAIR_DONE,
+    BT_PAIR_FAILED,
+};
+
+#define BT_SEARCH_MAX 4  // devices listed by a search
+#define BT_NAME_LEN   32 // including NUL
+
 enum eL2CAP {
     // {{{
     /* Bluetooth L2CAP PSM */

@@ -14,6 +14,7 @@
 #include "ds34bt.h"
 #include "sys_utils.h"
 #include "padmacro.h"
+#include <btkeys.h>
 
 //#define DPRINTF(x...) printf(x)
 #define DPRINTF(x...)
@@ -355,6 +356,17 @@ static void sdp_handle_request(int pad);
 static int l2cap_connection_request(u16 handle, u8 rxid, u16 scid, u16 psm);
 static int hci_reset();
 
+// keys of pads paired wirelessly from the OPL menu (empty: behaves exactly as before)
+static bt_link_key_t bt_keys[BTKEYS_MAX];
+static int bt_keys_count = 0;
+
+void ds34bt_set_keys(const char *arg)
+{
+    if (arg[0] == 'B' && arg[1] == 'T' && arg[2] == 'K')
+        bt_keys_count = btkeys_parse(arg + 3, bt_keys, BTKEYS_MAX);
+    DPRINTF("DS34BT: %d wireless key(s)\n", bt_keys_count);
+}
+
 static void bt_config_set(int result, int count, void *arg)
 {
     PollSema(bt_dev.hid_sema);
@@ -489,6 +501,40 @@ static int hci_link_key_request_reply(u8 *bdaddr)
     return HCI_Command(9 + sizeof(link_key), hci_cmd_buf);
 }
 
+static int hci_set_event_mask(void)
+{
+    // default mask + IO Capability Request/Response, User Confirmation Request, Simple Pairing Complete
+    static const u8 mask[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x27, 0x00};
+
+    hci_cmd_buf[0] = HCI_OCF_SET_EVENT_MASK;
+    hci_cmd_buf[1] = HCI_OGF_CTRL_BBAND;
+    hci_cmd_buf[2] = sizeof(mask);
+    mips_memcpy(&hci_cmd_buf[3], mask, sizeof(mask));
+
+    return HCI_Command(3 + sizeof(mask), hci_cmd_buf);
+}
+
+static int hci_write_ssp_mode(void)
+{
+    hci_cmd_buf[0] = HCI_OCF_WRITE_SSP_MODE;
+    hci_cmd_buf[1] = HCI_OGF_CTRL_BBAND;
+    hci_cmd_buf[2] = 0x01;
+    hci_cmd_buf[3] = 0x01; // enabled
+
+    return HCI_Command(4, hci_cmd_buf);
+}
+
+static int hci_link_key_reply_with(u8 *bdaddr, const u8 *key)
+{
+    hci_cmd_buf[0] = HCI_OCF_LINK_KEY_REQUEST_REPLY;
+    hci_cmd_buf[1] = HCI_OGF_LINK_CNTRL;
+    hci_cmd_buf[2] = 6 + 16;
+    mips_memcpy(&hci_cmd_buf[3], bdaddr, 6);
+    mips_memcpy(&hci_cmd_buf[9], key, 16);
+
+    return HCI_Command(3 + 6 + 16, hci_cmd_buf);
+}
+
 static void HCI_event_task(int result)
 {
     int i, pad;
@@ -504,11 +550,18 @@ static void HCI_event_task(int result)
                 DPRINTF("\tReturned = 0x%02X \n", hci_buf[5]);
                 if ((hci_buf[3] == HCI_OCF_RESET) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
                     if (hci_buf[5] == 0) {
-                        hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
+                        if (bt_keys_count > 0)
+                            hci_set_event_mask(); // pads paired wirelessly: enable Simple Pairing like when they were paired
+                        else
+                            hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
                     } else {
                         DelayThread(500);
                         hci_reset();
                     }
+                } else if ((hci_buf[3] == HCI_OCF_SET_EVENT_MASK) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
+                    hci_write_ssp_mode(); // errors ignored
+                } else if ((hci_buf[3] == HCI_OCF_WRITE_SSP_MODE) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
+                    hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG); // errors ignored
                 } else if ((hci_buf[3] == HCI_OCF_WRITE_SCAN_ENABLE) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
                     if (hci_buf[5] == 0) {
                         bt_dev.status |= DS34BT_STATE_USB_CONFIGURED;
@@ -704,7 +757,11 @@ static void HCI_event_task(int result)
                         DPRINTF(":");
                 }
                 DPRINTF("\n");
-                hci_link_key_request_reply(hci_buf + 2);
+                i = btkeys_find(bt_keys, bt_keys_count, hci_buf + 2);
+                if (i >= 0)
+                    hci_link_key_reply_with(hci_buf + 2, bt_keys[i].key); // paired wirelessly
+                else
+                    hci_link_key_request_reply(hci_buf + 2); // paired over USB (fixed key)
                 break;
 
             case HCI_EVENT_CHANGED_CONNECTION_TYPE:

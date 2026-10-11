@@ -1005,6 +1005,10 @@ static void _loadConfig()
 
     applyConfig(themeID, langID, 0);
 
+#ifdef PADEMU
+    guiGameBtKeysRequestPush(); // keys of pads paired wirelessly -> menu Bluetooth driver
+#endif
+
     lscret = result;
     lscstatus = 0;
     showCfgPopup = 1;

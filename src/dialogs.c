@@ -616,6 +616,11 @@ struct UIItem diaPadEmuConfig[] = {
     {UI_BUTTON, PADCFG_PAIR, 1, 1, _STR_HINT_PAIRPAD, 0, 0, {.label = {NULL, _STR_PAIR}}},
     {UI_BREAK},
 
+    {UI_LABEL, PADCFG_BTSEARCH_STR, 1, 1, -1, -50, 0, {.label = {"Wireless pairing", -1}}},
+    {UI_SPACER},
+    {UI_BUTTON, PADCFG_BTSEARCH, 1, 1, -1, 0, 0, {.label = {"Search", -1}}},
+    {UI_BREAK},
+
     {UI_LABEL, PADCFG_PADEMU_WORKAROUND_STR, 1, 1, -1, -50, 0, {.label = {NULL, _STR_PADEMU_WORKAROUND}}},
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_WORKAROUND, 1, 1, _STR_HINT_PADEMU_WORKAROUND, 0, 0, {.intvalue = {1, 1}}},
@@ -623,6 +628,38 @@ struct UIItem diaPadEmuConfig[] = {
 
     {UI_BREAK},
     {UI_BUTTON, PADCFG_BTINFO, 1, 1, _STR_HINT_BTINFO, 0, 0, {.label = {NULL, _STR_BTINFO}}},
+    {UI_BREAK},
+
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
+struct UIItem diaPadEmuBtSearch[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Wireless pairing", -1}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"DualSense: hold PS + Create.  DS4: hold PS + Share.", -1}}},
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Wait until the light flashes fast, then search.", -1}}},
+    {UI_BREAK},
+    {UI_BREAK},
+
+    {UI_LABEL, PADCFG_BTS_STATUS, 1, 1, -1, 0, 0, {.label = {"", -1}}},
+    {UI_BREAK},
+    {UI_BREAK},
+
+    {UI_BUTTON, PADCFG_BTS_DEV0, 1, 1, -1, 0, 0, {.label = {"", -1}}},
+    {UI_BREAK},
+    {UI_BUTTON, PADCFG_BTS_DEV1, 1, 1, -1, 0, 0, {.label = {"", -1}}},
+    {UI_BREAK},
+    {UI_BUTTON, PADCFG_BTS_DEV2, 1, 1, -1, 0, 0, {.label = {"", -1}}},
+    {UI_BREAK},
+    {UI_BUTTON, PADCFG_BTS_DEV3, 1, 1, -1, 0, 0, {.label = {"", -1}}},
+    {UI_BREAK},
+    {UI_BREAK},
+
+    {UI_BUTTON, PADCFG_BTS_AGAIN, 1, 1, -1, 0, 0, {.label = {"Search", -1}}},
     {UI_BREAK},
 
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},

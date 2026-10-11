@@ -197,10 +197,20 @@ int New_Reset_Iop(const char *arg, int arglen)
 
 #ifdef PADEMU
     if (iop_reboot_count >= 2 && config->EnablePadEmuOp) {
-        char args_for_pademu[8];
+        char args_for_pademu[8 + CORE_PADEMU_BTKEYS_LEN];
+        int args_len = 8;
         memcpy(args_for_pademu, &config->PadEmuSettings, 4);
         memcpy(args_for_pademu + 4, &config->PadMacroSettings, 4);
-        LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, sizeof(args_for_pademu), args_for_pademu);
+        if (config->PadEmuBtKeys[0] != '\0') { // keys of pads paired wirelessly, right after the settings
+            int i = 0;
+            while (i < CORE_PADEMU_BTKEYS_LEN - 1 && config->PadEmuBtKeys[i] != '\0') {
+                args_for_pademu[8 + i] = config->PadEmuBtKeys[i];
+                i++;
+            }
+            args_for_pademu[8 + i] = '\0';
+            args_len += i + 1;
+        }
+        LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, args_len, args_for_pademu);
     }
 #endif
 

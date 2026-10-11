@@ -16,8 +16,7 @@
 
 IRX_ID("ds34bt", 1, 1);
 
-//#define DPRINTF(x...) printf(x)
-#define DPRINTF(x...)
+#define DPRINTF(x...) printf(x)
 
 static int bt_probe(int devId);
 static int bt_connect(int devId);
@@ -718,6 +717,7 @@ static void bt_found_add(u8 *bdaddr, u8 psrm, u8 *cod, u16 clk)
     bt_found[bt_found_count].clk = clk & 0x7FFF;
     bt_found[bt_found_count].name[0] = '\0';
     bt_found_count++;
+    DPRINTF("BTSEARCH: found %02X:%02X:%02X:%02X:%02X:%02X class %02X%02X%02X\n", bdaddr[5], bdaddr[4], bdaddr[3], bdaddr[2], bdaddr[1], bdaddr[0], cod[2], cod[1], cod[0]);
 }
 
 // Inquiry Result (0x02) and Inquiry Result with RSSI (0x22): parameters are arrays of num_responses entries

@@ -159,6 +159,7 @@ enum eHCI {
 
 /* Wireless search and Secure Simple Pairing */
 #define HCI_OCF_INQUIRY               0x01 // OGF = 0x01
+#define HCI_OCF_INQUIRY_CANCEL        0x02 // OGF = 0x01
 #define HCI_OCF_CREATE_CONNECTION     0x05 // OGF = 0x01
 #define HCI_OCF_LINK_KEY_NEG_REPLY    0x0C // OGF = 0x01
 #define HCI_OCF_AUTH_REQUESTED        0x11 // OGF = 0x01

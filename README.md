@@ -2,8 +2,6 @@
 
 A fork of [Open PS2 Loader](https://github.com/ps2homebrew/Open-PS2-Loader) that lets you play your PS2 with a **DualSense over Bluetooth**. No cable from the couch to the console.
 
-I wanted to play PES 6 with my friends using PS5 controllers, and stock OPL only takes the DualSense over USB. So I went down the rabbit hole of PADEMU (OPL's pad emulator) and this is what came out of it.
-
 ## What's new
 
 - **DualSense over Bluetooth**, both in the OPL menu and in-game. Buttons, sticks, rumble and lightbar all work.

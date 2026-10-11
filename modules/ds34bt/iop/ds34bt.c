@@ -397,6 +397,7 @@ static bt_found_t bt_found[BT_SEARCH_MAX];
 static u8 bt_found_count = 0;
 static u8 bt_search_state = BT_SEARCH_IDLE;
 static u8 bt_name_idx = 0;
+static u8 bt_inquiry_cancelling = 0;
 
 static u8 bt_pair_state = BT_PAIR_IDLE;
 static u8 bt_pair_slot = 0;
@@ -697,6 +698,11 @@ static int hci_create_connection(bt_found_t *dev)
     return hci_command_params(hci_rpc_cmd_buf, HCI_OCF_CREATE_CONNECTION, HCI_OGF_LINK_CNTRL, p, sizeof(p));
 }
 
+static int hci_inquiry_cancel(void)
+{
+    return hci_command_params(hci_cmd_buf, HCI_OCF_INQUIRY_CANCEL, HCI_OGF_LINK_CNTRL, NULL, 0);
+}
+
 static void bt_found_add(u8 *bdaddr, u8 psrm, u8 *cod, u16 clk)
 {
     int i;
@@ -718,6 +724,13 @@ static void bt_found_add(u8 *bdaddr, u8 psrm, u8 *cod, u16 clk)
     bt_found[bt_found_count].clk = clk & 0x7FFF;
     bt_found[bt_found_count].name[0] = '\0';
     bt_found_count++;
+
+    // A pad in pairing mode answers right away: stop the inquiry instead of waiting the full 10 s.
+    // The search continues with the names when the cancel completes (see HCI_OCF_INQUIRY_CANCEL).
+    if (!bt_inquiry_cancelling && bt_search_state == BT_SEARCH_INQUIRY) {
+        bt_inquiry_cancelling = 1;
+        hci_inquiry_cancel();
+    }
 }
 
 // Inquiry Result (0x02) and Inquiry Result with RSSI (0x22): parameters are arrays of num_responses entries
@@ -809,6 +822,14 @@ static void HCI_event_task(int result)
                     } else {
                         DelayThread(500);
                         hci_reset();
+                    }
+                } else if ((hci_buf[3] == HCI_OCF_INQUIRY_CANCEL) && (hci_buf[4] == HCI_OGF_LINK_CNTRL)) {
+                    // inquiry stopped early (if it had already ended, Inquiry Complete moved on already)
+                    bt_inquiry_cancelling = 0;
+                    if (bt_search_state == BT_SEARCH_INQUIRY) {
+                        bt_search_state = BT_SEARCH_NAMES;
+                        bt_name_idx = 0;
+                        bt_search_next_name();
                     }
                 } else if ((hci_buf[3] == HCI_OCF_SET_EVENT_MASK) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
                     // errors ignored: adapters without Simple Pairing keep working as before
@@ -2198,6 +2219,7 @@ int ds34bt_search_start(void)
     } else if (!bt_pair_in_progress()) {
         bt_found_count = 0;
         bt_name_idx = 0;
+        bt_inquiry_cancelling = 0;
         bt_search_state = BT_SEARCH_INQUIRY;
         if (hci_inquiry() >= 0) {
             ret = 1;

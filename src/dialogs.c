@@ -616,7 +616,7 @@ struct UIItem diaPadEmuConfig[] = {
     {UI_BUTTON, PADCFG_PAIR, 1, 1, _STR_HINT_PAIRPAD, 0, 0, {.label = {NULL, _STR_PAIR}}},
     {UI_BREAK},
 
-    {UI_LABEL, PADCFG_BTSEARCH_STR, 1, 1, -1, -50, 0, {.label = {"Wireless pairing", -1}}},
+    {UI_LABEL, PADCFG_BTSEARCH_STR, 1, 1, -1, -50, 0, {.label = {"Wireless Pairing", -1}}},
     {UI_SPACER},
     {UI_BUTTON, PADCFG_BTSEARCH, 1, 1, -1, 0, 0, {.label = {"Search", -1}}},
     {UI_BREAK},
@@ -636,7 +636,7 @@ struct UIItem diaPadEmuConfig[] = {
     {UI_TERMINATOR}};
 
 struct UIItem diaPadEmuBtSearch[] = {
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Wireless pairing", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"Wireless Pairing", -1}}},
     {UI_SPLITTER},
 
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"DualSense: hold PS + Create.  DS4: hold PS + Share.", -1}}},

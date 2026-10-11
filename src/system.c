@@ -787,6 +787,9 @@ void sysPrintEECoreConfig(struct EECoreConfig_t *config)
     LOG("GSM = %s\n", config->EnableGSMOp == 0 ? "Disabled" : "Enabled");
 
     LOG("PADEMU = %s\n", config->EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
+#ifdef PADEMU
+    LOG("PADEMU wireless keys = %d\n", config->PadEmuBtKeys[0] ? (int)((strlen(config->PadEmuBtKeys) - 3) / BTKEYS_ENTRY_HEX) : 0);
+#endif
 
     LOG("enforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
 

@@ -759,12 +759,15 @@ static char btsNames[DS34BT_SEARCH_MAX][DS34BT_NAME_LEN];
 static char btsStatus[128];
 static int btsCount, btsShown, btsPairIdx, btsPairStart, btsTimer;
 
+static int btKeysCount = 0; // copy of the saved keys: OPL frees its config (configEnd) before launching a game
+
 static int guiGameBtKeysLoad(void)
 {
     char str[BTKEYS_HEX_LEN + 1];
 
     configGetStrCopy(configGetByType(CONFIG_OPL), CONFIG_ITEM_PADEMU_BTKEYS, str, sizeof(str));
-    return btkeys_parse(str, btKeys, BTKEYS_MAX);
+    btKeysCount = btkeys_parse(str, btKeys, BTKEYS_MAX);
+    return btKeysCount;
 }
 
 void guiGameBtKeysPushToDriver(void)
@@ -792,14 +795,13 @@ void guiGameBtKeysPushIfPending(void)
     }
 }
 
+// Uses the in-memory copy only: at game launch the OPL config has already been freed.
 void guiGameBtKeysModuleArg(char *out)
 {
-    int n = guiGameBtKeysLoad();
-
     out[0] = '\0';
-    if (n > 0) {
+    if (btKeysCount > 0) {
         strcpy(out, BTKEYS_ARG_TAG);
-        btkeys_format(btKeys, n, out + strlen(BTKEYS_ARG_TAG));
+        btkeys_format(btKeys, btKeysCount, out + strlen(BTKEYS_ARG_TAG));
     }
 }
 
@@ -809,6 +811,7 @@ static void guiGameBtKeysSave(const u8 *bdaddr, const u8 *key)
     int n = guiGameBtKeysLoad();
 
     n = btkeys_store(btKeys, n, bdaddr, key);
+    btKeysCount = n;
     btkeys_format(btKeys, n, str);
     configSetStr(configGetByType(CONFIG_OPL), CONFIG_ITEM_PADEMU_BTKEYS, str);
     saveConfig(CONFIG_OPL, 0);

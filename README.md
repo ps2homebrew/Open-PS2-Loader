@@ -2,8 +2,6 @@
 
 A fork of [Open PS2 Loader](https://github.com/ps2homebrew/Open-PS2-Loader) that lets you play your PS2 with a **DualSense over Bluetooth**. No cable from the couch to the console.
 
-I wanted to play PES 6 with my friends using PS5 controllers, and stock OPL only takes the DualSense over USB. So I went down the rabbit hole of PADEMU (OPL's pad emulator) and this is what came out of it.
-
 ## What's new
 
 - **DualSense over Bluetooth**, both in the OPL menu and in-game. Buttons, sticks, rumble and lightbar all work.
@@ -29,7 +27,7 @@ You need a **USB Bluetooth dongle** plugged into the PS2 (see [Compatibility](#c
 
 Then set:
 - `Pad Emulator` → **On**
-- `Pad Emulator Mode` → **DualShock3/4 BT**
+- `Pad Emulator Mode` → **DS3/DS4/DS5 BT**
 - `Settings For Port` → pick the port (1P, 2P...) and turn on `Emulation` (and `Vibration` if you want rumble)
 
 Don't forget `Save Changes`. If you skip it, the game launches without the emulator and you'll swear the pad is broken (been there).
@@ -51,13 +49,11 @@ The pairing is saved, so you don't have to do it again. Next time just press PS.
 
 Launch the game and press **PS** on the pad once the game is on screen. Launching a game resets the PS2's USB side, so the pad always disconnects for a second and needs that PS press to come back. Reconnecting takes a fraction of a second.
 
-**Back to OPL from a game:** `L1 + L2 + R1 + R2 + Start + Select` (on the DualSense that's Options + Create). Set `Settings → IGR Path` to where your OPL ELF lives (e.g. `mc0:/APPS/OPL.ELF`) so it lands back in OPL and not in the PS2 browser.
-
 ## Compatibility
 
 Honestly, it's only been tested on one setup so far. Everything else comes from how the code works, not from real testing. If you try it, please report back (see below).
 
-### Tested ✅
+### Tested 
 
 | What | Model |
 |---|---|
@@ -66,14 +62,14 @@ Honestly, it's only been tested on one setup so far. Everything else comes from 
 | Controller | DualSense (wireless pairing, USB pairing, menu and in-game) |
 | Mixed | DualSense on 1P via Bluetooth + wired DualShock 2 on 2P |
 
-### Should work 🤞
+### Should work 
 
 - **Any PS2 that runs OPL** (fat or slim). There's nothing model-specific in here.
 - **Dongles:** most USB Bluetooth adapters that don't need firmware loaded by the OS. CSR8510-based ones are the classic pick for PADEMU. The wireless search needs **Bluetooth 2.1 or newer**. USB pairing works with older dongles too.
 - **DualSense Edge:** same reports as the regular one and it's recognized by name, but nobody has tried it yet.
 - **Original DualShock 4** (both CUH-ZCT1 and ZCT2): USB pairing already worked in stock OPL, and the wireless search uses the same pairing method as the DualSense.
 
-### Probably won't work / unknown 🤷
+### Probably won't work / unknown 
 
 - **Dongles that need firmware uploaded** (some Intel and Broadcom ones) and **BLE-only dongles**.
 - **Cheap clone CSR dongles:** a coin toss.

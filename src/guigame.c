@@ -938,7 +938,7 @@ static void guiGameShowBtSearch(void)
 void guiGameShowPadEmuConfig(int forceGlobal)
 {
     const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
-    const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), _l(_STR_DS34BT_MODE), NULL};
+    const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), "DS3/DS4/DS5 BT", NULL}; // fixed label: says DualSense in every language
 
     int PadEmuMtap, PadEmuMtapPort, i;
 

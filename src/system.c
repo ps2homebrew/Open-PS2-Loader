@@ -788,6 +788,9 @@ void sysPrintEECoreConfig(struct EECoreConfig_t *config)
 
     LOG("PADEMU = %s\n", config->EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
     LOG("PADEMU settings = 0x%08X (modo %s, puertos 0x%02X)\n", (unsigned)gPadEmuSettings, (gPadEmuSettings & 0xFF) ? "BT" : "USB", (unsigned)((gPadEmuSettings >> 8) & 0xFF));
+#ifdef PADEMU
+    LOG("PADEMU wireless keys = %d\n", config->PadEmuBtKeys[0] ? (int)((strlen(config->PadEmuBtKeys) - 3) / BTKEYS_ENTRY_HEX) : 0);
+#endif
 
     LOG("enforceLanguage = %s\n", config->enforceLanguage == 0 ? "Disabled" : "Enabled");
 

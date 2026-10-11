@@ -123,6 +123,9 @@ int _start(int argc, char *argv[])
         u32 macro_settings = 0xAB;
         mips_memcpy(&macro_settings, argv[1] + 4, 4);
         padMacroInit(macro_settings);
+#ifdef BT
+        ds34bt_set_keys(argv[1] + 8); // optional: link keys of pads paired wirelessly
+#endif
     }
 
     DPRINTF("PADEMU: start argc=%d pad_enable=0x%02X vib=0x%02X mtap=%d mtap_port=%d options=%d\n",

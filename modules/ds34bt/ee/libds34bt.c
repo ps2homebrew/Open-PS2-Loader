@@ -13,6 +13,11 @@
 #define DS34BT_RESET         8
 #define DS34BT_GET_VERSION   9
 #define DS34BT_GET_FEATURES  10
+#define DS34BT_SEARCH_START  11
+#define DS34BT_GET_SEARCH    12
+#define DS34BT_PAIR          13
+#define DS34BT_GET_PAIR      14
+#define DS34BT_SET_KEY       15
 
 #define DS34BT_BIND_RPC_ID 0x18E3878F
 
@@ -170,4 +175,82 @@ int ds34bt_get_features(u8 *info)
     }
 
     return ret;
+}
+
+int ds34bt_search_start(void)
+{
+    if (!ds34bt_inited)
+        return 0;
+
+    if (SifCallRpc(&ds34bt, DS34BT_SEARCH_START, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL) == 0)
+        return rpcbuf[0];
+
+    return 0;
+}
+
+int ds34bt_get_search(int index, int *count, u8 *bdaddr, char *name)
+{
+    if (!ds34bt_inited)
+        return -1;
+
+    rpcbuf[0] = index;
+
+    if (SifCallRpc(&ds34bt, DS34BT_GET_SEARCH, 0, rpcbuf, 1, rpcbuf, 8 + DS34BT_NAME_LEN, NULL, NULL) != 0)
+        return -1;
+
+    if (count)
+        *count = rpcbuf[1];
+    if (bdaddr)
+        memcpy(bdaddr, &rpcbuf[2], 6);
+    if (name) {
+        memcpy(name, &rpcbuf[8], DS34BT_NAME_LEN);
+        name[DS34BT_NAME_LEN - 1] = '\0';
+    }
+
+    return rpcbuf[0];
+}
+
+int ds34bt_pair(int index)
+{
+    if (!ds34bt_inited)
+        return 0;
+
+    rpcbuf[0] = index;
+
+    if (SifCallRpc(&ds34bt, DS34BT_PAIR, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL) == 0)
+        return rpcbuf[0];
+
+    return 0;
+}
+
+int ds34bt_get_pair(u8 *bdaddr, u8 *key)
+{
+    if (!ds34bt_inited)
+        return -1;
+
+    if (SifCallRpc(&ds34bt, DS34BT_GET_PAIR, 0, NULL, 0, rpcbuf, 23, NULL, NULL) != 0)
+        return -1;
+
+    if (bdaddr)
+        memcpy(bdaddr, &rpcbuf[1], 6);
+    if (key)
+        memcpy(key, &rpcbuf[7], 16);
+
+    return rpcbuf[0];
+}
+
+int ds34bt_set_key(const u8 *bdaddr, const u8 *key)
+{
+    if (!ds34bt_inited)
+        return 0;
+
+    if (bdaddr && key) {
+        rpcbuf[0] = 1;
+        memcpy(&rpcbuf[1], bdaddr, 6);
+        memcpy(&rpcbuf[7], key, 16);
+    } else {
+        rpcbuf[0] = 0; // clear all
+    }
+
+    return (SifCallRpc(&ds34bt, DS34BT_SET_KEY, 0, rpcbuf, 23, NULL, 0, NULL, NULL) == 0);
 }

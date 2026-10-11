@@ -20,6 +20,7 @@
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
+#include "include/btkeys.h"
 #endif
 
 #define NEWLIB_PORT_AWARE
@@ -620,6 +621,8 @@ static int guiGamePadEmuUpdater(int modified)
     diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, (PadEmuMode == 1) & EnablePadEmu);
     diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, (PadEmuMode == 1) & EnablePadEmu);
     diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, (PadEmuMode == 1) & EnablePadEmu);
+    diaSetVisible(diaPadEmuConfig, PADCFG_BTSEARCH, (PadEmuMode == 1) & EnablePadEmu);
+    diaSetVisible(diaPadEmuConfig, PADCFG_BTSEARCH_STR, (PadEmuMode == 1) & EnablePadEmu);
 
     diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, (PadEmuMode == 1) & EnablePadEmu);
     diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, (PadEmuMode == 1) & EnablePadEmu);
@@ -743,6 +746,192 @@ static int guiGamePadEmuInfoUpdater(int modified)
     return 0;
 }
 
+/*
+ * Wireless pairing (DS4 / DualSense in pairing mode, Secure Simple Pairing).
+ * The link key of each pad paired this way is kept in conf_opl.cfg and handed to
+ * the menu driver (ds34bt) and to the in-game driver (bt_pademu).
+ */
+#define BTS_RESULT_PAIRED 0x7F000001 // returned by the search dialog updater
+
+static bt_link_key_t btKeys[BTKEYS_MAX];
+static char btsLabels[DS34BT_SEARCH_MAX][DS34BT_NAME_LEN + 24];
+static char btsNames[DS34BT_SEARCH_MAX][DS34BT_NAME_LEN];
+static char btsStatus[128];
+static int btsCount, btsShown, btsPairIdx, btsPairStart, btsTimer;
+
+static int guiGameBtKeysLoad(void)
+{
+    char str[BTKEYS_HEX_LEN + 1];
+
+    configGetStrCopy(configGetByType(CONFIG_OPL), CONFIG_ITEM_PADEMU_BTKEYS, str, sizeof(str));
+    return btkeys_parse(str, btKeys, BTKEYS_MAX);
+}
+
+void guiGameBtKeysPushToDriver(void)
+{
+    int n = guiGameBtKeysLoad(), i;
+
+    ds34bt_set_key(NULL, NULL);
+    for (i = 0; i < n; i++)
+        ds34bt_set_key(btKeys[i].bdaddr, btKeys[i].key);
+}
+
+static volatile int btKeysPushPending = 0;
+
+// Called from any thread: the push itself happens in the main thread (readPads), so RPC calls to ds34bt never overlap.
+void guiGameBtKeysRequestPush(void)
+{
+    btKeysPushPending = 1;
+}
+
+void guiGameBtKeysPushIfPending(void)
+{
+    if (btKeysPushPending) {
+        btKeysPushPending = 0;
+        guiGameBtKeysPushToDriver();
+    }
+}
+
+void guiGameBtKeysModuleArg(char *out)
+{
+    int n = guiGameBtKeysLoad();
+
+    out[0] = '\0';
+    if (n > 0) {
+        strcpy(out, BTKEYS_ARG_TAG);
+        btkeys_format(btKeys, n, out + strlen(BTKEYS_ARG_TAG));
+    }
+}
+
+static void guiGameBtKeysSave(const u8 *bdaddr, const u8 *key)
+{
+    char str[BTKEYS_HEX_LEN + 1];
+    int n = guiGameBtKeysLoad();
+
+    n = btkeys_store(btKeys, n, bdaddr, key);
+    btkeys_format(btKeys, n, str);
+    configSetStr(configGetByType(CONFIG_OPL), CONFIG_ITEM_PADEMU_BTKEYS, str);
+    saveConfig(CONFIG_OPL, 0);
+}
+
+static void guiGameBtSearchShowDevices(int show)
+{
+    int i;
+
+    for (i = 0; i < DS34BT_SEARCH_MAX; i++)
+        diaSetVisible(diaPadEmuBtSearch, PADCFG_BTS_DEV0 + i, show && i < btsCount);
+}
+
+static void guiGameBtSearchStart(void)
+{
+    btsCount = 0;
+    btsShown = 0;
+    guiGameBtSearchShowDevices(0);
+
+    if (ds34bt_search_start())
+        snprintf(btsStatus, sizeof(btsStatus), "Searching...");
+    else
+        snprintf(btsStatus, sizeof(btsStatus), "Bluetooth adapter not ready.");
+}
+
+static int guiGameBtSearchUpdater(int modified)
+{
+    u8 bdaddr[6], key[16];
+    int state, i, count;
+
+    if ((++btsTimer % 15) != 0) // poll the driver about 4 times per second
+        return 0;
+
+    if (btsPairIdx >= 0) {
+        state = ds34bt_get_pair(bdaddr, key);
+        if (state == DS34BT_PAIR_DONE) {
+            return BTS_RESULT_PAIRED;
+        } else if (state == DS34BT_PAIR_FAILED || state < 0 || (btsTimer - btsPairStart) > 45 * 60) {
+            snprintf(btsStatus, sizeof(btsStatus), "Pairing failed. Put the pad in pairing mode and search again.");
+            btsPairIdx = -1;
+        }
+        return 0;
+    }
+
+    state = ds34bt_get_search(0, &count, NULL, NULL);
+    switch (state) {
+        case DS34BT_SEARCH_INQUIRY:
+            snprintf(btsStatus, sizeof(btsStatus), "Searching...");
+            break;
+        case DS34BT_SEARCH_NAMES:
+            snprintf(btsStatus, sizeof(btsStatus), "Searching... reading names");
+            break;
+        case DS34BT_SEARCH_ERROR:
+            snprintf(btsStatus, sizeof(btsStatus), "Search failed. Try again.");
+            break;
+        case DS34BT_SEARCH_DONE:
+            if (btsShown)
+                break;
+            btsShown = 1;
+            btsCount = count > DS34BT_SEARCH_MAX ? DS34BT_SEARCH_MAX : count;
+            for (i = 0; i < btsCount; i++) {
+                ds34bt_get_search(i, NULL, bdaddr, btsNames[i]);
+                if (btsNames[i][0] == '\0')
+                    snprintf(btsNames[i], DS34BT_NAME_LEN, "Unknown device");
+                snprintf(btsLabels[i], sizeof(btsLabels[i]), "%s  (%02X:%02X:%02X:%02X:%02X:%02X)", btsNames[i],
+                         bdaddr[5], bdaddr[4], bdaddr[3], bdaddr[2], bdaddr[1], bdaddr[0]);
+                diaSetLabel(diaPadEmuBtSearch, PADCFG_BTS_DEV0 + i, btsLabels[i]);
+            }
+            guiGameBtSearchShowDevices(1);
+            if (btsCount > 0)
+                snprintf(btsStatus, sizeof(btsStatus), "Found %d. Select the pad to pair:", btsCount);
+            else
+                snprintf(btsStatus, sizeof(btsStatus), "Nothing found. Is the light flashing fast? Search again.");
+            break;
+        default:
+            break;
+    }
+
+    return 0;
+}
+
+static void guiGameShowBtSearch(void)
+{
+    u8 bdaddr[6], key[16];
+    int result = -1, idx;
+
+    btsPairIdx = -1;
+    btsTimer = 0;
+    diaSetLabel(diaPadEmuBtSearch, PADCFG_BTS_STATUS, btsStatus);
+    guiGameBtSearchStart();
+
+    while (1) {
+        result = diaExecuteDialog(diaPadEmuBtSearch, result, 1, &guiGameBtSearchUpdater);
+
+        if (result == UIID_BTN_OK || result == UIID_BTN_CANCEL) {
+            if (btsPairIdx < 0)
+                break; // don't leave while pairing: the key must be saved
+            result = -1;
+        } else if (result == PADCFG_BTS_AGAIN) {
+            if (btsPairIdx < 0)
+                guiGameBtSearchStart();
+        } else if (result >= PADCFG_BTS_DEV0 && result <= PADCFG_BTS_DEV3) {
+            idx = result - PADCFG_BTS_DEV0;
+            if (btsPairIdx < 0 && idx < btsCount) {
+                if (ds34bt_pair(idx)) {
+                    btsPairIdx = idx;
+                    btsPairStart = btsTimer;
+                    snprintf(btsStatus, sizeof(btsStatus), "Pairing with %s...", btsNames[idx]);
+                } else {
+                    snprintf(btsStatus, sizeof(btsStatus), "Could not start pairing. Search again.");
+                }
+            }
+        } else if (result == BTS_RESULT_PAIRED) {
+            if (ds34bt_get_pair(bdaddr, key) == DS34BT_PAIR_DONE) {
+                guiGameBtKeysSave(bdaddr, key);
+                snprintf(btsStatus, sizeof(btsStatus), "Paired and saved: %s", btsNames[btsPairIdx]);
+            }
+            btsPairIdx = -1;
+            result = -1;
+        }
+    }
+}
+
 void guiGameShowPadEmuConfig(int forceGlobal)
 {
     const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
@@ -771,6 +960,8 @@ void guiGameShowPadEmuConfig(int forceGlobal)
     diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, PadEmuSettings & EnablePadEmu);
     diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, PadEmuSettings & EnablePadEmu);
     diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, PadEmuSettings & EnablePadEmu);
+    diaSetVisible(diaPadEmuConfig, PADCFG_BTSEARCH, PadEmuSettings & EnablePadEmu);
+    diaSetVisible(diaPadEmuConfig, PADCFG_BTSEARCH_STR, PadEmuSettings & EnablePadEmu);
 
     diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, PadEmuSettings & EnablePadEmu);
     diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, PadEmuSettings & EnablePadEmu);
@@ -797,6 +988,9 @@ void guiGameShowPadEmuConfig(int forceGlobal)
                 }
             }
         }
+
+        if (result == PADCFG_BTSEARCH)
+            guiGameShowBtSearch();
 
         if (result == PADCFG_BTINFO) {
             for (i = PADCFG_FEAT_START; i < PADCFG_FEAT_END + 1; i++)

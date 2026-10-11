@@ -19,6 +19,10 @@ void guiGameShowPadEmuConfig(int forceGlobal);
 void guiGameShowPadMacroConfig(int forceGlobal);
 void guiGameSavePadEmuGlobalConfig(config_set_t *configGame);
 void guiGameSavePadMacroGlobalConfig(config_set_t *configGame);
+void guiGameBtKeysPushToDriver(void);
+void guiGameBtKeysRequestPush(void);
+void guiGameBtKeysPushIfPending(void);
+void guiGameBtKeysModuleArg(char *out); // needs BTKEYS_ARG_LEN bytes
 #endif
 
 void guiGameShowOSDLanguageConfig(int forceGlobal);

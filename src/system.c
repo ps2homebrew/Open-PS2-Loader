@@ -31,6 +31,10 @@
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
+#include "include/btkeys.h"
+#include "include/guigame.h"
+
+_Static_assert(BTKEYS_ARG_LEN <= CORE_PADEMU_BTKEYS_LEN, "PadEmuBtKeys too small");
 #endif
 
 #define NEWLIB_PORT_AWARE
@@ -279,6 +283,7 @@ void sysReset(int modload_mask)
 
         ds34usb_init();
         ds34bt_init();
+        guiGameBtKeysRequestPush(); // keys of pads paired wirelessly -> menu driver
     }
 #endif
 
@@ -940,6 +945,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     config->EnablePadEmuOp = gEnablePadEmu;
     config->PadEmuSettings = (unsigned int)(gPadEmuSettings >> 8);
     config->PadMacroSettings = (unsigned int)(gPadMacroSettings);
+    guiGameBtKeysModuleArg(config->PadEmuBtKeys);
 #endif
 
     config->CustomOSDConfigParam.spdifMode = PARAM.spdifMode;

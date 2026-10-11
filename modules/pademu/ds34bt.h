@@ -137,6 +137,10 @@ enum eHCI {
     // }}}
 };
 
+/* Wireless pairing: pads paired with Secure Simple Pairing from the OPL menu */
+#define HCI_OCF_SET_EVENT_MASK  0x01 // OGF = 0x03
+#define HCI_OCF_WRITE_SSP_MODE  0x56 // OGF = 0x03
+
 enum eL2CAP {
     // {{{
     /* Bluetooth L2CAP PSM */
@@ -239,6 +243,7 @@ enum eHID {
 };
 
 int ds34bt_init(u8 pads, u8 options);
+void ds34bt_set_keys(const char *arg); // "BTK" + hex link keys (include/btkeys.h), before ds34bt_init
 int ds34bt_get_status(int port);
 void ds34bt_reset();
 int ds34bt_get_data(u8 *dst, int size, int port);

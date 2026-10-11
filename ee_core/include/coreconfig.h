@@ -5,6 +5,7 @@
 #define CORE_EXIT_PATH_MAX_LEN      (256)
 #define CORE_GAME_MODE_DESC_MAX_LEN (16)
 #define CORE_GAME_ID_MAX_LEN        (16)
+#define CORE_PADEMU_BTKEYS_LEN      (180)
 
 // Do not use "EE" as it might catch a string.
 #define EE_CORE_MAGIC_0 (0x4D614730)
@@ -67,6 +68,9 @@ struct EECoreConfig_t
 
     int EnableGSMOp;
     struct GsmConfig_t GsmConfig;
+
+    // Link keys of pads paired wirelessly, passed to bt_pademu ("BTK" + hex, see include/btkeys.h)
+    char PadEmuBtKeys[CORE_PADEMU_BTKEYS_LEN];
 };
 
 #define USE_LOCAL_EECORE_CONFIG struct EECoreConfig_t *config = &g_ee_core_config;

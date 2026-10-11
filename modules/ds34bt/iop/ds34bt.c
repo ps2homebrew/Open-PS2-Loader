@@ -12,6 +12,7 @@
 #include "thbase.h"
 #include "thsemap.h"
 #include "ds34bt.h"
+#include <btkeys.h>
 
 IRX_ID("ds34bt", 1, 1);
 
@@ -376,6 +377,44 @@ static void sdp_handle_request(int pad);
 static int l2cap_connection_request(u16 handle, u8 rxid, u16 scid, u16 psm);
 static int hci_reset();
 
+/*
+ * Wireless search + Secure Simple Pairing (DS4 / DualSense in pairing mode).
+ * Keys of pads paired this way are kept in bt_keys; any other pad keeps using the
+ * fixed link_key written over USB, exactly as before.
+ */
+typedef struct
+{
+    u8 bdaddr[6];
+    u8 psrm; // page scan repetition mode
+    u16 clk; // clock offset
+    char name[BT_NAME_LEN];
+} bt_found_t;
+
+static bt_link_key_t bt_keys[BTKEYS_MAX];
+static int bt_keys_count = 0;
+
+static bt_found_t bt_found[BT_SEARCH_MAX];
+static u8 bt_found_count = 0;
+static u8 bt_search_state = BT_SEARCH_IDLE;
+static u8 bt_name_idx = 0;
+
+static u8 bt_pair_state = BT_PAIR_IDLE;
+static u8 bt_pair_slot = 0;
+static u8 bt_pair_bdaddr[6];
+static u8 bt_pair_key[16];
+static u8 bt_pair_got_key = 0;
+
+// commands sent from the RPC thread use their own buffer
+static u8 hci_rpc_cmd_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
+
+static int bt_pair_in_progress(void)
+{
+    return bt_pair_state == BT_PAIR_CONNECTING || bt_pair_state == BT_PAIR_AUTHENTICATING || bt_pair_state == BT_PAIR_ENCRYPTING;
+}
+
+static void bt_search_next_name(void);
+static void bt_pair_fail(void);
+
 static void bt_config_set(int result, int count, void *arg)
 {
     PollSema(bt_dev.hid_sema);
@@ -537,6 +576,196 @@ static int hci_link_key_request_reply(u8 *bdaddr)
     return HCI_Command(9 + sizeof(link_key), hci_cmd_buf);
 }
 
+// Generic HCI command: buf[0] = OCF, buf[1] = OGF (shifted), buf[2] = parameter length.
+static int hci_command_params(u8 *buf, u8 ocf, u8 ogf, const u8 *params, u8 len)
+{
+    buf[0] = ocf;
+    buf[1] = ogf;
+    buf[2] = len;
+    if (len)
+        mips_memcpy(&buf[3], params, len);
+
+    return HCI_Command(3 + len, buf);
+}
+
+static int hci_set_event_mask(void)
+{
+    // default mask (events 0x01..0x2D) + IO Capability Request/Response, User Confirmation Request,
+    // Simple Pairing Complete. Long events (Extended Inquiry Result, ...) stay disabled.
+    static const u8 mask[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F, 0x27, 0x00};
+
+    return hci_command_params(hci_cmd_buf, HCI_OCF_SET_EVENT_MASK, HCI_OGF_CTRL_BBAND, mask, sizeof(mask));
+}
+
+static int hci_write_ssp_mode(void)
+{
+    static const u8 enable = 0x01;
+
+    return hci_command_params(hci_cmd_buf, HCI_OCF_WRITE_SSP_MODE, HCI_OGF_CTRL_BBAND, &enable, 1);
+}
+
+static int hci_link_key_reply_with(u8 *bdaddr, const u8 *key)
+{
+    u8 p[22];
+
+    mips_memcpy(p, bdaddr, 6);
+    mips_memcpy(&p[6], key, 16);
+
+    return hci_command_params(hci_cmd_buf, HCI_OCF_LINK_KEY_REQUEST_REPLY, HCI_OGF_LINK_CNTRL, p, sizeof(p));
+}
+
+static int hci_link_key_negative_reply(u8 *bdaddr)
+{
+    return hci_command_params(hci_cmd_buf, HCI_OCF_LINK_KEY_NEG_REPLY, HCI_OGF_LINK_CNTRL, bdaddr, 6);
+}
+
+static int hci_io_capability_reply(u8 *bdaddr)
+{
+    u8 p[9];
+
+    mips_memcpy(p, bdaddr, 6);
+    p[6] = 0x03; // IO capability: NoInputNoOutput ("Just Works", like the consoles)
+    p[7] = 0x00; // no OOB data
+    p[8] = 0x04; // authentication requirements: MITM not required, general bonding
+
+    return hci_command_params(hci_cmd_buf, HCI_OCF_IO_CAPABILITY_REPLY, HCI_OGF_LINK_CNTRL, p, sizeof(p));
+}
+
+static int hci_user_confirm_reply(u8 *bdaddr)
+{
+    return hci_command_params(hci_cmd_buf, HCI_OCF_USER_CONFIRM_REPLY, HCI_OGF_LINK_CNTRL, bdaddr, 6);
+}
+
+static int hci_auth_requested(u16 handle)
+{
+    u8 p[2];
+
+    p[0] = (u8)(handle & 0xFF);
+    p[1] = (u8)((handle >> 8) & 0x0F);
+
+    return hci_command_params(hci_cmd_buf, HCI_OCF_AUTH_REQUESTED, HCI_OGF_LINK_CNTRL, p, sizeof(p));
+}
+
+static int hci_set_connection_encryption(u16 handle)
+{
+    u8 p[3];
+
+    p[0] = (u8)(handle & 0xFF);
+    p[1] = (u8)((handle >> 8) & 0x0F);
+    p[2] = 0x01; // encryption on
+
+    return hci_command_params(hci_cmd_buf, HCI_OCF_SET_CONN_ENCRYPTION, HCI_OGF_LINK_CNTRL, p, sizeof(p));
+}
+
+static int hci_remote_name_found(bt_found_t *dev)
+{
+    u8 p[10];
+
+    mips_memcpy(p, dev->bdaddr, 6);
+    p[6] = dev->psrm;
+    p[7] = 0x00;
+    p[8] = (u8)(dev->clk & 0xFF);
+    p[9] = (u8)((dev->clk >> 8) | 0x80); // clock offset valid
+
+    return hci_command_params(hci_cmd_buf, HCI_OCF_REMOTE_NAME, HCI_OGF_LINK_CNTRL, p, sizeof(p));
+}
+
+// RPC thread only (own buffer)
+static int hci_inquiry(void)
+{
+    static const u8 p[5] = {0x33, 0x8B, 0x9E, // General Inquiry Access Code
+                            0x08,             // 8 x 1.28 s
+                            0x00};            // unlimited responses
+
+    return hci_command_params(hci_rpc_cmd_buf, HCI_OCF_INQUIRY, HCI_OGF_LINK_CNTRL, p, sizeof(p));
+}
+
+// RPC thread only (own buffer)
+static int hci_create_connection(bt_found_t *dev)
+{
+    u8 p[13];
+
+    mips_memcpy(p, dev->bdaddr, 6);
+    p[6] = 0x18; // packet types DM1/DH1/DM3/DH3/DM5/DH5 (0xCC18)
+    p[7] = 0xCC;
+    p[8] = dev->psrm;
+    p[9] = 0x00;
+    p[10] = (u8)(dev->clk & 0xFF);
+    p[11] = (u8)((dev->clk >> 8) | 0x80); // clock offset valid
+    p[12] = 0x01;                         // allow role switch
+
+    return hci_command_params(hci_rpc_cmd_buf, HCI_OCF_CREATE_CONNECTION, HCI_OGF_LINK_CNTRL, p, sizeof(p));
+}
+
+static void bt_found_add(u8 *bdaddr, u8 psrm, u8 *cod, u16 clk)
+{
+    int i;
+
+    // only peripherals (major device class 0x05): gamepads, joysticks...
+    if ((cod[1] & 0x1F) != 0x05)
+        return;
+
+    for (i = 0; i < bt_found_count; i++) {
+        if (memcmp(bt_found[i].bdaddr, bdaddr, 6) == 0)
+            return; // already listed (inquiry reports the same device many times)
+    }
+
+    if (bt_found_count >= BT_SEARCH_MAX)
+        return;
+
+    mips_memcpy(bt_found[bt_found_count].bdaddr, bdaddr, 6);
+    bt_found[bt_found_count].psrm = psrm;
+    bt_found[bt_found_count].clk = clk & 0x7FFF;
+    bt_found[bt_found_count].name[0] = '\0';
+    bt_found_count++;
+}
+
+// Inquiry Result (0x02) and Inquiry Result with RSSI (0x22): parameters are arrays of num_responses entries
+static void bt_inquiry_result(int with_rssi)
+{
+    u8 *p = &hci_buf[2];
+    int n = p[0], i, o;
+    const int entry = 14; // bytes per response, in both formats
+
+    if (bt_search_state != BT_SEARCH_INQUIRY)
+        return;
+
+    if (3 + n * entry > MAX_BUFFER_SIZE) // only what fits in our event buffer
+        n = (MAX_BUFFER_SIZE - 3) / entry;
+
+    for (i = 0; i < n; i++) {
+        u8 *bdaddr = &p[1 + 6 * i];
+        o = 1 + 6 * n;
+        u8 psrm = p[o + i];
+        o += n;                   // page scan repetition mode
+        o += with_rssi ? n : 2 * n; // reserved
+        u8 *cod = &p[o + 3 * i];
+        o += 3 * n;
+        u16 clk = p[o + 2 * i] | (p[o + 2 * i + 1] << 8);
+        bt_found_add(bdaddr, psrm, cod, clk);
+    }
+}
+
+static void bt_search_next_name(void)
+{
+    while (bt_name_idx < bt_found_count) {
+        if (hci_remote_name_found(&bt_found[bt_name_idx]) >= 0)
+            return;
+        bt_name_idx++;
+    }
+
+    bt_search_state = BT_SEARCH_DONE;
+}
+
+static void bt_pair_fail(void)
+{
+    if (!bt_pair_in_progress())
+        return;
+
+    DPRINTF("DS34BT: pairing failed\n");
+    bt_pair_state = BT_PAIR_FAILED;
+}
+
 static void HCI_event_task(int result)
 {
     int i, pad;
@@ -576,11 +805,17 @@ static void HCI_event_task(int result)
                 } else if ((hci_buf[3] == HCI_OCF_READ_FEATURES) && (hci_buf[4] == HCI_OGF_INFO_PARAM)) {
                     if (hci_buf[5] == 0) {
                         mips_memcpy(bt_features, &hci_buf[6], sizeof(bt_features));
-                        hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
+                        hci_set_event_mask();
                     } else {
                         DelayThread(500);
                         hci_reset();
                     }
+                } else if ((hci_buf[3] == HCI_OCF_SET_EVENT_MASK) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
+                    // errors ignored: adapters without Simple Pairing keep working as before
+                    hci_write_ssp_mode();
+                } else if ((hci_buf[3] == HCI_OCF_WRITE_SSP_MODE) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
+                    DPRINTF("DS34BT: Simple Pairing mode status 0x%02X\n", hci_buf[5]);
+                    hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
                 } else if ((hci_buf[3] == HCI_OCF_WRITE_SCAN_ENABLE) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
                     if (hci_buf[5] == 0) {
                         bt_dev.status |= DS34BT_STATE_USB_CONFIGURED;
@@ -598,6 +833,72 @@ static void HCI_event_task(int result)
                     DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
                     DPRINTF("\t Command_OpCode(OGF) = 0x%02X \n", ((hci_buf[5] & 0xFC) >> 2));
                     DPRINTF("\t Command_OpCode(OCF) = 0x%02X 0x%02X \n", (hci_buf[5] & 0x03), hci_buf[4]);
+
+                    switch (hci_buf[4] | (hci_buf[5] << 8)) {
+                        case HCI_OPCODE(HCI_OGF_LINK_CNTRL, HCI_OCF_INQUIRY):
+                            if (bt_search_state == BT_SEARCH_INQUIRY)
+                                bt_search_state = BT_SEARCH_ERROR;
+                            break;
+                        case HCI_OPCODE(HCI_OGF_LINK_CNTRL, HCI_OCF_REMOTE_NAME):
+                            if (bt_search_state == BT_SEARCH_NAMES) {
+                                bt_name_idx++;
+                                bt_search_next_name();
+                            }
+                            break;
+                        case HCI_OPCODE(HCI_OGF_LINK_CNTRL, HCI_OCF_CREATE_CONNECTION):
+                            if (bt_pair_state == BT_PAIR_CONNECTING) {
+                                bt_pair_fail();
+                                ds34pad_clear(bt_pair_slot);
+                            }
+                            break;
+                        case HCI_OPCODE(HCI_OGF_LINK_CNTRL, HCI_OCF_AUTH_REQUESTED):
+                        case HCI_OPCODE(HCI_OGF_LINK_CNTRL, HCI_OCF_SET_CONN_ENCRYPTION):
+                            if (bt_pair_in_progress()) {
+                                bt_pair_fail();
+                                hci_disconnect(ds34pad[bt_pair_slot].hci_handle);
+                            }
+                            break;
+                    }
+                }
+                break;
+
+            case HCI_EVENT_INQUIRY_RESULT:
+                bt_inquiry_result(0);
+                break;
+
+            case HCI_EVENT_INQUIRY_RESULT_RSSI:
+                bt_inquiry_result(1);
+                break;
+
+            case HCI_EVENT_INQUIRY_COMPLETE:
+                DPRINTF("HCI Inquiry Complete: %d device(s)\n", bt_found_count);
+                if (bt_search_state == BT_SEARCH_INQUIRY) {
+                    bt_search_state = BT_SEARCH_NAMES;
+                    bt_name_idx = 0;
+                    bt_search_next_name();
+                }
+                break;
+
+            case HCI_EVENT_IO_CAPABILITY_REQ:
+                DPRINTF("HCI IO Capability Request\n");
+                hci_io_capability_reply(hci_buf + 2);
+                break;
+
+            case HCI_EVENT_USER_CONFIRM_REQ:
+                DPRINTF("HCI User Confirmation Request\n");
+                hci_user_confirm_reply(hci_buf + 2);
+                break;
+
+            case HCI_EVENT_SIMPLE_PAIRING_DONE:
+                DPRINTF("HCI Simple Pairing Complete: status 0x%02X\n", hci_buf[2]);
+                break;
+
+            case HCI_EVENT_LINK_KEY_NOTIFY:
+                DPRINTF("HCI Link Key Notification, type %d\n", hci_buf[24]);
+                bt_keys_count = btkeys_store(bt_keys, bt_keys_count, hci_buf + 2, hci_buf + 8);
+                if (bt_pair_in_progress() && memcmp(bt_pair_bdaddr, hci_buf + 2, 6) == 0) {
+                    mips_memcpy(bt_pair_key, hci_buf + 8, 16);
+                    bt_pair_got_key = 1;
                 }
                 break;
 
@@ -624,9 +925,19 @@ static void HCI_event_task(int result)
                         break;
                     }
                     pad_status_set(DS34BT_STATE_CONNECTED, i);
-                    hci_remote_name(ds34pad[i].bdaddr);
+                    if (bt_pair_state == BT_PAIR_CONNECTING && i == bt_pair_slot) {
+                        // we opened this link to pair: authenticate first (the pad has no key yet -> SSP)
+                        bt_pair_state = BT_PAIR_AUTHENTICATING;
+                        hci_auth_requested(ds34pad[i].hci_handle);
+                    } else {
+                        hci_remote_name(ds34pad[i].bdaddr);
+                    }
                 } else {
                     DPRINTF("\t Error 0x%02X \n", hci_buf[2]);
+                    if (bt_pair_state == BT_PAIR_CONNECTING && memcmp(bt_pair_bdaddr, hci_buf + 5, 6) == 0) {
+                        bt_pair_fail();
+                        ds34pad_clear(bt_pair_slot);
+                    }
                 }
                 break;
 
@@ -651,6 +962,8 @@ static void HCI_event_task(int result)
                         break;
                     }
                 }
+                if (i == bt_pair_slot && bt_pair_in_progress())
+                    bt_pair_fail();
                 ds34pad_clear(i);
                 break;
 
@@ -663,11 +976,32 @@ static void HCI_event_task(int result)
                 } else {
                     DPRINTF("\t Failed \n");
                 }
+                if (bt_pair_state == BT_PAIR_AUTHENTICATING &&
+                    ds34pad[bt_pair_slot].hci_handle == (hci_buf[3] | ((hci_buf[4] & 0x0F) << 8))) {
+                    if (!hci_buf[2]) {
+                        bt_pair_state = BT_PAIR_ENCRYPTING;
+                        hci_set_connection_encryption(ds34pad[bt_pair_slot].hci_handle);
+                    } else {
+                        bt_pair_fail();
+                        hci_disconnect(ds34pad[bt_pair_slot].hci_handle);
+                    }
+                }
                 break;
 
             case HCI_EVENT_REMOTE_NAME_COMPLETE:
                 DPRINTF("HCI Remote Name Requested Complete Event: \n");
                 DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
+                if (bt_search_state == BT_SEARCH_NAMES && bt_name_idx < bt_found_count &&
+                    memcmp(bt_found[bt_name_idx].bdaddr, hci_buf + 3, 6) == 0) {
+                    if (!hci_buf[2]) {
+                        // the name starts at hci_buf[9]; only the part inside our 64-byte event buffer is used
+                        for (i = 0; i < BT_NAME_LEN - 1 && 9 + i < MAX_BUFFER_SIZE && hci_buf[9 + i]; i++)
+                            bt_found[bt_name_idx].name[i] = hci_buf[9 + i];
+                        bt_found[bt_name_idx].name[i] = '\0';
+                    }
+                    bt_name_idx++;
+                    bt_search_next_name();
+                }
                 if (!hci_buf[2]) {
                     for (i = 0; i < MAX_PADS; i++) {
                         if (memcmp(ds34pad[i].bdaddr, hci_buf + 3, 6) == 0) {
@@ -702,6 +1036,17 @@ static void HCI_event_task(int result)
                 DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
                 DPRINTF("\t Connection_Handle = 0x%04X \n", (hci_buf[3] | ((hci_buf[4] & 0x0F) << 8)));
                 DPRINTF("\t Encryption_Enabled = 0x%02X \n", hci_buf[5]);
+                if (bt_pair_state == BT_PAIR_ENCRYPTING &&
+                    ds34pad[bt_pair_slot].hci_handle == (hci_buf[3] | ((hci_buf[4] & 0x0F) << 8))) {
+                    if (!hci_buf[2] && hci_buf[5] && bt_pair_got_key) {
+                        // paired: continue exactly like a pad that connected by itself
+                        bt_pair_state = BT_PAIR_DONE;
+                        hci_remote_name(ds34pad[bt_pair_slot].bdaddr);
+                    } else {
+                        bt_pair_fail();
+                        hci_disconnect(ds34pad[bt_pair_slot].hci_handle);
+                    }
+                }
                 break;
 
             case HCI_EVENT_CONNECT_REQUEST:
@@ -716,6 +1061,8 @@ static void HCI_event_task(int result)
                 for (i = 0; i < MAX_PADS; i++) // find free slot
                 {
                     if (!pad_status_check(DS34BT_STATE_RUNNING, i) && ds34pad[i].enabled) {
+                        if (i == bt_pair_slot && bt_pair_in_progress()) // busy pairing
+                            continue;
                         if (pad_status_check(DS34BT_STATE_CONNECTED, i)) {
                             if (pad_status_check(DS34BT_STATE_DISCONNECTING, i)) // if we're waiting for hci disconnect event
                                 continue;
@@ -781,7 +1128,15 @@ static void HCI_event_task(int result)
                         DPRINTF(":");
                 }
                 DPRINTF("\n");
-                hci_link_key_request_reply(hci_buf + 2);
+                if (bt_pair_state == BT_PAIR_AUTHENTICATING && memcmp(bt_pair_bdaddr, hci_buf + 2, 6) == 0) {
+                    hci_link_key_negative_reply(hci_buf + 2); // no key yet: let the controller run Simple Pairing
+                } else {
+                    i = btkeys_find(bt_keys, bt_keys_count, hci_buf + 2);
+                    if (i >= 0)
+                        hci_link_key_reply_with(hci_buf + 2, bt_keys[i].key); // paired wirelessly
+                    else
+                        hci_link_key_request_reply(hci_buf + 2); // paired over USB (fixed key)
+                }
                 break;
 
             case HCI_EVENT_CHANGED_CONNECTION_TYPE:
@@ -827,6 +1182,12 @@ static void ds34pad_init()
 
     g_press_emu = 0;
     identifier = 0;
+
+    // the adapter is being reset: a running search or pairing can't finish
+    if (bt_search_state == BT_SEARCH_INQUIRY || bt_search_state == BT_SEARCH_NAMES)
+        bt_search_state = BT_SEARCH_ERROR;
+    if (bt_pair_in_progress())
+        bt_pair_state = BT_PAIR_FAILED;
 }
 
 static void hci_event_cb(int resultCode, int bytes, void *arg)
@@ -1822,6 +2183,125 @@ void ds34bt_init_charging()
     }
 }
 
+// Starts a 10 s inquiry for pads in pairing mode. Returns 1 if the search is running.
+int ds34bt_search_start(void)
+{
+    int ret = 0;
+
+    if (!(bt_dev.status & DS34BT_STATE_USB_CONFIGURED))
+        return 0;
+
+    WaitSema(bt_dev.hid_sema);
+
+    if (bt_search_state == BT_SEARCH_INQUIRY || bt_search_state == BT_SEARCH_NAMES) {
+        ret = 1; // already searching
+    } else if (!bt_pair_in_progress()) {
+        bt_found_count = 0;
+        bt_name_idx = 0;
+        bt_search_state = BT_SEARCH_INQUIRY;
+        if (hci_inquiry() >= 0) {
+            ret = 1;
+        } else {
+            bt_search_state = BT_SEARCH_ERROR;
+        }
+    }
+
+    SignalSema(bt_dev.hid_sema);
+
+    return ret;
+}
+
+// in: data[0] = index. out: state, count, bdaddr[6], name[BT_NAME_LEN]
+void ds34bt_get_search(u8 *data)
+{
+    int idx = data[0];
+
+    WaitSema(bt_dev.hid_sema);
+
+    data[0] = bt_search_state;
+    data[1] = bt_found_count;
+    if (idx < bt_found_count) {
+        mips_memcpy(&data[2], bt_found[idx].bdaddr, 6);
+        mips_memcpy(&data[8], bt_found[idx].name, BT_NAME_LEN);
+    } else {
+        mips_memset(&data[2], 0, 6 + BT_NAME_LEN);
+    }
+
+    SignalSema(bt_dev.hid_sema);
+}
+
+// Pairs with a device of the last search. Returns 1 if pairing started.
+int ds34bt_pair(int idx)
+{
+    int i, ret = 0;
+
+    if (!(bt_dev.status & DS34BT_STATE_USB_CONFIGURED))
+        return 0;
+
+    WaitSema(bt_dev.hid_sema);
+
+    if (bt_search_state == BT_SEARCH_DONE && idx < bt_found_count && !bt_pair_in_progress()) {
+        // a free slot: an enabled one if possible (the pad is usable right away), any other otherwise
+        for (i = 0; i < MAX_PADS; i++) {
+            if (ds34pad[i].enabled && !pad_status_check(DS34BT_STATE_CONNECTED, i))
+                break;
+        }
+        if (i >= MAX_PADS) {
+            for (i = 0; i < MAX_PADS; i++) {
+                if (!pad_status_check(DS34BT_STATE_CONNECTED, i))
+                    break;
+            }
+        }
+
+        if (i < MAX_PADS) {
+            ds34pad_clear(i);
+            mips_memcpy(ds34pad[i].bdaddr, bt_found[idx].bdaddr, 6);
+            mips_memcpy(bt_pair_bdaddr, bt_found[idx].bdaddr, 6);
+            bt_pair_slot = i;
+            bt_pair_got_key = 0;
+            bt_pair_state = BT_PAIR_CONNECTING;
+            if (hci_create_connection(&bt_found[idx]) >= 0) {
+                ret = 1;
+            } else {
+                bt_pair_state = BT_PAIR_FAILED;
+                ds34pad_clear(i);
+            }
+        }
+    }
+
+    SignalSema(bt_dev.hid_sema);
+
+    return ret;
+}
+
+// out: state, bdaddr[6], key[16]
+void ds34bt_get_pair(u8 *data)
+{
+    WaitSema(bt_dev.hid_sema);
+
+    data[0] = bt_pair_state;
+    mips_memcpy(&data[1], bt_pair_bdaddr, 6);
+    if (bt_pair_state == BT_PAIR_DONE)
+        mips_memcpy(&data[7], bt_pair_key, 16);
+    else
+        mips_memset(&data[7], 0, 16);
+
+    SignalSema(bt_dev.hid_sema);
+}
+
+// in: data[0] = 1 to add (bdaddr[6], key[16] follow), 0 to clear the table
+void ds34bt_set_key(u8 *data)
+{
+    WaitSema(bt_dev.hid_sema);
+
+    if (data[0])
+        bt_keys_count = btkeys_store(bt_keys, bt_keys_count, &data[1], &data[7]);
+    else
+        bt_keys_count = 0;
+
+    SignalSema(bt_dev.hid_sema);
+}
+
 static void rpc_thread(void *data);
 static void *rpc_sf(int cmd, void *data, int size);
 
@@ -1840,6 +2320,11 @@ static int rpc_buf[64] __attribute((aligned(16)));
 #define DS34BT_RESET         8
 #define DS34BT_GET_VERSION   9
 #define DS34BT_GET_FEATURES  10
+#define DS34BT_SEARCH_START  11
+#define DS34BT_GET_SEARCH    12
+#define DS34BT_PAIR          13
+#define DS34BT_GET_PAIR      14
+#define DS34BT_SET_KEY       15
 
 #define DS34BT_BIND_RPC_ID 0x18E3878F
 
@@ -1883,6 +2368,21 @@ void *rpc_sf(int cmd, void *data, int size)
             break;
         case DS34BT_GET_FEATURES:
             *((u8 *)data + 8) = ds34bt_get_feat((u8 *)data);
+            break;
+        case DS34BT_SEARCH_START:
+            *(u8 *)data = ds34bt_search_start();
+            break;
+        case DS34BT_GET_SEARCH:
+            ds34bt_get_search((u8 *)data);
+            break;
+        case DS34BT_PAIR:
+            *(u8 *)data = ds34bt_pair(*(u8 *)data);
+            break;
+        case DS34BT_GET_PAIR:
+            ds34bt_get_pair((u8 *)data);
+            break;
+        case DS34BT_SET_KEY:
+            ds34bt_set_key((u8 *)data);
             break;
         default:
             break;

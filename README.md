@@ -41,7 +41,7 @@ Don't forget `Save Changes`. If you skip it, the game launches without the emula
 2. Hold **PS + Create** on the DualSense until the light blinks fast (DS4: **PS + Share**).
 3. Your pad shows up in the list. Select it and wait for `Paired and saved`.
 
-**P.S.:** Wireless pairing is only supported for the DS4 and DS5 controllers.
+**Note:** Wireless pairing only works with the DualSense and the DS4 (the DS4 hasn't been tested yet). The DS3 has no pairing mode, so it still needs the cable method below.
 
 <img src="docs/img/wireless-pairing.jpg" alt="Wireless Pairing screen finding a DualSense" width="640">
 

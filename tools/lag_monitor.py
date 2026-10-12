@@ -31,23 +31,49 @@ import time
 
 PORT = 18194
 LAT2 = re.compile(r"LAT2 (.*)")
+LAT3 = re.compile(r"LAT3 (.*)")
+FIELDS = ("t", "rx", "gap", "off_min", "off_max", "cb_avg", "cb_max", "tx",
+          "polls", "age_avg", "age_max", "chg", "chg_avg", "chg_max")
 KEY_LINES = ("PADEMU", "wireless key", "Connection Requested", "Encryption_Enabled", "Type: DualSense",
              "Disconnection Complete", "Reason =", "LaunchLoaderElf", "Starting ee_core")
 WINDOW = 30  # seconds used to estimate the "best case" transport time (handles clock drift)
 
 
-def parse(line):
-    m = LAT2.search(line)
-    if not m:
-        return None
+def kv(text):
     d = {}
-    for kv in m.group(1).split():
-        k, _, v = kv.partition("=")
+    for item in text.split():
+        k, _, v = item.partition("=")
         try:
             d[k] = int(v)
         except ValueError:
             pass
-    return d if "rx" in d else None
+    return d
+
+
+class Joiner:
+    """The PS2 sends each second as two lines (LAT2 + LAT3). Joins them; tolerates missing/cut lines."""
+
+    def __init__(self):
+        self.pending = None
+
+    def feed(self, line):
+        m2, m3 = LAT2.search(line), LAT3.search(line)
+        if m2:
+            done, self.pending = self.pending, kv(m2.group(1))
+            return self._complete(done)
+        if m3 and self.pending is not None:
+            self.pending.update(kv(m3.group(1)))
+            done, self.pending = self.pending, None
+            return self._complete(done)
+        return None
+
+    @staticmethod
+    def _complete(d):
+        if not d or "rx" not in d or "off_min" not in d or "off_max" not in d:
+            return None
+        for f in FIELDS:
+            d.setdefault(f, 0)
+        return d
 
 
 class Stats:
@@ -133,8 +159,9 @@ def main():
 
     if a.file:
         with open(a.file, encoding="utf-8", errors="replace") as f:
+            j = Joiner()
             for line in f:
-                d = parse(line)
+                d = j.feed(line)
                 if d:
                     st.add(d)
         st.report()
@@ -148,6 +175,7 @@ def main():
     print(f"Listening on UDP {PORT}. Start a game, press PS on the DualSense and play. Ctrl+C for the report.")
     sock.settimeout(1.0)
     buf = ""
+    j = Joiner()
     received = 0
     last_status = time.time()
     got_lat = False
@@ -162,11 +190,11 @@ def main():
                 line, buf = buf.split("\n", 1)
                 received += 1
                 log.write(line.rstrip() + "\n")
-                d = parse(line)
+                d = j.feed(line)
                 if d:
                     got_lat = True
                     print(Stats.line(st.add(d)))
-                elif any(k in line for k in KEY_LINES):
+                elif "LAT" not in line and any(k in line for k in KEY_LINES):
                     print("  | " + line.rstrip()[:110])
             log.flush()
             if not got_lat and time.time() - last_status >= 5:

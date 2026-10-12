@@ -1498,11 +1498,13 @@ static void lag_print(u32 now)
 {
     if (now - lag_last_print < 1000000)
         return;
-    printf("LAT2 t=%u rx=%u gap=%u off_min=%d off_max=%d cb_avg=%u cb_max=%u tx=%u polls=%u age_avg=%u age_max=%u chg=%u chg_avg=%u chg_max=%u\n",
+    // two short lines: the IOP printf truncates long ones
+    printf("LAT2 t=%u rx=%u gap=%u off_min=%d off_max=%d cb_avg=%u cb_max=%u tx=%u\n",
            (unsigned)((now - lag_t0) / 1000), (unsigned)lag_rx, (unsigned)lag_gap, lag_off_min, lag_off_max,
-           (unsigned)(lag_cb_n ? lag_cb_sum / lag_cb_n : 0), (unsigned)lag_cb_max, (unsigned)lag_tx,
-           (unsigned)lag_polls, (unsigned)(lag_polls ? lag_age_sum / lag_polls : 0), (unsigned)lag_age_max,
-           (unsigned)lag_chg, (unsigned)(lag_chg ? lag_chg_sum / lag_chg : 0), (unsigned)lag_chg_max);
+           (unsigned)(lag_cb_n ? lag_cb_sum / lag_cb_n : 0), (unsigned)lag_cb_max, (unsigned)lag_tx);
+    printf("LAT3 t=%u polls=%u age_avg=%u age_max=%u chg=%u chg_avg=%u chg_max=%u\n",
+           (unsigned)((now - lag_t0) / 1000), (unsigned)lag_polls, (unsigned)(lag_polls ? lag_age_sum / lag_polls : 0),
+           (unsigned)lag_age_max, (unsigned)lag_chg, (unsigned)(lag_chg ? lag_chg_sum / lag_chg : 0), (unsigned)lag_chg_max);
     lag_rx = lag_gap = lag_tx = lag_polls = lag_age_sum = lag_age_max = 0;
     lag_cb_sum = lag_cb_max = lag_cb_n = 0;
     lag_chg = lag_chg_sum = lag_chg_max = 0;

@@ -32,8 +32,9 @@ import time
 PORT = 18194
 LAT2 = re.compile(r"LAT2 (.*)")
 LAT3 = re.compile(r"LAT3 (.*)")
+LAT4 = re.compile(r"LAT4 (.*)")
 FIELDS = ("t", "rx", "gap", "off_min", "off_max", "cb_avg", "cb_max", "tx",
-          "polls", "age_avg", "age_max", "chg", "chg_avg", "chg_max")
+          "polls", "age_avg", "age_max", "chg", "chg_avg", "chg_max", "hic", "hicp")
 KEY_LINES = ("PADEMU", "wireless key", "Connection Requested", "Encryption_Enabled", "Type: DualSense",
              "Disconnection Complete", "Reason =", "LaunchLoaderElf", "Starting ee_core")
 WINDOW = 30  # seconds used to estimate the "best case" transport time (handles clock drift)
@@ -57,7 +58,10 @@ class Joiner:
         self.pending = None
 
     def feed(self, line):
-        m2, m3 = LAT2.search(line), LAT3.search(line)
+        m2, m3, m4 = LAT2.search(line), LAT3.search(line), LAT4.search(line)
+        if m4 and self.pending is not None:
+            self.pending.update(kv(m4.group(1)))
+            return None
         if m2:
             done, self.pending = self.pending, kv(m2.group(1))
             return self._complete(done)
@@ -94,7 +98,7 @@ class Stats:
         chg = (f"press->game {d['chg_avg']/1000:5.1f} avg {d['chg_max']/1000:5.1f} max (n={d['chg']})"
                if d.get("chg") else "press->game   -  (no presses)")
         return (f"t={d['t']//1000:4d}s  rx={d['rx']:4d}/s  gap={d['gap']/1000:5.1f}ms  "
-                f"transport={d['tr_min']:4.1f}..{d['tr_max']:5.1f}ms  "
+                f"jitter={(d['off_max'] - d['off_min'])/1000:5.1f}ms  pauses={d['hic']}({d['hicp']} after log)  "
                 f"game={d['polls']:3d}Hz age={d['age_avg']/1000:4.1f}/{d['age_max']/1000:4.1f}ms  "
                 f"cb={d['cb_avg']}/{d['cb_max']}us  tx={d['tx']}/s  {chg}")
 
@@ -120,7 +124,9 @@ class Stats:
         show("reports per second", [r["rx"] for r in rows], "/s")
         show("game reads per second", [r["polls"] for r in rows], "/s")
         show("longest pause between reports", [r["gap"] / 1000 for r in rows])
-        show("transport (worst per second)", [r["tr_max"] for r in rows])
+        show("delivery jitter within a second", [(r["off_max"] - r["off_min"]) / 1000 for r in rows])
+        show("pauses > 8 ms per second", [r["hic"] for r in rows], "")
+        show("  ...right after our own log print", [r["hicp"] for r in rows], "")
         show("report age when game reads", [r["age_max"] / 1000 for r in rows])
         show("driver time per report", [r["cb_avg"] / 1000 for r in rows])
         show("output reports per second", [r["tx"] for r in rows], "/s")
@@ -132,7 +138,7 @@ class Stats:
         gaps = [r["gap"] / 1000 for r in rows]
         trs = [r["tr_max"] for r in rows]
         bad_gap = sum(1 for g in gaps if g > 20)
-        bad_tr = sum(1 for t in trs if t > 15)
+        bad_tr = 0  # replaced by the jitter / pause figures above
         frame = 1000 / max(1, statistics.median([r["polls"] for r in rows]))
         if presses:
             print(f"  - The game reads the pad every ~{frame:.1f} ms; any pad (even wired) waits up to that.")
@@ -141,10 +147,15 @@ class Stats:
             print("    If it happens while the game loads data, it's the USB stick sharing the bus with the dongle.")
         else:
             print("  - No stalls over 20 ms between reports.")
-        if bad_tr:
-            print(f"  - {bad_tr} second(s) had reports arriving over 15 ms later than the best case (radio/USB queuing).")
-        else:
-            print("  - Transport stayed within 15 ms of the best case.")
+        hic = sum(r["hic"] for r in rows)
+        hicp = sum(r["hicp"] for r in rows)
+        if hic:
+            print(f"  - {hic} pauses over 8 ms; {hicp} of them right after the PS2 sent a log line"
+                  f" ({100 * hicp // hic}%). Those are caused by the measurement itself, not by normal play.")
+        if presses:
+            avg = statistics.mean([r["chg_avg"] / 1000 for r in presses])
+            print(f"  - Press -> game read averages {avg:.1f} ms; just waiting for the next frame averages {frame / 2:.1f} ms,")
+            print(f"    so the driver adds about {max(0.0, avg - frame / 2):.1f} ms on top of what a wired pad would see.")
         tx = statistics.median([r["tx"] for r in rows])
         if tx > 10:
             print(f"  - {tx:.0f} output reports/s sent to the pad: that's a lot of radio traffic (old build?).")

@@ -150,8 +150,8 @@ class Stats:
         hic = sum(r["hic"] for r in rows)
         hicp = sum(r["hicp"] for r in rows)
         if hic:
-            print(f"  - {hic} pauses over 8 ms; {hicp} of them right after the PS2 sent a log line"
-                  f" ({100 * hicp // hic}%). Those are caused by the measurement itself, not by normal play.")
+            print(f"  - {hic} pauses over 8 ms ({hic / len(rows):.1f}/s); {hicp} of them right after the PS2 sent a"
+                  f" log line ({100 * hicp // hic}%). Only those are caused by the measurement; the rest are real.")
         ints = [r["pint_min"] for r in rows if r.get("pint_min")] + [r["pint_max"] for r in rows if r.get("pint_max")]
         if ints:
             print(f"  - Time between pauses: median {statistics.median(ints):.0f} ms (min {min(ints)}, max {max(ints)}).")

@@ -23,6 +23,11 @@ static int bt_connect(int devId);
 static int bt_disconnect(int devId);
 static void bt_config_set(int result, int count, void *arg);
 
+// DEBUG latency instrumentation (defined further below)
+static u32 lag_now_us(void);
+static int lag_started;
+static u32 lag_tx, lag_tx_count, lag_cb_sum, lag_cb_max, lag_cb_n;
+
 static UsbDriver bt_driver = {NULL, NULL, "ds34bt", bt_probe, bt_connect, bt_disconnect};
 static bt_device bt_dev = {-1, -1, -1, -1, -1, -1, DS34BT_STATE_USB_DISCONNECTED};
 
@@ -1158,6 +1163,8 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
     int ret;
     u16 interrupt_dcid = 0x0041;
 
+    u32 lag_cb_t0 = lag_now_us();
+
     PollSema(bt_dev.hid_sema);
 
     ret = L2CAP_event_task(resultCode, bytes);
@@ -1187,6 +1194,16 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
 
     UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE + 23, l2cap_event_cb, arg);
     SignalSema(bt_dev.hid_sema);
+
+    if (ret == 0 && lag_started) {
+        u32 d = lag_now_us() - lag_cb_t0;
+        lag_cb_sum += d;
+        lag_cb_n++;
+        if (d > lag_cb_max)
+            lag_cb_max = d;
+        lag_tx += lag_tx_count;
+        lag_tx_count = 0;
+    }
 }
 
 /************************************************************/
@@ -1292,6 +1309,7 @@ static u32 ds5_crc32(const u8 *data, int len)
 
 static int hid_DS5Output(u8 *led, u8 lrum, u8 rrum, int pad)
 {
+    lag_tx_count++;
     u8 buf[1 + DS5_OUTPUT_REPORT_LEN];
     u8 *r = &buf[1];
     u8 *c = &r[3]; // common part of the output report
@@ -1450,12 +1468,18 @@ static int hid_LEDRumbleCommand(u8 *led, u8 lrum, u8 rrum, int pad)
     return HID_command(ds34pad[pad].hci_handle, ds34pad[pad].control_scid, led_buf, size, pad);
 }
 
-/* DEBUG: latency measurement. Compares the DualSense's own sensor clock (0.33 us units, in
- * report 0x31) with the IOP clock. If reports pile up somewhere, lag = IOP elapsed - DS5 elapsed grows. */
-static u32 dbg_calls, dbg_dups, dbg_short, dbg_last_ts, dbg_first_ds5, dbg_t0_us, dbg_last_print_us;
-static int dbg_started;
-
-static u32 dbg_now_us(void)
+/*
+ * DEBUG: input latency instrumentation for the DualSense on port 0 (one "LAT2" line per second).
+ *
+ *  rx      input reports received          gap     longest pause between two reports (us)
+ *  off_min/off_max  IOP clock - DS5 sensor clock (us). The DS5 stamps each report when it builds it, so
+ *          (off - its long-term minimum) = how long the report spent in the air + USB + queues.
+ *  cb_avg/cb_max  time spent in our USB callback per report (us)
+ *  tx      output reports sent (rumble/LED)
+ *  polls   times the game read the pad      age_avg/age_max  age of the newest report at each read (us)
+ *  chg     button changes seen by the game  chg_avg/chg_max  report arrival -> game read for those (us)
+ */
+static u32 lag_now_us(void)
 {
     iop_sys_clock_t clk;
     u32 sec, usec;
@@ -1464,37 +1488,93 @@ static u32 dbg_now_us(void)
     return sec * 1000000 + usec;
 }
 
-static void dbg_ds5_stats(u8 *data, int bytes)
-{
-    u32 now = dbg_now_us();
-    u32 ts, ds5_us;
+static u32 lag_t0, lag_last_print, lag_last_rx, lag_last_ts, lag_ds5_elapsed;
+static u32 lag_rx, lag_gap, lag_polls, lag_age_sum, lag_age_max;
+static u32 lag_chg, lag_chg_sum, lag_chg_max, lag_chg_pending, lag_chg_t;
+static int lag_off_min, lag_off_max;
+static u8 lag_last_btn[2];
 
-    dbg_calls++;
-    if (bytes < 20)
-        dbg_short++;
-    if (data[9] != 0x31 || bytes < 11 + 31)
+static void lag_print(u32 now)
+{
+    if (now - lag_last_print < 1000000)
+        return;
+    printf("LAT2 t=%u rx=%u gap=%u off_min=%d off_max=%d cb_avg=%u cb_max=%u tx=%u polls=%u age_avg=%u age_max=%u chg=%u chg_avg=%u chg_max=%u\n",
+           (unsigned)((now - lag_t0) / 1000), (unsigned)lag_rx, (unsigned)lag_gap, lag_off_min, lag_off_max,
+           (unsigned)(lag_cb_n ? lag_cb_sum / lag_cb_n : 0), (unsigned)lag_cb_max, (unsigned)lag_tx,
+           (unsigned)lag_polls, (unsigned)(lag_polls ? lag_age_sum / lag_polls : 0), (unsigned)lag_age_max,
+           (unsigned)lag_chg, (unsigned)(lag_chg ? lag_chg_sum / lag_chg : 0), (unsigned)lag_chg_max);
+    lag_rx = lag_gap = lag_tx = lag_polls = lag_age_sum = lag_age_max = 0;
+    lag_cb_sum = lag_cb_max = lag_cb_n = 0;
+    lag_chg = lag_chg_sum = lag_chg_max = 0;
+    lag_off_min = 0x7FFFFFFF;
+    lag_off_max = -0x7FFFFFFF;
+    lag_last_print = now;
+}
+
+// called for each DualSense input report on port 0, after it has been translated
+static void lag_on_report(u8 *data, int bytes, ds34bt_pad_t *pad)
+{
+    u32 now = lag_now_us();
+    u32 ts;
+    int off;
+
+    if (data[9] != PS5_31_REPORT_ID || bytes < 11 + 31)
         return;
 
     ts = data[11 + 27] | (data[11 + 28] << 8) | (data[11 + 29] << 16) | ((u32)data[11 + 30] << 24);
-    if (ts == dbg_last_ts)
-        dbg_dups++;
-    dbg_last_ts = ts;
-    ds5_us = ts / 3;
 
-    if (!dbg_started) {
-        dbg_started = 1;
-        dbg_first_ds5 = ds5_us;
-        dbg_t0_us = now;
-        dbg_last_print_us = now;
+    if (!lag_started) {
+        lag_started = 1;
+        lag_t0 = lag_last_print = lag_last_rx = now;
+        lag_last_ts = ts;
+        lag_ds5_elapsed = 0;
+        lag_off_min = 0x7FFFFFFF;
+        lag_off_max = -0x7FFFFFFF;
         return;
     }
 
-    if (now - dbg_last_print_us >= 1000000) {
-        DPRINTF("LAT iop_ms=%u ds5_ms=%u calls=%u dups=%u short=%u bytes=%d\n",
-                (unsigned)((now - dbg_t0_us) / 1000), (unsigned)((ds5_us - dbg_first_ds5) / 1000),
-                (unsigned)dbg_calls, (unsigned)dbg_dups, (unsigned)dbg_short, bytes);
-        dbg_calls = dbg_dups = dbg_short = 0;
-        dbg_last_print_us = now;
+    lag_ds5_elapsed += (ts - lag_last_ts) / 3; // DS5 clock: 0.333 us units (wrap-safe difference)
+    lag_last_ts = ts;
+    off = (int)((now - lag_t0) - lag_ds5_elapsed);
+    if (off < lag_off_min)
+        lag_off_min = off;
+    if (off > lag_off_max)
+        lag_off_max = off;
+
+    if (now - lag_last_rx > lag_gap)
+        lag_gap = now - lag_last_rx;
+    lag_last_rx = now;
+    lag_rx++;
+
+    if (!lag_chg_pending && (pad->data[0] != lag_last_btn[0] || pad->data[1] != lag_last_btn[1])) {
+        lag_chg_pending = 1;
+        lag_chg_t = now;
+    }
+    lag_last_btn[0] = pad->data[0];
+    lag_last_btn[1] = pad->data[1];
+
+    lag_print(now);
+}
+
+// called when the game reads port 0
+static void lag_on_poll(void)
+{
+    u32 now, age;
+
+    if (!lag_started)
+        return;
+    now = lag_now_us();
+    lag_polls++;
+    age = now - lag_last_rx;
+    lag_age_sum += age;
+    if (age > lag_age_max)
+        lag_age_max = age;
+    if (lag_chg_pending) {
+        lag_chg_pending = 0;
+        lag_chg++;
+        lag_chg_sum += now - lag_chg_t;
+        if (now - lag_chg_t > lag_chg_max)
+            lag_chg_max = now - lag_chg_t;
     }
 }
 
@@ -1504,8 +1584,6 @@ static void hid_readReport(u8 *data, int bytes, int pad_idx)
     if (data[8] == HID_THDR_DATA_INPUT && pad->type == DS5) {
         struct ds4report ds5;
         const u8 *in;
-
-        dbg_ds5_stats(data, bytes);
 
         if (data[9] == PS5_01_REPORT_ID && bytes >= 19) {
             // Simple report: LX LY RX RY, Hat+Face, L1..R3, PS/TPad, L2, R2 (same as DS4 simple report)
@@ -1523,6 +1601,8 @@ static void hid_readReport(u8 *data, int bytes, int pad_idx)
         }
 
         translate_pad_ds4(&ds5, &pad->ds2, 0);
+        if (pad_idx == 0)
+            lag_on_report(data, bytes, pad);
         {
             static u16 ds5_keepalive[MAX_PADS];
             if (++ds5_keepalive[pad_idx] >= 250) { // refresh LED/rumble state regularly so the link stays active
@@ -1673,6 +1753,9 @@ int ds34bt_get_data(u8 *dst, int size, int port)
     int ret;
 
     WaitSema(bt_dev.hid_sema);
+
+    if (port == 0)
+        lag_on_poll();
 
     mips_memcpy(dst, ds34pad[port].data, size);
     ret = ds34pad[port].analog_btn & 1;

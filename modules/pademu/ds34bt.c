@@ -1610,7 +1610,7 @@ static void lag_on_poll(void)
         return;
     now = lag_now_us();
     lag_polls++;
-    age = now - lag_last_rx;
+    age = (int)(now - lag_last_rx) > 0 ? now - lag_last_rx : 0; // a report may land between reading the clock and here
     lag_age_sum += age;
     if (age > lag_age_max)
         lag_age_max = age;

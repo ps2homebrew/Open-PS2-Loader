@@ -31,6 +31,8 @@ import time
 
 PORT = 18194
 LAT2 = re.compile(r"LAT2 (.*)")
+KEY_LINES = ("PADEMU", "wireless key", "Connection Requested", "Encryption_Enabled", "Type: DualSense",
+             "Disconnection Complete", "Reason =", "LaunchLoaderElf", "Starting ee_core")
 WINDOW = 30  # seconds used to estimate the "best case" transport time (handles clock drift)
 
 
@@ -144,18 +146,35 @@ def main():
     log = open("lag_log.txt", "a", encoding="utf-8")
     log.write(f"\n===== session {time.strftime('%Y-%m-%d %H:%M:%S')} =====\n")
     print(f"Listening on UDP {PORT}. Start a game, press PS on the DualSense and play. Ctrl+C for the report.")
+    sock.settimeout(1.0)
     buf = ""
+    received = 0
+    last_status = time.time()
+    got_lat = False
     try:
         while True:
-            data, _ = sock.recvfrom(4096)
+            try:
+                data, _ = sock.recvfrom(4096)
+            except socket.timeout:
+                data = b""
             buf += data.decode("latin-1", errors="replace")
             while "\n" in buf:
                 line, buf = buf.split("\n", 1)
+                received += 1
                 log.write(line.rstrip() + "\n")
                 d = parse(line)
                 if d:
+                    got_lat = True
                     print(Stats.line(st.add(d)))
+                elif any(k in line for k in KEY_LINES):
+                    print("  | " + line.rstrip()[:110])
             log.flush()
+            if not got_lat and time.time() - last_status >= 5:
+                last_status = time.time()
+                if received == 0:
+                    print("  (nothing received yet: same network? firewall allowing Python? debug ELF running?)")
+                else:
+                    print(f"  ({received} log lines received so far, no lag data yet: start a game and press PS)")
     except KeyboardInterrupt:
         st.report()
 

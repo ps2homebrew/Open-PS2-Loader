@@ -34,7 +34,7 @@ LAT2 = re.compile(r"LAT2 (.*)")
 LAT3 = re.compile(r"LAT3 (.*)")
 LAT4 = re.compile(r"LAT4 (.*)")
 FIELDS = ("t", "rx", "gap", "off_min", "off_max", "cb_avg", "cb_max", "tx",
-          "polls", "age_avg", "age_max", "chg", "chg_avg", "chg_max", "hic", "hicp")
+          "polls", "age_avg", "age_max", "chg", "chg_avg", "chg_max", "hic", "hicp", "pint_min", "pint_max")
 KEY_LINES = ("PADEMU", "wireless key", "Connection Requested", "Encryption_Enabled", "Type: DualSense",
              "Disconnection Complete", "Reason =", "LaunchLoaderElf", "Starting ee_core")
 WINDOW = 30  # seconds used to estimate the "best case" transport time (handles clock drift)
@@ -152,6 +152,9 @@ class Stats:
         if hic:
             print(f"  - {hic} pauses over 8 ms; {hicp} of them right after the PS2 sent a log line"
                   f" ({100 * hicp // hic}%). Those are caused by the measurement itself, not by normal play.")
+        ints = [r["pint_min"] for r in rows if r.get("pint_min")] + [r["pint_max"] for r in rows if r.get("pint_max")]
+        if ints:
+            print(f"  - Time between pauses: median {statistics.median(ints):.0f} ms (min {min(ints)}, max {max(ints)}).")
         if presses:
             avg = statistics.mean([r["chg_avg"] / 1000 for r in presses])
             print(f"  - Press -> game read averages {avg:.1f} ms; just waiting for the next frame averages {frame / 2:.1f} ms,")

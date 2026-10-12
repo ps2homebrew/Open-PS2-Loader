@@ -1527,7 +1527,7 @@ static u32 lag_t0, lag_last_print, lag_last_rx, lag_last_ts, lag_ds5_elapsed;
 static u32 lag_rx, lag_gap, lag_polls, lag_age_sum, lag_age_max;
 static u32 lag_chg, lag_chg_sum, lag_chg_max, lag_chg_pending, lag_chg_t;
 static int lag_off_min, lag_off_max;
-static u32 lag_hic, lag_hic_print; // pauses > 8 ms between reports, and how many of them right after our own log print
+static u32 lag_hic, lag_hic_print, lag_last_pause, lag_pint_min = 0xFFFFFFFF, lag_pint_max; // pauses > 8 ms between reports, and how many of them right after our own log print
 static u8 lag_last_btn[2];
 
 static void lag_print(u32 now)
@@ -1538,8 +1538,10 @@ static void lag_print(u32 now)
     printf("LAT2 t=%u rx=%u gap=%u off_min=%d off_max=%d cb_avg=%u cb_max=%u tx=%u\n",
            (unsigned)((now - lag_t0) / 1000), (unsigned)lag_rx, (unsigned)lag_gap, lag_off_min, lag_off_max,
            (unsigned)(lag_cb_n ? lag_cb_sum / lag_cb_n : 0), (unsigned)lag_cb_max, (unsigned)lag_tx);
-    printf("LAT4 t=%u hic=%u hicp=%u\n", (unsigned)((now - lag_t0) / 1000), (unsigned)lag_hic, (unsigned)lag_hic_print);
-    lag_hic = lag_hic_print = 0;
+    printf("LAT4 t=%u hic=%u hicp=%u pint_min=%u pint_max=%u\n", (unsigned)((now - lag_t0) / 1000), (unsigned)lag_hic,
+           (unsigned)lag_hic_print, (unsigned)(lag_pint_min == 0xFFFFFFFF ? 0 : lag_pint_min), (unsigned)lag_pint_max);
+    lag_hic = lag_hic_print = lag_pint_max = 0;
+    lag_pint_min = 0xFFFFFFFF;
     printf("LAT3 t=%u polls=%u age_avg=%u age_max=%u chg=%u chg_avg=%u chg_max=%u\n",
            (unsigned)((now - lag_t0) / 1000), (unsigned)lag_polls, (unsigned)(lag_polls ? lag_age_sum / lag_polls : 0),
            (unsigned)lag_age_max, (unsigned)lag_chg, (unsigned)(lag_chg ? lag_chg_sum / lag_chg : 0), (unsigned)lag_chg_max);
@@ -1585,6 +1587,14 @@ static void lag_on_report(u8 *data, int bytes, ds34bt_pad_t *pad)
         lag_gap = now - lag_last_rx;
     if (now - lag_last_rx > 8000) {
         lag_hic++;
+        if (lag_last_pause) { // time between consecutive pauses (ms): a fixed period points to a periodic cause
+            u32 pi = (now - lag_last_pause) / 1000;
+            if (pi < lag_pint_min)
+                lag_pint_min = pi;
+            if (pi > lag_pint_max)
+                lag_pint_max = pi;
+        }
+        lag_last_pause = now;
         if (now - lag_last_print < 60000) // the pause ended within 60 ms of printing the log line
             lag_hic_print++;
     }

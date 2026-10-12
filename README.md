@@ -30,6 +30,8 @@ Then set:
 - `Pad Emulator Mode` → **DS3/DS4/DS5 BT**
 - `Settings For Port` → pick the port (1P, 2P...) and turn on `Emulation` (and `Vibration` if you want rumble)
 
+<img src="docs/img/pademu-settings.jpg" alt="Pad Emulator Settings with the DS3/DS4/DS5 BT mode" width="640">
+
 Don't forget `Save Changes`. If you skip it, the game launches without the emulator and you'll swear the pad is broken (been there).
 
 ### 2. Pair the pad (only once)
@@ -38,6 +40,10 @@ Don't forget `Save Changes`. If you skip it, the game launches without the emula
 1. In the same PADEMU screen, go to `Wireless Pairing → Search`.
 2. Hold **PS + Create** on the DualSense until the light blinks fast (DS4: **PS + Share**).
 3. Your pad shows up in the list. Select it and wait for `Paired and saved`.
+
+**P.S.:** Wireless pairing is only supported for the DS4 and DS5 controllers.
+
+<img src="docs/img/wireless-pairing.jpg" alt="Wireless Pairing screen finding a DualSense" width="640">
 
 **With a cable:**
 1. Plug the DualSense into the PS2 with a USB cable (dongle in the other port).

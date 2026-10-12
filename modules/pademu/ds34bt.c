@@ -412,6 +412,35 @@ static int hci_write_scan_enable(u8 conf)
     return HCI_Command(4, hci_cmd_buf);
 }
 
+/*
+ * While page scanning (listening for new connections) some adapters stop serving the
+ * connected pads for ~11 ms every ~1.3 s, which shows up as input hiccups. Once every
+ * enabled pad is connected nobody else needs to find us, so stop page scanning; start it
+ * again as soon as a pad disconnects so it can come back.
+ */
+static u8 bt_page_scan_on = 1;
+
+static void bt_update_page_scan(void)
+{
+    int i, missing = 0;
+
+    if (!(bt_dev.status & DS34BT_STATE_USB_CONFIGURED))
+        return;
+
+    for (i = 0; i < MAX_PADS; i++) {
+        if (ds34pad[i].enabled && !pad_status_check(DS34BT_STATE_RUNNING, i))
+            missing = 1;
+    }
+
+    if (missing && !bt_page_scan_on) {
+        bt_page_scan_on = 1;
+        hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
+    } else if (!missing && bt_page_scan_on) {
+        bt_page_scan_on = 0;
+        hci_write_scan_enable(SCAN_ENABLE_NOINQ_NOPAG);
+    }
+}
+
 static int hci_accept_connection(u8 *bdaddr)
 {
     hci_cmd_buf[0] = HCI_OCF_ACCEPT_CONNECTION; // HCI OCF = 9
@@ -567,8 +596,12 @@ static void HCI_event_task(int result)
                 } else if ((hci_buf[3] == HCI_OCF_WRITE_SSP_MODE) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
                     hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG); // errors ignored
                 } else if ((hci_buf[3] == HCI_OCF_WRITE_SCAN_ENABLE) && (hci_buf[4] == HCI_OGF_CTRL_BBAND)) {
-                    if (hci_buf[5] == 0) {
+                    if (bt_dev.status & DS34BT_STATE_USB_CONFIGURED) {
+                        // page scan on/off while running (bt_update_page_scan): never reset the adapter for it
+                        DPRINTF("DS34BT: page scan %s, status 0x%02X\n", bt_page_scan_on ? "on" : "off", hci_buf[5]);
+                    } else if (hci_buf[5] == 0) {
                         bt_dev.status |= DS34BT_STATE_USB_CONFIGURED;
+                        bt_page_scan_on = 1;
                     } else {
                         DelayThread(500);
                         hci_reset();
@@ -635,6 +668,7 @@ static void HCI_event_task(int result)
                     }
                 }
                 ds34pad_clear(i);
+                bt_update_page_scan(); // a pad left: listen for connections again
                 break;
 
             case HCI_EVENT_AUTHENTICATION_COMPLETE:
@@ -1109,6 +1143,7 @@ static int L2CAP_event_task(int result, int bytes)
                             DelayThread(CMD_DELAY);
                             hid_LEDRumbleCommand(ds34pad[pad].oldled, 0, 0, pad);
                             pad_status_set(DS34BT_STATE_RUNNING, pad);
+                            bt_update_page_scan(); // all enabled pads connected: stop listening for new ones
                         }
                         ds34pad[pad].btn_delay = 0xFF;
                         break;

@@ -32,7 +32,8 @@ All of the devices mentioned above support multiple file formats, including:
 - Homebrew (Apps) in ELF format;
 - Expansion port HDDs support the HDLoader format.
 
-It's now the most compatible homebrew loader.
+>[!TIP]
+[RiptOPL](https://nathanneurotic.github.io/Open-PS2-Loader/) is a fork of this project which heavily uses LLM tools to accelerate its development.  
 
 >[!NOTE]
 OPL is developed continuously - anyone can contribute improvements to the project due to its open-source nature.  

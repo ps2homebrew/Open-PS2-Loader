@@ -88,7 +88,7 @@ OPL will automatically create the above directory structure the first time you l
 For HDDs formatted with the APA partition scheme, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry `hdd_partition` to use as your OPL partition.
 If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
 All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
-	
+ 
 HDDs are also able to be formatted as exFAT to avoid the 2TB limitation.  Please see below in the `HDD` section for more details on this configuration.
 
 </p>
@@ -128,14 +128,14 @@ are supported using the folder structure above.
 <details>
   <summary> <b> HDD </b> </summary>
 <p>
-	
+ 
 For PS2, 48-bit LBA internal HDDs are supported. The HDD can be formatted as:
 
 - APA partitioning with PFS filesystem (up to 2TB)
-	- OPL will create the `+OPL` partition on the HDD.  To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
+ 	- OPL will create the `+OPL` partition on the HDD.  To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt` that contains the preferred partition name (for example `__common`).
 - MBR partitioning (up to 2TB) or GPT partitioning (unlimited) with the exFAT filesystem
-	- Files should be added contiguously or synchronously to avoid fragmentation. For example, drag and drop files one at a time, or ensure that files are added sequentially.
-	- When formatting drives for the exFAT filesystem, please make sure the `Allocation unit size` is set to `Default`.
+ 	- Files should be added contiguously or synchronously to avoid fragmentation. For example, drag and drop files one at a time, or ensure that files are added sequentially.
+ 	- When formatting drives for the exFAT filesystem, please make sure the `Allocation unit size` is set to `Default`.
 
 </p>
 </details>
@@ -179,7 +179,6 @@ With this method the ELFs don't need to be in the APPS folder, but keeping them 
 the conf_apps.cfg file must be in the OPL folder, on your MemoryCard.\
 Or at the root of the storage device
 
-
 ### title.cfg method
 
 Also composed of two parts, or to be more exact, two lines
@@ -220,10 +219,10 @@ You can activate cheats via OPL's graphical interface. Navigate to a games setti
 
 ### cheat modes
 
-  * Auto Select Cheats:  
+- Auto Select Cheats:  
 This mode will enable and apply all cheat codes in your `.cht` file to your game automatically.
 
-  * Select Game Cheats:  
+- Select Game Cheats:  
 When enabled a cheat selection menu will appear when you launch a game. You can navigate the menu and disable undesired cheats for this launch session. `Mastercode`s cannot be disabled as they are required for any other cheats to be applied.
 
 </p>
@@ -247,16 +246,16 @@ You can use `hdl-dump`, `pfs-shell`, or even directly edit the disk in a hex edi
 
 For example, to use `hdl_dump` to install a game to the HDD:
 
-  * Connect with your choosen client (OS specific)
-  * Run `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO`
-  * Disconnect the client.
+- Connect with your choosen client (OS specific)
+- Run `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO`
+- Disconnect the client.
 
 To use the NBD server in OPL:
 
-  * Grab the latest beta version (OPL 1.1.0 (current stable) has some bugs in the NBD server) - go to the [Releases](https://github.com/ps2homebrew/Open-PS2-Loader/releases) section and grab the one at the top.
-  * Ensure OPL is configured with an IP address (either static or DHCP).
-  * Open the menu and select "Start NBD server". Once it's ready, it should update the screen to say "NBD Server running..."
-  * Now you can connect with any of the following NBD clients.
+- Grab the latest beta version (OPL 1.1.0 (current stable) has some bugs in the NBD server) - go to the [Releases](https://github.com/ps2homebrew/Open-PS2-Loader/releases) section and grab the one at the top.
+- Ensure OPL is configured with an IP address (either static or DHCP).
+- Open the menu and select "Start NBD server". Once it's ready, it should update the screen to say "NBD Server running..."
+- Now you can connect with any of the following NBD clients.
 
 ### nbd-client
 
@@ -402,7 +401,7 @@ Since 05/07/2021 every OPL build dispatched to the release section of this repos
 ### OPL Freezes on logo or grey screen
 
  Sometimes OPL freezes when loading config files made by older OPL builds.
-> hold __`START`__ while OPL initializes to make it skip the config loading, then, you can save your own settings.
+> hold **`START`** while OPL initializes to make it skip the config loading, then, you can save your own settings.
 > fixing the issue.
 
 ### Game freezes on white screen

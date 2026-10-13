@@ -54,3 +54,7 @@ lng/lang_*.lng
 src/lang_internal.c
 include/lang_autogen.h
 tmp/
+
+# Vendored pre-USBD-rewrite IRX for #1751 (see modules/usb-vendor/README.md)
+!modules/usb-vendor/
+!modules/usb-vendor/**

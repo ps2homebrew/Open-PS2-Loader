@@ -495,7 +495,8 @@ modules/isofs/isofs.irx: modules/isofs
 $(EE_ASM_DIR)isofs.c: modules/isofs/isofs.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
-$(EE_ASM_DIR)usbd.c: $(PS2SDK)/iop/irx/usbd_mini.irx | $(EE_ASM_DIR)
+# usbd: pin pre-USBD-rewrite IRX (see modules/usb-vendor/README.md / OPL#1751)
+$(EE_ASM_DIR)usbd.c: modules/usb-vendor/usbd_mini.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 $(EE_ASM_DIR)libsd.c: $(PS2SDK)/iop/irx/libsd.irx | $(EE_ASM_DIR)
@@ -551,7 +552,7 @@ $(EE_ASM_DIR)iLinkman.c: $(PS2SDK)/iop/irx/iLinkman.irx | $(EE_ASM_DIR)
 
 ifeq ($(DEBUG),1)
 # block device drivers with printf's
-$(EE_ASM_DIR)usbmass_bd.c: $(PS2SDK)/iop/irx/usbmass_bd.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)usbmass_bd.c: modules/usb-vendor/usbmass_bd.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 $(EE_ASM_DIR)IEEE1394_bd.c: $(PS2SDK)/iop/irx/IEEE1394_bd.irx | $(EE_ASM_DIR)
@@ -561,7 +562,8 @@ $(EE_ASM_DIR)mx4sio_bd.c: $(PS2SDK)/iop/irx/mx4sio_bd.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 else
 # block device drivers without printf's
-$(EE_ASM_DIR)usbmass_bd.c: $(PS2SDK)/iop/irx/usbmass_bd_mini.irx | $(EE_ASM_DIR)
+# usbmass: pin pre-USBD-rewrite IRX (see modules/usb-vendor/README.md / OPL#1751)
+$(EE_ASM_DIR)usbmass_bd.c: modules/usb-vendor/usbmass_bd_mini.irx | $(EE_ASM_DIR)
 	$(BIN2C) $< $@ $(*F)_irx
 
 $(EE_ASM_DIR)IEEE1394_bd.c: $(PS2SDK)/iop/irx/IEEE1394_bd_mini.irx | $(EE_ASM_DIR)

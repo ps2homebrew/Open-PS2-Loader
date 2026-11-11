@@ -83,6 +83,11 @@ GS_MODE_DTV_576P=0x53
 .equ DISPLAY_fix,          16 # BYTE
 .equ FIELD_fix,            17 # BYTE
 .equ gs576P_param,         18 # BYTE
+.equ PPAuto_fix,          19 # BYTE  -> Automatic pixel perfect
+.equ Vck_override,         20 # WORD  -> Manual pixel perfect: VCK per pixel (MAGH + 1), 0 = not overridden
+.equ Dw_override,          24 # WORD  -> Manual pixel perfect: raw DISPLAY.DW, 0 = not overridden
+.equ Dx_override,          28 # WORD  -> Manual pixel perfect: raw DISPLAY.DX, 0 = not overridden
+.equ PP_DX_BIAS,          -76 # Pixel perfect: DX offset of the reference position (NTSC 700 -> 624), keep in sync with GSM_CALC_DX_BIAS in src/gsm.c
 
 #GSMAdapts
 .equ Adapted_DISPLAY1,             0 # DWORD

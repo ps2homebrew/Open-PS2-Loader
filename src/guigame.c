@@ -16,6 +16,7 @@
 #include "include/guigame.h"
 #include "include/ds34common.h"
 #include "include/vmc_groups.h"
+#include "include/pggsm.h"
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -34,6 +35,14 @@ static int GSMVMode;
 static int GSMXOffset;
 static int GSMYOffset;
 static int GSMFIELDFix;
+static int GSMPixelPerfect;  // Manual pixel perfect: use the VCK, DW and DX fields below
+static int GSMPPAuto;        // Automatic pixel perfect: VCK, DW and DX are calculated in game
+static int GSMCalcWidthLast; // Game Internal Width and video mode last used to fill VCK, DW and DX,
+static int GSMCalcVModeLast; // so that they are only recalculated when one of them changes
+static int GSMVck;           // VCK per pixel (MAGH + 1)
+static int GSMWidth;         // Game Internal Width, only used by the calculator
+static int GSMDw;            // raw DISPLAY.DW
+static int GSMDx;            // raw DISPLAY.DX
 
 static int EnableCheat;
 static int CheatMode;
@@ -334,6 +343,25 @@ void guiGameShowVMCMenu(int id, item_list_t *support)
 }
 
 // GSM
+// Pixel perfect: hides the manual group (Manual pixel perfect, Game Internal Width, VCK, DW and DX,
+// together with their labels) while Automatic pixel perfect is on, since that mode uses none of them.
+static void guiGameGSMUpdateVisibility(void)
+{
+    int autoOn = 0;
+    diaGetInt(diaGSConfig, GSMCFG_GSMPPAUTO, &autoOn);
+
+    diaSetVisible(diaGSConfig, GSMCFG_GSMPIXELPERFECT_LABEL, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMPIXELPERFECT, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMWIDTH_LABEL, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMWIDTH, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMVCK_LABEL, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMVCK, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMDW_LABEL, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMDW, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMDX_LABEL, !autoOn);
+    diaSetVisible(diaGSConfig, GSMCFG_GSMDX, !autoOn);
+}
+
 static void guiGameSetGSMSettingsState(void)
 {
     int previousSource = gGSMSource;
@@ -356,6 +384,38 @@ static void guiGameSetGSMSettingsState(void)
     diaSetEnabled(diaGSConfig, GSMCFG_GSMXOFFSET, EnableGSM);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMYOFFSET, EnableGSM);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMFIELDFIX, EnableGSM);
+    // Pixel perfect is only available in the NTSC and PAL modes.
+    int ppVMode = 0;
+    diaGetInt(diaGSConfig, GSMCFG_GSMVMODE, &ppVMode);
+    int ppAvailable = EnableGSM && GSMIsPixelPerfectMode(ppVMode);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMPIXELPERFECT, ppAvailable);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMPPAUTO, ppAvailable);
+    // VCK, DW, DX and Game Internal Width are only used with Manual pixel perfect on.
+    int PixelPerfectOn = 0;
+    diaGetInt(diaGSConfig, GSMCFG_GSMPIXELPERFECT, &PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMVCK, ppAvailable && PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMDW, ppAvailable && PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMDX, ppAvailable && PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMWIDTH, ppAvailable && PixelPerfectOn);
+
+    // Game Internal Width calculator: when the width or the video mode changes, fill VCK, DW and DX
+    // (see GSMCalcFromWidth). Only VCK, DW and DX are sent to the game; the width is just saved for the UI.
+    int calcWidth = 0, calcVMode = 0;
+    diaGetInt(diaGSConfig, GSMCFG_GSMWIDTH, &calcWidth);
+    diaGetInt(diaGSConfig, GSMCFG_GSMVMODE, &calcVMode);
+    if (calcWidth != GSMCalcWidthLast || calcVMode != GSMCalcVModeLast) {
+        GSMCalcWidthLast = calcWidth;
+        GSMCalcVModeLast = calcVMode;
+        if (calcWidth > 0 && GSMIsPixelPerfectMode(calcVMode)) {
+            int vck, dw, dx;
+            GSMCalcFromWidth(calcVMode, calcWidth, &vck, &dw, &dx);
+            diaSetInt(diaGSConfig, GSMCFG_GSMVCK, vck);
+            diaSetInt(diaGSConfig, GSMCFG_GSMDW, dw);
+            diaSetInt(diaGSConfig, GSMCFG_GSMDX, dx);
+        }
+    }
+
+    guiGameGSMUpdateVisibility();
 }
 
 static int guiGameGSMUpdater(int modified)
@@ -412,6 +472,20 @@ void guiGameShowGSConfig(void)
     diaSetEnabled(diaGSConfig, GSMCFG_GSMXOFFSET, EnableGSM);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMYOFFSET, EnableGSM);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMFIELDFIX, EnableGSM);
+    // Pixel perfect is only available in the NTSC and PAL modes.
+    int ppVMode = 0;
+    diaGetInt(diaGSConfig, GSMCFG_GSMVMODE, &ppVMode);
+    int ppAvailable = EnableGSM && GSMIsPixelPerfectMode(ppVMode);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMPIXELPERFECT, ppAvailable);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMPPAUTO, ppAvailable);
+    // VCK, DW, DX and Game Internal Width are only used with Manual pixel perfect on.
+    int PixelPerfectOn = 0;
+    diaGetInt(diaGSConfig, GSMCFG_GSMPIXELPERFECT, &PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMVCK, ppAvailable && PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMDW, ppAvailable && PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMDX, ppAvailable && PixelPerfectOn);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMWIDTH, ppAvailable && PixelPerfectOn);
+    guiGameGSMUpdateVisibility();
 
     diaExecuteDialog(diaGSConfig, -1, 1, &guiGameGSMUpdater);
 }
@@ -1012,6 +1086,12 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
     diaGetInt(diaGSConfig, GSMCFG_GSMXOFFSET, &GSMXOffset);
     diaGetInt(diaGSConfig, GSMCFG_GSMYOFFSET, &GSMYOffset);
     diaGetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, &GSMFIELDFix);
+    diaGetInt(diaGSConfig, GSMCFG_GSMPIXELPERFECT, &GSMPixelPerfect);
+    diaGetInt(diaGSConfig, GSMCFG_GSMPPAUTO, &GSMPPAuto);
+    diaGetInt(diaGSConfig, GSMCFG_GSMVCK, &GSMVck);
+    diaGetInt(diaGSConfig, GSMCFG_GSMWIDTH, &GSMWidth);
+    diaGetInt(diaGSConfig, GSMCFG_GSMDW, &GSMDw);
+    diaGetInt(diaGSConfig, GSMCFG_GSMDX, &GSMDx);
 
     if (gGSMSource == SETTINGS_PERGAME) {
         result = configSetInt(configSet, CONFIG_ITEM_GSMSOURCE, gGSMSource);
@@ -1039,12 +1119,42 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
             result = configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
         else
             configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
+        if (GSMPixelPerfect != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMPIXELPERFECT, GSMPixelPerfect);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMPIXELPERFECT);
+        if (GSMPPAuto != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMPPAUTO, GSMPPAuto);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMPPAUTO);
+        if (GSMVck != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMVCK, GSMVck);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMVCK);
+        if (GSMWidth != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMWIDTH, GSMWidth);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMWIDTH);
+        if (GSMDw != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMDW, GSMDw);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMDW);
+        if (GSMDx != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMDX, GSMDx);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMDX);
     } else if (gGSMSource == SETTINGS_GLOBAL) {
         configSetInt(configGame, CONFIG_ITEM_ENABLEGSM, EnableGSM);
         configSetInt(configGame, CONFIG_ITEM_GSMVMODE, GSMVMode);
         configSetInt(configGame, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
         configSetInt(configGame, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
         configSetInt(configGame, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
+        configSetInt(configGame, CONFIG_ITEM_GSMPIXELPERFECT, GSMPixelPerfect);
+        configSetInt(configGame, CONFIG_ITEM_GSMPPAUTO, GSMPPAuto);
+        configSetInt(configGame, CONFIG_ITEM_GSMVCK, GSMVck);
+        configSetInt(configGame, CONFIG_ITEM_GSMWIDTH, GSMWidth);
+        configSetInt(configGame, CONFIG_ITEM_GSMDW, GSMDw);
+        configSetInt(configGame, CONFIG_ITEM_GSMDX, GSMDx);
     }
 
     /// Cheats ///
@@ -1120,6 +1230,12 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         configRemoveKey(configGame, CONFIG_ITEM_GSMXOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMFIELDFIX);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMPIXELPERFECT);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMPPAUTO);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMVCK);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMWIDTH);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMDW);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMDX);
         // OSD Language
         configRemoveKey(configGame, CONFIG_ITEM_OSD_SETTINGS_LANGID);
         configRemoveKey(configGame, CONFIG_ITEM_OSD_SETTINGS_TV_ASP);
@@ -1153,6 +1269,12 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
         configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMPIXELPERFECT);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMPPAUTO);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMVCK);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMWIDTH);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMDW);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMDX);
 
         // Cheats
         configRemoveKey(configSet, CONFIG_ITEM_CHEATSSOURCE);
@@ -1195,6 +1317,13 @@ static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGa
     GSMXOffset = 0;
     GSMYOffset = 0;
     GSMFIELDFix = 0;
+    GSMPixelPerfect = 0;
+    GSMPPAuto = 0;
+    // Manual pixel perfect defaults: the values for a 512px wide game in NTSC
+    GSMWidth = 512;
+    GSMVck = 4;
+    GSMDw = 2047;
+    GSMDx = 880;
 
     // set global settings.
     gGSMSource = 0;
@@ -1203,6 +1332,12 @@ static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGa
     configGetInt(configGame, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset);
     configGetInt(configGame, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
     configGetInt(configGame, CONFIG_ITEM_GSMFIELDFIX, &GSMFIELDFix);
+    configGetInt(configGame, CONFIG_ITEM_GSMPIXELPERFECT, &GSMPixelPerfect);
+    configGetInt(configGame, CONFIG_ITEM_GSMPPAUTO, &GSMPPAuto);
+    configGetInt(configGame, CONFIG_ITEM_GSMVCK, &GSMVck);
+    configGetInt(configGame, CONFIG_ITEM_GSMWIDTH, &GSMWidth);
+    configGetInt(configGame, CONFIG_ITEM_GSMDW, &GSMDw);
+    configGetInt(configGame, CONFIG_ITEM_GSMDX, &GSMDx);
 
     // override global with per-game settings if available and selected.
     configGetInt(configSet, CONFIG_ITEM_GSMSOURCE, &gGSMSource);
@@ -1217,6 +1352,18 @@ static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGa
             GSMYOffset = 0;
         if (!configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &GSMFIELDFix))
             GSMFIELDFix = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMPIXELPERFECT, &GSMPixelPerfect))
+            GSMPixelPerfect = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMPPAUTO, &GSMPPAuto))
+            GSMPPAuto = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMVCK, &GSMVck))
+            GSMVck = 4;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMWIDTH, &GSMWidth))
+            GSMWidth = 512;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMDW, &GSMDw))
+            GSMDw = 2047;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMDX, &GSMDx))
+            GSMDx = 880;
     }
 
     // set gui settings.
@@ -1226,6 +1373,16 @@ static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGa
     diaSetInt(diaGSConfig, GSMCFG_GSMXOFFSET, GSMXOffset);
     diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
     diaSetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, GSMFIELDFix);
+    diaSetInt(diaGSConfig, GSMCFG_GSMPIXELPERFECT, GSMPixelPerfect);
+    diaSetInt(diaGSConfig, GSMCFG_GSMPPAUTO, GSMPPAuto);
+    diaSetInt(diaGSConfig, GSMCFG_GSMVCK, GSMVck);
+    diaSetInt(diaGSConfig, GSMCFG_GSMWIDTH, GSMWidth);
+    diaSetInt(diaGSConfig, GSMCFG_GSMDW, GSMDw);
+    diaSetInt(diaGSConfig, GSMCFG_GSMDX, GSMDx);
+
+    // The saved VCK, DW and DX may have been edited by hand: do not recalculate them from the saved width on load
+    diaGetInt(diaGSConfig, GSMCFG_GSMVMODE, &GSMCalcVModeLast);
+    GSMCalcWidthLast = GSMWidth;
 }
 
 static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame)

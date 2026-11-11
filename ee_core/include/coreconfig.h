@@ -24,6 +24,10 @@ struct GsmConfig_t
     int k576P_fix;
     int kGsDxDyOffsetSupported;
     int FIELD_fix;
+    int PPAuto_fix;   // Automatic pixel perfect
+    int Vck_override; // Manual pixel perfect: VCK per pixel, 0 = not overridden
+    int Dw_override;  // Manual pixel perfect: raw DISPLAY.DW, 0 = not overridden
+    int Dx_override;  // Manual pixel perfect: raw DISPLAY.DX, 0 = not overridden
 };
 
 

@@ -520,6 +520,12 @@ gui_strings:
   string: Emulate FIELD Flipping
 - label: HINT_GSM_FIELD_FIX
   string: Fix for games that glitch under progressive video modes.
+- label: GSM_PP_AUTO
+  string: Automatic pixel perfect
+- label: GSM_PIXEL_PERFECT
+  string: Manual pixel perfect
+- label: GSM_WIDTH
+  string: Game Internal Width
 - label: PARENLOCKCONFIG
   string: Parental Lock Settings
 - label: PARENLOCK_PASSWORD

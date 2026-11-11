@@ -113,6 +113,17 @@ enum UI_ITEMS {
     GSMCFG_GSMXOFFSET,
     GSMCFG_GSMYOFFSET,
     GSMCFG_GSMFIELDFIX,
+    GSMCFG_GSMPPAUTO,             // Automatic pixel perfect
+    GSMCFG_GSMPIXELPERFECT,       // Manual pixel perfect
+    GSMCFG_GSMPIXELPERFECT_LABEL, // labels of the manual group, so they can be hidden with it
+    GSMCFG_GSMWIDTH_LABEL,
+    GSMCFG_GSMVCK_LABEL,
+    GSMCFG_GSMDW_LABEL,
+    GSMCFG_GSMDX_LABEL,
+    GSMCFG_GSMWIDTH, // Game Internal Width: fills VCK, DW and DX
+    GSMCFG_GSMVCK,
+    GSMCFG_GSMDW,
+    GSMCFG_GSMDX,
 
     COMPAT_DMA = 100,
     COMPAT_ALTSTARTUP,

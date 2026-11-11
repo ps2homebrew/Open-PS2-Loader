@@ -62,7 +62,7 @@ GSMSourceGSRegs:    .space 88
 GSMDestGSRegs:      .space 88
 
 .globl GSMFlags
-GSMFlags: .space 19
+GSMFlags: .space 32                                 # see struct GSMFlags in gsm_api.c (offsets in gsm_defines.h)
 
 .p2align 4                                          # align 16 bytes (IMPORTANT!!!)
 
@@ -697,6 +697,66 @@ have_DISPLAY_write_5:
     add     $t7, $t7, $t0                           #   t7 = Calculated_DW = Calculated_DW + Target_DX - Calculated_DX  # Target DW adjusted
 
 have_DISPLAY_write_6:
+# ----- AUTOMATIC PIXEL PERFECT (optional) -----
+#  Gives every game pixel the same VCK count as a 640px game in the forced mode (Target_MAGH + 1), so that
+#  PS2-to-HDMI converters sampling at that rate never duplicate pixels unevenly (e.g. a 512px game in NTSC
+#  normally gets 5 VCK per pixel). A narrower game gets a narrower DW and is centred with DX.
+#  Done every time the game writes DISPLAY, with the same formula as GSMCalcFromWidth() in src/gsm.c:
+#    VCK = Target_MAGH + 1, DW = Source_Pixels_Width * VCK - 1,
+#    DX  = Target_DX + PP_DX_BIAS + (Target_DW - DW) / 2
+#  NTSC, 512px game: VCK 4, DW 2047, DX 880. Images wider than the mode keep the normal adaptation above.
+#  Here a1 = Source_DISPLAY, v1 = Target_DISPLAY, t5 = Target_DW; t4/t7/t6 are the MAGH/DW/DX results.
+    lb      $t0, PPAuto_fix($s2)                    # t0 = PPAuto_fix
+    beqz    $t0, have_DISPLAY_write_6d              # in case of (PPAuto_fix)
+    nop
+    dsrl32  $t0, $a1, 0
+    andi    $t0, $t0, 0x0FFF
+    addi    $t0, $t0, 1                             #   t0 = Source_Width = Source_DW + 1
+    dsrl    $t1, $a1, 23
+    andi    $t1, $t1, 0x0F
+    addi    $t1, $t1, 1                             #   t1 = Source_Width_Scale = Source_MAGH + 1
+    divu    $zero, $t0, $t1
+    mflo    $t0                                     #   t0 = Source_Pixels_Width
+    dsrl    $t1, $v1, 23
+    andi    $t1, $t1, 0x0F
+    addi    $t1, $t1, 1                             #   t1 = Base_Scale = Target_MAGH + 1
+    mult    $t2, $t0, $t1                           #   t2 = New_Width = Source_Pixels_Width * Base_Scale
+    beqz    $t2, have_DISPLAY_write_6d              #   in case of no pixels keep the normal adaptation
+    nop
+    addi    $t3, $t5, 1                             #   t3 = Target_Width = Target_DW + 1
+    sltu    $t3, $t3, $t2                           #   t3 = (Target_Width < New_Width)
+    bnez    $t3, have_DISPLAY_write_6d              #   in case of wider than the mode keep the normal adaptation
+    nop
+    addi    $t7, $t2, -1                            #   Calculated_DW = New_Width - 1
+    addi    $t4, $t1, -1                            #   Calculated_MAGH = Base_Scale - 1
+    sub     $t0, $t5, $t7                           #   t0 = Target_DW - Calculated_DW (>= 0)
+    dsra    $t0, $t0, 1                             #   t0 = half of the excess width
+    andi    $t6, $v1, 0x0FFF                        #   t6 = Target_DX
+    addi    $t6, $t6, PP_DX_BIAS                    #   Target_DX + PP_DX_BIAS
+    add     $t6, $t6, $t0                           #   Calculated_DX = Target_DX + PP_DX_BIAS + half excess
+    bgez    $t6, have_DISPLAY_write_6d              #   in case of (Calculated_DX < 0)
+    nop
+    move    $t6, $zero                              #     Calculated_DX = 0
+have_DISPLAY_write_6d:
+
+# ----- MANUAL PIXEL PERFECT (optional, 0 = not overridden) -----
+#  VCK, DW and DX typed in the GSM menu replace the calculated values.
+#  t4 = Calculated_MAGH, t7 = Calculated_DW, t6 = Calculated_DX (H-POS/X_offset is added to DX afterwards)
+    lw      $t0, Vck_override($s2)                  # t0 = forced VCK per pixel
+    beqz    $t0, have_DISPLAY_write_6a              # in case of (Vck_override)
+    nop
+    addi    $t4, $t0, -1                            #   Calculated_MAGH = Vck_override - 1
+have_DISPLAY_write_6a:
+    lw      $t0, Dw_override($s2)                   # t0 = forced raw DW
+    beqz    $t0, have_DISPLAY_write_6b              # in case of (Dw_override)
+    nop
+    move    $t7, $t0                                #   Calculated_DW = Dw_override
+have_DISPLAY_write_6b:
+    lw      $t0, Dx_override($s2)                   # t0 = forced raw DX
+    beqz    $t0, have_DISPLAY_write_6c              # in case of (Dx_override)
+    nop
+    move    $t6, $t0                                #   Calculated_DX = Dx_override
+have_DISPLAY_write_6c:
     andi    $t7, $t7, 0x0FFF
     andi    $t4, $t4, 0x000F
     andi    $t6, $t6, 0x0FFF

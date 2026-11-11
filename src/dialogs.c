@@ -518,6 +518,38 @@ struct UIItem diaGSConfig[] = {
     {UI_BOOL, GSMCFG_GSMFIELDFIX, 1, 1, _STR_HINT_GSM_FIELD_FIX, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
+    // Pixel perfect: automatic mode, then the manual group (hidden while the automatic mode is on).
+    // VCK, DW and DX are GS register names, so their labels are not translated.
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_GSM_PP_AUTO}}},
+    {UI_SPACER},
+    {UI_BOOL, GSMCFG_GSMPPAUTO, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, GSMCFG_GSMPIXELPERFECT_LABEL, 1, 1, -1, -40, 0, {.label = {NULL, _STR_GSM_PIXEL_PERFECT}}},
+    {UI_SPACER},
+    {UI_BOOL, GSMCFG_GSMPIXELPERFECT, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, GSMCFG_GSMWIDTH_LABEL, 1, 1, -1, -40, 0, {.label = {NULL, _STR_GSM_WIDTH}}},
+    {UI_SPACER},
+    {UI_INT, GSMCFG_GSMWIDTH, 1, 1, -1, -5, 0, {.intvalue = {512, 512, 0, 1024}}},
+    {UI_BREAK},
+
+    {UI_LABEL, GSMCFG_GSMVCK_LABEL, 1, 1, -1, -40, 0, {.label = {"VCK", -1}}},
+    {UI_SPACER},
+    {UI_INT, GSMCFG_GSMVCK, 1, 1, -1, -5, 0, {.intvalue = {4, 4, 0, 16}}},
+    {UI_BREAK},
+
+    {UI_LABEL, GSMCFG_GSMDW_LABEL, 1, 1, -1, -40, 0, {.label = {"DW", -1}}},
+    {UI_SPACER},
+    {UI_INT, GSMCFG_GSMDW, 1, 1, -1, -5, 0, {.intvalue = {2047, 2047, 0, 4095}}},
+    {UI_BREAK},
+
+    {UI_LABEL, GSMCFG_GSMDX_LABEL, 1, 1, -1, -40, 0, {.label = {"DX", -1}}},
+    {UI_SPACER},
+    {UI_INT, GSMCFG_GSMDX, 1, 1, -1, -5, 0, {.intvalue = {880, 880, 0, 4095}}},
+    {UI_BREAK},
+
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},

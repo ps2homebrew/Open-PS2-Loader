@@ -66,6 +66,11 @@ struct GSMFlags
     u8 DISPLAY_fix;
     u8 FIELD_fix;
     u8 gs576P_param;
+    // Pixel perfect. Field offsets must match gsm_defines.h (the u32 fields are 4-byte aligned).
+    u8 PPAuto_fix;    // 1 = Automatic pixel perfect: VCK, DW and DX are calculated when the game writes DISPLAY
+    u32 Vck_override; // Manual pixel perfect: VCK per pixel (MAGH + 1). 0 = not overridden
+    u32 Dw_override;  // Manual pixel perfect: raw DISPLAY.DW. 0 = not overridden
+    u32 Dx_override;  // Manual pixel perfect: raw DISPLAY.DX (H-POS is still added). 0 = not overridden
 } __attribute__((packed));
 
 extern struct GSMDestSetGsCrt GSMDestSetGsCrt;
@@ -81,7 +86,7 @@ static unsigned int KSEG_backup[2]; // Copies of the original words at 0x8000010
 /*-------------------*/
 /*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix, int kGsDxDyOffsetSupported, int FIELD_fix)
+void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix, int kGsDxDyOffsetSupported, int FIELD_fix, int PPAuto_fix, int Vck_override, int Dw_override, int Dx_override)
 {
     unsigned int hvParam = GetGsVParam();
     int gs_DH, gs_DW, gs_DY, gs_DX;
@@ -109,6 +114,10 @@ void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, 
     GSMFlags.DISPLAY_fix = 1;    // Default = 1 = On
     GSMFlags.FIELD_fix = (FIELD_fix ? (1 << 2) : 0);
     GSMFlags.gs576P_param = (k576p_fix ? (1 << 1) : 0) | (hvParam & 1);
+    GSMFlags.PPAuto_fix = PPAuto_fix ? 1 : 0;
+    GSMFlags.Vck_override = (u32)Vck_override;
+    GSMFlags.Dw_override = (u32)Dw_override;
+    GSMFlags.Dx_override = (u32)Dx_override;
 
     if (kGsDxDyOffsetSupported && (!(mode >= GS_MODE_NTSC && mode <= GS_MODE_PAL))) {
         _GetGsDxDyOffset(mode, &gs_DX, &gs_DY, &gs_DW, &gs_DH);

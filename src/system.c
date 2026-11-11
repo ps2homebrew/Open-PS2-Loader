@@ -933,6 +933,10 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
         config->GsmConfig.k576P_fix = gsm_config.k576P_fix;
         config->GsmConfig.kGsDxDyOffsetSupported = gsm_config.kGsDxDyOffsetSupported;
         config->GsmConfig.FIELD_fix = gsm_config.FIELD_fix;
+        config->GsmConfig.PPAuto_fix = gsm_config.PPAuto_fix;
+        config->GsmConfig.Vck_override = gsm_config.Vck_override;
+        config->GsmConfig.Dw_override = gsm_config.Dw_override;
+        config->GsmConfig.Dx_override = gsm_config.Dx_override;
     }
 
 #ifdef PADEMU

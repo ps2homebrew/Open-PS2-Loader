@@ -50,6 +50,8 @@ typedef struct predef_vmode_struct
 } predef_vmode_struct;
 
 void InitGSMConfig(config_set_t *configSet);
+int GSMIsPixelPerfectMode(int vmode);
+void GSMCalcFromWidth(int vmode, int width, int *vck, int *dw, int *dx);
 int GetGSMEnabled(void);
 void PrepareGSM(char *cmdline, struct GsmConfig_t *config);
 

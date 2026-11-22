@@ -80,7 +80,7 @@ ds34usb_device ds34pad[MAX_PADS];
 static int is_x360_xinput(int devId, UsbDeviceDescriptor *device)
 {
     UsbConfigDescriptor *config;
-    UsbInterfaceDescriptor *interface;
+    const UsbInterfaceDescriptor *interface;
 
     // 8BitDo Ultimate 2C 2.4G dongle (known to work in the OPL menu driver): match by VID/PID, no descriptor parsing needed
     if (device->idVendor == 0x2DC8 && device->idProduct == 0x310A)
@@ -144,7 +144,7 @@ int usb_probe(int devId)
 
 int usb_connect(int devId)
 {
-    int pad, epCount, is_x360;
+    int pad, epCount;
     UsbDeviceDescriptor *device;
     UsbConfigDescriptor *config;
     UsbInterfaceDescriptor *interface;
@@ -174,23 +174,7 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    is_x360 = 0;
-#ifdef X360
-    x360_pending[pad] = 0;
-    x360_seq[pad] = 0;
-    x360_seen[pad] = 0;
-    x360_out_pending[pad] = 0;
-    x360_out_age[pad] = 0;
-    x360_sent_l[pad] = 0;
-    x360_sent_r[pad] = 0;
-
-    is_x360 = is_x360_xinput(devId, device);
-#endif
-
-    if (is_x360) {
-        ds34pad[pad].type = X360_XINPUT_USB;
-        epCount = interface->bNumEndpoints - 1; // only interface 0 (the pad) is used
-    } else if (device->idProduct == DS3_PID) {
+    if (device->idProduct == DS3_PID) {
         ds34pad[pad].type = DS3;
         epCount = interface->bNumEndpoints - 1;
     } else if (device->idProduct == GUITAR_HERO_PS3_PID) {
@@ -203,6 +187,21 @@ int usb_connect(int devId)
         ds34pad[pad].type = DS4;
         epCount = 20; // ds4 v2 returns interface->bNumEndpoints as 0
     }
+
+#ifdef X360
+    x360_pending[pad] = 0;
+    x360_seq[pad] = 0;
+    x360_seen[pad] = 0;
+    x360_out_pending[pad] = 0;
+    x360_out_age[pad] = 0;
+    x360_sent_l[pad] = 0;
+    x360_sent_r[pad] = 0;
+
+    if (is_x360_xinput(devId, device)) {
+        ds34pad[pad].type = X360_XINPUT_USB;
+        epCount = interface->bNumEndpoints - 1; // only interface 0 (the pad) is used
+    }
+#endif
 
     endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
@@ -363,7 +362,7 @@ static void readReport(u8 *data, int pad_idx)
     }
 #ifdef X360
     if (pad->type == X360_XINPUT_USB) {
-        struct x360report *report = (struct x360report *)data;
+        const struct x360report *report = (const struct x360report *)data;
 
         if (report->Type != 0x00 || report->Length != 0x14)
             return;
@@ -654,13 +653,12 @@ int ds34usb_get_data(u8 *dst, int size, int port)
         // never wait here: take the latest stored report (a few tries in case the callback is writing it)
         {
             u8 report[20];
-            unsigned int seq1, seq2;
             int tries;
 
             for (tries = 0; tries < 4; tries++) {
-                seq1 = x360_seq[port];
+                unsigned int seq1 = x360_seq[port];
                 mips_memcpy(report, x360_latest[port], 20);
-                seq2 = x360_seq[port];
+                unsigned int seq2 = x360_seq[port];
 
                 if (seq1 == seq2 && !(seq1 & 1)) {
                     if (seq1 != x360_seen[port]) {

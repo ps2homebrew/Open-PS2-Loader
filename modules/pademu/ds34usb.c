@@ -62,6 +62,9 @@ int usb_disconnect(int devId);
 
 static void usb_release(int pad);
 static void usb_config_set(int result, int count, void *arg);
+#ifdef X360
+static void TransferWait(int sema);
+#endif
 
 UsbDriver usb_driver = {NULL, NULL, "ds34usb", usb_probe, usb_connect, usb_disconnect};
 
@@ -70,6 +73,47 @@ static void readReport(u8 *data, int pad);
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad);
 
 ds34usb_device ds34pad[MAX_PADS];
+
+#ifdef X360
+// Xbox 360 (XInput) controllers expose a vendor specific interface with class/subclass/protocol FF/5D/01.
+// Wireless receivers (protocol 0x81) are not matched.
+static int is_x360_xinput(int devId, UsbDeviceDescriptor *device)
+{
+    UsbConfigDescriptor *config;
+    UsbInterfaceDescriptor *interface;
+
+    // 8BitDo Ultimate 2C 2.4G dongle (known to work in the OPL menu driver): match by VID/PID, no descriptor parsing needed
+    if (device->idVendor == 0x2DC8 && device->idProduct == 0x310A)
+        return 1;
+
+    config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
+    if (config == NULL)
+        return 0;
+
+    interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
+
+    return interface->bDescriptorType == USB_DT_INTERFACE && interface->bInterfaceClass == 0xFF && interface->bInterfaceSubClass == 0x5D && interface->bInterfaceProtocol == 0x01;
+}
+
+// XInput pads only send a report when something changes, so one interrupt transfer can stay pending for a long
+// time. The PS2 usbd refuses a new request on the same endpoint while one is pending (USB_RC_IOREQ), so keep a
+// single request in flight per pad and only resubmit it after it completes.
+static u8 x360_buf[MAX_PADS][32] __attribute((aligned(4)));
+static volatile int x360_pending[MAX_PADS];
+// The data callback stores each report here and immediately queues the next read, so the pad is always being
+// listened to. A sequence counter (odd while being written) lets the reader take a consistent copy without locking.
+static u8 x360_latest[MAX_PADS][20];
+static volatile unsigned int x360_seq[MAX_PADS];
+static unsigned int x360_seen[MAX_PADS];
+
+// Rumble is sent asynchronously and only when the wanted value changes, so reading the pad never blocks on it.
+// (The PS2 usbd also refuses a second request on the same endpoint while one is pending, hence the pending flag.)
+static u8 x360_out_buf[MAX_PADS][8] __attribute((aligned(4)));
+static volatile int x360_out_pending[MAX_PADS];
+static int x360_out_age[MAX_PADS];
+static u8 x360_sent_l[MAX_PADS];
+static u8 x360_sent_r[MAX_PADS];
+#endif
 
 int usb_probe(int devId)
 {
@@ -90,12 +134,17 @@ int usb_probe(int devId)
     if (device->idVendor == DS34_VID && (device->idProduct == DS3_PID || device->idProduct == DS4_PID || device->idProduct == DS4_PID_SLIM))
         return 1;
 
+#ifdef X360
+    if (is_x360_xinput(devId, device))
+        return 1;
+#endif
+
     return 0;
 }
 
 int usb_connect(int devId)
 {
-    int pad, epCount;
+    int pad, epCount, is_x360;
     UsbDeviceDescriptor *device;
     UsbConfigDescriptor *config;
     UsbInterfaceDescriptor *interface;
@@ -125,7 +174,23 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
 
-    if (device->idProduct == DS3_PID) {
+    is_x360 = 0;
+#ifdef X360
+    x360_pending[pad] = 0;
+    x360_seq[pad] = 0;
+    x360_seen[pad] = 0;
+    x360_out_pending[pad] = 0;
+    x360_out_age[pad] = 0;
+    x360_sent_l[pad] = 0;
+    x360_sent_r[pad] = 0;
+
+    is_x360 = is_x360_xinput(devId, device);
+#endif
+
+    if (is_x360) {
+        ds34pad[pad].type = X360_XINPUT_USB;
+        epCount = interface->bNumEndpoints - 1; // only interface 0 (the pad) is used
+    } else if (device->idProduct == DS3_PID) {
         ds34pad[pad].type = DS3;
         epCount = interface->bNumEndpoints - 1;
     } else if (device->idProduct == GUITAR_HERO_PS3_PID) {
@@ -202,6 +267,10 @@ static void usb_release(int pad)
     ds34pad[pad].outEndp = -1;
     ds34pad[pad].devId = -1;
     ds34pad[pad].status = DS34USB_STATE_DISCONNECTED;
+#ifdef X360
+    x360_pending[pad] = 0;
+    x360_out_pending[pad] = 0;
+#endif
 
     SignalSema(ds34pad[pad].sema);
 }
@@ -249,7 +318,20 @@ static void usb_config_set(int result, int count, void *arg)
         led[3] = 0;
     }
 
-    LEDRumble(led, 0, 0, pad);
+#ifdef X360
+    if (ds34pad[pad].type == X360_XINPUT_USB) {
+        // Same packet the Linux xpad driver sends to Xbox 360 pads: set LED pattern. Some pads (8BitDo dongle)
+        // do not send any report before receiving it.
+        static u8 x360_led[4] __attribute((aligned(4))) = {0x01, 0x03, 0x06, 0x00};
+
+        PollSema(ds34pad[pad].cmd_sema);
+        if (UsbInterruptTransfer(ds34pad[pad].outEndp, x360_led, 3, usb_cmd_cb, (void *)pad) == USB_RC_OK)
+            TransferWait(ds34pad[pad].cmd_sema);
+    } else
+#endif
+    {
+        LEDRumble(led, 0, 0, pad);
+    }
 
     ds34pad[pad].status |= DS34USB_STATE_RUNNING;
 
@@ -279,6 +361,34 @@ static void readReport(u8 *data, int pad_idx)
         translate_pad_guitar(report, &pad->ds2, pad->type == GUITAR_GH);
         padMacroPerform(&pad->ds2, report->PSButton);
     }
+#ifdef X360
+    if (pad->type == X360_XINPUT_USB) {
+        struct x360report *report = (struct x360report *)data;
+
+        if (report->Type != 0x00 || report->Length != 0x14)
+            return;
+
+        translate_pad_x360(report, &pad->ds2);
+        padMacroPerform(&pad->ds2, report->Guide);
+
+        // Guide + Back toggles analog mode (like PS + Select on the DS3)
+        if (report->Guide) {
+            if (report->Back && (pad->btn_delay == MAX_DELAY)) {
+                if (pad->analog_btn < 2) // unlocked mode
+                    pad->analog_btn = !pad->analog_btn;
+
+                pad->btn_delay = 1;
+            } else if (pad->btn_delay < MAX_DELAY) {
+                pad->btn_delay++;
+            }
+        } else if (pad->btn_delay > 0) {
+            pad->btn_delay--;
+        }
+
+        return;
+    }
+#endif
+
     if (data[0]) {
 
         if (pad->type == DS3) {
@@ -409,6 +519,17 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
         ret = UsbInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
     }
+#ifdef X360
+    else if (ds34pad[pad].type == X360_XINPUT_USB) {
+        usb_buf[0] = 0x00;
+        usb_buf[1] = 0x08; // rumble packet length
+        usb_buf[2] = 0x00;
+        usb_buf[3] = lrum;       // large motor
+        usb_buf[4] = rrum * 255; // small motor (on/off on the PS2)
+
+        ret = UsbInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 8, usb_cmd_cb, (void *)pad);
+    }
+#endif
 
     ds34pad[pad].oldled[0] = led[0];
     ds34pad[pad].oldled[1] = led[1];
@@ -449,6 +570,71 @@ void ds34usb_set_rumble(u8 lrum, u8 rrum, int port)
     SignalSema(ds34pad[port].sema);
 }
 
+#ifdef X360
+// No SignalSema here: reading never waits for these transfers, so the pad semaphore must not be touched.
+static void x360_data_cb(int resultCode, int bytes, void *arg)
+{
+    int pad = (int)arg;
+
+    if (resultCode == USB_RC_OK) {
+        x360_seq[pad]++; // odd: being written
+        mips_memcpy(x360_latest[pad], x360_buf[pad], 20);
+        x360_seq[pad]++; // even: consistent
+
+        // keep listening: queue the next read right away instead of waiting for the next pad poll
+        if (ds34pad[pad].interruptEndp >= 0 && UsbInterruptTransfer(ds34pad[pad].interruptEndp, x360_buf[pad], 32, x360_data_cb, arg) == USB_RC_OK)
+            return;
+    }
+
+    // on an error the read is restarted by the next pad poll (this also avoids spinning on a dead endpoint)
+    x360_pending[pad] = 0;
+}
+
+static void x360_out_cb(int resultCode, int bytes, void *arg)
+{
+    int pad = (int)arg;
+
+    x360_out_pending[pad] = 0;
+}
+
+// Send the wanted rumble state if it differs from the last one that was sent (never blocks).
+static void x360_update_rumble(int pad)
+{
+    u8 l = ds34pad[pad].lrum;       // large motor
+    u8 r = ds34pad[pad].rrum * 255; // small motor (on/off on the PS2)
+
+    if (x360_out_pending[pad]) {
+        // a lost completion must not block rumble forever (this also guarantees that "stop" is eventually sent)
+        if (++x360_out_age[pad] < 120)
+            return;
+
+        x360_out_pending[pad] = 0;
+    }
+
+    if (l == x360_sent_l[pad] && r == x360_sent_r[pad])
+        return;
+
+    x360_out_buf[pad][0] = 0x00;
+    x360_out_buf[pad][1] = 0x08; // rumble packet length
+    x360_out_buf[pad][2] = 0x00;
+    x360_out_buf[pad][3] = l;
+    x360_out_buf[pad][4] = r;
+    x360_out_buf[pad][5] = 0x00;
+    x360_out_buf[pad][6] = 0x00;
+    x360_out_buf[pad][7] = 0x00;
+
+    x360_out_pending[pad] = 1;
+    x360_out_age[pad] = 0;
+
+    if (UsbInterruptTransfer(ds34pad[pad].outEndp, x360_out_buf[pad], 8, x360_out_cb, (void *)pad) == USB_RC_OK) {
+        x360_sent_l[pad] = l;
+        x360_sent_r[pad] = r;
+    } else {
+        x360_out_pending[pad] = 0; // try again on the next poll
+    }
+}
+#endif
+
 int ds34usb_get_data(u8 *dst, int size, int port)
 {
     int ret = 0;
@@ -457,16 +643,51 @@ int ds34usb_get_data(u8 *dst, int size, int port)
 
     PollSema(ds34pad[port].sema);
 
-    ret = UsbInterruptTransfer(ds34pad[port].interruptEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
+#ifdef X360
+    if (ds34pad[port].type == X360_XINPUT_USB) {
+        if (!x360_pending[port]) {
+            x360_pending[port] = 1;
+            if (UsbInterruptTransfer(ds34pad[port].interruptEndp, x360_buf[port], 32, x360_data_cb, (void *)port) != USB_RC_OK)
+                x360_pending[port] = 0;
+        }
 
-    if (ret == USB_RC_OK) {
-        TransferWait(ds34pad[port].sema);
-        if (!usb_resulCode)
-            readReport(usb_buf, port);
+        // never wait here: take the latest stored report (a few tries in case the callback is writing it)
+        {
+            u8 report[20];
+            unsigned int seq1, seq2;
+            int tries;
 
-        usb_resulCode = 1;
-    } else {
-        DPRINTF("DS34USB: ds34usb_get_data usb transfer error %d\n", ret);
+            for (tries = 0; tries < 4; tries++) {
+                seq1 = x360_seq[port];
+                mips_memcpy(report, x360_latest[port], 20);
+                seq2 = x360_seq[port];
+
+                if (seq1 == seq2 && !(seq1 & 1)) {
+                    if (seq1 != x360_seen[port]) {
+                        x360_seen[port] = seq1;
+                        readReport(report, port);
+                    }
+                    break;
+                }
+            }
+        }
+
+        x360_update_rumble(port);
+        ds34pad[port].update_rum = 0;
+    } else
+#endif
+    {
+        ret = UsbInterruptTransfer(ds34pad[port].interruptEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
+
+        if (ret == USB_RC_OK) {
+            TransferWait(ds34pad[port].sema);
+            if (!usb_resulCode)
+                readReport(usb_buf, port);
+
+            usb_resulCode = 1;
+        } else {
+            DPRINTF("DS34USB: ds34usb_get_data usb transfer error %d\n", ret);
+        }
     }
 
     mips_memcpy(dst, ds34pad[port].data, size);
@@ -547,6 +768,7 @@ int ds34usb_init(u8 pads, u8 options)
         ds34pad[pad].cmd_sema = -1;
         ds34pad[pad].controlEndp = -1;
         ds34pad[pad].interruptEndp = -1;
+        ds34pad[pad].outEndp = -1;
         ds34pad[pad].enabled = (pads >> pad) & 1;
         ds34pad[pad].type = 0;
 

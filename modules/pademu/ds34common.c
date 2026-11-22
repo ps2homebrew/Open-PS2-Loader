@@ -142,3 +142,34 @@ void translate_pad_ds4(const struct ds4report *in, struct ds2report *out, u8 hav
     out->PressureL2 = in->PressureL2;
     out->PressureR2 = in->PressureR2;
 }
+
+#ifdef X360
+void translate_pad_x360(const struct x360report *in, struct ds2report *out)
+{
+    u8 l2 = in->LeftTrigger > 0x40, r2 = in->RightTrigger > 0x40;
+
+    out->nButtonStateL = ~(in->Back | in->L3 << 1 | in->R3 << 2 | in->Start << 3 | in->Up << 4 | in->Right << 5 | in->Down << 6 | in->Left << 7);
+    out->nButtonStateH = ~(l2 | r2 << 1 | in->LB << 2 | in->RB << 3 | in->Y << 4 | in->B << 5 | in->A << 6 | in->X << 7);
+
+    // signed 16 bit -> 0..255 (PS2 center is 0x80); the Xbox Y axis is up-positive, the PS2 one is up-negative
+    out->LeftStickX = (in->LeftStickX + 32768) >> 8;
+    out->LeftStickY = 255 - ((in->LeftStickY + 32768) >> 8);
+    out->RightStickX = (in->RightStickX + 32768) >> 8;
+    out->RightStickY = 255 - ((in->RightStickY + 32768) >> 8);
+
+    out->PressureRight = in->Right * 255;
+    out->PressureLeft = in->Left * 255;
+    out->PressureUp = in->Up * 255;
+    out->PressureDown = in->Down * 255;
+
+    out->PressureTriangle = in->Y * 255;
+    out->PressureCircle = in->B * 255;
+    out->PressureCross = in->A * 255;
+    out->PressureSquare = in->X * 255;
+
+    out->PressureL1 = in->LB * 255;
+    out->PressureR1 = in->RB * 255;
+    out->PressureL2 = in->LeftTrigger;
+    out->PressureR2 = in->RightTrigger;
+}
+#endif

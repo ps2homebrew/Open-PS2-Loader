@@ -648,6 +648,7 @@ static int guiGamePadEmuUpdater(int modified)
         }
     }
 
+    PadEmuSettings &= ~0xFF; // the mode byte is rebuilt below (0 = USB, 1 = BT, 2 = Xbox 360 XInput USB)
     PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort)) | (PadEmuVib << (16 + PadPort)) | (PadEmuMtap << 24) | ((PadEmuMtapPort - 1) << 25) | (PadEmuWorkaround << 26);
     PadEmuSettings &= (~(PadEmuMode ? 0 : 1) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
 
@@ -746,7 +747,7 @@ static int guiGamePadEmuInfoUpdater(int modified)
 void guiGameShowPadEmuConfig(int forceGlobal)
 {
     const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
-    const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), _l(_STR_DS34BT_MODE), NULL};
+    const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), _l(_STR_DS34BT_MODE), "Xbox 360 XInput USB", NULL};
 
     int PadEmuMtap, PadEmuMtapPort, i;
 

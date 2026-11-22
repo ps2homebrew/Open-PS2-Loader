@@ -228,6 +228,43 @@ enum DS4DpadDirections {
     DS4DpadDirectionReleased,
 };
 
+// Xbox 360 (XInput) wired controller input report, 20 bytes (interface class FF/5D/01)
+struct x360report
+{
+    uint8_t Type;   // 0x00 = input report
+    uint8_t Length; // 0x14
+    union
+    {
+        uint16_t ButtonState;
+        struct
+        {
+            uint16_t Up    : 1;
+            uint16_t Down  : 1;
+            uint16_t Left  : 1;
+            uint16_t Right : 1;
+            uint16_t Start : 1;
+            uint16_t Back  : 1;
+            uint16_t L3    : 1;
+            uint16_t R3    : 1;
+            uint16_t LB    : 1;
+            uint16_t RB    : 1;
+            uint16_t Guide : 1;
+            uint16_t       : 1;
+            uint16_t A     : 1;
+            uint16_t B     : 1;
+            uint16_t X     : 1;
+            uint16_t Y     : 1;
+        };
+    };
+    uint8_t LeftTrigger;  // 0 - 255
+    uint8_t RightTrigger; // 0 - 255
+    int16_t LeftStickX;   // signed 16 bit, 0 is mid
+    int16_t LeftStickY;   // signed 16 bit, up is positive
+    int16_t RightStickX;
+    int16_t RightStickY;
+    uint8_t Reserved[6];
+} __attribute__((packed));
+
 struct ds4report
 {
     uint8_t ReportID;
@@ -307,5 +344,13 @@ void translate_pad_guitar(const struct ds3guitarreport *in, struct ds2report *ou
  * NOTE: if set to 1, ds4report must be large enough for that data to be read!
  */
 void translate_pad_ds4(const struct ds4report *in, struct ds2report *out, uint8_t have_touchpad);
+
+/**
+ * Translate Xbox 360 (XInput) pad data into DS2 pad data.
+ * A/B/X/Y become Cross/Circle/Square/Triangle, LB/RB become L1/R1, Back becomes Select.
+ * @param in X360 report
+ * @param out DS2 report
+ */
+void translate_pad_x360(const struct x360report *in, struct ds2report *out);
 
 #endif

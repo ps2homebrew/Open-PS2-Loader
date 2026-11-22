@@ -5,10 +5,11 @@
 
 #include <ds34common.h>
 
-#define DS3       0
-#define DS4       1
-#define GUITAR_GH 2
-#define GUITAR_RB 3
+#define DS3             0
+#define DS4             1
+#define GUITAR_GH       2
+#define GUITAR_RB       3
+#define X360_XINPUT_USB 4 // Xbox 360 wired protocol (interface class FF/5D/01), e.g. 8BitDo Ultimate 2C dongle
 
 #define MODEL_GUITAR 1
 #define MODEL_PS2    3
@@ -25,7 +26,7 @@ typedef struct _usb_ds34
     int outEndp;
     u8 enabled;
     u8 status;
-    u8 type;      // 0 - ds3, 1 - ds4, 2 - guitar hero guitar, 3 - rock band guitar
+    u8 type;      // 0 - ds3, 1 - ds4, 2 - guitar hero guitar, 3 - rock band guitar, 4 - x360 xinput usb
     u8 oldled[4]; // rgb for ds4 and blink
     u8 lrum;
     u8 rrum;

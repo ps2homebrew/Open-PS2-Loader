@@ -153,7 +153,7 @@ else
 endif
 
 ifeq ($(PADEMU),1)
-  IOP_OBJS += bt_pademu.o usb_pademu.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
+  IOP_OBJS += bt_pademu.o usb_pademu.o x360_pademu.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
   EE_CFLAGS += -DPADEMU
   EE_INCS += -Imodules/ds34bt/ee -Imodules/ds34usb/ee
   PADEMU_FLAGS = PADEMU=1
@@ -331,6 +331,7 @@ clean:	download_lwNBD
 	echo " -pademu"
 	$(MAKE) -C modules/pademu USE_BT=1 clean
 	$(MAKE) -C modules/pademu USE_USB=1 clean
+	$(MAKE) -C modules/pademu USE_X360=1 clean
 	echo "-pc tools"
 	$(MAKE) -C pc clean
 
@@ -538,6 +539,12 @@ modules/pademu/usb_pademu.irx: modules/pademu
 	$(MAKE) -C $< USE_USB=1
 
 $(EE_ASM_DIR)usb_pademu.c: modules/pademu/usb_pademu.irx
+	$(BIN2C) $< $@ $(*F)_irx
+
+modules/pademu/x360_pademu.irx: modules/pademu
+	$(MAKE) -C $< USE_X360=1
+
+$(EE_ASM_DIR)x360_pademu.c: modules/pademu/x360_pademu.irx
 	$(BIN2C) $< $@ $(*F)_irx
 
 $(EE_ASM_DIR)bdm.c: $(PS2SDK)/iop/irx/bdm.irx | $(EE_ASM_DIR)

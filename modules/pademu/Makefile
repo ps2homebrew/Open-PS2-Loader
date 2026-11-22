@@ -7,6 +7,14 @@ IOP_OBJS_DIR = obj.usb/
 IOP_OBJS += ds34usb.o
 endif
 
+# Xbox 360 (XInput) pads: same driver as the USB one plus the XInput code, loaded only when the "Xbox 360 XInput USB" mode is selected
+ifeq ($(USE_X360),1)
+IOP_BIN = x360_pademu.irx
+IOP_CFLAGS += -DUSB -DX360
+IOP_OBJS_DIR = obj.x360/
+IOP_OBJS += ds34usb.o
+endif
+
 ifeq ($(USE_BT),1)
 IOP_BIN = bt_pademu.irx
 IOP_CFLAGS += -DBT

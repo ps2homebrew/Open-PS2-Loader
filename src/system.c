@@ -544,9 +544,13 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
 #ifdef PADEMU
     if (gEnablePadEmu) {
-        if (gPadEmuSettings & 0xFF) {
+        // mode byte: 0 = DS3/DS4 USB, 1 = DS3/DS4 Bluetooth, 2 = Xbox 360 XInput USB
+        if ((gPadEmuSettings & 0xFF) == 1) {
             irxptr_tab[modcount].info = size_bt_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
             irxptr_tab[modcount++].ptr = (void *)&bt_pademu_irx;
+        } else if ((gPadEmuSettings & 0xFF) == 2) {
+            irxptr_tab[modcount].info = size_x360_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
+            irxptr_tab[modcount++].ptr = (void *)&x360_pademu_irx;
         } else {
             irxptr_tab[modcount].info = size_usb_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
             irxptr_tab[modcount++].ptr = (void *)&usb_pademu_irx;

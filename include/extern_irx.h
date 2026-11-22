@@ -137,6 +137,7 @@ IMPORT_BIN2C(usbd_irx);
 IMPORT_BIN2C(usbmass_bd_irx);
 
 IMPORT_BIN2C(usb_pademu_irx);
+IMPORT_BIN2C(x360_pademu_irx);
 
 IMPORT_BIN2C(xhdd_irx);
 

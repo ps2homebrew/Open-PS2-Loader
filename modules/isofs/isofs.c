@@ -505,6 +505,14 @@ ssema:
     return r;
 }
 
+static s64 IsofsLseek64(iop_file_t *f, s64 offset, int whence)
+{
+    if (offset < INT_MIN || offset > INT_MAX)
+        return -EINVAL;
+
+    return IsofsLseek(f, (int)offset, whence);
+}
+
 static int ProbeZISO(int fd)
 {
     struct
@@ -623,7 +631,7 @@ static iop_device_ops_t IsofsDeviceOps = {
     (void *)&IsofsUnsupported,
     &IsofsMount,
     &IsofsUmount,
-    (void *)&IsofsUnsupported,
+    &IsofsLseek64,
     (void *)&IsofsUnsupported,
     (void *)&IsofsUnsupported,
     (void *)&IsofsUnsupported,
